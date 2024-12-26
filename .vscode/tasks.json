@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks":
+	[
+		{
+			"label": "buildServerJs:watch",
+			"type": "shell",
+			"command": "npm run buildServerJs:watch",
+			"group": "build",
+		},
+	],
+}
