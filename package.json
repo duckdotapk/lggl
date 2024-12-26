@@ -1,0 +1,15 @@
+{
+	"dependencies": {
+		"@donutteam/typescript-config": "^2.0.0",
+		"@prisma/client": "^6.1.0",
+		"@types/node": "^22.10.2",
+		"chalk": "^5.4.1",
+		"prisma": "^6.1.0",
+		"typescript": "^5.7.2",
+		"zod": "^3.24.1"
+	},
+	"type": "module",
+	"prisma": {
+		"schema": "prisma"
+	}
+}

@@ -1,0 +1,9 @@
+model Game {
+    id          Int    @id @default(autoincrement())
+    name        String
+    sortingName String
+
+    platform_id Int
+
+    platform Platform @relation(fields: [platform_id], references: [id])
+}

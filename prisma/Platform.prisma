@@ -1,0 +1,6 @@
+model Platform {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    games Game[]
+}
