@@ -4,9 +4,9 @@
 
 import { z } from "zod";
 
-import { prismaClient } from "../instances/prismaClient.js";
+import { prismaClient } from "../_shared/instances/prismaClient.js";
 
-import * as CliLib from "../libs/Cli.js";
+import * as CliLib from "../_shared/libs/Cli.js";
 
 //
 // Functions
