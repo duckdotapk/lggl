@@ -1,4 +1,5 @@
 build/*
 node_modules/*
+static/data/*
 
 database.db
