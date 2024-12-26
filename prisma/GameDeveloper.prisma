@@ -1,0 +1,9 @@
+model GameDeveloper {
+    id Int @id @default(autoincrement())
+
+    company_id Int
+    game_id    Int
+
+    company Company @relation(fields: [company_id], references: [id])
+    game    Game    @relation(fields: [game_id], references: [id])
+}

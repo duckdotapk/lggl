@@ -1,0 +1,9 @@
+model GameInstallation {
+    id       Int    @id @default(autoincrement())
+    fileSize Int
+    path     String
+
+    game_id Int
+
+    game Game @relation(fields: [game_id], references: [id])
+}

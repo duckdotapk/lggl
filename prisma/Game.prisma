@@ -1,9 +1,36 @@
 model Game {
-    id          Int    @id @default(autoincrement())
-    name        String
-    sortingName String
+    id                 Int       @id @default(autoincrement())
+    achievementSupport Int
+    completionStatus   Int
+    controllerSupport  Int
+    esrbRating         Int
+    firstPlayedDate    DateTime?
+    isEarlyAccess      Boolean
+    isFavorite         Boolean
+    isHidden           Boolean
+    isInstalled        Boolean
+    isShelved          Boolean
+    lastPlayedDate     DateTime?
+    modSupport         Int
+    name               String
+    playCount          Int
+    playTime           Int
+    progressionType    Int
+    sortingName        String
+    steamApp           Int?
+    vrSupport          Int
+    yearFirstCompleted Int?
+    yearFirstPlayed    Int?
 
-    platform_id Int
-
-    platform Platform @relation(fields: [platform_id], references: [id])
+    gameAntiCheats    GameAntiCheat[]
+    gameDevelopers    GameDeveloper[]
+    gameDrms          GameDrm[]
+    gameEngines       GameEngine[]
+    gameGenres        GameGenre[]
+    gameInstallations GameInstallation[]
+    gameModes         GameMode[]
+    gamePlatforms     GamePlatform[]
+    gamePublishers    GamePublisher[]
+    gameSources       GameSource[]
+    seriesGames       SeriesGame[]
 }

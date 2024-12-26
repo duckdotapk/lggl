@@ -1,0 +1,9 @@
+model EngineCompany {
+    id Int @id @default(autoincrement())
+
+    company_id Int
+    engine_id  Int
+
+    company Company @relation(fields: [company_id], references: [id])
+    engine  Engine  @relation(fields: [engine_id], references: [id])
+}

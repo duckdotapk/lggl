@@ -1,0 +1,9 @@
+model GameEngine {
+    id Int @id @default(autoincrement())
+
+    engine_id Int
+    game_id   Int
+
+    engine Engine @relation(fields: [engine_id], references: [id])
+    game   Game   @relation(fields: [game_id], references: [id])
+}

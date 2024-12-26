@@ -1,0 +1,7 @@
+model Engine {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    engineCompanies EngineCompany[]
+    gameEngines     GameEngine[]
+}

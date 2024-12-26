@@ -1,6 +1,6 @@
-model Platform {
+model AntiCheat {
     id   Int    @id @default(autoincrement())
     name String
 
-    gamePlatforms GamePlatform[]
+    gameAntiCheats GameAntiCheat[]
 }
