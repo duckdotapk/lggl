@@ -1,7 +1,8 @@
 model GameInstallation {
-    id       Int    @id @default(autoincrement())
-    fileSize Int
-    path     String
+    id                Int    @id @default(autoincrement())
+    fileSizeBytes     Int
+    fileSizeGibiBytes Int
+    path              String
 
     game_id Int
 

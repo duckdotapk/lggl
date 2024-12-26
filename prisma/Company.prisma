@@ -1,6 +1,7 @@
 model Company {
-    id   Int    @id @default(autoincrement())
-    name String
+    id    Int     @id @default(autoincrement())
+    name  String
+    notes String?
 
     engineCompanies EngineCompany[]
     gameDevelopers  GameDeveloper[]

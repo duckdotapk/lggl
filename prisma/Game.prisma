@@ -1,9 +1,9 @@
 model Game {
     id                 Int       @id @default(autoincrement())
     achievementSupport Int
-    completionStatus   Int
-    controllerSupport  Int
-    esrbRating         Int
+    completionStatus   Int       @default(0)
+    controllerSupport  Int?
+    esrbRating         Int?
     firstPlayedDate    DateTime?
     isEarlyAccess      Boolean
     isFavorite         Boolean
@@ -11,16 +11,14 @@ model Game {
     isInstalled        Boolean
     isShelved          Boolean
     lastPlayedDate     DateTime?
-    modSupport         Int
+    modSupport         Int?
     name               String
-    playCount          Int
-    playTime           Int
+    playCount          Int       @default(0)
+    playTime           Int       @default(0)
     progressionType    Int
     sortingName        String
     steamApp           Int?
-    vrSupport          Int
-    yearFirstCompleted Int?
-    yearFirstPlayed    Int?
+    vrSupport          Int?
 
     gameAntiCheats    GameAntiCheat[]
     gameDevelopers    GameDeveloper[]
