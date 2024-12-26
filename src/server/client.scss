@@ -1,0 +1,34 @@
+//
+// Imports
+//
+
+@use "../../node_modules/normalize.css/normalize.css";
+
+@use "components/_Global.scss";
+
+@use "components/Button.scss";
+@use "components/Library.scss";
+@use "components/LibraryGameDetails.scss";
+@use "components/LibrarySidebar.scss";
+@use "components/LibrarySidebarItem.scss";
+
+//
+// Client
+//
+
+@include Global.FontFaces();
+
+body
+{
+	background-color: #0d1125;
+	
+	color: #d7e5e5;
+
+	font-family: "Roboto", Arial, Helvetica, "sans-serif";
+}
+
+@include Button.Button();
+@include Library.Library();
+@include LibraryGameDetails.LibraryGameDetails();
+@include LibrarySidebar.LibrarySidebar();
+@include LibrarySidebarItem.LibrarySidebarItem();

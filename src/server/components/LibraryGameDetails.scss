@@ -1,0 +1,24 @@
+//
+// Component
+//
+
+@mixin LibraryGameDetails()
+{
+	.component-library-game-details-header
+	{
+		font-size: 2rem;
+		font-weight: bold;
+
+		margin-bottom: 0.25rem;
+	}
+
+	.component-library-game-details
+	{
+		height: 100%;
+		
+		background-color: #0d1125;
+
+		padding-top: 25rem;
+		padding-left: 10rem;
+	}
+}

@@ -1,10 +1,12 @@
 model Game {
     id                 Int       @id @default(autoincrement())
     achievementSupport Int
+    backgroundPath     String?
     completionStatus   Int       @default(0)
     controllerSupport  Int?
     esrbRating         Int?
     firstPlayedDate    DateTime?
+    iconPath           String?
     isEarlyAccess      Boolean
     isFavorite         Boolean
     isHidden           Boolean

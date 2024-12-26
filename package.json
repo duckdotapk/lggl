@@ -1,19 +1,30 @@
 {
 	"scripts": {
 		"build": "npm run buildServerJs",
+		"buildClientCss": "npx sass ./src/server/client.scss:./static/data/client.css",
+		"buildClientCss:watch": "npx sass ./src/server/client.scss:./static/data/client.css --watch",
+		"buildClientJs": "node ./buildClientJs.js",
+		"buildClientJs:watch": "node ./buildClientJs.js --watch",
 		"buildServerJs": "npx rimraf ./build && npx tsc",
 		"buildServerJs:watch": "npx rimraf ./build && npx tsc --watch"
 	},
 	"dependencies": {
+		"@donutteam/browser-utilities": "^1.1.0",
+		"@donutteam/document-builder": "^8.0.3",
 		"@donutteam/fritter": "^4.2.2",
 		"@donutteam/fritter-api-utilities": "^3.0.0",
 		"@donutteam/typescript-config": "^2.0.0",
 		"@prisma/client": "^6.1.0",
+		"@types/luxon": "^3.4.2",
 		"@types/node": "^22.10.2",
 		"@types/source-map-support": "^0.5.10",
 		"chalk": "^5.4.1",
+		"esbuild": "^0.24.2",
+		"luxon": "^3.5.0",
+		"normalize.css": "^8.0.1",
 		"prisma": "^6.1.0",
 		"rimraf": "^6.0.1",
+		"sass": "^1.83.0",
 		"source-map-support": "^0.5.21",
 		"typescript": "^5.7.2",
 		"zod": "^3.24.1"

@@ -1,0 +1,25 @@
+//
+// Component
+//
+
+@mixin Library
+{
+	.component-library
+	{
+
+		width: 100dvw;
+		height: 100dvh;
+
+		display: grid;
+		grid-template-columns: 350px 1fr;
+
+		> .game-details-container
+		{
+			> iframe
+			{
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+}

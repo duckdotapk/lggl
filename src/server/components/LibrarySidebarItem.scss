@@ -1,0 +1,30 @@
+//
+// Component
+//
+
+@mixin LibrarySidebarItem()
+{
+	.component-library-sidebar-item
+	{
+		border-left: 5px solid transparent;
+
+		padding: 0.25rem;
+
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.25rem;
+		align-items: center;
+
+		&:hover
+		{
+			border-left-color: #ffffff;
+			cursor: pointer;
+		}
+
+		> .icon
+		{
+			width: 32px;
+			height: 32px;
+		}
+	}
+}
