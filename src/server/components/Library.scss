@@ -13,13 +13,11 @@
 		display: grid;
 		grid-template-columns: 350px 1fr;
 
-		> .game-details-container
+		> .game-details-wrapper
 		{
-			> iframe
-			{
-				width: 100%;
-				height: 100%;
-			}
+			height: 100%;
+
+			overflow-y: scroll;
 		}
 	}
 }

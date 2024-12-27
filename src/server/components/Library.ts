@@ -46,9 +46,12 @@ export function Library(sidebarGames: LibrarySidebarGame[], selectedGame: Librar
 						[
 							LibrarySidebar(sidebarGames),
 
-							selectedGame != null
-								? LibraryGameDetails(selectedGame)
-								: null,
+							new DE("div", "game-details-wrapper",
+								[
+									selectedGame != null
+										? LibraryGameDetails(selectedGame)
+										: null,
+								]),
 						]),
 				]),
 		]);
