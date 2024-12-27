@@ -3,6 +3,7 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 //
@@ -18,8 +19,95 @@ export const ResponseBodySchema = z.union(
 	[
 		FritterApiUtilities.SuccessResponseBodySchema.extend(
 			{
-				// TODO: actual schema here
-				game: z.any(),
+				game: z.custom<Prisma.GameGetPayload<
+					{
+						include:
+						{
+							gameAntiCheats:
+							{
+								include:
+								{
+									antiCheat: true;
+								};
+							};
+							gameDevelopers:
+							{
+								include:
+								{
+									company: true;
+								};
+							};
+							gameDrms:
+							{
+								include:
+								{
+									drm: true;
+								};
+							};
+							gameEngines:
+							{
+								include:
+								{
+									engine:
+									{
+										include:
+										{
+											engineCompanies:
+											{
+												include:
+												{
+													company: true;
+												};
+											};
+										};
+									};
+								};
+							};
+							gameGenres:
+							{
+								include:
+								{
+									genre: true;
+								};
+							};
+							gameInstallations: true;
+							gameModes:
+							{
+								include:
+								{
+									mode: true;
+								};
+							};
+							gamePlatforms:
+							{
+								include:
+								{
+									platform: true;
+								};
+							};
+							gamePublishers:
+							{
+								include:
+								{
+									company: true;
+								};
+							};
+							gameSources:
+							{
+								include:
+								{
+									source: true;
+								};
+							};
+							seriesGames:
+							{
+								include:
+								{
+									series: true;
+								};
+							};
+						};
+					}>>(),
 			}),
 
 		FritterApiUtilities.ErrorResponseBodySchema,
@@ -40,3 +128,20 @@ export type ResponseBody = z.infer<typeof ResponseBodySchema>;
 export const method = "GET";
 
 export const path = "/api/games/findOne";
+
+//
+// Utility Functions
+//
+
+export function findGame(gameId: number)
+{
+	return FritterApiUtilities.request(method, path,
+		{
+			requestBodySchema: RequestBodySchema,
+			responseBodySchema: ResponseBodySchema,
+			requestBody:
+			{
+				gameId,
+			},
+		});
+}
