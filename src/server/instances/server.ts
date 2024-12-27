@@ -20,8 +20,6 @@ export const staticMiddleware = Fritter.StaticMiddleware.create(
 		enableGzip: true,
 	});
 
-console.log(staticMiddleware.directories);
-
 const bodyParserMiddleware = Fritter.BodyParserMiddleware.create();
 
 export const routerMiddleware = Fritter.RouterMiddleware.create();
