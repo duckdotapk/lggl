@@ -20,6 +20,8 @@ export const staticMiddleware = Fritter.StaticMiddleware.create(
 		enableGzip: true,
 	});
 
+const logRequestMiddleware = Fritter.LogRequestMiddleware.create();
+
 const bodyParserMiddleware = Fritter.BodyParserMiddleware.create();
 
 export const routerMiddleware = Fritter.RouterMiddleware.create();
@@ -32,6 +34,8 @@ export const server = new Fritter.Fritter();
 
 server.use(staticMiddleware.execute);
 
+server.use(logRequestMiddleware.execute);
+
 server.use(bodyParserMiddleware.execute);
 
 server.use(routerMiddleware.execute);
@@ -39,5 +43,6 @@ server.use(routerMiddleware.execute);
 export type ServerFritterContext =
 	Fritter.FritterContext &
 	Fritter.StaticMiddleware.MiddlewareFritterContext &
+	Fritter.LogRequestMiddleware.MiddlewareFritterContext &
 	Fritter.BodyParserMiddleware.MiddlewareFritterContext &
 	Fritter.RouterMiddleware.MiddlewareFritterContext;
