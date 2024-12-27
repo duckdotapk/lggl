@@ -20,6 +20,7 @@ model Game {
     progressionType    Int
     sortingName        String
     steamApp           Int?
+    trackingPath       String
     vrSupport          Int?
 
     gameAntiCheats    GameAntiCheat[]
