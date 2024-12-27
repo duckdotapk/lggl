@@ -8,7 +8,7 @@ import { prismaClient } from "../../../../_shared/instances/prismaClient.js";
 
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./findOne.schemas.js";
+import * as Schemas from "./find-one.schemas.js";
 
 //
 // Route

@@ -1,12 +1,12 @@
 {
 	"scripts": {
-		"build": "npm run buildServerJs",
-		"buildClientCss": "npx sass ./src/server/client.scss:./static/data/client.css",
-		"buildClientCss:watch": "npx sass ./src/server/client.scss:./static/data/client.css --watch",
-		"buildClientJs": "node ./buildClientJs.js",
-		"buildClientJs:watch": "node ./buildClientJs.js --watch",
-		"buildServerJs": "npx rimraf ./build && npx tsc",
-		"buildServerJs:watch": "npx rimraf ./build && npx tsc --watch"
+		"build": "npm run build-client-css && npm run build-client-js && npm run build-server-js",
+		"build-client-css": "npx sass ./src/server/client.scss:./static/data/client.css",
+		"build-client-css:watch": "npx sass ./src/server/client.scss:./static/data/client.css --watch",
+		"build-client-js": "node ./build-client-js.js",
+		"build-client-js:watch": "node ./build-client-js.js --watch",
+		"build-server-js": "npx rimraf ./build && npx tsc",
+		"build-server-js:watch": "npx rimraf ./build && npx tsc --watch"
 	},
 	"dependencies": {
 		"@donutteam/browser-utilities": "^1.1.0",

@@ -3,21 +3,21 @@
 	"tasks":
 	[
 		{
-			"label": "buildClientCss:watch",
+			"label": "build-client-css:watch",
 			"type": "shell",
-			"command": "npm run buildClientCss:watch",
+			"command": "npm run build-client-css:watch",
 			"group": "build",
 		},
 		{
-			"label": "buildClientJs:watch",
+			"label": "build-client-js:watch",
 			"type": "shell",
-			"command": "npm run buildClientJs:watch",
+			"command": "npm run build-client-js:watch",
 			"group": "build",
 		},
 		{
-			"label": "buildServerJs:watch",
+			"label": "build-server-js:watch",
 			"type": "shell",
-			"command": "npm run buildServerJs:watch",
+			"command": "npm run build-server-js:watch",
 			"group": "build",
 		},
 	],

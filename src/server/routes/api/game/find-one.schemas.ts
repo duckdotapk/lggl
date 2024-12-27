@@ -127,7 +127,7 @@ export type ResponseBody = z.infer<typeof ResponseBodySchema>;
 
 export const method = "GET";
 
-export const path = "/api/games/findOne";
+export const path = "/api/games/find-one";
 
 //
 // Utility Functions
