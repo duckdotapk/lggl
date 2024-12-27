@@ -2,13 +2,19 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { ButtonElementAttributes, DE } from "@donutteam/document-builder";
 
 //
 // Component
 //
 
-export function Button(text: string)
+export function Button(text: string, extraAttributes?: ButtonElementAttributes)
 {
-	return new DE("button", "component-button", text);
+	return new DE("button",
+		{
+			class: "component-button",
+
+			...extraAttributes,
+		},
+		text);
 }
