@@ -1,0 +1,12 @@
+model PlaySession {
+    id             Int     @id @default(autoincrement())
+    endTimestamp   Int
+    notes          String?
+    playTime       Int
+    platform       String
+    startTimestamp Int
+
+    game_id Int
+
+    game Game @relation(fields: [game_id], references: [id])
+}

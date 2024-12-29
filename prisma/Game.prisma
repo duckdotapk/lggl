@@ -1,27 +1,28 @@
 model Game {
-    id                 Int       @id @default(autoincrement())
-    achievementSupport Int
-    backgroundPath     String?
-    completionStatus   Int       @default(0)
-    controllerSupport  Int?
-    esrbRating         Int?
-    firstPlayedDate    DateTime?
-    iconPath           String?
-    isEarlyAccess      Boolean
-    isFavorite         Boolean
-    isHidden           Boolean
-    isInstalled        Boolean
-    isShelved          Boolean
-    lastPlayedDate     DateTime?
-    modSupport         Int?
-    name               String
-    playCount          Int       @default(0)
-    playTime           Int       @default(0)
-    progressionType    Int
-    sortingName        String
-    steamApp           Int?
-    trackingPath       String
-    vrSupport          Int?
+    id                   Int     @id @default(autoincrement())
+    achievementSupport   Int?
+    backgroundPath       String?
+    completionStatus     Int     @default(0)
+    controllerSupport    Int?
+    esrbRating           Int?
+    firstPlayedTimestamp Int?
+    iconPath             String?
+    isEarlyAccess        Boolean
+    isFavorite           Boolean
+    isHidden             Boolean
+    isInstalled          Boolean
+    isNsfw               Boolean
+    isShelved            Boolean
+    lastPlayedTimestamp  Int?
+    modSupport           Int?
+    name                 String
+    playCount            Int     @default(0)
+    playTime             Int     @default(0)
+    progressionType      Int
+    sortingName          String
+    steamApp             String?
+    trackingPath         String?
+    vrSupport            Int?
 
     gameAntiCheats    GameAntiCheat[]
     gameDevelopers    GameDeveloper[]
@@ -33,5 +34,6 @@ model Game {
     gamePlatforms     GamePlatform[]
     gamePublishers    GamePublisher[]
     gameSources       GameSource[]
+    playSessions      PlaySession[]
     seriesGames       SeriesGame[]
 }
