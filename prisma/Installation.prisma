@@ -1,4 +1,4 @@
-model GameInstallation {
+model Installation {
     id                Int    @id @default(autoincrement())
     fileSizeBytes     Int
     fileSizeGibiBytes Int

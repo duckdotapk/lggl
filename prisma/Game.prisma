@@ -2,7 +2,7 @@ model Game {
     id                   Int     @id @default(autoincrement())
     achievementSupport   Int?
     backgroundPath       String?
-    completionStatus     Int     @default(0)
+    completionStatus     Int?
     controllerSupport    Int?
     esrbRating           Int?
     firstPlayedTimestamp Int?
@@ -17,23 +17,24 @@ model Game {
     modSupport           Int?
     name                 String
     playCount            Int     @default(0)
+    playniteId           String?
     playTime             Int     @default(0)
     progressionType      Int
     sortingName          String
-    steamApp             String?
+    steamAppId           String?
     trackingPath         String?
     vrSupport            Int?
 
-    gameAntiCheats    GameAntiCheat[]
-    gameDevelopers    GameDeveloper[]
-    gameDrms          GameDrm[]
-    gameEngines       GameEngine[]
-    gameGenres        GameGenre[]
-    gameInstallations GameInstallation[]
-    gameModes         GameMode[]
-    gamePlatforms     GamePlatform[]
-    gamePublishers    GamePublisher[]
-    gameSources       GameSource[]
-    playSessions      PlaySession[]
-    seriesGames       SeriesGame[]
+    gameAntiCheats GameAntiCheat[]
+    gameDevelopers GameDeveloper[]
+    gameDrms       GameDrm[]
+    gameEngines    GameEngine[]
+    gameGenres     GameGenre[]
+    gameModes      GameMode[]
+    gamePlatforms  GamePlatform[]
+    gamePublishers GamePublisher[]
+    gameSources    GameSource[]
+    installations  Installation[]
+    playSessions   PlaySession[]
+    seriesGames    SeriesGame[]
 }
