@@ -20,15 +20,14 @@ export const COMPLETION_STATUS =
 export const CONTROLLER_SUPPORT =
 {
 	NONE: 0,
-	PARTIAL: 1,
-	FULL: 2,
-	REQUIRED: 3,
+	SUPPORTED: 1,
+	REQUIRED: 2,
 };
 
 export const ESRB_RATING =
 {
 	E: 0,
-	E10: 1,
+	E_10: 1,
 	T: 2,
 	M: 3,
 	AO: 4,
