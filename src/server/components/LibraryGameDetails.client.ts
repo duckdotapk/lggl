@@ -21,10 +21,14 @@ async function initialise(element: HTMLElement)
 		launchButton.addEventListener("click",
 			async () =>
 			{
+				launchButton.disabled = true;
+
 				const response = await launchGame(gameId);
 
-				// TODO: show feedback of some kind
+				// TODO: show errors somehow
 				console.log(response);
+
+				launchButton.disabled = false;
 			});
 	}
 }

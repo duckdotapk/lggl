@@ -2,9 +2,9 @@
 // Component
 //
 
-@mixin LibrarySidebarItem()
+@mixin LibrarySidebarGroupItem()
 {
-	.component-library-sidebar-item
+	.component-library-sidebar-group-item
 	{
 		color: inherit;
 		text-decoration: none;
@@ -30,12 +30,22 @@
 			height: 32px;
 		}
 
-		> .name
+		> .text
 		{
+			> .name
+			{
+	
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
 
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+			> .last-played
+			{
+				font-size: 0.75em;
+
+				opacity: 0.5;
+			}
 		}
 	}
 }

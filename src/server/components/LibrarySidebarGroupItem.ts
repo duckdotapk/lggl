@@ -6,18 +6,19 @@ import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 
 import { staticMiddleware } from "../instances/server.js";
+import { DateTime } from "luxon";
 
 //
 // Locals
 //
 
-export type LibrarySidebarItemGame = Prisma.GameGetPayload<null>;
+export type LibrarySidebarGroupItemGame = Prisma.GameGetPayload<null>;
 
-export type LibrarySidebarItemSelectedGame = Prisma.GameGetPayload<null> | null;
+export type LibrarySidebarGroupItemSelectedGame = Prisma.GameGetPayload<null> | null;
 
-export function LibrarySidebarItem(game: LibrarySidebarItemGame, selectedGame: LibrarySidebarItemSelectedGame, searchParameters: URLSearchParams)
+export function LibrarySidebarGroupItem(game: LibrarySidebarGroupItemGame, selectedGame: LibrarySidebarGroupItemSelectedGame, searchParameters: URLSearchParams)
 {
-	let className = "component-library-sidebar-item";
+	let className = "component-library-sidebar-group-item";
 
 	if (selectedGame != null && selectedGame.id == game.id)
 	{
@@ -30,7 +31,7 @@ export function LibrarySidebarItem(game: LibrarySidebarItemGame, selectedGame: L
 
 	return new DE("a",
 		{
-			class:className,
+			class: className,
 
 			href: "/?" + itemSearchParameters.toString(),
 		},
@@ -44,6 +45,17 @@ export function LibrarySidebarItem(game: LibrarySidebarItemGame, selectedGame: L
 					})
 				: new DE("span", "icon fa-solid fa-gamepad-modern"),
 
-			new DE("span", "name", game.name),
+			new DE("div", "text",
+				[
+					new DE("div", "name", game.name),
+
+					new DE("div", "last-played",
+						[
+							"Last played ",
+							game.lastPlayedDate != null
+								? DateTime.fromJSDate(game.lastPlayedDate).toRelative()
+								: "never",
+						]),
+				]),
 		]);
 }

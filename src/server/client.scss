@@ -10,7 +10,8 @@
 @use "components/Library.scss";
 @use "components/LibraryGameDetails.scss";
 @use "components/LibrarySidebar.scss";
-@use "components/LibrarySidebarItem.scss";
+@use "components/LibrarySidebarGroup.scss";
+@use "components/LibrarySidebarGroupItem.scss";
 
 //
 // Client
@@ -22,4 +23,5 @@
 @include Library.Library();
 @include LibraryGameDetails.LibraryGameDetails();
 @include LibrarySidebar.LibrarySidebar();
-@include LibrarySidebarItem.LibrarySidebarItem();
+@include LibrarySidebarGroup.LibrarySidebarGroup();
+@include LibrarySidebarGroupItem.LibrarySidebarGroupItem();

@@ -18,7 +18,7 @@ export type LibraryGames = Prisma.GameGetPayload<null>[];
 
 export type LibrarySelectedGame = Prisma.GameGetPayload<null> | null;
 
-export function Library(games: LibraryGames, selectedGame: LibrarySelectedGame, searchParameters: URLSearchParams)
+export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: LibrarySelectedGame, searchParameters: URLSearchParams)
 {
 	return new DE("html",
 		{
@@ -46,7 +46,7 @@ export function Library(games: LibraryGames, selectedGame: LibrarySelectedGame, 
 				[
 					new DE("div", "component-library",
 						[
-							LibrarySidebar(games, selectedGame, searchParameters),
+							LibrarySidebar(gameGroups, selectedGame, searchParameters),
 
 							new DE("div", "game-details-wrapper",
 								[
