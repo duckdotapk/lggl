@@ -6,12 +6,15 @@
 {
 	.component-library
 	{
-
 		width: 100dvw;
 		height: 100dvh;
 
 		display: grid;
 		grid-template-columns: 350px 1fr;
+		
+		background-color: #0d1125;
+		color: #d7e5e5;
+		font-family: "Roboto", Arial, Helvetica, "sans-serif";
 
 		> .game-details-wrapper
 		{

@@ -18,15 +18,6 @@
 
 @include Global.FontFaces();
 
-body
-{
-	background-color: #0d1125;
-	
-	color: #d7e5e5;
-
-	font-family: "Roboto", Arial, Helvetica, "sans-serif";
-}
-
 @include Button.Button();
 @include Library.Library();
 @include LibraryGameDetails.LibraryGameDetails();
