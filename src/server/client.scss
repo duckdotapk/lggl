@@ -8,8 +8,8 @@
 
 @use "components/Button.scss";
 @use "components/GameHeader.scss";
+@use "components/GamePlayActionButtonGroup.scss";
 @use "components/Library.scss";
-@use "components/LibraryGameDetails.scss";
 @use "components/LibrarySidebar.scss";
 @use "components/LibrarySidebarGroup.scss";
 @use "components/LibrarySidebarGroupItem.scss";
@@ -22,8 +22,8 @@
 
 @include Button.Button();
 @include GameHeader.GameHeader();
+@include GamePlayActionButtonGroup.GamePlayActionButtonGroup();
 @include Library.Library();
-@include LibraryGameDetails.LibraryGameDetails();
 @include LibrarySidebar.LibrarySidebar();
 @include LibrarySidebarGroup.LibrarySidebarGroup();
 @include LibrarySidebarGroupItem.LibrarySidebarGroupItem();

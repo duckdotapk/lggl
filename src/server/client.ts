@@ -2,10 +2,10 @@
 // Imports
 //
 
-import { initialiseLibraryGameDetails } from "./components/LibraryGameDetails.client.js";
+import { initialiseGamePlayActionButtonGroups } from "./components/GamePlayActionButtonGroup.client.js";
 
 //
 // Client
 //
 
-initialiseLibraryGameDetails();
+initialiseGamePlayActionButtonGroups();

@@ -9,6 +9,7 @@ import { GameHeader } from "./GameHeader.js";
 import { LibrarySidebar } from "./LibrarySidebar.js";
 
 import { staticMiddleware } from "../instances/server.js";
+import { GamePlayActionButtonGroup } from "./GamePlayActionButtonGroup.js";
 
 //
 // Component
@@ -16,7 +17,13 @@ import { staticMiddleware } from "../instances/server.js";
 
 export type LibraryGames = Prisma.GameGetPayload<null>[];
 
-export type LibrarySelectedGame = Prisma.GameGetPayload<null> | null;
+export type LibrarySelectedGame = Prisma.GameGetPayload<
+	{
+		include:
+		{
+			gamePlayActions: true;
+		};
+	}> | null;
 
 export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: LibrarySelectedGame, searchParameters: URLSearchParams)
 {
@@ -52,6 +59,8 @@ export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: Lib
 								? new DE("div", "game-details-wrapper",
 									[
 										GameHeader(selectedGame),
+
+										GamePlayActionButtonGroup(selectedGame),
 									])
 								: null,
 						]),
