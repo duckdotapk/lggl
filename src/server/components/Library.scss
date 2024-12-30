@@ -10,7 +10,7 @@
 		height: 100dvh;
 
 		display: grid;
-		grid-template-columns: 350px 1fr;
+		grid-template-columns: auto 1fr;
 		
 		background-color: #1f2937; // Tailwind Gray 800
 		color: #f3f4f6; // Tailwind Gray 100

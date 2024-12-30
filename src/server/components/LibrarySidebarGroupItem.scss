@@ -32,15 +32,16 @@
 
 		> .text
 		{
+			overflow: hidden;
+
 			> .name
 			{
-	
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
 
-			> .last-played
+			> .details
 			{
 				font-size: 0.75em;
 

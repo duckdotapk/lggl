@@ -47,7 +47,7 @@ export function LibrarySidebarGroupItem(game: LibrarySidebarGroupItemGame, selec
 				[
 					new DE("div", "name", game.name),
 
-					new DE("div", "last-played",
+					new DE("div", "details",
 						[
 							"Last played ",
 							game.lastPlayedDate != null
