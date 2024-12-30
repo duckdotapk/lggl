@@ -118,50 +118,6 @@ function determinePlatform()
 	}
 }
 
-async function recordPlaySession(gameId: number, startDateTime: DateTime, endDateTime: DateTime)
-{
-	const playTimeSeconds = Math.round(endDateTime.toSeconds() - startDateTime.toSeconds());
-
-	await prismaClient.$transaction(
-		async (transactionClient) =>
-		{
-			const game = await transactionClient.game.findFirstOrThrow(
-				{
-					where:
-					{
-						id: gameId,
-					},
-				});
-	
-			await transactionClient.game.update(
-				{
-					where:
-					{
-						id: game.id,
-					},
-					data:
-					{
-						lastPlayedDate: DateTime.now().toJSDate(),
-						playCount: { increment: 1 },
-						playTimeTotalSeconds: { increment: playTimeSeconds },
-					},
-				});
-
-			await transactionClient.playSession.create(
-				{
-					data:
-					{
-						platform: determinePlatform(),
-						startDate: startDateTime.toJSDate(),
-						endDate: endDateTime.toJSDate(),
-						playTimeSeconds,
-
-						game_id: game.id,
-					},
-				});
-		});
-}
-
 export async function launchGame(game: Prisma.GameGetPayload<{ include: { installations: true } }>)
 {
 	console.log("[GameLauncherLib] Getting tracking path: %s", game.name);
@@ -208,25 +164,86 @@ export async function launchGame(game: Prisma.GameGetPayload<{ include: { instal
 
 	const playSessionStartDateTime = DateTime.now();
 
+	const playSession = await prismaClient.playSession.create(
+		{
+			data:
+			{
+				platform: determinePlatform(),
+				startDate: playSessionStartDateTime.toJSDate(),
+				endDate: playSessionStartDateTime.toJSDate(),
+				playTimeSeconds: 0,
+
+				game_id: game.id,
+			},
+		});
+
 	console.log("[GameLauncherLib] Starting session at: %d", playSessionStartDateTime);
 
 	const interval = setInterval(
 		async () =>
 		{
+			const playSessionEndDateTime =  DateTime.now();
+
+			const playTimeSeconds = Math.round(playSessionEndDateTime.toSeconds() - playSessionStartDateTime.toSeconds());
+
 			const gameProcess = await findGameProcess(trackingPath);
 
 			if (gameProcess != null)
 			{
-				return;
+				console.log("[GameLauncherLib] Updating play session %d with play time: %d", playSession.id, playTimeSeconds);
+
+				await prismaClient.playSession.update(
+					{
+						where:
+						{
+							id: playSession.id,
+						},
+						data:
+						{
+							endDate: DateTime.now().toJSDate(),
+							playTimeSeconds,
+						},
+					});
 			}
+			else
+			{
 
-			clearInterval(interval);
+				console.log("[GameLauncherLib] Ending session at: %d", playSessionEndDateTime);
+				
+				clearInterval(interval);
 
-			const playSessionEndDateTime =  DateTime.now();
+				await prismaClient.$transaction(
+					async (transactionClient) =>
+					{
+						await transactionClient.game.update(
+							{
+								where:
+								{
+									id: game.id,
+								},
+								data:
+								{
+									lastPlayedDate: playSessionEndDateTime.toJSDate(),
+									playCount: { increment: 1 },
+									playTimeTotalSeconds: { increment: playTimeSeconds },
+								}
+							});
 
-			console.log("[GameLauncherLib] Ending session at: %d", playSessionEndDateTime);
-
-			await recordPlaySession(game.id, playSessionStartDateTime, playSessionEndDateTime);
+						await transactionClient.playSession.update(
+							{
+								where:
+								{
+									id: playSession.id,
+								},
+								data:
+								{
+									endDate: playSessionEndDateTime.toJSDate(),
+									playTimeSeconds,
+									addedToTotal: true,
+								},
+							});
+					});
+			}
 		},
 		checkInterval);
 }

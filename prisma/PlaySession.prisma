@@ -16,6 +16,7 @@ model PlaySession {
     startDate       DateTime
     endDate         DateTime
     playTimeSeconds Int                 @map("playTime")
+    addedToTotal    Boolean             @default(false)
     isHistorical    Boolean             @default(false)
     notes           String?
 
