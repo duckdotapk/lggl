@@ -4,9 +4,9 @@ model Installation {
     lastUpdatedDate DateTime @updatedAt
     sortOrder       Int      @default(0)
 
-    fileSizeBytes     Int
-    fileSizeGibiBytes Int
     path              String
+    fileSizeGibiBytes Int
+    fileSizeBytes     Int
 
     game_id Int
 

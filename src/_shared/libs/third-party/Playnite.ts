@@ -49,7 +49,7 @@ export const PlayniteGameSchema = z.object(
 		DeveloperIds: z.array(z.string()),
 		ReleaseDate: z.object(
 			{
-				ReleaseDate: z.string().transform((value) => DateTime.fromFormat(value, "yyyy-M-d").toObject()),
+				ReleaseDate: z.string().transform((value) => DateTime.fromFormat(value, "yyyy-M-d").set({ hour: 12, minute: 0, second: 0, millisecond: 0})),
 			}).nullable(),
 		CategoryIds: z.array(z.string()).nullable(),
 		TagIds: z.array(z.string()),
@@ -70,7 +70,7 @@ export const PlayniteGameSchema = z.object(
 		Added: z.string().transform((value) => DateTime.fromISO(value)),
 		Modified: z.string().transform((value) => DateTime.fromISO(value)),
 		PlayCount: z.number(),
-		InstallSize: z.number().nullable(),
+		InstallSize: z.coerce.bigint().nullable(),
 		LastSizeScanDate: z.string().transform((value) => DateTime.fromISO(value)).nullable(),
 		SeriesIds: z.array(z.string()),
 		Version: z.string().nullable(),

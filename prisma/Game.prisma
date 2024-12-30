@@ -44,6 +44,8 @@ model Game {
     name        String    @unique
     sortName    String
     releaseDate DateTime?
+    description String?
+    notes       String?
 
     backgroundPath String?
     iconPath       String?
