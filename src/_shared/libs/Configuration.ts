@@ -13,6 +13,7 @@ import { z } from "zod";
 
 export const ConfigurationSchema = z.object(
 	{
+		databaseUrl: z.string().url(),
 		steamApiKey: z.string(),
 		steamUserId: z.string(),
 	});
