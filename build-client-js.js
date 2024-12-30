@@ -29,7 +29,7 @@ const clientContext = await esbuild.context(
 		sourcemap: "linked",
 		target:
 		[
-			"es6",
+			"esnext",
 		],
 	});
 
