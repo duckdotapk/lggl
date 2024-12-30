@@ -1,0 +1,22 @@
+enum GamePlayActionType {
+    EXECUTABLE
+    STEAM
+}
+
+model GamePlayAction {
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    name         String
+    type         GamePlayActionType
+    path         String
+    trackingPath String
+    isArchived   Boolean            @default(false)
+
+    game_id Int
+
+    game                   Game                    @relation(fields: [game_id], references: [id])
+    gamePlayActionSessions GamePlayActionSession[]
+}

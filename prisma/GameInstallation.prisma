@@ -1,4 +1,4 @@
-model Installation {
+model GameInstallation {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @updatedAt

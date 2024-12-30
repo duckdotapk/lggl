@@ -547,7 +547,7 @@ async function createInstallation(transactionClient: Prisma.TransactionClient, p
 
 	const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(playniteGame.InstallSize);
 
-	await transactionClient.installation.create(
+	await transactionClient.gameInstallation.create(
 		{
 			data:
 			{

@@ -12,6 +12,7 @@ import { z } from "zod";
 export const RequestBodySchema = z.object(
 	{
 		gameId: z.number().int().min(1),
+		gamePlayActionId: z.number().int().min(1),
 	});
 
 export const ResponseBodySchema = z.union(
@@ -41,7 +42,7 @@ export const path = "/api/games/launch";
 // Utility Functions
 //
 
-export function launchGame(gameId: number)
+export function launchGame(gameId: number, gamePlayActionId: number)
 {
 	return FritterApiUtilities.request(method, path,
 		{
@@ -50,6 +51,7 @@ export function launchGame(gameId: number)
 			requestBody:
 			{
 				gameId,
+				gamePlayActionId,
 			},
 		});
 }

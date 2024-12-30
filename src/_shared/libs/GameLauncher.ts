@@ -23,12 +23,9 @@ const checkInterval = 2000;
 // Utility Functions
 //
 
-async function startProcess(game: Prisma.GameGetPayload<null>)
+async function startProcess(gamePlayAction: Prisma.GamePlayActionGetPayload<null>)
 {
-	if (game.steamAppId == null)
-	{
-		throw new Error(`Game ${game.id} does not have a Steam App ID!`);
-	}
+	// TODO: will this work with EXECUTABLE type GamePlayActions?
 
 	let command: string;
 	let commandArguments: string[];
@@ -37,7 +34,7 @@ async function startProcess(game: Prisma.GameGetPayload<null>)
 	{
 		case "win32":
 			command = "cmd";
-			commandArguments = [ "/c", "start", "", "steam://rungameid/" + game.steamAppId ];
+			commandArguments = [ "/c", "start", "", gamePlayAction.path ];
 
 			break;
 
@@ -118,22 +115,13 @@ function determinePlatform()
 	}
 }
 
-export async function launchGame(game: Prisma.GameGetPayload<{ include: { installations: true } }>)
+export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayAction: Prisma.GamePlayActionGetPayload<null>)
 {
-	console.log("[GameLauncherLib] Getting tracking path: %s", game.name);
+	console.log("[GameLauncherLib] Starting process for game: %s (%d)", game.name, game.id);
 
-	if (game.installations[0] == null)
-	{
-		throw new Error(`Game ${game.id} does not have any installations!`);
-	}
+	await startProcess(gamePlayAction);
 
-	const trackingPath = game.installations[0].path;
-
-	console.log("[GameLauncherLib] Launching game: %s", game.name);
-
-	await startProcess(game);
-
-	console.log("[GameLauncherLib] Game process started, using tracking path: %s", game.name);
+	console.log("[GameLauncherLib] Process started, using game play action %d tracking path: %s", gamePlayAction.id, gamePlayAction.trackingPath);
 
 	await new Promise(resolve => setTimeout(resolve, initialCheckDelay));
 
@@ -141,7 +129,7 @@ export async function launchGame(game: Prisma.GameGetPayload<{ include: { instal
 
 	for (let i = 0; i < maxTrackingAttempts; i++)
 	{
-		gameProcess = await findGameProcess(trackingPath);
+		gameProcess = await findGameProcess(gamePlayAction.trackingPath);
 
 		if (gameProcess == null)
 		{
@@ -186,7 +174,7 @@ export async function launchGame(game: Prisma.GameGetPayload<{ include: { instal
 
 			const playTimeSeconds = Math.round(playSessionEndDateTime.toSeconds() - playSessionStartDateTime.toSeconds());
 
-			const gameProcess = await findGameProcess(trackingPath);
+			const gameProcess = await findGameProcess(gamePlayAction.trackingPath);
 
 			if (gameProcess != null)
 			{

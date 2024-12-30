@@ -33,10 +33,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 					{
 						id: requestBody.gameId,
 					},
-					include:
-					{
-						installations: true,
-					},
 				});
 
 			if (game == null)
@@ -44,13 +40,28 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
 			}
 
+			const gamePlayAction = await prismaClient.gamePlayAction.findFirst(
+				{
+					where:
+					{
+						id: requestBody.gamePlayActionId,
+
+						game_id: game.id,
+					},
+				});
+
+			if (gamePlayAction == null)
+			{
+				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game play action not found." });
+			}
+
 			try
 			{
-				await GameLauncherLib.launchGame(game);
+				await GameLauncherLib.launchGame(game, gamePlayAction);
 			}
 			catch (error)
 			{
-				console.error("[/api/games/launch] Error launching game:", error);
+				console.error("[" + Schemas.path + "] Error launching game:", error);
 
 				throw new FritterApiUtilities.APIError(
 					{ 

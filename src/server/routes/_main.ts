@@ -110,7 +110,17 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		//
 
 		const selectedGame = selectedGameId != null
-			? (games.find((game) => game.id === selectedGameId) ?? null)
+			? await prismaClient.game.findFirst(
+				{
+					where:
+					{
+						id: selectedGameId,
+					},
+					include:
+					{
+						gamePlayActions: true,
+					},
+				})
 			: null;
 
 		//
