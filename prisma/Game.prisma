@@ -49,6 +49,7 @@ model Game {
 
     backgroundPath String?
     iconPath       String?
+    logoPath       String?
 
     isEarlyAccess Boolean
     isFavorite    Boolean
