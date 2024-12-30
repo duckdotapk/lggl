@@ -2,6 +2,39 @@
 // Component
 //
 
+@mixin Resets()
+{
+	*
+	{
+		font: inherit;
+	}
+
+	*,
+	*::before,
+	*::after
+	{
+		box-sizing: border-box;
+	}
+
+	button,
+	input,
+	select,
+	textarea
+	{
+		font: inherit;
+	}
+
+	img,
+	picture,
+	svg,
+	video
+	{
+		display: block;
+
+		max-width: 100%;
+	}
+}
+
 @mixin FontFaces()
 {
 	@font-face
