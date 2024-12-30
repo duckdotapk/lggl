@@ -2,11 +2,11 @@
 // Imports
 //
 
-import child_process from "node:child_process";
-
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 
 import { prismaClient } from "../../../../_shared/instances/prismaClient.js";
+
+import * as GameLauncherLib from "../../../../_shared/libs/GameLauncher.js";
 
 import { ServerFritterContext } from "../../../instances/server.js";
 
@@ -49,24 +49,14 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_INSTALLED", message: "Game is not installed." });
 			}
 
-			if (game.steamApp == null)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_IMPLEMENTED", message: "Launching non-Steam games is not supported yet." });
-			}
-
-			// TODO: this will NOT work on Linux or macOS
-			const command = `start "" "steam://rungameid/${game.steamApp}"`;
-
 			try
 			{
-				await new Promise<void>(
-					(resolve, reject) =>
-					{
-						child_process.exec(command, (error) => error != null ? reject(error) : resolve);
-					});
+				await GameLauncherLib.launchGame(game);
 			}
 			catch (error)
 			{
+				console.error("[/api/games/launch] Error launching game:", error);
+
 				throw new FritterApiUtilities.APIError(
 					{ 
 						code: "LAUNCH_FAILED", 
