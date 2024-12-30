@@ -23,7 +23,7 @@ const IPlayerServiceGetOwnedGamesResponseSchema = z.object(
 						playtime_2weeks: z.number().nullish(),
 						playtime_forever: z.number(),
 						img_icon_url: z.string(),
-						has_community_visible_stats: z.boolean(),
+						has_community_visible_stats: z.boolean().nullish(),
 						playtime_windows_forever: z.number(),
 						playtime_mac_forever: z.number(),
 						playtime_linux_forever: z.number(),
@@ -243,6 +243,11 @@ export async function fetchOwnedApp(appId: string)
 
 	if (!responseParseResult.success)
 	{
+		for (const issue of responseParseResult.error.issues)
+		{
+			console.log(issue.code, issue.path.join(" > "), issue.message);
+		}
+
 		return null;
 	}
 
