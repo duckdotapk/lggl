@@ -1,11 +1,49 @@
+enum GameAchievementSupport {
+    NONE
+    INGAME
+    LAUNCHER
+}
+
+enum GameCompletionStatus {
+    TODO
+    IN_PROGRESS
+    COMPLETE
+    ONE_HUNDRED_PERCENT
+}
+
+enum GameControllerSupport {
+    NONE
+    SUPPORTED
+    REQUIRED
+}
+
+enum GameModSupport {
+    NONE
+    UNOFFICIAL
+    OFFICIAL
+}
+
+enum GameProgressionType {
+    NONE
+    NON_CAMPAIGN
+    CAMPAIGN
+}
+
+enum GameVirtualRealitySupport {
+    NONE
+    SUPPORTED
+    REQUIRED
+}
+
 model Game {
     id              Int      @id @default(autoincrement())
-    createdDate     DateTime
-    lastUpdatedDate DateTime
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
-    name        String
-    sortingName String
-    releaseDate DateTime
+    name        String    @unique
+    sortName    String
+    releaseDate DateTime?
 
     backgroundPath String?
     iconPath       String?
@@ -16,21 +54,22 @@ model Game {
     isNsfw        Boolean
     isShelved     Boolean
 
-    firstPlayedDate             DateTime
-    firstPlayedDateApproximated Boolean
-    lastPlayedDate              DateTime?
-    playCount                   Int       @default(0)
-    playTimeSeconds             Int       @default(0)
+    progressionType                GameProgressionType?
+    completionStatus               GameCompletionStatus?
+    firstPlayedDate                DateTime?
+    firstPlayedDateApproximated    Boolean
+    firstCompletedDate             DateTime?
+    firstCompletedDateApproximated Boolean
+    lastPlayedDate                 DateTime?
+    playCount                      Int                   @default(0)
+    playTimeTotalSeconds           Int                   @default(0)
 
-    achievementSupport Int?
-    controllerSupport  Int?
-    modSupport         Int?
-    vrSupport          Int?
+    achievementSupport    GameAchievementSupport?
+    controllerSupport     GameControllerSupport?
+    modSupport            GameModSupport?
+    virtualRealitySupport GameVirtualRealitySupport?
 
-    completionStatus Int?
-    progressionType  Int?
-
-    playniteGameId String?
+    playniteGameId String? @unique
     steamAppId     String?
 
     gameAntiCheats         GameAntiCheat[]
@@ -49,102 +88,153 @@ model Game {
 }
 
 model GameAntiCheat {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     antiCheat_id Int
     game_id      Int
 
     antiCheat AntiCheat @relation(fields: [antiCheat_id], references: [id])
     game      Game      @relation(fields: [game_id], references: [id])
+
+    @@unique([antiCheat_id, game_id])
 }
 
 model GameDeveloper {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     company_id Int
     game_id    Int
 
     company Company @relation(fields: [company_id], references: [id])
     game    Game    @relation(fields: [game_id], references: [id])
+
+    @@unique([company_id, game_id])
 }
 
 model GameDrm {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     drm_id  Int
     game_id Int
 
     drm  Drm  @relation(fields: [drm_id], references: [id])
     game Game @relation(fields: [game_id], references: [id])
+
+    @@unique([drm_id, game_id])
 }
 
 model GameEngine {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    version Int?
 
     engine_id Int
     game_id   Int
 
     engine Engine @relation(fields: [engine_id], references: [id])
     game   Game   @relation(fields: [game_id], references: [id])
+
+    @@unique([engine_id, game_id])
 }
 
 model GameGenre {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     game_id  Int
     genre_id Int
 
     game  Game  @relation(fields: [game_id], references: [id])
     genre Genre @relation(fields: [genre_id], references: [id])
+
+    @@unique([game_id, genre_id])
 }
 
 model GameMode {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     game_id Int
     mode_id Int
 
     game Game @relation(fields: [game_id], references: [id])
     mode Mode @relation(fields: [mode_id], references: [id])
+
+    @@unique([game_id, mode_id])
 }
 
 model GamePlatform {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     game_id     Int
     platform_id Int
 
     game     Game     @relation(fields: [game_id], references: [id])
     platform Platform @relation(fields: [platform_id], references: [id])
+
+    @@unique([game_id, platform_id])
 }
 
 model GamePublisher {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     company_id Int
     game_id    Int
 
     company Company @relation(fields: [company_id], references: [id])
     game    Game    @relation(fields: [game_id], references: [id])
+
+    @@unique([company_id, game_id])
 }
 
 model GameRatingBoardRating {
-    id               Int @id @default(autoincrement())
-    createdTimestamp Int
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     game_id              Int
     ratingBoardRating_id Int
 
     game              Game              @relation(fields: [game_id], references: [id])
     ratingBoardRating RatingBoardRating @relation(fields: [ratingBoardRating_id], references: [id])
+
+    @@unique([game_id, ratingBoardRating_id])
 }
 
 model GameSource {
-    id Int @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
 
     game_id   Int
     source_id Int
 
     game   Game   @relation(fields: [game_id], references: [id])
     source Source @relation(fields: [source_id], references: [id])
+
+    @@unique([game_id, source_id])
 }

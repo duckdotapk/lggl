@@ -1,17 +1,28 @@
 model RatingBoard {
-    id   Int    @id @default(autoincrement())
-    name String
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    name      String  @unique
+    shortName String?
 
     ratingBoardRatings RatingBoardRating[]
 }
 
 model RatingBoardRating {
-    id        Int    @id @default(autoincrement())
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
     name      String
-    sortOrder Int
+    shortName String?
 
     ratingBoard_id Int
 
     gameRatingBoardRatings GameRatingBoardRating[]
     ratingBoard            RatingBoard             @relation(fields: [ratingBoard_id], references: [id])
+
+    @@unique([ratingBoard_id, name])
 }

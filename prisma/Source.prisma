@@ -1,6 +1,10 @@
 model Source {
-    id   Int    @id @default(autoincrement())
-    name String
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    name String @unique
 
     gameSources GameSource[]
 }

@@ -1,6 +1,14 @@
 model Mode {
-    id   Int    @id @default(autoincrement())
-    name String
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    name          String
+    isMultiplayer Boolean
+    isOnline      Boolean
 
     gameModes GameMode[]
+
+    @@unique([name, isMultiplayer, isOnline])
 }

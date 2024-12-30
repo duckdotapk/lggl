@@ -1,10 +1,23 @@
+enum PlaySessionPlatform {
+    WINDOWS
+    MAC
+    LINUX
+    STEAM_DECK
+    UNKNOWN
+}
+
 model PlaySession {
-    id             Int     @id @default(autoincrement())
-    endTimestamp   Int
-    notes          String?
-    playTime       Int
-    platform       String
-    startTimestamp Int
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    platform        PlaySessionPlatform
+    startDate       DateTime
+    endDate         DateTime
+    playTimeSeconds Int                 @map("playTime")
+    isHistorical    Boolean             @default(false)
+    notes           String?
 
     game_id Int
 
