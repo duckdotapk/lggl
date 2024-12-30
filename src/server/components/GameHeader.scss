@@ -2,9 +2,9 @@
 // Component
 //
 
-@mixin LibraryGameDetails()
+@mixin GameHeader()
 {
-	.component-library-game-details-banner
+	.component-game-header
 	{
 		display: grid;
 		grid-template-areas: stack;
@@ -33,14 +33,20 @@
 
 			align-self: end;
 
-			margin-left: 0.5rem;
+			padding: 1rem;
+
+			max-width: 20rem;
+		}
+
+		> .name
+		{
+			grid-area: stack;
+
+			align-self: end;
+
+			padding: 1rem;
 
 			font-size: 3rem;
 		}
-	}
-
-	.component-library-game-details
-	{
-		height: 100%;
 	}
 }

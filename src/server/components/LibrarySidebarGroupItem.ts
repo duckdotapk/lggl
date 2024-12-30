@@ -36,11 +36,11 @@ export function LibrarySidebarGroupItem(game: LibrarySidebarGroupItemGame, selec
 			href: "/?" + itemSearchParameters.toString(),
 		},
 		[
-			game.iconPath != null
+			game.iconImagePath != null
 				? new DE("img",
 					{
 						class: "icon",
-						src: staticMiddleware.getCacheBustedPath(game.iconPath),
+						src: staticMiddleware.getCacheBustedPath(game.iconImagePath),
 						alt: game.name + " icon",
 					})
 				: new DE("span", "icon fa-solid fa-gamepad-modern"),

@@ -7,6 +7,7 @@
 @use "components/_Global.scss";
 
 @use "components/Button.scss";
+@use "components/GameHeader.scss";
 @use "components/Library.scss";
 @use "components/LibraryGameDetails.scss";
 @use "components/LibrarySidebar.scss";
@@ -20,6 +21,7 @@
 @include Global.FontFaces();
 
 @include Button.Button();
+@include GameHeader.GameHeader();
 @include Library.Library();
 @include LibraryGameDetails.LibraryGameDetails();
 @include LibrarySidebar.LibrarySidebar();
