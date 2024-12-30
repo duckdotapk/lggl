@@ -2,6 +2,7 @@ build/*
 node_modules/*
 static/data/*
 
+.env
 configuration.yaml
 database.db
 playnite-games.json
