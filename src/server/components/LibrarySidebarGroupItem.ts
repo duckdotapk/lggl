@@ -47,6 +47,7 @@ export function LibrarySidebarGroupItem(game: LibrarySidebarGroupItemGame, selec
 				[
 					new DE("div", "name", game.name),
 
+					// TODO: make what details are shown here, or whether they are at all, configurable
 					new DE("div", "details",
 						[
 							"Last played ",
