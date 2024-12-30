@@ -3,7 +3,6 @@
 //
 
 import fs from "node:fs";
-import path from "node:path";
 
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameProgressionType, GameVirtualRealitySupport, PlaySessionPlatform, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
@@ -22,12 +21,6 @@ import * as SourceModelLib from "../_shared/libs/models/Source.js";
 import * as PlayniteThirdPartyLib from "../_shared/libs/third-party/Playnite.js";
 
 import * as FileSizeLib from "../_shared/libs/FileSize.js";
-
-//
-// Schemas
-//
-
-const playniteFilesPath = "D:\\Programs\\Playnite\\library\\files";
 
 //
 // Functions
@@ -231,66 +224,6 @@ function determineSteamAppId(playniteGame: PlayniteThirdPartyLib.PlayniteGame)
 	}
 
 	return steamAppId.toString();
-}
-
-async function addBackgroundPath(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
-{
-	if (playniteGame.BackgroundImage == null)
-	{
-		return;
-	}
-
-	const playniteBackgroundPath = path.join(playniteFilesPath, playniteGame.BackgroundImage);
-
-	const backgroundPath = "/data/game/" + game.id + "/background.png";
-
-	const backgroundPathOnDisk = "./static" + backgroundPath;
-
-	await fs.promises.mkdir(path.dirname(backgroundPathOnDisk), { recursive: true });
-
-	await fs.promises.copyFile(playniteBackgroundPath, backgroundPathOnDisk);
-
-	await transactionClient.game.update(
-		{
-			where:
-			{
-				id: game.id,
-			},
-			data:
-			{
-				backgroundPath,
-			},
-		});
-}
-
-async function addIconPath(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
-{
-	if (playniteGame.Icon == null)
-	{
-		return;
-	}
-	
-	const playniteIconPath = path.join(playniteFilesPath, playniteGame.Icon);
-
-	const iconPath = "/data/game/" + game.id + "/icon" + path.extname(playniteGame.Icon);
-
-	const iconPathOnDisk = "./static" + iconPath;
-
-	await fs.promises.copyFile(playniteIconPath, iconPathOnDisk);
-
-	await fs.promises.copyFile(playniteIconPath, iconPathOnDisk);
-
-	await transactionClient.game.update(
-		{
-			where:
-			{
-				id: game.id,
-			},
-			data:
-			{
-				iconPath,
-			},
-		});
 }
 
 async function createGameAntiCheats(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
@@ -693,9 +626,6 @@ async function createGame(transactionClient: Prisma.TransactionClient, playniteG
 				description: playniteGame.Description,
 				notes: playniteGame.Notes,
 
-				backgroundPath: null,
-				iconPath: null,
-
 				isEarlyAccess: determineIsEarlyAccess(playniteGame),
 				isFavorite: playniteGame.Favorite,
 				isHidden: false,
@@ -721,10 +651,6 @@ async function createGame(transactionClient: Prisma.TransactionClient, playniteG
 				steamAppId: determineSteamAppId(playniteGame),
 			},
 		});
-
-	await addBackgroundPath(transactionClient, playniteGame, game);
-
-	await addIconPath(transactionClient, playniteGame, game);
 
 	await createGameAntiCheats(transactionClient, playniteGame, game);
 

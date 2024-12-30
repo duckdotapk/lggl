@@ -47,9 +47,10 @@ model Game {
     description String?
     notes       String?
 
-    backgroundPath String?
-    iconPath       String?
-    logoPath       String?
+    bannerImagePath String?
+    coverImagePath  String?
+    iconImagePath   String?
+    logoImagePath   String?
 
     isEarlyAccess Boolean
     isFavorite    Boolean

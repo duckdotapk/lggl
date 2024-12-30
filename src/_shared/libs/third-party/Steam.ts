@@ -33,7 +33,7 @@ const IPlayerServiceGetOwnedGamesResponseSchema = z.object(
 						has_workshop: z.boolean(),
 						has_market: z.boolean(),
 						has_dlc: z.boolean(),
-						content_descriptorids: z.array(z.number()),
+						content_descriptorids: z.array(z.number()).nullish(),
 						playtime_disconnected: z.number(),
 					})),
 			}),
@@ -203,6 +203,52 @@ export const GENRE_ID =
 // Utility Functions
 //
 
+export async function fetchImageUrls(appId: string)
+{
+	const appDetails = await fetchOwnedApp(appId);
+
+	// TODO: I'm not sure if this is the most "correct" names for these images
+	return {
+		icon: appDetails != null
+			? ("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/" + appId + "/" + appDetails.img_icon_url + ".jpg")
+			: null,
+		libraryBackground: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/library_hero.jpg",
+		libraryCapsule: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/library_600x900_2x.jpg",
+		libraryLogo: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/logo.png",
+	};
+}
+
+export async function fetchOwnedApp(appId: string)
+{
+	const json =
+	{
+		steamid: configuration.steamUserId,
+		include_appinfo: true,
+		include_extended_appinfo: true,
+		include_played_free_games: true,
+		appids_filter: [ appId ],
+	};
+
+	const searchParameters = new URLSearchParams();
+
+	searchParameters.set("key", configuration.steamApiKey);
+	
+	searchParameters.set("input_json", JSON.stringify(json));
+
+	const response = await fetch("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1?" + searchParameters.toString());
+
+	const responseJson = await response.json();
+
+	const responseParseResult = IPlayerServiceGetOwnedGamesResponseSchema.safeParse(responseJson);
+
+	if (!responseParseResult.success)
+	{
+		return null;
+	}
+
+	return responseParseResult.data.response.games.find(game => game.appid == Number(appId)) ?? null;
+}
+
 export async function fetchOwnedApps()
 {
 	const json =
@@ -228,11 +274,11 @@ export async function fetchOwnedApps()
 	return parseResponse.response.games;
 }
 
-export async function fetchAppDetails(appId: number)
+export async function fetchAppDetails(appId: string)
 {
 	const searchParameters = new URLSearchParams();
 
-	searchParameters.set("appids", appId.toString());
+	searchParameters.set("appids", appId);
 
 	const response = await fetch("https://store.steampowered.com/api/appdetails?" + searchParameters.toString());
 
@@ -244,7 +290,7 @@ export async function fetchAppDetails(appId: number)
 
 	if (appDetails == null || !appDetails.success)
 	{
-		throw new Error("Failed to fetch app details for app ID: " + appId);
+		return null;
 	}
 
 	return appDetails.data;
