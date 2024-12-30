@@ -42,11 +42,9 @@ export function LibraryGameDetails(game: LibraryGameDetailsGame)
 		[
 			Header(game),
 
-			game.isInstalled
-				? Button("Launch",
-					{
-						"data-launch-game-id": game.id,
-					})
-				: null,
+			Button("Launch",
+				{
+					"data-launch-game-id": game.id,
+				}),
 		]);
 }

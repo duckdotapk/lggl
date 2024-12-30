@@ -48,19 +48,7 @@ export const ResponseBodySchema = z.union(
 							{
 								include:
 								{
-									engine:
-									{
-										include:
-										{
-											engineCompanies:
-											{
-												include:
-												{
-													company: true;
-												};
-											};
-										};
-									};
+									engine: true;
 								};
 							};
 							gameGenres:
@@ -70,7 +58,6 @@ export const ResponseBodySchema = z.union(
 									genre: true;
 								};
 							};
-							gameInstallations: true;
 							gameModes:
 							{
 								include:
@@ -92,6 +79,19 @@ export const ResponseBodySchema = z.union(
 									company: true;
 								};
 							};
+							gameRatingBoardRatings:
+							{
+								include:
+								{
+									ratingBoardRating:
+									{
+										include:
+										{
+											ratingBoard: true;
+										};
+									};
+								};
+							};
 							gameSources:
 							{
 								include:
@@ -99,6 +99,7 @@ export const ResponseBodySchema = z.union(
 									source: true;
 								};
 							};
+							installations: true;
 							seriesGames:
 							{
 								include:

@@ -4,7 +4,7 @@
 
 import child_process from "node:child_process";
 
-import { Prisma } from "@prisma/client";
+import { PlaySessionPlatform, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../instances/prismaClient.js";
@@ -13,26 +13,21 @@ import { prismaClient } from "../instances/prismaClient.js";
 // Constants
 //
 
+const initialCheckDelay = 2000;
+
 const maxTrackingAttempts = 5;
 
-const initialCheckDelay = 5000;
-
-const checkInterval = 5000;
+const checkInterval = 2000;
 
 //
 // Utility Functions
 //
 
-async function startProcess(gameId: number, trackingPath: string | null, steamApp: string | null)
+async function startProcess(game: Prisma.GameGetPayload<null>)
 {
-	if (trackingPath == null)
+	if (game.steamAppId == null)
 	{
-		throw new Error(`Game ${gameId} does not have a tracking path!`);
-	}
-
-	if (steamApp == null)
-	{
-		throw new Error(`Game ${gameId} does not have a Steam App ID!`);
+		throw new Error(`Game ${game.id} does not have a Steam App ID!`);
 	}
 
 	let command: string;
@@ -42,7 +37,7 @@ async function startProcess(gameId: number, trackingPath: string | null, steamAp
 	{
 		case "win32":
 			command = "cmd";
-			commandArguments = [ "/c", "start", "", "steam://rungameid/" + steamApp ];
+			commandArguments = [ "/c", "start", "", "steam://rungameid/" + game.steamAppId ];
 
 			break;
 
@@ -59,11 +54,6 @@ async function startProcess(gameId: number, trackingPath: string | null, steamAp
 		});
 
 	child.unref();
-
-	return {
-		trackingPath,
-		steamApp,
-	};
 }
 
 async function getRunningProcesses()
@@ -105,14 +95,32 @@ async function findGameProcess(trackingPath: string)
 {
 	const processes = await getRunningProcesses();
 
-	const gameProcess = processes.find(process => process.startsWith(trackingPath));
-
-	return gameProcess;
+	return processes.find(process => process.startsWith(trackingPath)) ?? null;
 }
 
-async function recordPlaySession(gameId: number, startTimestamp: number, endTimestamp: number)
+function determinePlatform()
 {
-	const playTime = Math.round(endTimestamp - startTimestamp);
+	// TODO: detect Steam Deck, somehow
+
+	switch (process.platform)
+	{
+		case "win32":
+			return PlaySessionPlatform.WINDOWS;
+
+		case "darwin":
+			return PlaySessionPlatform.MAC;
+
+		case "linux":
+			return PlaySessionPlatform.LINUX;
+
+		default:
+			return PlaySessionPlatform.UNKNOWN;
+	}
+}
+
+async function recordPlaySession(gameId: number, startDateTime: DateTime, endDateTime: DateTime)
+{
+	const playTimeSeconds = Math.round(endDateTime.toSeconds() - startDateTime.toSeconds());
 
 	await prismaClient.$transaction(
 		async (transactionClient) =>
@@ -133,8 +141,9 @@ async function recordPlaySession(gameId: number, startTimestamp: number, endTime
 					},
 					data:
 					{
+						lastPlayedDate: DateTime.now().toJSDate(),
 						playCount: { increment: 1 },
-						playTime: { increment: playTime },
+						playTimeTotalSeconds: { increment: playTimeSeconds },
 					},
 				});
 
@@ -142,10 +151,10 @@ async function recordPlaySession(gameId: number, startTimestamp: number, endTime
 				{
 					data:
 					{
-						startTimestamp,
-						endTimestamp,
-						platform: process.platform,
-						playTime,
+						platform: determinePlatform(),
+						startDate: startDateTime.toJSDate(),
+						endDate: endDateTime.toJSDate(),
+						playTimeSeconds,
 
 						game_id: game.id,
 					},
@@ -153,20 +162,30 @@ async function recordPlaySession(gameId: number, startTimestamp: number, endTime
 		});
 }
 
-export async function launchGame(game: Prisma.GameGetPayload<null>)
+export async function launchGame(game: Prisma.GameGetPayload<{ include: { installations: true } }>)
 {
+	console.log("[GameLauncherLib] Getting tracking path: %s", game.name);
+
+	if (game.installations[0] == null)
+	{
+		throw new Error(`Game ${game.id} does not have any installations!`);
+	}
+
+	const trackingPath = game.installations[0].path;
+
 	console.log("[GameLauncherLib] Launching game: %s", game.name);
 
-	const { trackingPath } = await startProcess(game.id, game.trackingPath, game.steamApp);
+	await startProcess(game);
 
 	console.log("[GameLauncherLib] Game process started, using tracking path: %s", game.name);
 
 	await new Promise(resolve => setTimeout(resolve, initialCheckDelay));
 
-	// TODO: this is fucking stupid and wrong idiot, it should return if the process is never found
+	let gameProcess: string | null = null;
+
 	for (let i = 0; i < maxTrackingAttempts; i++)
 	{
-		const gameProcess = await findGameProcess(trackingPath);
+		gameProcess = await findGameProcess(trackingPath);
 
 		if (gameProcess == null)
 		{
@@ -182,9 +201,14 @@ export async function launchGame(game: Prisma.GameGetPayload<null>)
 		break;
 	}
 
-	const playSessionStartTimestamp = DateTime.utc().toSeconds();
+	if (gameProcess == null)
+	{
+		throw new Error("Game process not found after " + maxTrackingAttempts + " attempts!");
+	}
 
-	console.log("[GameLauncherLib] Starting session at: %d", playSessionStartTimestamp);
+	const playSessionStartDateTime = DateTime.now();
+
+	console.log("[GameLauncherLib] Starting session at: %d", playSessionStartDateTime);
 
 	const interval = setInterval(
 		async () =>
@@ -198,11 +222,11 @@ export async function launchGame(game: Prisma.GameGetPayload<null>)
 
 			clearInterval(interval);
 
-			const playSessionEndTimestamp = DateTime.utc().toSeconds();
+			const playSessionEndDateTime =  DateTime.now();
 
-			console.log("[GameLauncherLib] Ending session at: %d", playSessionEndTimestamp);
+			console.log("[GameLauncherLib] Ending session at: %d", playSessionEndDateTime);
 
-			await recordPlaySession(game.id, playSessionStartTimestamp, playSessionEndTimestamp);
+			await recordPlaySession(game.id, playSessionStartDateTime, playSessionEndDateTime);
 		},
 		checkInterval);
 }

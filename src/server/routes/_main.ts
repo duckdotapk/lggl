@@ -22,11 +22,42 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/",
 	handler: async (context) =>
 	{
-		const games = await prismaClient.game.findMany();
+		const searchParameters = context.fritterRequest.getSearchParams();
+		
+		let selectedGameId: number | null = parseInt(searchParameters.get("selectedGameId") ?? "");
 
-		const selectedGame = games[0] ?? null;
+		if (selectedGameId != null && isNaN(selectedGameId))
+		{
+			selectedGameId = null;
+		}
+
+		const games = await prismaClient.game.findMany(
+			{
+				where:
+				{
+					isHidden: false,
+					isNsfw: false,
+				},
+				orderBy:
+				[
+					{
+						isFavorite: "desc",
+					},
+					{
+						lastPlayedDate:
+						{
+							sort: "desc",
+							nulls: "last",
+						},
+					},
+				],
+			});
+
+		const selectedGame = selectedGameId != null
+			? (games.find((game) => game.id === selectedGameId) ?? null)
+			: null;
 
 		context.fritterResponse.setContentType("text/html");
-		context.fritterResponse.setBody(Library(games, selectedGame).renderToString());
+		context.fritterResponse.setBody(Library(games, selectedGame, searchParameters).renderToString());
 	},
 };

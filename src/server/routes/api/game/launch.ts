@@ -35,18 +35,13 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 					},
 					include:
 					{
-						gameInstallations: true,
+						installations: true,
 					},
 				});
 
 			if (game == null)
 			{
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
-
-			if (!game.isInstalled)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_INSTALLED", message: "Game is not installed." });
 			}
 
 			try

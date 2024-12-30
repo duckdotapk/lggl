@@ -13,13 +13,26 @@ import { staticMiddleware } from "../instances/server.js";
 
 export type LibrarySidebarItemGame = Prisma.GameGetPayload<null>;
 
-export function LibrarySidebarItem(game: LibrarySidebarItemGame)
-{
-	return new DE("div",
-		{
-			class: "component-library-sidebar-item",
+export type LibrarySidebarItemSelectedGame = Prisma.GameGetPayload<null> | null;
 
-			"data-game-id": game.id,
+export function LibrarySidebarItem(game: LibrarySidebarItemGame, selectedGame: LibrarySidebarItemSelectedGame, searchParameters: URLSearchParams)
+{
+	let className = "component-library-sidebar-item";
+
+	if (selectedGame != null && selectedGame.id == game.id)
+	{
+		className += " selected";
+	}
+
+	const itemSearchParameters = new URLSearchParams(searchParameters);
+
+	itemSearchParameters.set("selectedGameId", game.id.toString());
+
+	return new DE("a",
+		{
+			class:className,
+
+			href: "/?" + itemSearchParameters.toString(),
 		},
 		[
 			game.iconPath != null

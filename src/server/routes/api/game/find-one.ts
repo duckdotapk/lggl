@@ -58,19 +58,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						{
 							include:
 							{
-								engine:
-								{
-									include:
-									{
-										engineCompanies:
-										{
-											include:
-											{
-												company: true,
-											},
-										},
-									},
-								},
+								engine: true,
 							},
 						},
 						gameGenres:
@@ -80,7 +68,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 								genre: true,
 							},
 						},
-						gameInstallations: true,
 						gameModes:
 						{
 							include:
@@ -102,6 +89,19 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 								company: true,
 							},
 						},
+						gameRatingBoardRatings:
+						{
+							include:
+							{
+								ratingBoardRating:
+								{
+									include:
+									{
+										ratingBoard: true,
+									},
+								},
+							},
+						},
 						gameSources:
 						{
 							include:
@@ -109,6 +109,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 								source: true,
 							},
 						},
+						installations: true,
 						seriesGames:
 						{
 							include:

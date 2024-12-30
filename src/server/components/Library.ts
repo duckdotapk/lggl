@@ -5,8 +5,8 @@
 import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 
-import { LibraryGameDetails, LibraryGameDetailsGame } from "./LibraryGameDetails.js";
-import { LibrarySidebar, LibrarySidebarGame } from "./LibrarySidebar.js";
+import { LibraryGameDetails } from "./LibraryGameDetails.js";
+import { LibrarySidebar } from "./LibrarySidebar.js";
 
 import { staticMiddleware } from "../instances/server.js";
 
@@ -14,9 +14,11 @@ import { staticMiddleware } from "../instances/server.js";
 // Component
 //
 
-export type LibraryGame = Prisma.GameGetPayload<null>;
+export type LibraryGames = Prisma.GameGetPayload<null>[];
 
-export function Library(sidebarGames: LibrarySidebarGame[], selectedGame: LibraryGameDetailsGame | null)
+export type LibrarySelectedGame = Prisma.GameGetPayload<null> | null;
+
+export function Library(games: LibraryGames, selectedGame: LibrarySelectedGame, searchParameters: URLSearchParams)
 {
 	return new DE("html",
 		{
@@ -44,7 +46,7 @@ export function Library(sidebarGames: LibrarySidebarGame[], selectedGame: Librar
 				[
 					new DE("div", "component-library",
 						[
-							LibrarySidebar(sidebarGames),
+							LibrarySidebar(games, selectedGame, searchParameters),
 
 							new DE("div", "game-details-wrapper",
 								[

@@ -11,12 +11,14 @@ import { LibrarySidebarItem } from "./LibrarySidebarItem.js";
 // Component
 //
 
-export type LibrarySidebarGame = Prisma.GameGetPayload<null>;
+export type LibrarySidebarGames = Prisma.GameGetPayload<null>[];
 
-export function LibrarySidebar(games: LibrarySidebarGame[])
+export type LibrarySidebarSelectedGame = Prisma.GameGetPayload<null> | null;
+
+export function LibrarySidebar(games: LibrarySidebarGames, selectedGame: LibrarySidebarSelectedGame, searchParameters: URLSearchParams)
 {
 	return new DE("aside", "component-library-sidebar",
 		[
-			games.map((game) => LibrarySidebarItem(game)),
+			games.map((game) => LibrarySidebarItem(game, selectedGame, searchParameters)),
 		]);
 }
