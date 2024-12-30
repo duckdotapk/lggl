@@ -1,0 +1,14 @@
+model GamePlatform {
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    game_id     Int
+    platform_id Int
+
+    game     Game     @relation(fields: [game_id], references: [id])
+    platform Platform @relation(fields: [platform_id], references: [id])
+
+    @@unique([game_id, platform_id])
+}

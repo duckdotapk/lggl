@@ -1,0 +1,14 @@
+model GameDeveloper {
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    company_id Int
+    game_id    Int
+
+    company Company @relation(fields: [company_id], references: [id])
+    game    Game    @relation(fields: [game_id], references: [id])
+
+    @@unique([company_id, game_id])
+}

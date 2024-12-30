@@ -1,0 +1,14 @@
+model GameMode {
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    game_id Int
+    mode_id Int
+
+    game Game @relation(fields: [game_id], references: [id])
+    mode Mode @relation(fields: [mode_id], references: [id])
+
+    @@unique([game_id, mode_id])
+}

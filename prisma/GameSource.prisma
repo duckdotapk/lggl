@@ -1,0 +1,14 @@
+model GameSource {
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime @default(now())
+    lastUpdatedDate DateTime @updatedAt
+    sortOrder       Int      @default(0)
+
+    game_id   Int
+    source_id Int
+
+    game   Game   @relation(fields: [game_id], references: [id])
+    source Source @relation(fields: [source_id], references: [id])
+
+    @@unique([game_id, source_id])
+}
