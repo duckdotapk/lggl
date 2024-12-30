@@ -1,0 +1,17 @@
+model RatingBoard {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    ratingBoardRatings RatingBoardRating[]
+}
+
+model RatingBoardRating {
+    id        Int    @id @default(autoincrement())
+    name      String
+    sortOrder Int
+
+    ratingBoard_id Int
+
+    gameRatingBoardRatings GameRatingBoardRating[]
+    ratingBoard            RatingBoard             @relation(fields: [ratingBoard_id], references: [id])
+}

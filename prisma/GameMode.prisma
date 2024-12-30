@@ -1,9 +1,0 @@
-model GameMode {
-    id Int @id @default(autoincrement())
-
-    game_id Int
-    mode_id Int
-
-    game Game @relation(fields: [game_id], references: [id])
-    mode Mode @relation(fields: [mode_id], references: [id])
-}

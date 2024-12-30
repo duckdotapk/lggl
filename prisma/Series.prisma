@@ -4,3 +4,13 @@ model Series {
 
     seriesGames SeriesGame[]
 }
+
+model SeriesGame {
+    id Int @id @default(autoincrement())
+
+    game_id   Int
+    series_id Int
+
+    game   Game   @relation(fields: [game_id], references: [id])
+    series Series @relation(fields: [series_id], references: [id])
+}

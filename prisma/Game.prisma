@@ -1,40 +1,150 @@
 model Game {
-    id                   Int     @id @default(autoincrement())
-    achievementSupport   Int?
-    backgroundPath       String?
-    completionStatus     Int?
-    controllerSupport    Int?
-    esrbRating           Int?
-    firstPlayedTimestamp Int?
-    iconPath             String?
-    isEarlyAccess        Boolean
-    isFavorite           Boolean
-    isHidden             Boolean
-    isInstalled          Boolean
-    isNsfw               Boolean
-    isShelved            Boolean
-    lastPlayedTimestamp  Int?
-    modSupport           Int?
-    name                 String
-    playCount            Int     @default(0)
-    playniteId           String?
-    playTime             Int     @default(0)
-    progressionType      Int
-    sortingName          String
-    steamAppId           String?
-    trackingPath         String?
-    vrSupport            Int?
+    id              Int      @id @default(autoincrement())
+    createdDate     DateTime
+    lastUpdatedDate DateTime
 
-    gameAntiCheats GameAntiCheat[]
-    gameDevelopers GameDeveloper[]
-    gameDrms       GameDrm[]
-    gameEngines    GameEngine[]
-    gameGenres     GameGenre[]
-    gameModes      GameMode[]
-    gamePlatforms  GamePlatform[]
-    gamePublishers GamePublisher[]
-    gameSources    GameSource[]
-    installations  Installation[]
-    playSessions   PlaySession[]
-    seriesGames    SeriesGame[]
+    name        String
+    sortingName String
+    releaseDate DateTime
+
+    backgroundPath String?
+    iconPath       String?
+
+    isEarlyAccess Boolean
+    isFavorite    Boolean
+    isHidden      Boolean
+    isNsfw        Boolean
+    isShelved     Boolean
+
+    firstPlayedDate             DateTime
+    firstPlayedDateApproximated Boolean
+    lastPlayedDate              DateTime?
+    playCount                   Int       @default(0)
+    playTimeSeconds             Int       @default(0)
+
+    achievementSupport Int?
+    controllerSupport  Int?
+    modSupport         Int?
+    vrSupport          Int?
+
+    completionStatus Int?
+    progressionType  Int?
+
+    playniteGameId String?
+    steamAppId     String?
+
+    gameAntiCheats         GameAntiCheat[]
+    gameDevelopers         GameDeveloper[]
+    gameDrms               GameDrm[]
+    gameEngines            GameEngine[]
+    gameGenres             GameGenre[]
+    gameModes              GameMode[]
+    gamePlatforms          GamePlatform[]
+    gamePublishers         GamePublisher[]
+    gameRatingBoardRatings GameRatingBoardRating[]
+    gameSources            GameSource[]
+    installations          Installation[]
+    playSessions           PlaySession[]
+    seriesGames            SeriesGame[]
+}
+
+model GameAntiCheat {
+    id Int @id @default(autoincrement())
+
+    antiCheat_id Int
+    game_id      Int
+
+    antiCheat AntiCheat @relation(fields: [antiCheat_id], references: [id])
+    game      Game      @relation(fields: [game_id], references: [id])
+}
+
+model GameDeveloper {
+    id Int @id @default(autoincrement())
+
+    company_id Int
+    game_id    Int
+
+    company Company @relation(fields: [company_id], references: [id])
+    game    Game    @relation(fields: [game_id], references: [id])
+}
+
+model GameDrm {
+    id Int @id @default(autoincrement())
+
+    drm_id  Int
+    game_id Int
+
+    drm  Drm  @relation(fields: [drm_id], references: [id])
+    game Game @relation(fields: [game_id], references: [id])
+}
+
+model GameEngine {
+    id Int @id @default(autoincrement())
+
+    engine_id Int
+    game_id   Int
+
+    engine Engine @relation(fields: [engine_id], references: [id])
+    game   Game   @relation(fields: [game_id], references: [id])
+}
+
+model GameGenre {
+    id Int @id @default(autoincrement())
+
+    game_id  Int
+    genre_id Int
+
+    game  Game  @relation(fields: [game_id], references: [id])
+    genre Genre @relation(fields: [genre_id], references: [id])
+}
+
+model GameMode {
+    id Int @id @default(autoincrement())
+
+    game_id Int
+    mode_id Int
+
+    game Game @relation(fields: [game_id], references: [id])
+    mode Mode @relation(fields: [mode_id], references: [id])
+}
+
+model GamePlatform {
+    id Int @id @default(autoincrement())
+
+    game_id     Int
+    platform_id Int
+
+    game     Game     @relation(fields: [game_id], references: [id])
+    platform Platform @relation(fields: [platform_id], references: [id])
+}
+
+model GamePublisher {
+    id Int @id @default(autoincrement())
+
+    company_id Int
+    game_id    Int
+
+    company Company @relation(fields: [company_id], references: [id])
+    game    Game    @relation(fields: [game_id], references: [id])
+}
+
+model GameRatingBoardRating {
+    id               Int @id @default(autoincrement())
+    createdTimestamp Int
+
+    game_id              Int
+    ratingBoardRating_id Int
+
+    game              Game              @relation(fields: [game_id], references: [id])
+    ratingBoardRating RatingBoardRating @relation(fields: [ratingBoardRating_id], references: [id])
+}
+
+model GameSource {
+    id Int @id @default(autoincrement())
+
+    game_id   Int
+    source_id Int
+
+    game   Game   @relation(fields: [game_id], references: [id])
+    source Source @relation(fields: [source_id], references: [id])
 }

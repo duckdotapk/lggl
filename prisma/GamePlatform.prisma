@@ -1,9 +1,0 @@
-model GamePlatform {
-    id Int @id @default(autoincrement())
-
-    game_id     Int
-    platform_id Int
-
-    game     Game     @relation(fields: [game_id], references: [id])
-    platform Platform @relation(fields: [platform_id], references: [id])
-}

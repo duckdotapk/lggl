@@ -1,9 +1,0 @@
-model GameDrm {
-    id Int @id @default(autoincrement())
-
-    drm_id  Int
-    game_id Int
-
-    drm  Drm  @relation(fields: [drm_id], references: [id])
-    game Game @relation(fields: [game_id], references: [id])
-}

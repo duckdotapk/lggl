@@ -1,9 +1,0 @@
-model GameAntiCheat {
-    id Int @id @default(autoincrement())
-
-    antiCheat_id Int
-    game_id      Int
-
-    antiCheat AntiCheat @relation(fields: [antiCheat_id], references: [id])
-    game      Game      @relation(fields: [game_id], references: [id])
-}
