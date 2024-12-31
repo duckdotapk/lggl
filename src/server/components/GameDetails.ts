@@ -174,13 +174,20 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 							DataTable(recentGamePlayActionSessions.map(
 								(gamePlayActionSession) =>
 								{
+									let title = "Played for " + Utilities.NumberLib.format(gamePlayActionSession.playTimeSeconds) + " seconds on " + gamePlayActionSession.platform.name;
+
+									if (gamePlayActionSession.notes != null)
+									{
+										title += "\n\n" + gamePlayActionSession.notes;
+									}
+
 									return {
 										label: !gamePlayActionSession.isHistorical
 											? HumanDateTime(DateTime.fromJSDate(gamePlayActionSession.startDate))
 											: "Historical",
 										value: new DE("span",
 											{
-												title: "Played for " + Utilities.NumberLib.format(gamePlayActionSession.playTimeSeconds) + " seconds on " + gamePlayActionSession.platform.name,
+												title,
 											},
 											[
 												// TODO: fa icon here
