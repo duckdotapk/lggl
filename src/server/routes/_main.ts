@@ -134,9 +134,14 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						},
 					},
 					orderBy:
-					{
-						startDate: "desc",
-					},
+					[
+						{
+							startDate: "desc",
+						},
+						{
+							createdDate: "desc",
+						},
+					],
 				})
 			: [];
 
