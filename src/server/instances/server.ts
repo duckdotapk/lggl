@@ -2,9 +2,9 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
-
 import path from "node:path";
+
+import * as Fritter from "@donutteam/fritter";
 
 import { configuration } from "../../_shared/libs/Configuration.js";
 
@@ -21,8 +21,16 @@ export const staticMiddleware = Fritter.StaticMiddleware.create(
 				mountPath: "/data/fontawesome",
 				path: path.join(configuration.dataDirectory, "fontawesome"),
 			},
+			{
+				mountPath: "/data/generated",
+				path: path.join(configuration.dataDirectory, "generated"),
+			},
+			{
+				mountPath: "/data/images",
+				path: path.join(configuration.dataDirectory, "images"),
+			},
 			{ 
-				path: "./static",
+				path: path.join(process.cwd(), "static"),
 			},
 		],
 		enableGzip: true,

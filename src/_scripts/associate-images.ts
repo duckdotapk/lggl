@@ -5,10 +5,13 @@
 import "source-map-support/register.js";
 
 import fs from "node:fs";
+import path from "node:path";
 
 import { Prisma } from "@prisma/client";
 
 import { prismaClient } from "../_shared/instances/prismaClient.js";
+
+import { configuration } from "../_shared/libs/Configuration.js";
 
 //
 // Functions
@@ -39,24 +42,24 @@ async function main()
 
 		const gameUpdateData: Prisma.GameUpdateArgs["data"] = {};
 
-		if (game.bannerImagePath == null && fs.existsSync("./static/data/game/" + game.id + "/banner.jpg"))
+		if (game.bannerImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "banner.jpg")))
 		{
-			gameUpdateData.bannerImagePath = "/data/game/" + game.id + "/banner.jpg";
+			gameUpdateData.bannerImagePath = "/data/images/games/" + game.id + "/banner.jpg";
 		}
 
-		if (game.coverImagePath == null && fs.existsSync("./static/data/game/" + game.id + "/cover.jpg"))
+		if (game.coverImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "cover.jpg")))
 		{
-			gameUpdateData.coverImagePath = "/data/game/" + game.id + "/cover.jpg";
+			gameUpdateData.coverImagePath = "/data/images/games/" + game.id + "/cover.jpg";
 		}
 
-		if (game.iconImagePath == null && fs.existsSync("./static/data/game/" + game.id + "/icon.jpg"))
+		if (game.iconImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "icon.jpg")))
 		{
-			gameUpdateData.iconImagePath = "/data/game/" + game.id + "/icon.jpg";
+			gameUpdateData.iconImagePath = "/data/images/games/" + game.id + "/icon.jpg";
 		}
 
-		if (game.logoImagePath == null && fs.existsSync("./static/data/game/" + game.id + "/logo.jpg"))
+		if (game.logoImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "logo.jpg")))
 		{
-			gameUpdateData.logoImagePath = "/data/game/" + game.id + "/logo.jpg";
+			gameUpdateData.logoImagePath = "/data/images/games/" + game.id + "/logo.jpg";
 		}
 
 		const numberOfUpdatedImagePaths = Object.keys(gameUpdateData).length;

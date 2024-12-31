@@ -51,6 +51,13 @@ export function Library(options: LibraryOptions)
 
 					new DE("link",
 						{
+							rel: "icon",
+							href: "/favicon.ico",
+							type: "image/x-icon",
+						}),
+
+					new DE("link",
+						{
 							rel: "stylesheet",
 							href: staticMiddleware.getCacheBustedPath("/data/fontawesome/css/all.min.css"),
 						}),
@@ -58,13 +65,13 @@ export function Library(options: LibraryOptions)
 					new DE("link",
 						{
 							rel: "stylesheet",
-							href: staticMiddleware.getCacheBustedPath("/data/client.css"),
+							href: staticMiddleware.getCacheBustedPath("/data/generated/client.css"),
 						}),
 
 					new DE("script",
 						{
 							type: "module",
-							src: staticMiddleware.getCacheBustedPath("/data/client.js"),
+							src: staticMiddleware.getCacheBustedPath("/data/generated/client.js"),
 						}),
 				]),
 

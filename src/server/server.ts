@@ -24,10 +24,10 @@ await fs.promises.mkdir(configuration.dataDirectory, { recursive: true });
 // Download Font Awesome Free
 //
 
-if (!fs.existsSync("./data/fontawesome"))
-{
-	const fontAwesomeDirectory = path.join(configuration.dataDirectory, "fontawesome");
+const fontAwesomeDirectory = path.join(configuration.dataDirectory, "fontawesome");
 
+if (!fs.existsSync(fontAwesomeDirectory))
+{
 	await fs.promises.mkdir(fontAwesomeDirectory, { recursive: true });
 
 	try

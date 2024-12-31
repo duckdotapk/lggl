@@ -103,7 +103,7 @@ const clientContext = await esbuild.context(
 		metafile: true,
 		minify: true,
 		platform: "browser",
-		outfile: "./static/data/client.js",
+		outfile: "./data/generated/client.js",
 		plugins:
 		[
 			logOnEndPlugin,
