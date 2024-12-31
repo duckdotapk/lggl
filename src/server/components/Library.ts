@@ -5,11 +5,10 @@
 import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 
-import { GameHeader } from "./GameHeader.js";
+import { GameDetails } from "./GameDetails.js";
 import { Sidebar } from "./Sidebar.js";
 
 import { staticMiddleware } from "../instances/server.js";
-import { GamePlayActionButtonGroup } from "./GamePlayActionButtonGroup.js";
 
 //
 // Component
@@ -56,12 +55,7 @@ export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: Lib
 							Sidebar(gameGroups, selectedGame, searchParameters),
 
 							selectedGame != null
-								? new DE("div", "game-details-wrapper",
-									[
-										GameHeader(selectedGame),
-
-										GamePlayActionButtonGroup(selectedGame),
-									])
+								? GameDetails(selectedGame)
 								: null,
 						]),
 				]),

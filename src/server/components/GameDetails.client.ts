@@ -12,11 +12,12 @@ import { launchGame } from "../routes/api/game/launch.schemas.js";
 
 async function initialise(element: HTMLElement)
 {
-	const buttons = element.querySelectorAll<HTMLButtonElement>("button.component-button");
+	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(element, "gameId");
+
+	const buttons = element.querySelectorAll<HTMLButtonElement>(`[data-game-play-action-id]`);
 
 	for (const button of buttons)
 	{
-		const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(button, "gameId");
 		const gamePlayActionId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(button, "gamePlayActionId");
 
 		button.addEventListener("click",
@@ -43,11 +44,11 @@ async function initialise(element: HTMLElement)
 // Components
 //
 
-export async function initialiseGamePlayActionButtonGroups()
+export async function initialiseGameDetails()
 {
-	const gamePlayActionButtonGroups = document.querySelectorAll<HTMLElement>(".component-game-play-action-button-group:not(.initialised)");
+	const gameDetails = document.querySelectorAll<HTMLElement>(".component-game-play-action-button-group:not(.initialised)");
 
-	for (const element of gamePlayActionButtonGroups)
+	for (const element of gameDetails)
 	{
 		try
 		{

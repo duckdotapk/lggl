@@ -7,8 +7,7 @@
 @use "components/_Global.scss";
 
 @use "components/Button.scss";
-@use "components/GameHeader.scss";
-@use "components/GamePlayActionButtonGroup.scss";
+@use "components/GameDetails.scss";
 @use "components/Library.scss";
 @use "components/Sidebar.scss";
 
@@ -20,7 +19,6 @@
 @include Global.FontFaces();
 
 @include Button.Button();
-@include GameHeader.GameHeader();
-@include GamePlayActionButtonGroup.GamePlayActionButtonGroup();
+@include GameDetails.GameDetails();
 @include Library.Library();
 @include Sidebar.Sidebar();

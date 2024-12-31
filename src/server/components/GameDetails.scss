@@ -2,12 +2,12 @@
 // Component
 //
 
-@mixin GameHeader()
+@mixin GameDetails()
 {
-	.component-game-header
+	.component-game-details-header
 	{
 		display: grid;
-		grid-template-areas: stack;
+		grid-template-areas: "stack";
 
 		height: 20rem;
 
@@ -23,6 +23,8 @@
 			height: 100%;
 
 			object-fit: cover;
+
+			align-self: center;
 		}
 
 		> .logo
@@ -46,5 +48,16 @@
 
 			font-size: 3rem;
 		}
+	}
+
+	.component-game-details-play-action-button-group
+	{
+		display: flex;
+		gap: 0.25rem;
+
+		padding: 0.5rem;
+
+		border-top: 1px solid #374151; // Tailwind Gray 700
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
 	}
 }
