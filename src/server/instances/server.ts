@@ -2,9 +2,11 @@
 // Imports
 //
 
+import * as Fritter from "@donutteam/fritter";
+
 import path from "node:path";
 
-import * as Fritter from "@donutteam/fritter";
+import { configuration } from "../../_shared/libs/Configuration.js";
 
 //
 // Server Middlewares
@@ -15,7 +17,13 @@ export const staticMiddleware = Fritter.StaticMiddleware.create(
 		cacheControlHeader: "public, max-age=" + (365 * 24 * 60 * 60),
 		directories:
 		[
-			{ path: path.join(import.meta.dirname, "..", "..", "..", "static") },
+			{ 
+				mountPath: "/data/fontawesome",
+				path: path.join(configuration.dataDirectory, "fontawesome"),
+			},
+			{ 
+				path: "./static",
+			},
 		],
 		enableGzip: true,
 	});
