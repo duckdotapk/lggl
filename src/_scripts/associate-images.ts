@@ -2,6 +2,8 @@
 // Imports
 //
 
+import "source-map-support/register.js";
+
 import fs from "node:fs";
 
 import { Prisma } from "@prisma/client";

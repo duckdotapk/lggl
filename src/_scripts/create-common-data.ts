@@ -2,6 +2,8 @@
 // Imports
 //
 
+import "source-map-support/register.js";
+
 import { prismaClient } from "../_shared/instances/prismaClient.js";
 
 //

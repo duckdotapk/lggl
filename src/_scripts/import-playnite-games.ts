@@ -2,6 +2,8 @@
 // Imports
 //
 
+import "source-map-support/register.js";
+
 import fs from "node:fs";
 
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GamePlayActionType, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
