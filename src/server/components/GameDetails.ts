@@ -137,7 +137,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 												[
 													humanizeDuration(game.playTimeTotalSeconds * 1000),
 												])
-											: "Not played",
+											: "No playtime recorded",
 									},
 									{
 										label: "Last played",
@@ -149,7 +149,13 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 												[
 													HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)),
 												])
-											: null,
+											: "Never played",
+									},
+									{
+										label: "Steam app ID",
+										value: game.steamAppId != null
+											? game.steamAppId
+											: "-",
 									},
 								]),
 						]),
