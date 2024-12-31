@@ -4,10 +4,12 @@
 
 import child_process from "node:child_process";
 
-import { GamePlayActionOperatingSystem, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../instances/prismaClient.js";
+
+import * as ProcessLib from "../libs/Process.js";
 
 //
 // Constants
@@ -95,26 +97,6 @@ async function findGameProcess(trackingPath: string)
 	return processes.find(process => process.startsWith(trackingPath)) ?? null;
 }
 
-function determineOperatingSystem()
-{
-	// TODO: detect Steam Deck, somehow
-
-	switch (process.platform)
-	{
-		case "win32":
-			return GamePlayActionOperatingSystem.WINDOWS;
-
-		case "darwin":
-			return GamePlayActionOperatingSystem.MAC;
-
-		case "linux":
-			return GamePlayActionOperatingSystem.LINUX;
-
-		default:
-			return GamePlayActionOperatingSystem.OTHER;
-	}
-}
-
 export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayAction: Prisma.GamePlayActionGetPayload<null>)
 {
 	console.log("[GameLauncherLib] Starting process for game: %s (%d)", game.name, game.id);
@@ -156,12 +138,12 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 		{
 			data:
 			{
-				operatingSystem: determineOperatingSystem(),
 				startDate: playSessionStartDateTime.toJSDate(),
 				endDate: playSessionStartDateTime.toJSDate(),
 				playTimeSeconds: 0,
 
 				gamePlayAction_id: gamePlayAction.id,
+				platform_id: ProcessLib.determinePlatformId(),
 			},
 		});
 

@@ -1,28 +1,19 @@
-enum GamePlayActionOperatingSystem {
-    WINDOWS
-    MAC
-    LINUX
-    LINUX_STEAM_DECK
-    OTHER
-}
-
 model GamePlayActionSession {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
     sortOrder       Int      @default(0)
 
-    operatingSystem GamePlayActionOperatingSystem
     startDate       DateTime
     endDate         DateTime
-    playTimeSeconds Int                           @map("playTime")
-    addedToTotal    Boolean                       @default(false)
-    isHistorical    Boolean                       @default(false)
+    playTimeSeconds Int      @map("playTime")
+    addedToTotal    Boolean  @default(false)
+    isHistorical    Boolean  @default(false)
     notes           String?
 
     gamePlayAction_id Int
-    platform_id       Int?
+    platform_id       Int
 
     gamePlayAction GamePlayAction @relation(fields: [gamePlayAction_id], references: [id])
-    platform       Platform?      @relation(fields: [platform_id], references: [id])
+    platform       Platform       @relation(fields: [platform_id], references: [id])
 }

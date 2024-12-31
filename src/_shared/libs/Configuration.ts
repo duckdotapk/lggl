@@ -16,6 +16,14 @@ export const ConfigurationSchema = z.object(
 		databaseUrl: z.string().url(),
 		steamApiKey: z.string(),
 		steamUserId: z.string(),
+		processPlatformIdMap: z.object(
+			{
+				windows: z.number(),
+				mac: z.number(),
+				linux: z.number(),
+				steamDeck: z.number(),
+				unknown: z.number(),
+			}),
 	});
 
 //

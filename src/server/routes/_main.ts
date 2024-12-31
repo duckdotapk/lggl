@@ -133,6 +133,10 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 							game_id: selectedGame.id,
 						},
 					},
+					include:
+					{
+						platform: true,
+					},
 					orderBy:
 					[
 						{

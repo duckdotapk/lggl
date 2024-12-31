@@ -4,7 +4,7 @@
 
 import fs from "node:fs";
 
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GamePlayActionOperatingSystem, GamePlayActionType, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GamePlayActionType, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../_shared/instances/prismaClient.js";
@@ -21,6 +21,7 @@ import * as SourceModelLib from "../_shared/libs/models/Source.js";
 import * as PlayniteThirdPartyLib from "../_shared/libs/third-party/Playnite.js";
 import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
 
+import { configuration } from "../_shared/libs/Configuration.js";
 import * as FileSizeLib from "../_shared/libs/FileSize.js";
 
 //
@@ -273,7 +274,6 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 				{
 					data:
 					{
-						operatingSystem: GamePlayActionOperatingSystem.WINDOWS,
 						startDate: DateTime.fromSeconds(0).toJSDate(),
 						endDate: DateTime.fromSeconds(appDetails.playtime_windows_forever).toJSDate(),
 						playTimeSeconds: appDetails.playtime_windows_forever,
@@ -282,6 +282,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
+						platform_id: configuration.processPlatformIdMap.windows,
 					},
 				});
 		}
@@ -292,7 +293,6 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 				{
 					data:
 					{
-						operatingSystem: GamePlayActionOperatingSystem.MAC,
 						startDate: DateTime.fromSeconds(0).toJSDate(),
 						endDate: DateTime.fromSeconds(appDetails.playtime_mac_forever).toJSDate(),
 						playTimeSeconds: appDetails.playtime_mac_forever,
@@ -301,6 +301,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
+						platform_id: configuration.processPlatformIdMap.mac,
 					},
 				});
 		}
@@ -313,7 +314,6 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 				{
 					data:
 					{
-						operatingSystem: GamePlayActionOperatingSystem.LINUX,
 						startDate: DateTime.fromSeconds(0).toJSDate(),
 						endDate: DateTime.fromSeconds(nonSteamDeckLinuxPlaytime).toJSDate(),
 						playTimeSeconds: nonSteamDeckLinuxPlaytime,
@@ -322,6 +322,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
+						platform_id: configuration.processPlatformIdMap.linux,
 					},
 				});
 		}
@@ -332,7 +333,6 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 				{
 					data:
 					{
-						operatingSystem: GamePlayActionOperatingSystem.LINUX_STEAM_DECK,
 						startDate: DateTime.fromSeconds(0).toJSDate(),
 						endDate: DateTime.fromSeconds(appDetails.playtime_deck_forever).toJSDate(),
 						playTimeSeconds: appDetails.playtime_deck_forever,
@@ -341,6 +341,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
+						platform_id: configuration.processPlatformIdMap.steamDeck,
 					},
 				});
 		}

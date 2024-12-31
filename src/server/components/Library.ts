@@ -24,7 +24,13 @@ export type LibrarySelectedGame = Prisma.GameGetPayload<
 		};
 	}> | null;
 
-export type LibraryRecentGamePlayActionSessions = Prisma.GamePlayActionSessionGetPayload<null>[];
+export type LibraryRecentGamePlayActionSessions = Prisma.GamePlayActionSessionGetPayload<
+	{
+		include:
+		{
+			platform: true;
+		};
+	}>[];
 
 export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: LibrarySelectedGame, recentGamePlayActionSessions: LibraryRecentGamePlayActionSessions, searchParameters: URLSearchParams)
 {

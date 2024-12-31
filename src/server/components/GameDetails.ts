@@ -106,7 +106,13 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 		};
 	}>;
 
-export type GameDetailsRecentGamePlayActionSessions = Prisma.GamePlayActionSessionGetPayload<null>[];
+export type GameDetailsRecentGamePlayActionSessions = Prisma.GamePlayActionSessionGetPayload<
+	{
+		include:
+		{
+			platform: true;
+		};
+	}>[];
 
 export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions: GameDetailsRecentGamePlayActionSessions)
 {
@@ -157,7 +163,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											? game.steamAppId
 											: "-",
 									},
-								]),
+								]), 
 						]),
 
 					Section("Recent play sessions",
@@ -169,7 +175,16 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										label: !gamePlayActionSession.isHistorical
 											? HumanDateTime(DateTime.fromJSDate(gamePlayActionSession.startDate))
 											: "Historical",
-										value: humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000),
+										value: new DE("span",
+											{
+												title: "Played for " + Utilities.NumberLib.format(gamePlayActionSession.playTimeSeconds) + " seconds on " + gamePlayActionSession.platform.name,
+											},
+											[
+												// TODO: fa icon here
+												new DE("span", gamePlayActionSession.platform.iconName),
+												" ",
+												humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000),
+											]),
 									};
 								})),
 						]),
