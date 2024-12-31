@@ -21,7 +21,6 @@ import * as SourceModelLib from "../_shared/libs/models/Source.js";
 import * as PlayniteThirdPartyLib from "../_shared/libs/third-party/Playnite.js";
 import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
 
-import { configuration } from "../_shared/libs/Configuration.js";
 import * as FileSizeLib from "../_shared/libs/FileSize.js";
 
 //
@@ -282,7 +281,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
-						platform_id: configuration.processPlatformIdMap.windows,
+						platform_id: 1,
 					},
 				});
 		}
@@ -301,7 +300,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
-						platform_id: configuration.processPlatformIdMap.mac,
+						platform_id: 6,
 					},
 				});
 		}
@@ -322,7 +321,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
-						platform_id: configuration.processPlatformIdMap.linux,
+						platform_id: 7,
 					},
 				});
 		}
@@ -341,7 +340,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 						notes: "Historical playtime from Steam.",
 
 						gamePlayAction_id: gamePlayAction.id,
-						platform_id: configuration.processPlatformIdMap.steamDeck,
+						platform_id: 8,
 					},
 				});
 		}

@@ -9,7 +9,7 @@ import { DateTime } from "luxon";
 
 import { prismaClient } from "../instances/prismaClient.js";
 
-import * as ProcessLib from "../libs/Process.js";
+import { configuration } from "./Configuration.js";
 
 //
 // Constants
@@ -143,7 +143,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 				playTimeSeconds: 0,
 
 				gamePlayAction_id: gamePlayAction.id,
-				platform_id: ProcessLib.determinePlatformId(),
+				platform_id: configuration.platformId,
 			},
 		});
 
