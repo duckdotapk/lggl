@@ -4,7 +4,9 @@ model Platform {
     lastUpdatedDate DateTime @updatedAt
     sortOrder       Int      @default(0)
 
-    name String @unique
+    iconName String @default("fa-solid fa-cube")
+    name     String @unique
 
-    gamePlatforms GamePlatform[]
+    gamePlatforms          GamePlatform[]
+    gamePlayActionSessions GamePlayActionSession[]
 }

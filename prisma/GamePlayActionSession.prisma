@@ -21,6 +21,8 @@ model GamePlayActionSession {
     notes           String?
 
     gamePlayAction_id Int
+    platform_id       Int?
 
     gamePlayAction GamePlayAction @relation(fields: [gamePlayAction_id], references: [id])
+    platform       Platform?      @relation(fields: [platform_id], references: [id])
 }
