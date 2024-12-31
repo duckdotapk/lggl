@@ -2,9 +2,9 @@
 // Component
 //
 
-@mixin LibrarySidebarGroupItem()
+@mixin Sidebar()
 {
-	.component-library-sidebar-group-item
+	.component-sidebar-group-item
 	{
 		color: inherit;
 		text-decoration: none;
@@ -48,5 +48,32 @@
 				opacity: 0.5;
 			}
 		}
+	}
+	
+	.component-sidebar-group
+	{
+		> .title
+		{
+			padding: 0.25rem;
+
+			font-weight: bold;
+
+			&:hover
+			{
+				background-color: #030712;
+				color: #f3f4f6;
+				cursor: pointer;
+			}
+		}
+	}
+	
+	.component-sidebar
+	{
+		border-right: 1px solid #374151; // Tailwind Gray 700
+
+		width: 350px;
+		height: 100%;
+
+		overflow-y: scroll;
 	}
 }
