@@ -4,7 +4,7 @@
 
 import child_process from "node:child_process";
 
-import { PlaySessionPlatform, Prisma } from "@prisma/client";
+import { GamePlayActionOperatingSystem, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../instances/prismaClient.js";
@@ -95,23 +95,23 @@ async function findGameProcess(trackingPath: string)
 	return processes.find(process => process.startsWith(trackingPath)) ?? null;
 }
 
-function determinePlatform()
+function determineOperatingSystem()
 {
 	// TODO: detect Steam Deck, somehow
 
 	switch (process.platform)
 	{
 		case "win32":
-			return PlaySessionPlatform.WINDOWS;
+			return GamePlayActionOperatingSystem.WINDOWS;
 
 		case "darwin":
-			return PlaySessionPlatform.MAC;
+			return GamePlayActionOperatingSystem.MAC;
 
 		case "linux":
-			return PlaySessionPlatform.LINUX;
+			return GamePlayActionOperatingSystem.LINUX;
 
 		default:
-			return PlaySessionPlatform.UNKNOWN;
+			return GamePlayActionOperatingSystem.OTHER;
 	}
 }
 
@@ -152,16 +152,16 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 	const playSessionStartDateTime = DateTime.now();
 
-	const playSession = await prismaClient.playSession.create(
+	const gamePlayActionSession = await prismaClient.gamePlayActionSession.create(
 		{
 			data:
 			{
-				platform: determinePlatform(),
+				operatingSystem: determineOperatingSystem(),
 				startDate: playSessionStartDateTime.toJSDate(),
 				endDate: playSessionStartDateTime.toJSDate(),
 				playTimeSeconds: 0,
 
-				game_id: game.id,
+				gamePlayAction_id: gamePlayAction.id,
 			},
 		});
 
@@ -178,13 +178,13 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 			if (gameProcess != null)
 			{
-				console.log("[GameLauncherLib] Updating play session %d with play time: %d", playSession.id, playTimeSeconds);
+				console.log("[GameLauncherLib] Updating game play action session %d with play time: %d", gamePlayAction.id, playTimeSeconds);
 
-				await prismaClient.playSession.update(
+				await prismaClient.gamePlayActionSession.update(
 					{
 						where:
 						{
-							id: playSession.id,
+							id: gamePlayActionSession.id,
 						},
 						data:
 						{
@@ -214,14 +214,14 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 									lastPlayedDate: playSessionEndDateTime.toJSDate(),
 									playCount: { increment: 1 },
 									playTimeTotalSeconds: { increment: playTimeSeconds },
-								}
+								},
 							});
 
-						await transactionClient.playSession.update(
+						await transactionClient.gamePlayActionSession.update(
 							{
 								where:
 								{
-									id: playSession.id,
+									id: gamePlayActionSession.id,
 								},
 								data:
 								{

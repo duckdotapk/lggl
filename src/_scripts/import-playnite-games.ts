@@ -4,7 +4,7 @@
 
 import fs from "node:fs";
 
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameProgressionType, GameVirtualRealitySupport, PlaySessionPlatform, Prisma } from "@prisma/client";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../_shared/instances/prismaClient.js";
@@ -528,7 +528,7 @@ async function createGameSource(transactionClient: Prisma.TransactionClient, pla
 		});
 }
 
-async function createInstallation(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
+async function createGameInstallation(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
 {
 	if (playniteGame.GameActions.length > 1)
 	{
@@ -554,31 +554,6 @@ async function createInstallation(transactionClient: Prisma.TransactionClient, p
 				path: playniteGame.InstallDirectory,
 				fileSizeBytes,
 				fileSizeGibiBytes,
-
-				game_id: game.id,
-			},
-		});
-}
-
-async function createPlaySession(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
-{
-	if (playniteGame.Playtime == 0)
-	{
-		return;
-	}
-
-	await transactionClient.playSession.create(
-		{
-			data:
-			{
-				sortOrder: -1,
-
-				platform: PlaySessionPlatform.UNKNOWN,
-				startDate: DateTime.fromSeconds(0).toJSDate(),
-				endDate: DateTime.fromSeconds(playniteGame.Playtime).toJSDate(),
-				playTimeSeconds: playniteGame.Playtime,
-				isHistorical: true,
-				notes: "Playtime imported from Playnite.",
 
 				game_id: game.id,
 			},
@@ -652,6 +627,8 @@ async function createGame(transactionClient: Prisma.TransactionClient, playniteG
 			},
 		});
 
+	// TODO: create GamePlayAction + historical GamePlayActionSession
+
 	await createGameAntiCheats(transactionClient, playniteGame, game);
 
 	await createGameDevelopers(transactionClient, playniteGame, game);
@@ -662,6 +639,8 @@ async function createGame(transactionClient: Prisma.TransactionClient, playniteG
 
 	await createGameGenres(transactionClient, playniteGame, game);
 
+	await createGameInstallation(transactionClient, playniteGame, game);
+
 	await createGameModes(transactionClient, playniteGame, game);
 	
 	await createGamePlatforms(transactionClient, playniteGame, game);
@@ -669,10 +648,6 @@ async function createGame(transactionClient: Prisma.TransactionClient, playniteG
 	await createGamePublishers(transactionClient, playniteGame, game);
 
 	await createGameSource(transactionClient, playniteGame, game);
-
-	await createInstallation(transactionClient, playniteGame, game);
-
-	await createPlaySession(transactionClient, playniteGame, game);
 
 	await createSeriesGames(transactionClient, playniteGame, game);
 }

@@ -23,4 +23,6 @@ model PlaySession {
     game_id Int
 
     game Game @relation(fields: [game_id], references: [id])
+
+    @@ignore
 }
