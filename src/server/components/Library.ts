@@ -5,34 +5,40 @@
 import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 
+import { FilterOptionsToolbar } from "./FilterOptionsToolbar.js";
 import { GameDetails } from "./GameDetails.js";
 import { Sidebar } from "./Sidebar.js";
 
 import { staticMiddleware } from "../instances/server.js";
 
+import * as LibraryLib from "../../_shared/libs/Library.js";
+
 //
 // Component
 //
 
-export type LibraryGames = Prisma.GameGetPayload<null>[];
-
-export type LibrarySelectedGame = Prisma.GameGetPayload<
-	{
-		include:
+export type LibraryOptions =
+{
+	searchParameters: URLSearchParams;
+	filterOptions: LibraryLib.FilterOptions;
+	gameGroups: Map<string, Prisma.GameGetPayload<null>[]>;
+	selectedGame: Prisma.GameGetPayload<
 		{
-			gamePlayActions: true;
-		};
-	}> | null;
-
-export type LibraryRecentGamePlayActionSessions = Prisma.GamePlayActionSessionGetPayload<
-	{
-		include:
+			include:
+			{
+				gamePlayActions: true;
+			};
+		}> | null;
+	recentGamePlayActionSessions: Prisma.GamePlayActionSessionGetPayload<
 		{
-			platform: true;
-		};
-	}>[];
+			include:
+			{
+				platform: true;
+			};
+		}>[];
+}
 
-export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: LibrarySelectedGame, recentGamePlayActionSessions: LibraryRecentGamePlayActionSessions, searchParameters: URLSearchParams)
+export function Library(options: LibraryOptions)
 {
 	return new DE("html",
 		{
@@ -66,10 +72,12 @@ export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: Lib
 				[
 					new DE("div", "component-library",
 						[
-							Sidebar(gameGroups, selectedGame, searchParameters),
+							FilterOptionsToolbar(options.filterOptions),
 
-							selectedGame != null
-								? GameDetails(selectedGame, recentGamePlayActionSessions)
+							Sidebar(options.gameGroups, options.selectedGame, options.searchParameters),
+
+							options.selectedGame != null
+								? GameDetails(options.selectedGame, options.recentGamePlayActionSessions)
 								: null,
 						]),
 				]),

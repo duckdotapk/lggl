@@ -1,0 +1,25 @@
+//
+// Component
+//
+
+@mixin FilterOptionsToolbar
+{
+	.component-filter-options-toolbar-checkbox
+	{
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.component-filter-options-toolbar
+	{
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
+
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		justify-content: center;
+
+		padding: 0.5rem;
+	}
+}

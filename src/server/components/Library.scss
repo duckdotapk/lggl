@@ -10,14 +10,30 @@
 		height: 100dvh;
 
 		display: grid;
+		grid-template-areas:
+			"filter-options-toolbar filter-options-toolbar"
+			"sidebar                game-details-wrapper";
 		grid-template-columns: auto 1fr;
+		grid-template-rows: auto 1fr;
 		
 		background-color: #1f2937; // Tailwind Gray 800
 		color: #f3f4f6; // Tailwind Gray 100
 		font-family: "Roboto", Arial, Helvetica, "sans-serif";
 
+		> .component-filter-options-toolbar
+		{
+			grid-area: filter-options-toolbar;
+		}
+
+		> .component-sidebar
+		{
+			grid-area: sidebar;
+		}
+
 		> .game-details-wrapper
 		{
+			grid-area: game-details-wrapper;
+
 			height: 100%;
 
 			overflow-y: scroll;

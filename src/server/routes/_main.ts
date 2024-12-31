@@ -25,12 +25,43 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	handler: async (context) =>
 	{
 		//
-		// Get Parameters
+		// Get Search Parameters
 		//
 
 		const searchParameters = context.fritterRequest.getSearchParams();
 
-		const filterOptions = LibraryLib.parseFilterOptions(context.fritterRequest.getSearchParams());
+		//
+		// Get Filter Options
+		//
+
+		const filterOptionsParseResult = LibraryLib.FilterOptionsSchema.safeParse(JSON.parse(searchParameters.get("filterOptions") ?? "{}"));
+
+		if (!filterOptionsParseResult.success)
+		{
+			const defaultFilterOptions: LibraryLib.FilterOptions =
+			{
+				groupMode: "lastPlayed",
+				sortMode: "lastPlayed",
+
+				groupFavoritesSeparately: true,
+
+				showVisibleGames: true,
+				showHiddenGames: false,
+				showNsfwGames: false,
+			};
+
+			const newSearchParameters = new URLSearchParams(searchParameters);
+
+			newSearchParameters.set("filterOptions", JSON.stringify(defaultFilterOptions));
+
+			return context.fritterResponse.setRedirect("/?" + newSearchParameters.toString());
+		}
+
+		const filterOptions = filterOptionsParseResult.data;
+
+		//
+		// Get Selected Game ID
+		//
 		
 		let selectedGameId: number | null = parseInt(searchParameters.get("selectedGameId") ?? "");
 
@@ -45,11 +76,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		let games = await prismaClient.game.findMany(
 			{
-				where:
-				{
-					isHidden: false,
-					isNsfw: false,
-				},
 				orderBy:
 				[
 					{
@@ -67,6 +93,25 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					},
 				],
 			});
+
+		//
+		// Filter Out Games
+		//
+
+		if (!filterOptions.showVisibleGames)
+		{
+			games = games.filter((game) => game.isHidden || game.isNsfw);
+		}
+
+		if (!filterOptions.showHiddenGames)
+		{
+			games = games.filter((game) => !game.isHidden);
+		}
+
+		if (!filterOptions.showNsfwGames)
+		{
+			games = games.filter((game) => !game.isNsfw);
+		}
 
 		//
 		// Sort Games
@@ -201,6 +246,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		//
 
 		context.fritterResponse.setContentType("text/html");
-		context.fritterResponse.setBody(Library(gameGroups, selectedGame, recentGamePlayActionSessions, searchParameters).renderToString());
+		context.fritterResponse.setBody(Library(
+			{
+				searchParameters,
+				filterOptions,
+				gameGroups, 
+				selectedGame, 
+				recentGamePlayActionSessions,
+			}).renderToString());
 	},
 };

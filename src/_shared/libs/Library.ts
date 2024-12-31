@@ -1,51 +1,23 @@
 //
+// Schemas
+//
+
+import { z } from "zod";
+
+export const FilterOptionsSchema = z.object(
+	{
+		groupMode: z.enum([ "lastPlayed" ]),
+		sortMode: z.enum([ "lastPlayed" ]),
+
+		groupFavoritesSeparately: z.boolean(),
+
+		showVisibleGames: z.boolean(),
+		showHiddenGames: z.boolean(),
+		showNsfwGames: z.boolean(),
+	});
+
+//
 // Types
 //
 
-export type FilterOptions =
-{
-	groupMode: "lastPlayed";
-	sortMode: "lastPlayed";
-
-	groupFavoritesSeparately: boolean;
-};
-
-//
-// Utility Functions
-//
-
-export function parseFilterOptions(searchParameters: URLSearchParams): FilterOptions
-{
-	let groupMode: FilterOptions["groupMode"];
-
-	switch (searchParameters.get("groupMode"))
-	{
-		case "lastPlayed":
-		default:
-			groupMode = "lastPlayed";
-
-			break;
-	}
-
-	let sortMode: FilterOptions["sortMode"];
-
-	switch (searchParameters.get("sortMode"))
-	{
-		case "lastPlayed":
-		default:
-			sortMode = "lastPlayed";
-
-			break;
-	}
-
-	const groupFavoritesSeparately = searchParameters.has("groupFavoritesSeparately")
-		? searchParameters.get("groupFavoritesSeparately") == "true"
-		: true;
-
-	return {
-		groupMode,
-		sortMode,
-
-		groupFavoritesSeparately,
-	};
-}
+export type FilterOptions = z.infer<typeof FilterOptionsSchema>;
