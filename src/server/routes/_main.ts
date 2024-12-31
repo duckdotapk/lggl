@@ -43,7 +43,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				groupMode: "lastPlayed",
 				sortMode: "lastPlayed",
 
-				groupFavoritesSeparately: true,
+				showFavoritesGroup: true,
 
 				showVisibleGames: true,
 				showHiddenGames: false,
@@ -155,7 +155,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		const gameGroups = new Map<string, typeof games>();
 
-		if (filterOptions.groupFavoritesSeparately)
+		if (filterOptions.showFavoritesGroup)
 		{
 			const favoriteGames = games.filter((game) => game.isFavorite);
 
@@ -163,8 +163,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			{
 				gameGroups.set("Favorites", favoriteGames);
 			}
-
-			games = games.filter((game) => !game.isFavorite);
 		}
 
 		switch (filterOptions.groupMode)

@@ -9,7 +9,7 @@ export const FilterOptionsSchema = z.object(
 		groupMode: z.enum([ "lastPlayed" ]),
 		sortMode: z.enum([ "lastPlayed" ]),
 
-		groupFavoritesSeparately: z.boolean(),
+		showFavoritesGroup: z.boolean(),
 
 		showVisibleGames: z.boolean(),
 		showHiddenGames: z.boolean(),

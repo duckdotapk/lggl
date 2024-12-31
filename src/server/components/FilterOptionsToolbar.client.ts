@@ -16,7 +16,7 @@ async function initialise(toolbar: HTMLFormElement)
 
 	const sortModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="sortMode"]`);
 
-	const groupFavoritesSeparatelyCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="groupFavoritesSeparately"]`);
+	const showFavoritesGroupCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showFavoritesGroup"]`);
 
 	const showVisibleGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showVisibleGames"]`);
 
@@ -31,7 +31,7 @@ async function initialise(toolbar: HTMLFormElement)
 			groupMode: groupModeSelect.value as LibraryLib.FilterOptions["groupMode"],
 			sortMode: sortModeSelect.value as LibraryLib.FilterOptions["sortMode"],
 	
-			groupFavoritesSeparately: groupFavoritesSeparatelyCheckbox.checked,
+			showFavoritesGroup: showFavoritesGroupCheckbox.checked,
 	
 			showVisibleGames: showVisibleGamesCheckbox.checked,
 			showHiddenGames: showHiddenGamesCheckbox.checked,
@@ -48,15 +48,6 @@ async function initialise(toolbar: HTMLFormElement)
 	toolbar.addEventListener("submit", () => updateFilterOptions());
 
 	toolbar.addEventListener("change", () => updateFilterOptions());
-
-	// groupModeSelect.addEventListener("change", () => updateFilterOptions());
-	// sortModeSelect.addEventListener("change", () => updateFilterOptions());
-
-	// groupFavoritesSeparatelyCheckbox.addEventListener("change", () => updateFilterOptions());
-
-	// showVisibleGamesCheckbox.addEventListener("change", () => updateFilterOptions());
-	// showHiddenGamesCheckbox.addEventListener("change", () => updateFilterOptions());
-	// showNsfwGamesCheckbox.addEventListener("change", () => updateFilterOptions());
 }
 
 //

@@ -47,7 +47,7 @@ export function FilterOptionsToolbar(filterOptions: LibraryLib.FilterOptions)
 						]),
 				]),
 
-			Checkbox("groupFavoritesSeparately", "Group favorites separately", filterOptions.groupFavoritesSeparately),
+			Checkbox("showFavoritesGroup", "Show favorites group", filterOptions.showFavoritesGroup),
 
 			Checkbox("showVisibleGames", "Show visible games", filterOptions.showVisibleGames),
 			Checkbox("showHiddenGames", "Show hidden games", filterOptions.showHiddenGames),
