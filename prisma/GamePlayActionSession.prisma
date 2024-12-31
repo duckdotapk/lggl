@@ -9,7 +9,7 @@ enum GamePlayActionOperatingSystem {
 model GamePlayActionSession {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
-    lastUpdatedDate DateTime @updatedAt
+    lastUpdatedDate DateTime @default(now()) @updatedAt
     sortOrder       Int      @default(0)
 
     operatingSystem GamePlayActionOperatingSystem

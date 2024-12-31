@@ -1,7 +1,7 @@
 model Company {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
-    lastUpdatedDate DateTime @updatedAt
+    lastUpdatedDate DateTime @default(now()) @updatedAt
     sortOrder       Int      @default(0)
 
     name String @unique
