@@ -10,19 +10,19 @@ import type * as LibraryLib from "../../_shared/libs/Library.js";
 // Locals
 //
 
-async function initialise(element: HTMLFormElement)
+async function initialise(toolbar: HTMLFormElement)
 {
-	const groupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(element, `select[name="groupMode"]`);
+	const groupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="groupMode"]`);
 
-	const sortModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(element, `select[name="sortMode"]`);
+	const sortModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="sortMode"]`);
 
-	const groupFavoritesSeparatelyCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, `input[name="groupFavoritesSeparately"]`);
+	const groupFavoritesSeparatelyCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="groupFavoritesSeparately"]`);
 
-	const showVisibleGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, `input[name="showVisibleGames"]`);
+	const showVisibleGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showVisibleGames"]`);
 
-	const showHiddenGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, `input[name="showHiddenGames"]`);
+	const showHiddenGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showHiddenGames"]`);
 
-	const showNsfwGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, `input[name="showNsfwGames"]`);
+	const showNsfwGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showNsfwGames"]`);
 
 	const updateFilterOptions = () =>
 	{
@@ -45,9 +45,9 @@ async function initialise(element: HTMLFormElement)
 		window.location.search = searchParameters.toString();
 	};
 
-	element.addEventListener("submit", () => updateFilterOptions());
+	toolbar.addEventListener("submit", () => updateFilterOptions());
 
-	element.addEventListener("change", () => updateFilterOptions());
+	toolbar.addEventListener("change", () => updateFilterOptions());
 
 	// groupModeSelect.addEventListener("change", () => updateFilterOptions());
 	// sortModeSelect.addEventListener("change", () => updateFilterOptions());
@@ -65,19 +65,19 @@ async function initialise(element: HTMLFormElement)
 
 export async function initialiseFilterOptionsToolbars()
 {
-	const filterOptionsToolbars = document.querySelectorAll<HTMLFormElement>(".component-filter-options-toolbar:not(.initialised)");
+	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-filter-options-toolbar:not(.initialised)");
 
-	for (const element of filterOptionsToolbars)
+	for (const toolbar of toolbars)
 	{
 		try
 		{
-			await initialise(element);
+			await initialise(toolbar);
 			
-			element.classList.add("initialised");
+			toolbar.classList.add("initialised");
 		}
 		catch (error)
 		{
-			console.error("[FilterOptionsToolbar] Error initialising:", element, error);
+			console.error("[FilterOptionsToolbar] Error initialising:", toolbar, error);
 		}
 	}
 }

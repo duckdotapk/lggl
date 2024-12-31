@@ -46,9 +46,9 @@ async function initialise(element: HTMLElement)
 
 export async function initialiseGameDetails()
 {
-	const gameDetails = document.querySelectorAll<HTMLElement>(".component-game-details:not(.initialised)");
+	const elements = document.querySelectorAll<HTMLElement>(".component-game-details:not(.initialised)");
 
-	for (const element of gameDetails)
+	for (const element of elements)
 	{
 		try
 		{

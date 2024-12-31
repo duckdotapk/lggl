@@ -4,9 +4,19 @@
 
 async function initialise(element: HTMLElement)
 {
-	const selectedGameGroupItem = element.querySelector<HTMLAnchorElement>(".component-sidebar-group-item.selected");
+	const selectedSidebarGroupItem = element.querySelector<HTMLAnchorElement>(".component-sidebar-group-item.selected");
 
-	selectedGameGroupItem?.scrollIntoView({ block: "center" });
+	if (selectedSidebarGroupItem != null)
+	{
+		const sidebarGroup = selectedSidebarGroupItem.closest<HTMLDetailsElement>(".component-sidebar-group");
+	
+		if (sidebarGroup != null)
+		{
+			sidebarGroup.open = true;
+		}
+	
+		selectedSidebarGroupItem?.scrollIntoView({ block: "center" });
+	}
 }
 
 //

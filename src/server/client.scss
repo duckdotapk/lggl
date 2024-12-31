@@ -7,10 +7,11 @@
 @use "components/_Global.scss";
 
 @use "components/Button.scss";
-@use "components/FilterOptionsToolbar.scss";
+@use "components/Checkbox.scss";
 @use "components/GameDetails.scss";
 @use "components/Library.scss";
 @use "components/Sidebar.scss";
+@use "components/Toolbar.scss";
 
 //
 // Client
@@ -20,7 +21,8 @@
 @include Global.FontFaces();
 
 @include Button.Button();
-@include FilterOptionsToolbar.FilterOptionsToolbar();
+@include Checkbox.Checkbox();
 @include GameDetails.GameDetails();
 @include Library.Library();
 @include Sidebar.Sidebar();
+@include Toolbar.Toolbar();

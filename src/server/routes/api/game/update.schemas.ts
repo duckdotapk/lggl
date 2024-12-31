@@ -12,7 +12,15 @@ import { z } from "zod";
 export const RequestBodySchema = z.object(
 	{
 		id: z.number().int().min(1),
-		gamePlayAction_id: z.number().int().min(1),
+		
+		updateData: z.object(
+			{
+				isEarlyAccess: z.boolean().optional(),
+				isFavorite: z.boolean().optional(),
+				isHidden: z.boolean().optional(),
+				isNsfw: z.boolean().optional(),
+				isShelved: z.boolean().optional(),
+			}),
 	});
 
 export const ResponseBodySchema = z.union(
@@ -36,13 +44,13 @@ export type ResponseBody = z.infer<typeof ResponseBodySchema>;
 
 export const method = "POST";
 
-export const path = "/api/games/launch";
+export const path = "/api/games/update";
 
 //
 // Utility Functions
 //
 
-export function launchGame(id: number, gamePlayAction_id: number)
+export function updateGame(id: number, updateData: RequestBody["updateData"])
 {
 	return FritterApiUtilities.request(method, path,
 		{
@@ -50,8 +58,8 @@ export function launchGame(id: number, gamePlayAction_id: number)
 			responseBodySchema: ResponseBodySchema,
 			requestBody:
 			{
-				id: id,
-				gamePlayAction_id,
+				id,
+				updateData,
 			},
 		});
 }

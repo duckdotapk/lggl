@@ -9,6 +9,7 @@ import humanizeDuration from "humanize-duration";
 import { DateTime } from "luxon";
 
 import { Button } from "./Button.js";
+import { GameFlagsToolbar } from "./GameFlagsToolbar.js";
 import { HumanDateTime } from "./HumanDateTime.js";
 
 import { staticMiddleware } from "../instances/server.js";
@@ -126,6 +127,8 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 			Header(game),
 
 			PlayActionButtonGroup(game),
+
+			GameFlagsToolbar(game),
 
 			new DE("div", "details-sections",
 				[

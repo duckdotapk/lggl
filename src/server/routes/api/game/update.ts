@@ -6,11 +6,9 @@ import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 
 import { prismaClient } from "../../../../_shared/instances/prismaClient.js";
 
-import * as GameLauncherLib from "../../../../_shared/libs/GameLauncher.js";
-
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./launch.schemas.js";
+import * as Schemas from "./update.schemas.js";
 
 //
 // Route
@@ -40,35 +38,21 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
 			}
 
-			const gamePlayAction = await prismaClient.gamePlayAction.findFirst(
+			await prismaClient.game.update(
 				{
 					where:
 					{
-						id: requestBody.gamePlayAction_id,
-
-						game_id: game.id,
+						id: game.id,
+					},
+					data:
+					{
+						isEarlyAccess: requestBody.updateData.isEarlyAccess,
+						isFavorite: requestBody.updateData.isFavorite,
+						isHidden: requestBody.updateData.isHidden,
+						isNsfw: requestBody.updateData.isNsfw,
+						isShelved: requestBody.updateData.isShelved,
 					},
 				});
-
-			if (gamePlayAction == null)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game play action not found." });
-			}
-
-			try
-			{
-				await GameLauncherLib.launchGame(game, gamePlayAction);
-			}
-			catch (error)
-			{
-				console.error("[" + Schemas.path + "] Error launching game:", error);
-
-				throw new FritterApiUtilities.APIError(
-					{ 
-						code: "LAUNCH_FAILED", 
-						message: error instanceof Error ? error.message : "Unknown error launching game.",
-					});
-			}
 
 			return {
 				success: true,

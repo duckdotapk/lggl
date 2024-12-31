@@ -1,0 +1,13 @@
+//
+// Component
+//
+
+@mixin Checkbox()
+{
+	.component-checkbox
+	{
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+}

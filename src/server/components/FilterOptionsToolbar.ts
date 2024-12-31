@@ -6,27 +6,8 @@ import { DE } from "@donutteam/document-builder";
 
 import * as LibraryLib from "../../_shared/libs/Library.js";
 
-//
-// Locals
-//
-
-function Checkbox(name: string, label: string, checked: boolean)
-{
-	return new DE("label", "component-filter-options-toolbar-checkbox",
-		[
-			new DE("input",
-				{
-					type: "checkbox",
-					name: name,
-					checked,
-				}),
-			
-			new DE("span", "label",
-				[
-					label,
-				]),
-		]);
-}
+import { Checkbox } from "./Checkbox.js";
+import { Toolbar } from "./Toolbar.js";
 
 //
 // Components
@@ -34,7 +15,7 @@ function Checkbox(name: string, label: string, checked: boolean)
 
 export function FilterOptionsToolbar(filterOptions: LibraryLib.FilterOptions)
 {
-	return new DE("form", "component-filter-options-toolbar",
+	return Toolbar("component-filter-options-toolbar", null,
 		[
 			new DE("select",
 				{
