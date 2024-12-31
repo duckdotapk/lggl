@@ -88,6 +88,5 @@ model Game {
     gamePublishers         GamePublisher[]
     gameRatingBoardRatings GameRatingBoardRating[]
     gameSources            GameSource[]
-    playSessions           PlaySession[]           @ignore
     seriesGames            SeriesGame[]
 }
