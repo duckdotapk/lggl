@@ -40,6 +40,12 @@ export function Library(gameGroups: Map<string, LibraryGames>, selectedGame: Lib
 					new DE("link",
 						{
 							rel: "stylesheet",
+							href: staticMiddleware.getCacheBustedPath("/data/fontawesome/css/all.min.css"),
+						}),
+
+					new DE("link",
+						{
+							rel: "stylesheet",
 							href: staticMiddleware.getCacheBustedPath("/data/client.css"),
 						}),
 
