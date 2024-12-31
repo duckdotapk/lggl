@@ -57,7 +57,7 @@ export async function initialiseGamePlayActionButtonGroups()
 		}
 		catch (error)
 		{
-			console.error("[GamePlayActionButtonGroup] Error initialising:", gamePlayActionButtonGroups, error);
+			console.error("[GamePlayActionButtonGroup] Error initialising:", element, error);
 		}
 	}
 }
