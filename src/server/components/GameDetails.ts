@@ -159,7 +159,9 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 								(gamePlayActionSession) =>
 								{
 									return {
-										label: DateTime.fromJSDate(gamePlayActionSession.startDate).toLocaleString(DateTime.DATETIME_MED),
+										label: gamePlayActionSession.isHistorical
+											? "Historical"
+											: DateTime.fromJSDate(gamePlayActionSession.startDate).toLocaleString(DateTime.DATETIME_MED),
 										value: humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000),
 									};
 								})),
