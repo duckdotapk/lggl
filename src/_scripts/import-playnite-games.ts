@@ -4,7 +4,7 @@
 
 import fs from "node:fs";
 
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GamePlayActionOperatingSystem, GamePlayActionType, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../_shared/instances/prismaClient.js";
@@ -19,6 +19,7 @@ import * as SeriesModelLib from "../_shared/libs/models/Series.js";
 import * as SourceModelLib from "../_shared/libs/models/Source.js";
 
 import * as PlayniteThirdPartyLib from "../_shared/libs/third-party/Playnite.js";
+import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
 
 import * as FileSizeLib from "../_shared/libs/FileSize.js";
 
@@ -205,25 +206,145 @@ function determineVirtualRealitySupport(playniteGame: PlayniteThirdPartyLib.Play
 
 function determineSteamAppId(playniteGame: PlayniteThirdPartyLib.PlayniteGame)
 {
-	const steamStorePageLink = playniteGame.Links?.find((link) => link.Name == "Steam Store Page");
+	const launchViaSteamGameAction = playniteGame.GameActions.find((gameAction) => gameAction.Name == "Launch via Steam");
 
-	if (steamStorePageLink == null)
+	if (launchViaSteamGameAction == null)
 	{
-		throw new Error("Could not find Steam Store Page link for game: " + playniteGame.Name);
+		throw new Error("Could not find Launch via Steam GameAction for game: " + playniteGame.Name);
 	}
 
-	const steamStorePageUrl = new URL(steamStorePageLink.Url);
+	const steamRunUrl = new URL(launchViaSteamGameAction.Path);
 
-	const steamStorePagePathComponents = steamStorePageUrl.pathname.split("/");
+	const steamRunUrlComponents = steamRunUrl.pathname.split("/");
 
-	const steamAppId = parseInt(steamStorePagePathComponents[2] ?? "");
+	const steamAppId = parseInt(steamRunUrlComponents[1] ?? "");
 
 	if (isNaN(steamAppId))
 	{
-		throw new Error("Could not parse Steam App ID from URL: " + steamStorePageLink.Url);
+		throw new Error("Could not parse Steam App ID from URL: " + launchViaSteamGameAction.Path);
 	}
 
 	return steamAppId.toString();
+}
+
+async function createGamePlayAction(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
+{
+	if (game.steamAppId == null)
+	{
+		throw new Error("Game does not have a Steam App ID: " + playniteGame.Name);
+	}
+
+	const launchViaSteamGameAction = playniteGame.GameActions.find((gameAction) => gameAction.Name == "Launch via Steam");
+
+	if (launchViaSteamGameAction == null)
+	{
+		throw new Error("Could not find Launch via Steam GameAction for game: " + playniteGame.Name);
+	}
+
+	if (launchViaSteamGameAction.TrackingPath == null)
+	{
+		throw new Error("Launch via Steam GameAction does not have a TrackingPath: " + playniteGame.Name);
+	}
+
+	const gamePlayAction = await transactionClient.gamePlayAction.create(
+		{
+			data:
+			{
+				name: "Launch via Steam",
+				type: GamePlayActionType.STEAM,
+				path: launchViaSteamGameAction.Path,
+				trackingPath: launchViaSteamGameAction.TrackingPath,
+
+				game_id: game.id,
+			},
+		});
+
+	const appDetails = await SteamThirdPartyLib.fetchOwnedApp(game.steamAppId);
+
+	if (appDetails == null || appDetails.playtime_windows_forever == 0 && appDetails.playtime_mac_forever == 0 && appDetails.playtime_linux_forever == 0 && appDetails.playtime_deck_forever == 0)
+	{
+
+	}
+	else
+	{
+		if (appDetails.playtime_windows_forever > 0)
+		{
+			await transactionClient.gamePlayActionSession.create(
+				{
+					data:
+					{
+						operatingSystem: GamePlayActionOperatingSystem.WINDOWS,
+						startDate: DateTime.fromSeconds(0).toJSDate(),
+						endDate: DateTime.fromSeconds(appDetails.playtime_windows_forever).toJSDate(),
+						playTimeSeconds: appDetails.playtime_windows_forever,
+						addedToTotal: true,
+						isHistorical: false,
+						notes: "Historical playtime from Steam.",
+
+						gamePlayAction_id: gamePlayAction.id,
+					},
+				});
+		}
+
+		if (appDetails.playtime_mac_forever > 0)
+		{
+			await transactionClient.gamePlayActionSession.create(
+				{
+					data:
+					{
+						operatingSystem: GamePlayActionOperatingSystem.MAC,
+						startDate: DateTime.fromSeconds(0).toJSDate(),
+						endDate: DateTime.fromSeconds(appDetails.playtime_mac_forever).toJSDate(),
+						playTimeSeconds: appDetails.playtime_mac_forever,
+						addedToTotal: true,
+						isHistorical: false,
+						notes: "Historical playtime from Steam.",
+
+						gamePlayAction_id: gamePlayAction.id,
+					},
+				});
+		}
+
+		const nonSteamDeckLinuxPlaytime = appDetails.playtime_linux_forever - appDetails.playtime_deck_forever;
+
+		if (nonSteamDeckLinuxPlaytime > 0)
+		{
+			await transactionClient.gamePlayActionSession.create(
+				{
+					data:
+					{
+						operatingSystem: GamePlayActionOperatingSystem.LINUX,
+						startDate: DateTime.fromSeconds(0).toJSDate(),
+						endDate: DateTime.fromSeconds(nonSteamDeckLinuxPlaytime).toJSDate(),
+						playTimeSeconds: nonSteamDeckLinuxPlaytime,
+						addedToTotal: true,
+						isHistorical: false,
+						notes: "Historical playtime from Steam.",
+
+						gamePlayAction_id: gamePlayAction.id,
+					},
+				});
+		}
+
+		if (appDetails.playtime_deck_forever > 0)
+		{
+			await transactionClient.gamePlayActionSession.create(
+				{
+					data:
+					{
+						operatingSystem: GamePlayActionOperatingSystem.LINUX_STEAM_DECK,
+						startDate: DateTime.fromSeconds(0).toJSDate(),
+						endDate: DateTime.fromSeconds(appDetails.playtime_deck_forever).toJSDate(),
+						playTimeSeconds: appDetails.playtime_deck_forever,
+						addedToTotal: true,
+						isHistorical: false,
+						notes: "Historical playtime from Steam.",
+
+						gamePlayAction_id: gamePlayAction.id,
+					},
+				});
+		}
+	}
 }
 
 async function createGameAntiCheats(transactionClient: Prisma.TransactionClient, playniteGame: PlayniteThirdPartyLib.PlayniteGame, game: Prisma.GameGetPayload<null>)
@@ -537,12 +658,12 @@ async function createGameInstallation(transactionClient: Prisma.TransactionClien
 
 	if (playniteGame.InstallDirectory == null)
 	{
-		throw new Error("Game does not have an InstallDirectory: " + playniteGame.Name);
+		return;
 	}
 
 	if (playniteGame.InstallSize == null)
 	{
-		throw new Error("Game does not have an InstallSize: " + playniteGame.Name);
+		return;
 	}
 
 	const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(playniteGame.InstallSize);
@@ -627,7 +748,7 @@ async function createGame(transactionClient: Prisma.TransactionClient, playniteG
 			},
 		});
 
-	// TODO: create GamePlayAction + historical GamePlayActionSession
+	await createGamePlayAction(transactionClient, playniteGame, game);
 
 	await createGameAntiCheats(transactionClient, playniteGame, game);
 
@@ -679,6 +800,11 @@ async function main()
 
 		const playniteGame = playniteGameParseResult.data;
 
+		if (playniteGame.Source.Name != "Steam")
+		{
+			continue;
+		}
+
 		const existingGame = await prismaClient.game.findFirst(
 			{
 				where:
@@ -688,13 +814,6 @@ async function main()
 			});
 	
 		if (existingGame != null)
-		{
-			continue;
-		}
-
-		const steamStorePageLink = playniteGame.Links?.find((link) => link.Name == "Steam Store Page");
-
-		if (steamStorePageLink == null)
 		{
 			continue;
 		}
