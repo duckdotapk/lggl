@@ -10,6 +10,8 @@ import { Library } from "../components/Library.js";
 
 import { ServerFritterContext } from "../instances/server.js";
 
+import * as LibraryLib from "../../_shared/libs/Library.js";
+
 //
 // Route
 //
@@ -26,9 +28,9 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		// Get Parameters
 		//
 
-		const groupBy = context.fritterRequest.getSearchParams().get("groupBy");
-
 		const searchParameters = context.fritterRequest.getSearchParams();
+
+		const filterOptions = LibraryLib.parseFilterOptions(context.fritterRequest.getSearchParams());
 		
 		let selectedGameId: number | null = parseInt(searchParameters.get("selectedGameId") ?? "");
 
@@ -41,7 +43,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		// Find Games
 		//
 
-		const games = await prismaClient.game.findMany(
+		let games = await prismaClient.game.findMany(
 			{
 				where:
 				{
@@ -67,29 +69,80 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			});
 
 		//
+		// Sort Games
+		//
+
+		switch (filterOptions.sortMode)
+		{
+			case "lastPlayed":
+				games = games.sort(
+					(a, b) =>
+					{
+						if (a.lastPlayedDate != null && b.lastPlayedDate != null)
+						{
+							if (a.lastPlayedDate > b.lastPlayedDate)
+							{
+								return -1;
+							}
+							else
+							{
+								return 1;
+							}
+						}
+						else if (a.lastPlayedDate != null)
+						{
+							return -1;
+						}
+						else if (b.lastPlayedDate != null)
+						{
+							return 1;
+						}
+
+						return a.sortName.localeCompare(b.sortName);
+					});
+
+				break;
+		}
+
+		//
 		// Group Games
 		//
 
 		const gameGroups = new Map<string, typeof games>();
 
-		switch (groupBy)
+		if (filterOptions.groupFavoritesSeparately)
 		{
-			default:
-				const favoriteGames = games.filter((game) => game.isFavorite);
-				
-				if (favoriteGames.length > 0)
-				{
-					gameGroups.set("Favorites", favoriteGames);
-				}
+			const favoriteGames = games.filter((game) => game.isFavorite);
 
-				const playedGames = games.filter((game) => !game.isFavorite && game.playTimeTotalSeconds > 0);
+			if (favoriteGames.length > 0)
+			{
+				gameGroups.set("Favorites", favoriteGames);
+			}
+
+			games = games.filter((game) => !game.isFavorite);
+		}
+
+		switch (filterOptions.groupMode)
+		{
+			case "lastPlayed":
+			default:
+				const playedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
 
 				if (playedGames.length > 0)
 				{
-					gameGroups.set("Played Games", playedGames);
+					for (const playedGame of playedGames)
+					{
+						const year = playedGame.lastPlayedDate?.getFullYear() ?? 0;
+
+						const yearGroup = gameGroups.get(year.toString()) ?? [];
+
+						yearGroup.push(playedGame);
+
+						gameGroups.set(year.toString(), yearGroup);
+					}
 				}
 
-				const unplayedGames = games.filter((game) => !game.isFavorite && game.playTimeTotalSeconds == 0);
+				const unplayedGames = games.filter((game) => game.playTimeTotalSeconds == 0);
 
 				if (unplayedGames.length > 0)
 				{
@@ -98,12 +151,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 				break;
 		}
-
-		//
-		// Sort Groups
-		//
-
-		// TODO
 
 		//
 		// Find Selected Game
