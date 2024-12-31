@@ -61,7 +61,7 @@ async function initialise(element: HTMLElement)
 			sidebarGroup.open = true;
 		}
 	
-		selectedSidebarGroupItem?.scrollIntoView({ block: "center" });
+		selectedSidebarGroupItem?.scrollIntoView({ block: "nearest" });
 	}
 }
 
