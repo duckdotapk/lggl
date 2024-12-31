@@ -7,10 +7,11 @@ import "source-map-support/register.js";
 import fs from "node:fs";
 import path from "node:path";
 
+import { Prisma } from "@prisma/client";
+
 import { prismaClient } from "../_shared/instances/prismaClient.js";
 
 import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
-import { Prisma } from "@prisma/client";
 
 //
 // Functions
