@@ -16,7 +16,13 @@ async function main()
 		{
 			include:
 			{
-				gamePlayActions: true,
+				gamePlayActions:
+				{
+					include:
+					{
+						gamePlayActionSessions: true,
+					},
+				},
 			},
 			orderBy:
 			{
@@ -27,6 +33,10 @@ async function main()
 	for (const game of games)
 	{
 		const problems: string[] = [];
+
+		//
+		// Check Game Model
+		//
 
 		if (game.releaseDate == null)
 		{
@@ -53,12 +63,33 @@ async function main()
 			problems.push("no gamePlayActions");
 		}
 
+		let playTimeTotalSecondsFromGamePlayActionSessions = 0;
+
+		for (const gamePlayAction of game.gamePlayActions)
+		{
+			for (const gamePlayActionSession of gamePlayAction.gamePlayActionSessions)
+			{
+				playTimeTotalSecondsFromGamePlayActionSessions += gamePlayActionSession.playTimeSeconds;
+			}
+		}
+
+		if (game.playTimeTotalSeconds != playTimeTotalSecondsFromGamePlayActionSessions)
+		{
+			const difference = game.playTimeTotalSeconds - playTimeTotalSecondsFromGamePlayActionSessions;
+
+			problems.push("playTimeTotalSeconds differs from gamePlayActionSessions total: " + difference);
+		}
+
+		//
+		// Log Problems
+		//
+
 		if (problems.length == 0)
 		{
 			continue;
 		}
 
-		console.group("Game #" + game.id + " - " + game.name);
+		console.group("Game #" + game.id + " - " + game.name + " (Steam app ID: " + game.steamAppId + ")");
 
 		for (const problem of problems)
 		{
