@@ -181,6 +181,11 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										title += "\n\n" + gamePlayActionSession.notes;
 									}
 
+									if (configuration.developerMode)
+									{
+										title += "\n\nGamePlayActionSession #" + gamePlayActionSession.id;
+									}
+
 									return {
 										label: !gamePlayActionSession.isHistorical
 											? HumanDateTime(DateTime.fromJSDate(gamePlayActionSession.startDate))

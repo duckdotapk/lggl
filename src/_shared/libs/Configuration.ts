@@ -14,6 +14,7 @@ import { z } from "zod";
 
 export const ConfigurationSchema = z.object(
 	{
+		developerMode: z.boolean().default(false),
 		port: z.number().default(8008),
 		databaseUrl: z.string().url(),
 		dataDirectory: z.string().default(path.join(process.cwd(), "data")),
