@@ -60,4 +60,45 @@
 		border-top: 1px solid #374151; // Tailwind Gray 700
 		border-bottom: 1px solid #374151; // Tailwind Gray 700
 	}
+
+	.component-game-details-section
+	{
+		padding: 1rem;
+
+		width: 500px;
+
+		> .header
+		{
+			font-size: 1.1rem;
+
+			border-bottom: 1px solid #374151; // Tailwind Gray 700
+
+			margin-bottom: 0.5rem;
+		}
+	}
+
+	.component-game-details-data-table
+	{
+		td
+		{
+			padding: 0.5rem 0.5rem 0.5rem 0;
+
+			&.label
+			{
+				font-weight: bold;
+			}
+		}
+	}
+
+	.component-game-details
+	{
+		> .details-sections
+		{
+			display: flex;
+
+			gap: 0.5rem;
+
+			flex-wrap: wrap;
+		}
+	}
 }

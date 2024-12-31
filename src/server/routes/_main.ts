@@ -123,11 +123,28 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				})
 			: null;
 
+		const recentGamePlayActionSessions = selectedGame != null
+			? await prismaClient.gamePlayActionSession.findMany(
+				{
+					where:
+					{
+						gamePlayAction:
+						{
+							game_id: selectedGame.id,
+						},
+					},
+					orderBy:
+					{
+						startDate: "desc",
+					},
+				})
+			: [];
+
 		//
 		// Render Library
 		//
 
 		context.fritterResponse.setContentType("text/html");
-		context.fritterResponse.setBody(Library(gameGroups, selectedGame, searchParameters).renderToString());
+		context.fritterResponse.setBody(Library(gameGroups, selectedGame, recentGamePlayActionSessions, searchParameters).renderToString());
 	},
 };
