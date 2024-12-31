@@ -6,11 +6,12 @@ import { Child, DE } from "@donutteam/document-builder";
 import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import humanizeDuration from "humanize-duration";
+import { DateTime } from "luxon";
 
 import { Button } from "./Button.js";
+import { HumanDateTime } from "./HumanDateTime.js";
 
 import { staticMiddleware } from "../instances/server.js";
-import { DateTime } from "luxon";
 
 //
 // Locals
@@ -76,7 +77,7 @@ function Section(text: string, children: Child)
 
 type DataTableRow =
 {
-	label: string;
+	label: Child;
 	value: Child;
 };
 
@@ -146,7 +147,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 													title: DateTime.fromJSDate(game.lastPlayedDate).toLocaleString(DateTime.DATETIME_MED),
 												},
 												[
-													DateTime.fromJSDate(game.lastPlayedDate).toRelative(),
+													HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)),
 												])
 											: null,
 									},
@@ -159,9 +160,9 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 								(gamePlayActionSession) =>
 								{
 									return {
-										label: gamePlayActionSession.isHistorical
-											? "Historical"
-											: DateTime.fromJSDate(gamePlayActionSession.startDate).toLocaleString(DateTime.DATETIME_MED),
+										label: !gamePlayActionSession.isHistorical
+											? HumanDateTime(DateTime.fromJSDate(gamePlayActionSession.startDate))
+											: "Historical",
 										value: humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000),
 									};
 								})),

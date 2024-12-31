@@ -7,6 +7,8 @@ import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
+import { HumanDateTime } from "./HumanDateTime.js";
+
 import { staticMiddleware } from "../instances/server.js";
 
 //
@@ -33,14 +35,22 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 			href: "/?" + itemSearchParameters.toString(),
 		},
 		[
-			new DE("img",
-				{
-					class: "icon",
-					src: staticMiddleware.getCacheBustedPath(game.iconImagePath ?? "/icons/gamepad-modern.svg"),
-					alt: game.name + " icon",
-				}),
+			new DE("div", "icon-wrapper",
+				[
+					game.iconImagePath != null
+						? new DE("img",
+							{
+								class: "icon image",
+								src: staticMiddleware.getCacheBustedPath(game.iconImagePath),
+								alt: game.name + " icon",
+							})
+						: new DE("div", "icon font-awesome",
+							[
+								new DE("span", "fa-solid fa-gamepad-modern fa-fw"),
+							]),
+				]),
 
-			new DE("div", "text",
+			new DE("div", "text-wrapper",
 				[
 					new DE("div", "name", game.name),
 
@@ -49,7 +59,7 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 						[
 							"Last played ",
 							game.lastPlayedDate != null
-								? DateTime.fromJSDate(game.lastPlayedDate).toRelative()
+								? HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED)
 								: "never",
 						]),
 				]),

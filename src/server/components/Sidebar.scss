@@ -24,13 +24,28 @@
 			cursor: pointer;
 		}
 
-		> .icon
+		> .icon-wrapper
 		{
-			width: 32px;
-			height: 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 2rem;
+			height: 2rem;
+
+			> .icon.font-awesome
+			{
+				font-size: 1.5rem;
+			}
+
+			> .icon.image
+			{
+				width: 100%;
+				object-fit: cover;
+			}
 		}
 
-		> .text
+		> .text-wrapper
 		{
 			overflow: hidden;
 
