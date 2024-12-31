@@ -1,9 +1,55 @@
 //
+// Imports
+//
+
+import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { z } from "zod";
+
+//
 // Locals
 //
 
+async function loadCollapsedSidebarGroupNames()
+{
+	const rawCollapsedGroups = localStorage.getItem("CollapsedSidebarGroupNames");
+
+	const collapsedGroupsParseResult = z.array(z.string()).safeParse(JSON.parse(rawCollapsedGroups ?? "[]"));
+
+	return collapsedGroupsParseResult.success ? collapsedGroupsParseResult.data : [];
+}
+
+async function saveCollapsedSidebarGroupNames(names: string[])
+{
+
+	localStorage.setItem("CollapsedSidebarGroupNames", JSON.stringify(names));
+}
+
 async function initialise(element: HTMLElement)
 {
+	const collapsedSidebarGroupNames = await loadCollapsedSidebarGroupNames();
+
+	const sidebarGroups = document.querySelectorAll<HTMLDetailsElement>(".component-sidebar-group");
+
+	for (const sidebarGroup of sidebarGroups)
+	{
+		const sidebarGroupName = BrowserUtilities.ElementClientLib.getStringDataOrThrow(sidebarGroup, "name");
+
+		if (!collapsedSidebarGroupNames.includes(sidebarGroupName))
+		{
+			sidebarGroup.open = true;
+		}
+
+		sidebarGroup.addEventListener("toggle", 
+			async () =>
+			{
+				const collapsedSidebarGroupNames = sidebarGroup.open
+					? (await loadCollapsedSidebarGroupNames()).filter(name => name !== sidebarGroupName)
+					: (await loadCollapsedSidebarGroupNames()).concat(sidebarGroupName);
+
+				saveCollapsedSidebarGroupNames(Array.from(new Set(collapsedSidebarGroupNames)));
+			});
+	}
+
 	const selectedSidebarGroupItem = element.querySelector<HTMLAnchorElement>(".component-sidebar-group-item.selected");
 
 	if (selectedSidebarGroupItem != null)

@@ -72,7 +72,7 @@ function Group(title: string, games: SidebarGames, selectedGame: SidebarSelected
 		{
 			class: "component-sidebar-group",
 
-			open: true,
+			"data-name": title,
 		},
 		[
 			new DE("summary", "title",
