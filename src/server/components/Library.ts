@@ -47,7 +47,7 @@ export function Library(options: LibraryOptions)
 		[
 			new DE("head", null,
 				[
-					new DE("title", null, "Game Launcher"),
+					new DE("title", null, "LGGL"),
 
 					new DE("link",
 						{
