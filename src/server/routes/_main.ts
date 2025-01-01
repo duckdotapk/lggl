@@ -88,7 +88,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					orderBy:
 					[
 						{
-							sortName: "asc",
+							lastPlayedDate: "desc",
 						},
 					],
 				});
