@@ -12,16 +12,19 @@ import { z } from "zod";
 // Schemas
 //
 
-// TODO: refactor configuration into multiple sub objects for organization
 export const ConfigurationSchema = z.object(
 	{
 		developerMode: z.boolean().default(false),
+
 		port: z.number().default(8008),
+
 		databaseUrl: z.string().url(),
 		dataDirectory: z.string().default(path.join(process.cwd(), "data")),
+
 		steamApiKey: z.string(),
 		steamAccessToken: z.string(),
 		steamUserId: z.string(),
+
 		platformId: z.number(),
 		platformIds: z.object(
 			{
@@ -31,6 +34,7 @@ export const ConfigurationSchema = z.object(
 				steamDeck: z.number(),
 				unknown: z.number(),
 			}),
+
 		gamePlayActionSessionHistoryDays: z.union(
 			[
 				z.number().min(1),
