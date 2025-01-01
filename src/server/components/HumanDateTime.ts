@@ -24,5 +24,5 @@ export function HumanDateTime(dateTime: DateTime, format: DateTimeFormatOptions 
 						includeOffset: true,
 					}),
 			},
-			text);
+			text); // TODO: auto update text on client
 }
