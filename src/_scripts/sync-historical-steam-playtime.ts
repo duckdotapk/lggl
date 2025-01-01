@@ -69,15 +69,18 @@ async function getPlayTimeFromClientLastPlayTimesEndpoint(steamAppId: number): P
 
 		windowsPlayTimeSeconds: ownedGame.playtime_windows_forever * 60,
 		macPlayTimeSeconds: ownedGame.playtime_mac_forever * 60,
-		linuxPlayTimeSeconds: ownedGame.playtime_linux_forever * 60,
+		linuxPlayTimeSeconds: (ownedGame.playtime_linux_forever - ownedGame.playtime_deck_forever) * 60,
 		steamDeckPlayTimeSeconds: ownedGame.playtime_deck_forever * 60,
 		unknownPlayTimeSeconds:
 		(
-			ownedGame.playtime_forever -
-			ownedGame.playtime_windows_forever -
-			ownedGame.playtime_mac_forever -
-			ownedGame.playtime_linux_forever -
-			ownedGame.playtime_deck_forever -
+			// Note: playtime_disconnected is apparently NOT included in playtime_forever
+			(
+				ownedGame.playtime_forever -
+				ownedGame.playtime_windows_forever -
+				ownedGame.playtime_mac_forever -
+				ownedGame.playtime_linux_forever -
+				ownedGame.playtime_deck_forever
+			) +
 			ownedGame.playtime_disconnected
 		) * 60,
 	};
@@ -160,6 +163,7 @@ async function getPlayTimeFromGetPlaytimeSummaryEndpoint(steamAppId: number, ste
 
 	const entries =
 	[
+		// Note: I'm not sure if entries includes everything in entries_by_owner, so I'm including both just in case
 		...responseParseResult.data.response.entries,
 		...responseParseResult.data.response.entries_by_owner,
 	];
