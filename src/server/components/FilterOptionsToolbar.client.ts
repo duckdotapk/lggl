@@ -14,8 +14,6 @@ async function initialise(toolbar: HTMLFormElement)
 {
 	const groupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="groupMode"]`);
 
-	const sortModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="sortMode"]`);
-
 	const showFavoritesGroupCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showFavoritesGroup"]`);
 
 	const showVisibleGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showVisibleGames"]`);
@@ -29,7 +27,6 @@ async function initialise(toolbar: HTMLFormElement)
 		const filterOptions: LibraryLib.FilterOptions =
 		{
 			groupMode: groupModeSelect.value as LibraryLib.FilterOptions["groupMode"],
-			sortMode: sortModeSelect.value as LibraryLib.FilterOptions["sortMode"],
 	
 			showFavoritesGroup: showFavoritesGroupCheckbox.checked,
 	

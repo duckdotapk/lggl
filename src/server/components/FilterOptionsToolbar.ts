@@ -10,6 +10,22 @@ import { Checkbox } from "./Checkbox.js";
 import { Toolbar } from "./Toolbar.js";
 
 //
+// Locals
+//
+
+function Option(value: LibraryLib.FilterOptions["groupMode"], label: string, selected: boolean)
+{
+	return new DE("option",
+		{
+			value: value,
+			selected: selected,
+		},
+		[
+			label,
+		]);
+}
+
+//
 // Components
 //
 
@@ -22,29 +38,9 @@ export function FilterOptionsToolbar(filterOptions: LibraryLib.FilterOptions)
 					name: "groupMode",
 				},
 				[
-					new DE("option",
-						{
-							value: "lastPlayed" satisfies LibraryLib.FilterOptions["groupMode"],
-							selected: filterOptions.groupMode === "lastPlayed",
-						},
-						[
-							"Group by Last played",
-						]),
-				]),
+					Option("lastPlayed", "Group by Last played", filterOptions.groupMode === "lastPlayed"),
 
-			new DE("select",
-				{
-					name: "sortMode",
-				},
-				[
-					new DE("option",
-						{
-							value: "lastPlayed" satisfies LibraryLib.FilterOptions["sortMode"],
-							selected: filterOptions.sortMode === "lastPlayed",
-						},
-						[
-							"Sort by Last played",
-						]),
+					Option("series", "Group by Series", filterOptions.groupMode === "series"),
 				]),
 
 			Checkbox("showFavoritesGroup", "Show favorites group", filterOptions.showFavoritesGroup),

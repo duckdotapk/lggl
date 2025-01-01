@@ -6,7 +6,7 @@ import * as Fritter from "@donutteam/fritter";
 
 import { prismaClient } from "../../_shared/instances/prismaClient.js";
 
-import { Library } from "../components/Library.js";
+import { Library, LibraryOptions } from "../components/Library.js";
 
 import { ServerFritterContext } from "../instances/server.js";
 
@@ -41,7 +41,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			const defaultFilterOptions: LibraryLib.FilterOptions =
 			{
 				groupMode: "lastPlayed",
-				sortMode: "lastPlayed",
 
 				showFavoritesGroup: true,
 
@@ -71,104 +70,58 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		}
 
 		//
-		// Find Games
+		// Create Game Groups
 		//
 
-		let games = await prismaClient.game.findMany(
-			{
-				orderBy:
-				[
-					{
-						isFavorite: "desc",
-					},
-					{
-						lastPlayedDate:
-						{
-							sort: "desc",
-							nulls: "last",
-						},
-					},
-					{
-						name: "asc",
-					},
-				],
-			});
-
-		//
-		// Filter Out Games
-		//
-
-		if (!filterOptions.showVisibleGames)
-		{
-			games = games.filter((game) => game.isHidden || game.isNsfw);
-		}
-
-		if (!filterOptions.showHiddenGames)
-		{
-			games = games.filter((game) => !game.isHidden);
-		}
-
-		if (!filterOptions.showNsfwGames)
-		{
-			games = games.filter((game) => !game.isNsfw);
-		}
-
-		//
-		// Sort Games
-		//
-
-		switch (filterOptions.sortMode)
-		{
-			case "lastPlayed":
-				games = games.sort(
-					(a, b) =>
-					{
-						if (a.lastPlayedDate != null && b.lastPlayedDate != null)
-						{
-							if (a.lastPlayedDate > b.lastPlayedDate)
-							{
-								return -1;
-							}
-							else
-							{
-								return 1;
-							}
-						}
-						else if (a.lastPlayedDate != null)
-						{
-							return -1;
-						}
-						else if (b.lastPlayedDate != null)
-						{
-							return 1;
-						}
-
-						return a.sortName.localeCompare(b.sortName);
-					});
-
-				break;
-		}
-
-		//
-		// Group Games
-		//
-
-		const gameGroups = new Map<string, typeof games>();
-
+		const gameGroups: LibraryOptions["gameGroups"] = new Map();
+		
 		if (filterOptions.showFavoritesGroup)
 		{
-			const favoriteGames = games.filter((game) => game.isFavorite);
+			const favoriteGames = await prismaClient.game.findMany(
+				{
+					where:
+					{
+						isFavorite: true,
+						isHidden: filterOptions.showHiddenGames ? undefined : false,
+						isNsfw: filterOptions.showNsfwGames ? undefined : false,
+					},
+					orderBy:
+					[
+						{
+							sortName: "asc",
+						},
+					],
+				});
 
-			if (favoriteGames.length > 0)
-			{
-				gameGroups.set("Favorites", favoriteGames);
-			}
+			gameGroups.set("Favorites", favoriteGames);
 		}
 
 		switch (filterOptions.groupMode)
 		{
 			case "lastPlayed":
-			default:
+			{
+				const games = await prismaClient.game.findMany(
+					{
+						where:
+						{
+							isHidden: filterOptions.showHiddenGames ? undefined : false,
+							isNsfw: filterOptions.showNsfwGames ? undefined : false,
+						},
+						orderBy:
+						[
+							{
+								lastPlayedDate:
+								{
+									sort: "desc",
+									nulls: "last",
+								},
+							},
+							{
+								sortName: "asc",
+							},
+						],
+					});
+
 				const playedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
 
 				if (playedGames.length > 0)
@@ -193,6 +146,60 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				}
 
 				break;
+			}
+
+			case "series":
+			{
+				const seriesList = await prismaClient.series.findMany(
+					{
+						include:
+						{
+							seriesGames:
+							{
+								where:
+								{
+									game:
+									{
+										isHidden: filterOptions.showHiddenGames ? undefined : false,
+										isNsfw: filterOptions.showNsfwGames ? undefined : false,
+									},
+								},
+								orderBy:
+								[
+									{
+										sortOrder: "asc",
+									},
+									{
+										game:
+										{
+											sortName: "asc",
+										},
+									},
+								],
+								include:
+								{
+									game: true,
+								},
+							},
+						},
+						orderBy:
+						[
+							{
+								sortOrder: "desc",
+							},
+							{
+								name: "asc",
+							},
+						],
+					});
+
+				for (const series of seriesList)
+				{
+					gameGroups.set(series.name, series.seriesGames.map((seriesGame) => seriesGame.game));
+				}
+
+				break;
+			}
 		}
 
 		//

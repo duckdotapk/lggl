@@ -14,6 +14,8 @@ import { HumanDateTime } from "./HumanDateTime.js";
 
 import { staticMiddleware } from "../instances/server.js";
 
+import { configuration } from "../../_shared/libs/Configuration.js";
+
 //
 // Locals
 //
@@ -144,7 +146,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 													title: Utilities.NumberLib.format(game.playTimeTotalSeconds) + " seconds",
 												},
 												[
-													humanizeDuration(game.playTimeTotalSeconds * 1000),
+													humanizeDuration(game.playTimeTotalSeconds * 1000, { units: [ "h", "m", "s" ] }),
 												])
 											: "No playtime recorded",
 									},
@@ -195,10 +197,9 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 												title,
 											},
 											[
-												// TODO: fa icon here
 												new DE("span", gamePlayActionSession.platform.iconName),
 												" ",
-												humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000),
+												humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000, { units: [ "h", "m", "s" ] }),
 											]),
 									};
 								})),
