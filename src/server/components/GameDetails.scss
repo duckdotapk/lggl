@@ -4,7 +4,7 @@
 
 @mixin GameDetails()
 {
-	.component-game-details-header
+	.component-game-details-banner
 	{
 		display: grid;
 		grid-template-areas: "stack";
@@ -67,16 +67,16 @@
 		padding: 1rem;
 
 		width: 100%;
-		max-width: 500px;
+		max-width: 400px;
+	}
 
-		> .header
-		{
-			font-size: 1.1rem;
+	.component-game-details-header
+	{
+		font-size: 1.1rem;
 
-			border-bottom: 1px solid #374151; // Tailwind Gray 700
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
 
-			margin-bottom: 0.5rem;
-		}
+		margin: 0.5rem 0 0.5rem 0;
 	}
 
 	.component-game-details-data-table
