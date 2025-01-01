@@ -1,6 +1,41 @@
 //
+// Imports
+//
+
+import fs from "node:fs";
+import path from "node:path";
+
+//
 // Utility Functions
 //
+
+export async function getFolderSize(folderPath: string): Promise<bigint>
+{
+    let totalSize = 0n;
+
+    const entries = await fs.promises.readdir(folderPath, 
+		{ 
+			withFileTypes: true,
+		});
+
+    for (const entry of entries)
+    {
+        const fullPath = path.join(folderPath, entry.name);
+
+        if (entry.isDirectory())
+        {
+            totalSize += await getFolderSize(fullPath);
+        }
+        else if (entry.isFile())
+        {
+            const { size } = await fs.promises.stat(fullPath);
+
+            totalSize += BigInt(size);
+        }
+    }
+
+    return totalSize;
+}
 
 export function fromGibiBytes(gigaBytes: number, bytes: number): bigint
 {
