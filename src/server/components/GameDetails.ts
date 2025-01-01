@@ -70,14 +70,19 @@ function PlayActionButtonGroup(game: GameDetailsGame)
 		]);
 }
 
-function Section(children: Child)
-{
-	return new DE("section", "component-game-details-section", children);
-}
-
 function Header(text: string)
 {
 	return new DE("header", "component-game-details-header", text);
+}
+
+function Section(headerText: string, children: Child)
+{
+	return new DE("section", "component-game-details-section",
+		[
+			Header(headerText),
+
+			children,
+		]);
 }
 
 type DataTableRow =
@@ -163,10 +168,8 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 
 			new DE("div", "details-sections",
 				[
-					Section(
+					Section("Play data",
 						[
-							Header("Play data"),
-
 							DataTable(
 								[
 									game.completionStatus != null
@@ -228,10 +231,8 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 								]), 
 						]),
 
-					Section(
+					Section("Recent play sessions",
 						[
-							Header("Recent play sessions"),
-
 							recentGamePlayActionSessions.length > 0
 								? DataTable(recentGamePlayActionSessions.map((gamePlayActionSession) =>
 									{
@@ -267,10 +268,16 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 									: "No play sessions recorded."),
 						]),
 
-					Section(
-						[
-							Header("Metadata"),
+					game.description != null
+						? Section("Description",
+							[
+								// TODO: render as markdown instead
+								game.description.split("\n").map((line) => Paragraph(line)),
+							])
+						: null,
 
+					Section("Metadata",
+						[
 							DataTable(
 								[
 									{
@@ -286,22 +293,41 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 								]),
 						]),
 
-					Section(
+					Section("Links",
 						[
-							Header("Links"),
-
 							links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))),
 						]),
 
 					game.notes != null
-						? Section(
+						? Section("Notes",
 							[
-								Header("Notes"),
-
-								// TODO: render as markdown!
-								game.notes,
+								// TODO: render as markdown instead
+								game.notes.split("\n").map((line) => Paragraph(line)),
 							])
 						: null,
+
+					Section("Library data",
+						[
+							DataTable(
+								[
+									{
+										label: "ID",
+										value: game.id,
+									},
+									{
+										label: "Created",
+										value: HumanDateTime(DateTime.fromJSDate(game.createdDate)),
+									},
+									{
+										label: "Last updated",
+										value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate)),
+									},
+									{
+										label: "Sort order",
+										value: game.sortOrder,
+									},
+								])
+						]),
 				]),
 		]);
 }
