@@ -75,6 +75,7 @@ model Game {
 
     playniteGameId String? @unique
     steamAppId     String?
+    steamAppName   String?
 
     gameAntiCheats         GameAntiCheat[]
     gameDevelopers         GameDeveloper[]
