@@ -12,6 +12,7 @@ import { z } from "zod";
 // Schemas
 //
 
+// TODO: refactor configuration into multiple sub objects for organization
 export const ConfigurationSchema = z.object(
 	{
 		developerMode: z.boolean().default(false),
@@ -30,6 +31,12 @@ export const ConfigurationSchema = z.object(
 				steamDeck: z.number(),
 				unknown: z.number(),
 			}),
+		gamePlayActionSessionHistoryDays: z.union(
+			[
+				z.number().min(1),
+
+				z.literal(-1),
+			]),
 	});
 
 //

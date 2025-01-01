@@ -3,6 +3,7 @@
 //
 
 import * as Fritter from "@donutteam/fritter";
+import { DateTime } from "luxon";
 
 import { prismaClient } from "../../_shared/instances/prismaClient.js";
 
@@ -10,6 +11,7 @@ import { Library, LibraryOptions } from "../components/Library.js";
 
 import { ServerFritterContext } from "../instances/server.js";
 
+import { configuration } from "../../_shared/libs/Configuration.js";
 import * as LibraryLib from "../../_shared/libs/Library.js";
 
 //
@@ -279,6 +281,10 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				{
 					where:
 					{
+						startDate: configuration.gamePlayActionSessionHistoryDays >= 1
+							? { gt: DateTime.now().minus({ days: configuration.gamePlayActionSessionHistoryDays }).toJSDate() }
+							: undefined,
+
 						gamePlayAction:
 						{
 							game_id: selectedGame.id,
