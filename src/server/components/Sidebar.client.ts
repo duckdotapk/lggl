@@ -26,6 +26,44 @@ async function saveCollapsedSidebarGroupNames(names: string[])
 
 async function initialise(element: HTMLElement)
 {
+	const sidebarSearchInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, ".component-sidebar-search");
+
+	sidebarSearchInput.addEventListener("input",
+		() =>
+		{
+			const query = sidebarSearchInput.value.trim().toLowerCase();
+
+			const sidebarGroupItems = element.querySelectorAll<HTMLAnchorElement>(".component-sidebar-group-item");
+
+			for (const sidebarGroupItem of sidebarGroupItems)
+			{
+				if (query == "")
+				{
+					sidebarGroupItem.style.display = "";
+
+					continue;
+				}
+
+				const normalizedName = BrowserUtilities.ElementClientLib.getStringDataOrThrow(sidebarGroupItem, "normalizedName");
+
+				if (normalizedName.includes(sidebarSearchInput.value.toLowerCase()))
+				{
+					sidebarGroupItem.style.display = "";
+
+					const sidebarGroup = sidebarGroupItem.closest<HTMLDetailsElement>(".component-sidebar-group");
+
+					if (sidebarGroup != null)
+					{
+						sidebarGroup.open = true;
+					}
+				}
+				else
+				{
+					sidebarGroupItem.style.display = "none";
+				}
+			}
+		});
+
 	const collapsedSidebarGroupNames = await loadCollapsedSidebarGroupNames();
 
 	const sidebarGroups = document.querySelectorAll<HTMLDetailsElement>(".component-sidebar-group");

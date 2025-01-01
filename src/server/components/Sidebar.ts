@@ -33,6 +33,9 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 			class: className,
 
 			href: "/?" + itemSearchParameters.toString(),
+
+			"data-name": game.name,
+			"data-normalized-name": game.name.toLowerCase().replace(/[^a-z0-9]/g, " "),
 		},
 		[
 			new DE("div", "icon-wrapper",
@@ -87,6 +90,16 @@ function Group(title: string, games: SidebarGames, selectedGame: SidebarSelected
 		]);
 }
 
+function Search()
+{
+	return new DE("input",
+		{
+			class: "component-sidebar-search",
+			name: "search",
+			placeholder: "Search for a game...",
+		});
+}
+
 //
 // Component
 //
@@ -103,6 +116,8 @@ export function Sidebar(gameGroups: SidebarGameGroups, selectedGame: SidebarSele
 {
 	return new DE("aside", "component-sidebar",
 		[
+			Search(),
+
 			Array.from(gameGroups.entries()).map(([ title, games ]) => Group(title, games, selectedGame, searchParameters)),
 		]);
 }
