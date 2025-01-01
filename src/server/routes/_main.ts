@@ -3,6 +3,7 @@
 //
 
 import * as Fritter from "@donutteam/fritter";
+import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../../_shared/instances/prismaClient.js";
@@ -72,59 +73,66 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		}
 
 		//
-		// Create Game Groups
+		// Initialise Game Groups Map
 		//
 
 		const gameGroups: LibraryOptions["gameGroups"] = new Map();
+
+		//
+		// Get All Games
+		//
+
+		let games = await prismaClient.game.findMany(
+			{
+				include:
+				{
+					seriesGames:
+					{
+						include:
+						{
+							series: true,
+						},
+					},
+				},
+			});
+
+		if (!filterOptions.showVisibleGames)
+		{
+			games = games.filter((game) => game.isHidden || game.isNsfw);
+		}
+
+		if (!filterOptions.showHiddenGames)
+		{
+			games = games.filter((game) => !game.isHidden);
+		}
+
+		if (!filterOptions.showNsfwGames)
+		{
+			games = games.filter((game) => !game.isNsfw);
+		}
+
+		//
+		// Create Favorites Group
+		//
 		
 		if (filterOptions.showFavoritesGroup)
 		{
-			const favoriteGames = await prismaClient.game.findMany(
-				{
-					where:
-					{
-						isFavorite: true,
-						isHidden: filterOptions.showHiddenGames ? undefined : false,
-						isNsfw: filterOptions.showNsfwGames ? undefined : false,
-					},
-					orderBy:
-					{
-						lastPlayedDate:
-						{
-							sort: "desc",
-							nulls: "last",
-						},
-					},
-				});
+			const favoriteGames = games.filter((game) => game.isFavorite);
 
 			gameGroups.set("Favorites", favoriteGames);
+
+			games = games.filter((game) => !game.isFavorite);
 		}
+
+		//
+		// Group Games by Group Mode
+		//
 
 		switch (filterOptions.groupMode)
 		{
 			case "name":
 			{
-				const games = await prismaClient.game.findMany(
-					{
-						where:
-						{
-							isHidden: filterOptions.showHiddenGames ? undefined : false,
-							isNsfw: filterOptions.showNsfwGames ? undefined : false,
-						},
-						orderBy:
-						[
-							{
-								sortName: "asc",
-							},
-							{
-								lastPlayedDate:
-								{
-									sort: "desc",
-									nulls: "last",
-								},
-							},
-						],
-					});
+				games = games.sort((a, b) => a.sortName.localeCompare(b.sortName));
 
 				for (const game of games)
 				{
@@ -156,29 +164,9 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 			case "lastPlayed":
 			{
-				const games = await prismaClient.game.findMany(
-					{
-						where:
-						{
-							isHidden: filterOptions.showHiddenGames ? undefined : false,
-							isNsfw: filterOptions.showNsfwGames ? undefined : false,
-						},
-						orderBy:
-						[
-							{
-								lastPlayedDate:
-								{
-									sort: "desc",
-									nulls: "last",
-								},
-							},
-							{
-								sortName: "asc",
-							},
-						],
-					});
-
-				const playedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
+				const playedGames = games
+					.filter((game) => game.lastPlayedDate != null && game.playTimeTotalSeconds > 0)
+					.sort((a, b) => b.lastPlayedDate!.getTime() - a.lastPlayedDate!.getTime());
 
 				if (playedGames.length > 0)
 				{
@@ -194,7 +182,9 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					}
 				}
 
-				const unplayedGames = games.filter((game) => game.playTimeTotalSeconds == 0);
+				const unplayedGames = games
+					.filter((game) => game.lastPlayedDate == null || game.playTimeTotalSeconds == 0)
+					.sort((a, b) => a.sortName.localeCompare(b.sortName));
 
 				if (unplayedGames.length > 0)
 				{
@@ -206,52 +196,54 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 			case "series":
 			{
-				const seriesList = await prismaClient.series.findMany(
-					{
-						include:
-						{
-							seriesGames:
-							{
-								where:
-								{
-									game:
-									{
-										isHidden: filterOptions.showHiddenGames ? undefined : false,
-										isNsfw: filterOptions.showNsfwGames ? undefined : false,
-									},
-								},
-								orderBy:
-								[
-									{
-										sortOrder: "asc",
-									},
-									{
-										game:
-										{
-											sortName: "asc",
-										},
-									},
-								],
-								include:
-								{
-									game: true,
-								},
-							},
-						},
-						orderBy:
-						[
-							{
-								sortOrder: "desc",
-							},
-							{
-								name: "asc",
-							},
-						],
-					});
+				const gamesBySeries: Map<string, Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>[]> = new Map();
 
-				for (const series of seriesList)
+				for (const game of games)
 				{
-					gameGroups.set(series.name, series.seriesGames.map((seriesGame) => seriesGame.game));
+					for (const seriesGame of game.seriesGames)
+					{
+						const gamesInSeries = gamesBySeries.get(seriesGame.series.name) ?? [];
+
+						gamesInSeries.push(game);
+
+						gamesBySeries.set(seriesGame.series.name, gamesInSeries);
+					}
+				}
+
+				const series = Array.from(gamesBySeries.entries())
+					.map(([ seriesName, gamesInSeries ]) => ({ seriesName, gamesInSeries }))
+					.sort((a, b) => a.seriesName.localeCompare(b.seriesName));
+
+				for (const { seriesName, gamesInSeries } of series)
+				{
+					const sortedGamesInSeries = gamesInSeries
+						.map((game) =>
+						{
+							// Note: Using ! because we know the series game exists
+							const seriesGame = game.seriesGames.find((seriesGame) => seriesGame.series.name === seriesName)!;
+
+							return {
+								seriesGame,
+								game,
+							};
+						})
+						.sort((a, b) =>
+						{
+							if (a.seriesGame.sortOrder < b.seriesGame.sortOrder)
+							{
+								return -1;
+							}
+
+							if (a.seriesGame.sortOrder > b.seriesGame.sortOrder)
+							{
+								return 1;
+							}
+
+							return a.game.sortName.localeCompare(b.game.sortName);
+						})
+						.map((wrapper) => wrapper.game);
+
+					gameGroups.set(seriesName, sortedGamesInSeries);
 				}
 
 				break;
