@@ -1,6 +1,6 @@
 enum GamePlayActionType {
     EXECUTABLE
-    STEAM
+    URL
 }
 
 model GamePlayAction {

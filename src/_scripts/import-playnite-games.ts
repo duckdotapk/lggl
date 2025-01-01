@@ -253,7 +253,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 			data:
 			{
 				name: "Launch via Steam",
-				type: GamePlayActionType.STEAM,
+				type: GamePlayActionType.URL,
 				path: launchViaSteamGameAction.Path,
 				trackingPath: launchViaSteamGameAction.TrackingPath,
 
