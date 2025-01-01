@@ -4,7 +4,12 @@
 
 import "source-map-support/register.js";
 
+import fs from "node:fs";
+import path from "node:path";
+
 import { prismaClient } from "../_shared/instances/prismaClient.js";
+
+import { configuration } from "../_shared/libs/Configuration.js";
 
 //
 // Functions
@@ -47,15 +52,36 @@ async function main()
 		{
 			problems.push("bannerImagePath is null");
 		}
+		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.bannerImagePath.slice(5))))
+		{
+			problems.push("bannerImagePath does not exist on disk");
+		}
 
 		if (game.coverImagePath == null)
 		{
 			problems.push("coverImagePath is null");
 		}
+		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.coverImagePath.slice(5))))
+		{
+			problems.push("coverImagePath does not exist on disk");
+		}
 
 		if (game.iconImagePath == null)
 		{
 			problems.push("iconImagePath is null");
+		}
+		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.iconImagePath.slice(5))))
+		{
+			problems.push("iconImagePath does not exist on disk");
+		}
+
+		if (game.logoImagePath == null)
+		{
+			problems.push("logoImagePath is null");
+		}
+		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.logoImagePath.slice(5))))
+		{
+			problems.push("logoImagePath does not exist on disk");
 		}
 
 		if (game.gamePlayActions.length == 0)
