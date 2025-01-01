@@ -297,6 +297,9 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					orderBy:
 					[
 						{
+							sortOrder: "desc",
+						},
+						{
 							startDate: "desc",
 						},
 						{
