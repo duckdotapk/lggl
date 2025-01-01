@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client";
 import humanizeDuration from "humanize-duration";
 import { DateTime } from "luxon";
 
+import { Anchor } from "./Anchor.js";
 import { Button } from "./Button.js";
 import { GameFlagsToolbar } from "./GameFlagsToolbar.js";
 import { HumanDateTime } from "./HumanDateTime.js";
@@ -119,6 +120,31 @@ export type GameDetailsRecentGamePlayActionSessions = Prisma.GamePlayActionSessi
 
 export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions: GameDetailsRecentGamePlayActionSessions)
 {
+	const links: { title: string; url: string }[] = [];
+
+	if (game.steamAppId != null)
+	{
+		links.push(
+			{
+				title: "Steam Store Page",
+				url: "https://store.steampowered.com/app/" + game.steamAppId,
+			});
+
+		links.push(
+			{
+				title: "SteamDB Page",
+				url: "https://steamdb.info/app/" + game.steamAppId,
+			});
+
+		links.push(
+			{
+				title: "PC Gaming Wiki Page",
+
+				// Note: This is a URL they have that will redirect to the correct page, pretty neat
+				url: "https://www.pcgamingwiki.com/api/appid.php?appid=" + game.steamAppId,
+			});
+	}
+
 	return new DE("div", 
 		{
 			class: "component-game-details",
@@ -203,6 +229,11 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											]),
 									};
 								})),
+						]),
+
+					Section("Links",
+						[
+							links.map((link) => new DE("p", null, Anchor(link.title, link.url, "_blank"))),
 						]),
 				]),
 		]);

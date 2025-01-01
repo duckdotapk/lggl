@@ -6,6 +6,7 @@
 
 @use "components/_Global.scss";
 
+@use "components/Anchor.scss";
 @use "components/Button.scss";
 @use "components/Checkbox.scss";
 @use "components/GameDetails.scss";
@@ -20,6 +21,7 @@
 @include Global.Resets();
 @include Global.FontFaces();
 
+@include Anchor.Anchor();
 @include Button.Button();
 @include Checkbox.Checkbox();
 @include GameDetails.GameDetails();

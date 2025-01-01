@@ -1,0 +1,16 @@
+//
+// Component
+//
+
+@mixin Anchor()
+{
+	.component-anchor
+	{		
+		color: inherit;
+
+		&:visited
+		{
+			color: inherit;
+		}
+	}
+}
