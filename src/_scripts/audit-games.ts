@@ -15,6 +15,8 @@ import { configuration } from "../_shared/libs/Configuration.js";
 // Functions
 //
 
+const shouldFixData = process.argv.includes("--fix");
+
 async function main()
 {
 	const games = await prismaClient.game.findMany(
@@ -42,6 +44,28 @@ async function main()
 		//
 		// Check Game Model
 		//
+
+		if (game.completionStatus == "TODO" && game.playTimeTotalSeconds > 0)
+		{
+			if (!shouldFixData)
+			{
+				problems.push("completionStatus is TODO but playTimeTotalSeconds is greater than 0");
+			}
+			else
+			{
+				await prismaClient.game.update(
+					{
+						where:
+						{
+							id: game.id,
+						},
+						data:
+						{
+							completionStatus: "IN_PROGRESS",
+						},
+					});
+			}
+		}
 
 		if (game.releaseDate == null)
 		{
