@@ -57,9 +57,9 @@ async function main()
 			gameUpdateData.iconImagePath = "/data/images/games/" + game.id + "/icon.jpg";
 		}
 
-		if (game.logoImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "logo.jpg")))
+		if (game.logoImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "logo.png")))
 		{
-			gameUpdateData.logoImagePath = "/data/images/games/" + game.id + "/logo.jpg";
+			gameUpdateData.logoImagePath = "/data/images/games/" + game.id + "/logo.png";
 		}
 
 		const numberOfUpdatedImagePaths = Object.keys(gameUpdateData).length;
