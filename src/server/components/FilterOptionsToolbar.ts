@@ -38,6 +38,8 @@ export function FilterOptionsToolbar(filterOptions: LibraryLib.FilterOptions)
 					name: "groupMode",
 				},
 				[
+					Option("name", "Group by Name", filterOptions.groupMode === "name"),
+
 					Option("lastPlayed", "Group by Last played", filterOptions.groupMode === "lastPlayed"),
 
 					Option("series", "Group by Series", filterOptions.groupMode === "series"),

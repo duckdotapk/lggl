@@ -86,11 +86,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						isNsfw: filterOptions.showNsfwGames ? undefined : false,
 					},
 					orderBy:
-					[
+					{
+						lastPlayedDate:
 						{
-							lastPlayedDate: "desc",
+							sort: "desc",
+							nulls: "last",
 						},
-					],
+					},
 				});
 
 			gameGroups.set("Favorites", favoriteGames);
@@ -98,6 +100,58 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		switch (filterOptions.groupMode)
 		{
+			case "name":
+			{
+				const games = await prismaClient.game.findMany(
+					{
+						where:
+						{
+							isHidden: filterOptions.showHiddenGames ? undefined : false,
+							isNsfw: filterOptions.showNsfwGames ? undefined : false,
+						},
+						orderBy:
+						[
+							{
+								sortName: "asc",
+							},
+							{
+								lastPlayedDate:
+								{
+									sort: "desc",
+									nulls: "last",
+								},
+							},
+						],
+					});
+
+				for (const game of games)
+				{
+					const firstLetter = game.sortName.charAt(0).toUpperCase();
+
+					// TODO: wrote this while high as fuck, make sure this actually works
+					if (!isNaN(parseInt(firstLetter)))
+					{
+						const numberGroup = gameGroups.get("#") ?? [];
+
+						numberGroup.push(game);
+
+						gameGroups.set("#", numberGroup);
+					}
+					else
+					{
+						const groupName = firstLetter.toUpperCase();
+
+						const letterGroup = gameGroups.get(groupName) ?? [];
+	
+						letterGroup.push(game);
+	
+						gameGroups.set(groupName, letterGroup);
+					}
+				}
+
+				break;
+			}
+
 			case "lastPlayed":
 			{
 				const games = await prismaClient.game.findMany(
