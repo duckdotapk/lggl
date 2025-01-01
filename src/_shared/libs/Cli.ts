@@ -34,42 +34,45 @@ export class RetryableError extends Error
 
 export type PromptOptions<T> =
 {
-	prompt: string;
+	options?: 
+	{ 
+		id: number;
+		description: string;
+	}[];
 	validateAndTransform: (rawInput: string) => Promise<T>;
 };
 
-export async function prompt<T>(promptOptions: PromptOptions<T>)
+export async function prompt<T>(readlineInterface: readline.promises.Interface, question: string, promptOptions: PromptOptions<T>)
 {
-	const readlineInterface = readline.promises.createInterface(
-		{
-			input: process.stdin,
-			output: process.stdout,
-		});
+	let text = chalk.bold(question) + ":\n";
 
-	while (true)
+	if (promptOptions.options != null)
 	{
-		const rawInput = await readlineInterface.question(chalk.bold(promptOptions.prompt) + ": ");
-
-		try
+		for (const option of promptOptions.options)
 		{
-			const input = await promptOptions.validateAndTransform(rawInput);
+			text += "  " + chalk.red(option.id + ":") + " " + option.description + "\n";
+		}
+	}
 
+	const rawInput = await readlineInterface.question(text);
+
+	try
+	{
+		return await promptOptions.validateAndTransform(rawInput);
+	}
+	catch (error)
+	{
+		if (error instanceof RetryableError)
+		{
+			console.error(error.message + "\n");
+
+			return await prompt(readlineInterface, question, promptOptions);
+		}
+		else
+		{
 			readlineInterface.close();
 
-			return input;
-		}
-		catch (error)
-		{
-			if (error instanceof RetryableError)
-			{
-				console.error(error.message);
-			}
-			else
-			{
-				readlineInterface.close();
-
-				throw error;
-			}
+			throw error;
 		}
 	}
 }
