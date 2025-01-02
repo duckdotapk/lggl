@@ -1,4 +1,5 @@
 {
+	"name": "@duckdotapk/lggl",
 	"scripts": {
 		"build": "npm run build-client-css && npm run build-client-js && npm run build-server-js",
 		"build-client-css": "npx sass ./src/client.scss:./data/generated/client.css",
