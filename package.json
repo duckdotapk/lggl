@@ -22,6 +22,7 @@
 		"@types/source-map-support": "^0.5.10",
 		"@types/unzipper": "^0.10.10",
 		"chalk": "^5.4.1",
+		"dotenv": "^16.4.7",
 		"esbuild": "^0.24.2",
 		"humanize-duration": "^3.32.1",
 		"luxon": "^3.5.0",
@@ -32,7 +33,6 @@
 		"source-map-support": "^0.5.21",
 		"typescript": "^5.7.2",
 		"unzipper": "^0.12.3",
-		"yaml": "^2.6.1",
 		"zod": "^3.24.1"
 	},
 	"type": "module",

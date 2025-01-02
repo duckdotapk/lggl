@@ -4,6 +4,6 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("LOGGAL_DATABASE_URL")
+    provider = "sqlite"
+    url      = env("LGGL_DATABASE_URL")
 }

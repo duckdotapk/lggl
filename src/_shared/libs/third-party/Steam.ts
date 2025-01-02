@@ -4,7 +4,8 @@
 
 import { z } from "zod";
 
-import { configuration } from "../Configuration.js";
+import { LGGL_STEAM_API_KEY } from "../../../env/LGGL_STEAM_API_KEY.js";
+import { LGGL_STEAM_USER_ID } from "../../../env/LGGL_STEAM_USER_ID.js";
 
 //
 // Schemas
@@ -221,7 +222,7 @@ export async function fetchOwnedApp(appId: string)
 {
 	const json =
 	{
-		steamid: configuration.steamUserId,
+		steamid: LGGL_STEAM_USER_ID,
 		include_appinfo: true,
 		include_extended_appinfo: true,
 		include_played_free_games: true,
@@ -230,7 +231,7 @@ export async function fetchOwnedApp(appId: string)
 
 	const searchParameters = new URLSearchParams();
 
-	searchParameters.set("key", configuration.steamApiKey);
+	searchParameters.set("key", LGGL_STEAM_API_KEY);
 	
 	searchParameters.set("input_json", JSON.stringify(json));
 
@@ -257,7 +258,7 @@ export async function fetchOwnedApps()
 {
 	const json =
 	{
-		steamid: configuration.steamUserId,
+		steamid: LGGL_STEAM_USER_ID,
 		include_appinfo: true,
 		include_extended_appinfo: true,
 		include_played_free_games: true,
@@ -265,7 +266,7 @@ export async function fetchOwnedApps()
 
 	const searchParameters = new URLSearchParams();
 
-	searchParameters.set("key", configuration.steamApiKey);
+	searchParameters.set("key", LGGL_STEAM_API_KEY);
 	
 	searchParameters.set("input_json", JSON.stringify(json));
 

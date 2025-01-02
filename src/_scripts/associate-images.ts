@@ -9,9 +9,9 @@ import path from "node:path";
 
 import { Prisma } from "@prisma/client";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
 
-import { configuration } from "../_shared/libs/Configuration.js";
+import { prismaClient } from "../_shared/instances/prismaClient.js";
 
 //
 // Functions
@@ -42,22 +42,22 @@ async function main()
 
 		const gameUpdateData: Prisma.GameUpdateArgs["data"] = {};
 
-		if (game.bannerImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "banner.jpg")))
+		if (game.bannerImagePath == null && fs.existsSync(path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "banner.jpg")))
 		{
 			gameUpdateData.bannerImagePath = "/data/images/games/" + game.id + "/banner.jpg";
 		}
 
-		if (game.coverImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "cover.jpg")))
+		if (game.coverImagePath == null && fs.existsSync(path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "cover.jpg")))
 		{
 			gameUpdateData.coverImagePath = "/data/images/games/" + game.id + "/cover.jpg";
 		}
 
-		if (game.iconImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "icon.jpg")))
+		if (game.iconImagePath == null && fs.existsSync(path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "icon.jpg")))
 		{
 			gameUpdateData.iconImagePath = "/data/images/games/" + game.id + "/icon.jpg";
 		}
 
-		if (game.logoImagePath == null && fs.existsSync(path.join(configuration.dataDirectory, "images", "games", game.id.toString(), "logo.png")))
+		if (game.logoImagePath == null && fs.existsSync(path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "logo.png")))
 		{
 			gameUpdateData.logoImagePath = "/data/images/games/" + game.id + "/logo.png";
 		}

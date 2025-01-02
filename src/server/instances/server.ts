@@ -6,7 +6,7 @@ import path from "node:path";
 
 import * as Fritter from "@donutteam/fritter";
 
-import { configuration } from "../../_shared/libs/Configuration.js";
+import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
 //
 // Server Middlewares
@@ -19,15 +19,15 @@ export const staticMiddleware = Fritter.StaticMiddleware.create(
 		[
 			{ 
 				mountPath: "/data/fontawesome",
-				path: path.join(configuration.dataDirectory, "fontawesome"),
+				path: path.join(LGGL_DATA_DIRECTORY, "fontawesome"),
 			},
 			{
 				mountPath: "/data/generated",
-				path: path.join(configuration.dataDirectory, "generated"),
+				path: path.join(LGGL_DATA_DIRECTORY, "generated"),
 			},
 			{
 				mountPath: "/data/images",
-				path: path.join(configuration.dataDirectory, "images"),
+				path: path.join(LGGL_DATA_DIRECTORY, "images"),
 			},
 			{ 
 				path: path.join(process.cwd(), "static"),

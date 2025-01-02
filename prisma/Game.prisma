@@ -1,40 +1,3 @@
-enum GameAchievementSupport {
-    NONE
-    INGAME
-    LAUNCHER
-}
-
-enum GameCompletionStatus {
-    TODO
-    IN_PROGRESS
-    COMPLETE
-    ONE_HUNDRED_PERCENT
-}
-
-enum GameControllerSupport {
-    NONE
-    SUPPORTED
-    REQUIRED
-}
-
-enum GameModSupport {
-    NONE
-    UNOFFICIAL
-    OFFICIAL
-}
-
-enum GameProgressionType {
-    NONE
-    NON_CAMPAIGN
-    CAMPAIGN
-}
-
-enum GameVirtualRealitySupport {
-    NONE
-    SUPPORTED
-    REQUIRED
-}
-
 model Game {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
@@ -58,20 +21,20 @@ model Game {
     isNsfw        Boolean
     isShelved     Boolean
 
-    progressionType                GameProgressionType?
-    completionStatus               GameCompletionStatus?
+    progressionType                String? // GameProgressionType?
+    completionStatus               String? // GameCompletionStatus?
     firstPlayedDate                DateTime?
     firstPlayedDateApproximated    Boolean
     firstCompletedDate             DateTime?
     firstCompletedDateApproximated Boolean
     lastPlayedDate                 DateTime?
-    playCount                      Int                   @default(0)
-    playTimeTotalSeconds           Int                   @default(0)
+    playCount                      Int       @default(0)
+    playTimeTotalSeconds           Int       @default(0)
 
-    achievementSupport    GameAchievementSupport?
-    controllerSupport     GameControllerSupport?
-    modSupport            GameModSupport?
-    virtualRealitySupport GameVirtualRealitySupport?
+    achievementSupport    String? // GameAchievementSupport?
+    controllerSupport     String? // GameControllerSupport?
+    modSupport            String? // GameModSupport?
+    virtualRealitySupport String? // GameVirtualRealitySupport?
 
     playniteGameId String? @unique
     steamAppId     String?

@@ -7,9 +7,9 @@ import child_process from "node:child_process";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { prismaClient } from "../instances/prismaClient.js";
+import { LGGL_CURRENT_PLATFORM_ID } from "../../env/LGGL_CURRENT_PLATFORM_ID.js";
 
-import { configuration } from "./Configuration.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
 //
 // Constants
@@ -157,7 +157,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 				playTimeSeconds: 0,
 
 				gamePlayAction_id: gamePlayAction.id,
-				platform_id: configuration.platformId,
+				platform_id: LGGL_CURRENT_PLATFORM_ID,
 			},
 		});
 

@@ -1,8 +1,3 @@
-enum GamePlayActionType {
-    EXECUTABLE
-    URL
-}
-
 model GamePlayAction {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
@@ -10,10 +5,10 @@ model GamePlayAction {
     sortOrder       Int      @default(0)
 
     name         String
-    type         GamePlayActionType
+    type         String // GamePlayActionType
     path         String
     trackingPath String
-    isArchived   Boolean            @default(false)
+    isArchived   Boolean @default(false)
 
     game_id Int
 

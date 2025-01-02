@@ -32,11 +32,7 @@ async function main()
 					{
 						where:
 						{
-							name:
-							{
-								contains: input,
-								mode: "insensitive",
-							},
+							name: { contains: input },
 						},
 						include:
 						{

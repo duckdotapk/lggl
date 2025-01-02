@@ -9,9 +9,9 @@ import path from "node:path";
 
 import chalk from "chalk";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
 
-import { configuration } from "../_shared/libs/Configuration.js";
+import { prismaClient } from "../_shared/instances/prismaClient.js";
 
 //
 // Functions
@@ -147,7 +147,7 @@ async function main()
 		{
 			problems.push("bannerImagePath is null");
 		}
-		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.bannerImagePath.slice(5))))
+		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.bannerImagePath.slice(5))))
 		{
 			problems.push("bannerImagePath does not exist on disk");
 		}
@@ -156,7 +156,7 @@ async function main()
 		{
 			problems.push("coverImagePath is null");
 		}
-		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.coverImagePath.slice(5))))
+		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.coverImagePath.slice(5))))
 		{
 			problems.push("coverImagePath does not exist on disk");
 		}
@@ -165,7 +165,7 @@ async function main()
 		{
 			problems.push("iconImagePath is null");
 		}
-		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.iconImagePath.slice(5))))
+		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.iconImagePath.slice(5))))
 		{
 			problems.push("iconImagePath does not exist on disk");
 		}
@@ -174,7 +174,7 @@ async function main()
 		{
 			problems.push("logoImagePath is null");
 		}
-		else if (!fs.existsSync(path.join(configuration.dataDirectory, game.logoImagePath.slice(5))))
+		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.logoImagePath.slice(5))))
 		{
 			problems.push("logoImagePath does not exist on disk");
 		}

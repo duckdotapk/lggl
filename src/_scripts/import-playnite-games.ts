@@ -6,7 +6,7 @@ import "source-map-support/register.js";
 
 import fs from "node:fs";
 
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GamePlayActionType, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../_shared/instances/prismaClient.js";
@@ -22,6 +22,15 @@ import * as SourceModelLib from "../_shared/libs/models/Source.js";
 
 import * as PlayniteThirdPartyLib from "../_shared/libs/third-party/Playnite.js";
 import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
+
+import {
+	ACHIEVEMENT_SUPPORT as GameAchievementSupport,
+	COMPLETION_STATUS as GameCompletionStatus,
+	CONTROLLER_SUPPORT as GameControllerSupport,
+	PROGRESSION_TYPE as GameProgressionType,
+	VIRTUAL_REALITY_SUPPORT as GameVirtualRealitySupport,
+} from "../_shared/libs/models/Game.js";
+import { TYPE as GamePlayActionType } from "../_shared/libs/models/GamePlayAction.js";
 
 import * as FileSizeLib from "../_shared/libs/FileSize.js";
 

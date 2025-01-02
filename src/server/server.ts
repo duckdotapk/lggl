@@ -10,21 +10,22 @@ import path from "node:path";
 import chalk from "chalk";
 import * as unzipper from "unzipper";
 
-import { routerMiddleware, server } from "./instances/server.js";
+import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
+import { LGGL_PORT } from "../env/LGGL_PORT.js";
 
-import { configuration } from "../_shared/libs/Configuration.js";
+import { routerMiddleware, server } from "./instances/server.js";
 
 //
 // Create Data Directory
 //
 
-await fs.promises.mkdir(configuration.dataDirectory, { recursive: true });
+await fs.promises.mkdir(LGGL_DATA_DIRECTORY, { recursive: true });
 
 //
 // Download Font Awesome Free
 //
 
-const fontAwesomeDirectory = path.join(configuration.dataDirectory, "fontawesome");
+const fontAwesomeDirectory = path.join(LGGL_DATA_DIRECTORY, "fontawesome");
 
 if (!fs.existsSync(fontAwesomeDirectory))
 {
@@ -48,9 +49,9 @@ if (!fs.existsSync(fontAwesomeDirectory))
 			throw new Error("response body is null");
 		}
 
-		const fontAwesomeZipPath = path.join(configuration.dataDirectory, "fontawesome.zip");
+		const fontAwesomeZipPath = path.join(LGGL_DATA_DIRECTORY, "fontawesome.zip");
 
-		await fs.promises.writeFile(path.join(configuration.dataDirectory, "fontawesome.zip"), Buffer.from(await response.arrayBuffer()));
+		await fs.promises.writeFile(path.join(LGGL_DATA_DIRECTORY, "fontawesome.zip"), Buffer.from(await response.arrayBuffer()));
 
 		console.log("[Server] Extracting Font Awesome Free...");
 
@@ -105,6 +106,6 @@ console.log("[Server] Loaded " + routes.length + " routes.");
 // Start Server
 //
 
-await server.start(configuration.port);
+await server.start(LGGL_PORT);
 
-console.log("[Server] Listening on port " + configuration.port + "...");
+console.log("[Server] Listening on port " + LGGL_PORT + "...");

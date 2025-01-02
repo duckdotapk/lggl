@@ -14,9 +14,10 @@ import { GameFlagsToolbar } from "./GameFlagsToolbar.js";
 import { HumanDateTime } from "./HumanDateTime.js";
 import { Paragraph } from "./Paragraph.js";
 
-import { staticMiddleware } from "../instances/server.js";
+import { LGGL_DEVELOPER_MODE } from "../../env/LGGL_DEVELOPER_MODE.js";
+import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
 
-import { configuration } from "../../_shared/libs/Configuration.js";
+import { staticMiddleware } from "../instances/server.js";
 
 //
 // Locals
@@ -255,7 +256,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											title += "\n\n" + gamePlayActionSession.notes;
 										}
 
-										if (configuration.developerMode)
+										if (LGGL_DEVELOPER_MODE)
 										{
 											title += "\n\nGamePlayActionSession #" + gamePlayActionSession.id;
 										}
@@ -275,8 +276,8 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 												]),
 										};
 									}))
-								: Paragraph(configuration.gamePlayActionSessionHistoryDays != -1
-									? "No play sessions in the last " + configuration.gamePlayActionSessionHistoryDays + " days."
+								: Paragraph(LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS != -1
+									? "No play sessions in the last " + LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS + " days."
 									: "No play sessions recorded."),
 						]),
 
