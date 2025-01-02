@@ -105,7 +105,6 @@ console.log("[Server] Loaded " + routes.length + " routes.");
 // Start Server
 //
 
-// TODO: make port configurable
 await server.start(configuration.port);
 
 console.log("[Server] Listening on port " + configuration.port + "...");

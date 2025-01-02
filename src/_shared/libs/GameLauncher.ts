@@ -40,8 +40,8 @@ async function startProcess(gamePlayAction: Prisma.GamePlayActionGetPayload<null
 
 			break;
 
-		// TODO: make this work on Linux
 		// TODO: make this work on macOS
+		// TODO: make this work on Linux
 		default:
 			throw new Error("Unsupported platform: " + process.platform);
 	}
@@ -66,8 +66,8 @@ async function getRunningProcesses()
 
 			break;
 
-		// TODO: make this work on Linux
 		// TODO: make this work on macOS
+		// TODO: make this work on Linux
 		default:
 			throw new Error("Unsupported platform: " + process.platform);
 	}

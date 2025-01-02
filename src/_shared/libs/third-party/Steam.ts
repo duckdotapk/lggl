@@ -207,7 +207,6 @@ export async function fetchImageUrls(appId: string)
 {
 	const appDetails = await fetchOwnedApp(appId);
 
-	// TODO: I'm not sure if this is the most "correct" names for these images
 	return {
 		icon: appDetails != null
 			? ("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/" + appId + "/" + appDetails.img_icon_url + ".jpg")

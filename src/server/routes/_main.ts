@@ -138,7 +138,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				{
 					const firstLetter = game.sortName.charAt(0).toUpperCase();
 
-					// TODO: wrote this while high as fuck, make sure this actually works
 					if (!isNaN(parseInt(firstLetter)))
 					{
 						const numberGroup = gameGroups.get("#") ?? [];
@@ -210,6 +209,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					}
 				}
 
+				// TODO: use series sortOrder here (games in the "None" series should be last)
 				const series = Array.from(gamesBySeries.entries())
 					.map(([ seriesName, gamesInSeries ]) => ({ seriesName, gamesInSeries }))
 					.sort((a, b) => a.seriesName.localeCompare(b.seriesName));
