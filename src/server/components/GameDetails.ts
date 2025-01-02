@@ -204,6 +204,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											: "Never played",
 									},
 									
+									// TODO: show unknown when date is equivilent to 0 unix time
 									game.firstPlayedDate != null
 										? {
 											label: game.firstPlayedDateApproximated ? "Year first played" : "Date first played",
@@ -213,6 +214,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										}
 										: null,
 
+									// TODO: show unknown when date is equivilent to 0 unix time
 									game.firstCompletedDate != null
 										? {
 											label: game.firstCompletedDateApproximated ? "Year first completed" : "Date first completed",
@@ -280,15 +282,15 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 						[
 							DataTable(
 								[
+									game.releaseDate != null
+										? {
+											label: "Release date",
+											value: HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED),
+										}
+										: null,
 									{
 										label: "Progression type",
 										value: game.progressionType, // TODO: map enum value to a friendly string
-									},
-									{
-										label: "Steam app ID",
-										value: game.steamAppId != null
-											? game.steamAppId
-											: "-",
 									},
 								]),
 						]),
@@ -303,6 +305,23 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 							[
 								// TODO: render as markdown instead
 								game.notes.split("\n").map((line) => Paragraph(line)),
+							])
+						: null,
+
+					game.steamAppId != null
+						? Section("Steam data",
+							[
+								DataTable(
+									[
+										{
+											label: "Steam app ID",
+											value: game.steamAppId,
+										},
+										{
+											label: "Steam app name",
+											value: game.steamAppName,
+										}
+									]),
 							])
 						: null,
 
