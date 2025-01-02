@@ -8,7 +8,7 @@
 			"request": "launch",
 			"runtimeVersion": "22.12.0",
 			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/server/server.js",
+			"program": "${workspaceFolder}/build/server.js",
 			"console": "integratedTerminal",
 		},
 		{
@@ -17,7 +17,7 @@
 			"request": "launch",
 			"runtimeVersion": "22.12.0",
 			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/_scripts/sync-historical-steam-playtime.js",
+			"program": "${workspaceFolder}/build/scripts/sync-historical-steam-playtime.js",
 			"console": "integratedTerminal",
 		},
 	],
