@@ -4,7 +4,7 @@
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
-import { updateGame } from "../routes/api/game/update.schemas.js";
+import { updateGame } from "../../routes/api/game/update.schemas.js";
 
 //
 // Locals

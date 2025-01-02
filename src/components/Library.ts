@@ -5,7 +5,8 @@
 import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 
-import { FilterOptionsToolbar } from "./FilterOptionsToolbar.js";
+import { FilterOptionsToolbar } from "./toolbars/FilterOptionsToolbar.js";
+
 import { GameDetails } from "./GameDetails.js";
 import { Sidebar } from "./Sidebar.js";
 

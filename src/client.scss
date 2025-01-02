@@ -6,6 +6,8 @@
 
 @use "components/_Global.scss";
 
+@use "components/toolbars/Toolbar.scss";
+
 @use "components/Anchor.scss";
 @use "components/Button.scss";
 @use "components/Checkbox.scss";
@@ -13,7 +15,6 @@
 @use "components/Library.scss";
 @use "components/Paragraph.scss";
 @use "components/Sidebar.scss";
-@use "components/Toolbar.scss";
 
 //
 // Client
@@ -22,6 +23,8 @@
 @include Global.Resets();
 @include Global.FontFaces();
 
+@include Toolbar.Toolbar();
+
 @include Anchor.Anchor();
 @include Button.Button();
 @include Checkbox.Checkbox();
@@ -29,4 +32,3 @@
 @include Library.Library();
 @include Paragraph.Paragraph();
 @include Sidebar.Sidebar();
-@include Toolbar.Toolbar();

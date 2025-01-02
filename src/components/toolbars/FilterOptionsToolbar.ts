@@ -4,10 +4,11 @@
 
 import { DE } from "@donutteam/document-builder";
 
-import { Checkbox } from "./Checkbox.js";
 import { Toolbar } from "./Toolbar.js";
 
-import * as LibrarySchemaLib from "../libs/schemas/Library.js";
+import { Checkbox } from "../Checkbox.js";
+
+import * as LibrarySchemaLib from "../../libs/schemas/Library.js";
 
 //
 // Locals

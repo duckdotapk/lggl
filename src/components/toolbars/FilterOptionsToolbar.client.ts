@@ -4,7 +4,7 @@
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
-import type * as LibrarySchemaLib from "../libs/schemas/Library.js";
+import type * as LibrarySchemaLib from "../../libs/schemas/Library.js";
 
 //
 // Locals

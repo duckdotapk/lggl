@@ -4,8 +4,9 @@
 
 import { Prisma } from "@prisma/client";
 
-import { Checkbox } from "./Checkbox.js";
 import { Toolbar } from "./Toolbar.js";
+
+import { Checkbox } from "../Checkbox.js";
 
 //
 // Components
