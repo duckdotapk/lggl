@@ -44,15 +44,13 @@ async function main()
 
 	for (const game of games)
 	{
-		const steamAppName = await CliLib.prompt(readlineInterface, `Enter the Steam app name for '${game.name}' (use blank to use the game's library name)`,
+		const steamAppName = await CliLib.prompt(readlineInterface, 
 			{
+				text: `Enter the Steam app name for "${game.name}"`,
+				defaultValue: game.name,
 				validateAndTransform: async (input) =>
 				{
-					input = input.trim();
-
-					return input.length > 0
-						? input
-						: game.name;
+					return input;
 				},
 			});
 

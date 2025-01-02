@@ -26,8 +26,9 @@ async function main()
 			output: process.stdout,
 		});
 
-	const games = await CliLib.prompt(readlineInterface, "Search for a game by name",
+	const games = await CliLib.prompt(readlineInterface,
 		{
+			text: "Search for a game by name",
 			validateAndTransform: async (input) =>
 			{
 				const games = await prismaClient.game.findMany(
@@ -55,13 +56,14 @@ async function main()
 			},
 		});
 
-	const game = await CliLib.prompt(readlineInterface, "Choose which game you want to add a playtime to",
+	const game = await CliLib.prompt(readlineInterface,
 		{
+			text: "Choose which game you want to add a playtime to",
 			options: games.map(
 				(game) =>
 				{
 					return {
-						id: game.id,
+						value: game.id.toString(),
 						description: game.name,
 					};
 				}),
@@ -92,8 +94,9 @@ async function main()
 		throw new Error("Game not found.");
 	}
 
-	const installationPath = await CliLib.prompt(readlineInterface, "Enter the game's installation path",
+	const installationPath = await CliLib.prompt(readlineInterface, 
 		{
+			text: "Enter the game's installation path",
 			validateAndTransform: async (input) =>
 			{
 				input = input.trim();

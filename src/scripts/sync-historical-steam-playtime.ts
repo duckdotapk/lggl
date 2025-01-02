@@ -343,7 +343,7 @@ async function main()
 			throw new Error("Game #" + game.id + " has no game play action!");
 		}
 
-		const playTime = await getPlayTime(steamData, parseInt(game.steamAppId!));
+		const playTime = await getPlayTime(steamData, game.steamAppId!);
 
 		if (playTime == null)
 		{

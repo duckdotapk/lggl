@@ -204,21 +204,21 @@ export const GENRE_ID =
 // Utility Functions
 //
 
-export async function fetchImageUrls(appId: string)
+export async function fetchImageUrls(steamAppId: number)
 {
-	const appDetails = await fetchOwnedApp(appId);
+	const appDetails = await fetchOwnedApp(steamAppId);
 
 	return {
 		icon: appDetails != null
-			? ("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/" + appId + "/" + appDetails.img_icon_url + ".jpg")
+			? ("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/" + steamAppId + "/" + appDetails.img_icon_url + ".jpg")
 			: null,
-		libraryBackground: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/library_hero.jpg",
-		libraryCapsule: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/library_600x900_2x.jpg",
-		libraryLogo: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/logo.png",
+		libraryBackground: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + steamAppId + "/library_hero.jpg",
+		libraryCapsule: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + steamAppId + "/library_600x900_2x.jpg",
+		libraryLogo: "https://cdn.cloudflare.steamstatic.com/steam/apps/" + steamAppId + "/logo.png",
 	};
 }
 
-export async function fetchOwnedApp(appId: string)
+export async function fetchOwnedApp(steamAppId: number)
 {
 	const json =
 	{
@@ -226,7 +226,10 @@ export async function fetchOwnedApp(appId: string)
 		include_appinfo: true,
 		include_extended_appinfo: true,
 		include_played_free_games: true,
-		appids_filter: [ appId ],
+		appids_filter: 
+		[ 
+			steamAppId,
+		],
 	};
 
 	const searchParameters = new URLSearchParams();
@@ -251,7 +254,7 @@ export async function fetchOwnedApp(appId: string)
 		return null;
 	}
 
-	return responseParseResult.data.response.games.find(game => game.appid == Number(appId)) ?? null;
+	return responseParseResult.data.response.games.find(game => game.appid == steamAppId) ?? null;
 }
 
 export async function fetchOwnedApps()

@@ -37,7 +37,7 @@ model Game {
     virtualRealitySupport String?
 
     playniteGameId String? @unique
-    steamAppId     String?
+    steamAppId     Int?
     steamAppName   String?
 
     gameAntiCheats         GameAntiCheat[]

@@ -25,8 +25,9 @@ async function main()
 			output: process.stdout,
 		});
 
-	const games = await CliLib.prompt(readlineInterface, "Search for a game by name",
+	const games = await CliLib.prompt(readlineInterface,
 		{
+			text: "Search for a game by name",
 			validateAndTransform: async (input) =>
 			{
 				const games = await prismaClient.game.findMany(
@@ -54,13 +55,14 @@ async function main()
 			},
 		});
 
-	const game = await CliLib.prompt(readlineInterface, "Choose which game you want to add a playtime to",
+	const game = await CliLib.prompt(readlineInterface, 
 		{
+			text: "Choose which game you want to add a playtime to",
 			options: games.map(
 				(game) =>
 				{
 					return {
-						id: game.id,
+						value: game.id.toString(),
 						description: game.name,
 					};
 				}),
@@ -91,13 +93,14 @@ async function main()
 		throw new Error("Game not found.");
 	}
 
-	const gamePlayAction = await CliLib.prompt(readlineInterface, "Choose which game play action you want to associate this playtime with",
+	const gamePlayAction = await CliLib.prompt(readlineInterface, 
 		{
+			text: "Choose which game play action you want to associate this playtime with",
 			options: game.gamePlayActions.map(
 				(gamePlayAction) =>
 				{
 					return {
-						id: gamePlayAction.id,
+						value: gamePlayAction.id.toString(),
 						description: gamePlayAction.name,
 					};
 				}),
@@ -131,13 +134,14 @@ async function main()
 			},
 		});
 
-	const platform = await CliLib.prompt(readlineInterface, "Enter the ID of the platform this playtime is from",
+	const platform = await CliLib.prompt(readlineInterface, 
 		{
+			text: "Enter the ID of the platform this playtime is from",
 			options: platforms.map(
 				(platform) =>
 				{
 					return {
-						id: platform.id,
+						value: platform.id.toString(),
 						description: platform.name,
 					};
 				}),
@@ -163,8 +167,9 @@ async function main()
 			},
 		});
 
-	const playTimeSeconds = await CliLib.prompt(readlineInterface, "Enter the playtime in HH:MM:SS format",
+	const playTimeSeconds = await CliLib.prompt(readlineInterface, 
 		{
+			text: "Enter the playtime in HH:MM:SS format",
 			validateAndTransform: async (input) =>
 			{
 				const inputComponents = input.split(":").map((component) => parseInt(component));
@@ -182,8 +187,9 @@ async function main()
 			},
 		});
 
-	const notes = await CliLib.prompt(readlineInterface, "Enter any notes you want to add to this playtime",
+	const notes = await CliLib.prompt(readlineInterface, 
 		{
+			text: "Enter any notes you want to add to this playtime",
 			validateAndTransform: async (input) =>
 			{
 				input = input.trim();
