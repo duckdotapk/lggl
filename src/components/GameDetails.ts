@@ -8,7 +8,7 @@ import { Prisma } from "@prisma/client";
 import humanizeDuration from "humanize-duration";
 import { DateTime } from "luxon";
 
-import { GameFlagsToolbar } from "./toolbars/GameFlagsToolbar.js";
+import { GameFlagsToolbar } from "./toolbar/GameFlagsToolbar.js";
 
 import { Anchor } from "./Anchor.js";
 import { Button } from "./Button.js";
