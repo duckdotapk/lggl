@@ -6,15 +6,14 @@ import * as Fritter from "@donutteam/fritter";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { prismaClient } from "../../_shared/instances/prismaClient.js";
-
 import { Library, LibraryOptions } from "../components/Library.js";
 
-import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
+import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
 
+import { prismaClient } from "../instances/prismaClient.js";
 import { ServerFritterContext } from "../instances/server.js";
 
-import * as LibraryLib from "../../_shared/libs/Library.js";
+import * as LibrarySchemaLib from "../libs/schemas/Library.js";
 
 //
 // Route
@@ -38,11 +37,11 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		// Get Filter Options
 		//
 
-		const filterOptionsParseResult = LibraryLib.FilterOptionsSchema.safeParse(JSON.parse(searchParameters.get("filterOptions") ?? "{}"));
+		const filterOptionsParseResult = LibrarySchemaLib.FilterOptionsSchema.safeParse(JSON.parse(searchParameters.get("filterOptions") ?? "{}"));
 
 		if (!filterOptionsParseResult.success)
 		{
-			const defaultFilterOptions: LibraryLib.FilterOptions =
+			const defaultFilterOptions: LibrarySchemaLib.FilterOptions =
 			{
 				groupMode: "lastPlayed",
 

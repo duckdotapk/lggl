@@ -14,8 +14,8 @@ import { GameFlagsToolbar } from "./GameFlagsToolbar.js";
 import { HumanDateTime } from "./HumanDateTime.js";
 import { Paragraph } from "./Paragraph.js";
 
-import { LGGL_DEVELOPER_MODE } from "../../env/LGGL_DEVELOPER_MODE.js";
-import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
+import { LGGL_DEVELOPER_MODE } from "../env/LGGL_DEVELOPER_MODE.js";
+import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
 
 import { staticMiddleware } from "../instances/server.js";
 

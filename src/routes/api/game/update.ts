@@ -4,8 +4,7 @@
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 
-import { prismaClient } from "../../../../_shared/instances/prismaClient.js";
-
+import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
 import * as Schemas from "./update.schemas.js";

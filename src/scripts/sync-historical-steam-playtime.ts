@@ -14,7 +14,7 @@ import { LGGL_STEAM_API_KEY } from "../env/LGGL_STEAM_API_KEY.js";
 import { LGGL_STEAM_ACCESS_TOKEN } from "../env/LGGL_STEAM_ACCESS_TOKEN.js";
 import { LGGL_STEAM_USER_ID } from "../env/LGGL_STEAM_USER_ID.js";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
 //
 // Schemas

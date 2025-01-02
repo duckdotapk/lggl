@@ -7,7 +7,7 @@ import child_process from "node:child_process";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { LGGL_CURRENT_PLATFORM_ID } from "../../env/LGGL_CURRENT_PLATFORM_ID.js";
+import { LGGL_CURRENT_PLATFORM_ID } from "../env/LGGL_CURRENT_PLATFORM_ID.js";
 
 import { prismaClient } from "../instances/prismaClient.js";
 

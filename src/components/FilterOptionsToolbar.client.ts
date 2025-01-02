@@ -4,7 +4,7 @@
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
-import type * as LibraryLib from "../../_shared/libs/Library.js";
+import type * as LibrarySchemaLib from "../libs/schemas/Library.js";
 
 //
 // Locals
@@ -24,9 +24,9 @@ async function initialise(toolbar: HTMLFormElement)
 
 	const updateFilterOptions = () =>
 	{
-		const filterOptions: LibraryLib.FilterOptions =
+		const filterOptions: LibrarySchemaLib.FilterOptions =
 		{
-			groupMode: groupModeSelect.value as LibraryLib.FilterOptions["groupMode"],
+			groupMode: groupModeSelect.value as LibrarySchemaLib.FilterOptions["groupMode"],
 	
 			showFavoritesGroup: showFavoritesGroupCheckbox.checked,
 	

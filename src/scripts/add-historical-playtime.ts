@@ -2,14 +2,16 @@
 // Imports
 //
 
+import "source-map-support/register.js";
+
 import readline from "node:readline";
 
+import { DateTime } from "luxon";
 import { z } from "zod";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
-import * as CliLib from "../_shared/libs/Cli.js";
-import { DateTime } from "luxon";
+import * as CliLib from "../libs/Cli.js";
 
 //
 // Functions

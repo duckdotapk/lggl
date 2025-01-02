@@ -10,8 +10,8 @@ import path from "node:path";
 import chalk from "chalk";
 import * as unzipper from "unzipper";
 
-import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
-import { LGGL_PORT } from "../env/LGGL_PORT.js";
+import { LGGL_DATA_DIRECTORY } from "./env/LGGL_DATA_DIRECTORY.js";
+import { LGGL_PORT } from "./env/LGGL_PORT.js";
 
 import { routerMiddleware, server } from "./instances/server.js";
 

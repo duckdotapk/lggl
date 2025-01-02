@@ -1,8 +1,8 @@
 {
 	"scripts": {
 		"build": "npm run build-client-css && npm run build-client-js && npm run build-server-js",
-		"build-client-css": "npx sass ./src/server/client.scss:./data/generated/client.css",
-		"build-client-css:watch": "npx sass ./src/server/client.scss:./data/generated/client.css --watch",
+		"build-client-css": "npx sass ./src/client.scss:./data/generated/client.css",
+		"build-client-css:watch": "npx sass ./src/client.scss:./data/generated/client.css --watch",
 		"build-client-js": "node ./build-client-js.js",
 		"build-client-js:watch": "node ./build-client-js.js --watch",
 		"build-server-js": "npx rimraf ./build && npx tsc",

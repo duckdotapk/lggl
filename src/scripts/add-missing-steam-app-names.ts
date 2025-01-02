@@ -2,11 +2,13 @@
 // Imports
 //
 
+import "source-map-support/register.js";
+
 import readline from "node:readline";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
-import * as CliLib from "../_shared/libs/Cli.js";
+import * as CliLib from "../libs/Cli.js";
 
 //
 // Functions

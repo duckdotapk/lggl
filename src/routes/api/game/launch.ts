@@ -4,11 +4,10 @@
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 
-import { prismaClient } from "../../../../_shared/instances/prismaClient.js";
-
-import * as GameLauncherLib from "../../../../_shared/libs/GameLauncher.js";
-
+import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
+
+import * as GameLauncherLib from "../../../libs/GameLauncher.js";
 
 import * as Schemas from "./launch.schemas.js";
 

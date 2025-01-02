@@ -6,7 +6,7 @@ import path from "node:path";
 
 import * as Fritter from "@donutteam/fritter";
 
-import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
+import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
 
 //
 // Server Middlewares

@@ -9,9 +9,9 @@ import path from "node:path";
 
 import { Prisma } from "@prisma/client";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
-import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
+import * as SteamThirdPartyLib from "../libs/third-party/Steam.js";
 
 //
 // Functions

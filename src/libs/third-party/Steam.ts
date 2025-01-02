@@ -4,8 +4,8 @@
 
 import { z } from "zod";
 
-import { LGGL_STEAM_API_KEY } from "../../../env/LGGL_STEAM_API_KEY.js";
-import { LGGL_STEAM_USER_ID } from "../../../env/LGGL_STEAM_USER_ID.js";
+import { LGGL_STEAM_API_KEY } from "../../env/LGGL_STEAM_API_KEY.js";
+import { LGGL_STEAM_USER_ID } from "../../env/LGGL_STEAM_USER_ID.js";
 
 //
 // Schemas

@@ -11,7 +11,7 @@ import { Sidebar } from "./Sidebar.js";
 
 import { staticMiddleware } from "../instances/server.js";
 
-import * as LibraryLib from "../../_shared/libs/Library.js";
+import * as LibrarySchemaLib from "../libs/schemas/Library.js";
 
 //
 // Component
@@ -20,7 +20,7 @@ import * as LibraryLib from "../../_shared/libs/Library.js";
 export type LibraryOptions =
 {
 	searchParameters: URLSearchParams;
-	filterOptions: LibraryLib.FilterOptions;
+	filterOptions: LibrarySchemaLib.FilterOptions;
 	gameGroups: Map<string, Prisma.GameGetPayload<null>[]>;
 	selectedGame: Prisma.GameGetPayload<
 		{

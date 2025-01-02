@@ -93,7 +93,7 @@ const clientContext = await esbuild.context(
 		bundle: true,
 		entryPoints:
 		[
-			"src/server/client.ts",
+			"src/client.ts",
 		],
 		external:
 		[

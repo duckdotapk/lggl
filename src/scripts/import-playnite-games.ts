@@ -9,30 +9,24 @@ import fs from "node:fs";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
-import * as AntiCheatModelLib from "../_shared/libs/models/AntiCheat.js";
-import * as CompanyModelLib from "../_shared/libs/models/Company.js";
-import * as DrmModelLib from "../_shared/libs/models/Drm.js";
-import * as EngineModelLib from "../_shared/libs/models/Engine.js";
-import * as GenreModelLib from "../_shared/libs/models/Genre.js";
-import * as PlatformModelLib from "../_shared/libs/models/Platform.js";
-import * as SeriesModelLib from "../_shared/libs/models/Series.js";
-import * as SourceModelLib from "../_shared/libs/models/Source.js";
+import * as AntiCheatModelLib from "../libs/models/AntiCheat.js";
+import * as CompanyModelLib from "../libs/models/Company.js";
+import * as DrmModelLib from "../libs/models/Drm.js";
+import * as EngineModelLib from "../libs/models/Engine.js";
+import * as GameModelLib from "../libs/models/Game.js";
+import * as GamePlayActionModelLib from "../libs/models/GamePlayAction.js";
+import * as GenreModelLib from "../libs/models/Genre.js";
+import * as PlatformModelLib from "../libs/models/Platform.js";
+import * as SeriesModelLib from "../libs/models/Series.js";
+import * as SourceModelLib from "../libs/models/Source.js";
 
-import * as PlayniteThirdPartyLib from "../_shared/libs/third-party/Playnite.js";
-import * as SteamThirdPartyLib from "../_shared/libs/third-party/Steam.js";
+import * as PlayniteThirdPartyLib from "../libs/third-party/Playnite.js";
+import * as SteamThirdPartyLib from "../libs/third-party/Steam.js";
 
-import {
-	ACHIEVEMENT_SUPPORT as GameAchievementSupport,
-	COMPLETION_STATUS as GameCompletionStatus,
-	CONTROLLER_SUPPORT as GameControllerSupport,
-	PROGRESSION_TYPE as GameProgressionType,
-	VIRTUAL_REALITY_SUPPORT as GameVirtualRealitySupport,
-} from "../_shared/libs/models/Game.js";
-import { TYPE as GamePlayActionType } from "../_shared/libs/models/GamePlayAction.js";
 
-import * as FileSizeLib from "../_shared/libs/FileSize.js";
+import * as FileSizeLib from "../libs/FileSize.js";
 
 //
 // Functions
@@ -57,7 +51,7 @@ function determineProgressionType(playniteGame: PlayniteThirdPartyLib.PlayniteGa
 		case "Risk of Rain":
 		case "Satisfactory":
 		case "The Binding of Isaac":
-			return GameProgressionType.NON_CAMPAIGN;
+			return GameModelLib.PROGRESSION_TYPE.NON_CAMPAIGN;
 
 		case "Accounting+":
 		case "Arizona Sunshine":
@@ -65,22 +59,22 @@ function determineProgressionType(playniteGame: PlayniteThirdPartyLib.PlayniteGa
 		case "Marvel's Spider-Man":
 		case "SWELTER":
 		case "System Shock":
-			return GameProgressionType.CAMPAIGN;
+			return GameModelLib.PROGRESSION_TYPE.CAMPAIGN;
 	}
 
 	if (playniteGame.CompletionStatus.Name.startsWith("-"))
 	{
-		return GameProgressionType.NONE;
+		return GameModelLib.PROGRESSION_TYPE.NONE;
 	}
 
 	if (playniteGame.CompletionStatus.Name.startsWith("Other"))
 	{
-		return GameProgressionType.NON_CAMPAIGN;
+		return GameModelLib.PROGRESSION_TYPE.NON_CAMPAIGN;
 	}
 
 	if (playniteGame.CompletionStatus.Name.startsWith("Campaign"))
 	{
-		return GameProgressionType.CAMPAIGN;
+		return GameModelLib.PROGRESSION_TYPE.CAMPAIGN;
 	}
 	
 	return null;
@@ -92,20 +86,20 @@ function determineCompletionStatus(playniteGame: PlayniteThirdPartyLib.PlayniteG
 	{
 		case "Campaign > TODO":
 		case "Other > TODO":
-			return GameCompletionStatus.TODO;
+			return GameModelLib.COMPLETION_STATUS.TODO;
 
 		case "Campaign > In Progress":
 		case "Other > In Progress":
 		case "Shelved":
-			return GameCompletionStatus.IN_PROGRESS;
+			return GameModelLib.COMPLETION_STATUS.IN_PROGRESS;
 
 		case "Campaign > Complete":
 		case "Other > Complete":
-			return GameCompletionStatus.COMPLETE
+			return GameModelLib.COMPLETION_STATUS.COMPLETE
 
 		case "Campaign > 100%":
 		case "Other > 100%":
-			return GameCompletionStatus.ONE_HUNDRED_PERCENT;
+			return GameModelLib.COMPLETION_STATUS.ONE_HUNDRED_PERCENT;
 
 		default:
 			return null;
@@ -176,25 +170,25 @@ function determineFirstCompletedDate(playniteGame: PlayniteThirdPartyLib.Playnit
 function determineAchievementSupport(playniteGame: PlayniteThirdPartyLib.PlayniteGame)
 {
 	return playniteGame.Features.find((feature) => feature.Name == "Achievements")
-		? GameAchievementSupport.LAUNCHER
-		: GameAchievementSupport.NONE;
+		? GameModelLib.ACHIEVEMENT_SUPPORT.LAUNCHER
+		: GameModelLib.ACHIEVEMENT_SUPPORT.NONE;
 }
 
 function determineControllerSupport(playniteGame: PlayniteThirdPartyLib.PlayniteGame)
 {
 	if (playniteGame.Features.find((feature) => feature.Name == "Controller > Required") != null)
 	{
-		return GameControllerSupport.REQUIRED;
+		return GameModelLib.CONTROLLER_SUPPORT.REQUIRED;
 	}
 
 	if (playniteGame.Features.find((feature) => feature.Name == "Controller > Optional") != null)
 	{
-		return GameControllerSupport.SUPPORTED;
+		return GameModelLib.CONTROLLER_SUPPORT.SUPPORTED;
 	}
 
 	if (playniteGame.Features.find((feature) => feature.Name == "Controller > Unsupported") != null)
 	{
-		return GameControllerSupport.NONE;
+		return GameModelLib.CONTROLLER_SUPPORT.NONE;
 	}
 
 	return null;
@@ -204,15 +198,15 @@ function determineVirtualRealitySupport(playniteGame: PlayniteThirdPartyLib.Play
 {
 	if (playniteGame.Features.find((feature) => feature.Name == "VR > Required") != null)
 	{
-		return GameVirtualRealitySupport.REQUIRED;
+		return GameModelLib.VIRTUAL_REALITY_SUPPORT.REQUIRED;
 	}
 
 	if (playniteGame.Features.find((feature) => feature.Name == "VR > Optional") != null)
 	{
-		return GameVirtualRealitySupport.SUPPORTED;
+		return GameModelLib.VIRTUAL_REALITY_SUPPORT.SUPPORTED;
 	}
 
-	return GameVirtualRealitySupport.NONE;
+	return GameModelLib.VIRTUAL_REALITY_SUPPORT.NONE;
 }
 
 function determineSteamAppId(playniteGame: PlayniteThirdPartyLib.PlayniteGame)
@@ -262,7 +256,7 @@ async function createGamePlayAction(transactionClient: Prisma.TransactionClient,
 			data:
 			{
 				name: "Launch via Steam",
-				type: GamePlayActionType.URL,
+				type: GamePlayActionModelLib.TYPE.URL,
 				path: launchViaSteamGameAction.Path,
 				trackingPath: launchViaSteamGameAction.TrackingPath,
 

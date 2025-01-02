@@ -2,15 +2,17 @@
 // Imports
 //
 
+import "source-map-support/register.js";
+
 import fs from "node:fs";
 import readline from "node:readline";
 
 import { z } from "zod";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
-import * as CliLib from "../_shared/libs/Cli.js";
-import * as FileSizeLib from "../_shared/libs/FileSize.js";
+import * as CliLib from "../libs/Cli.js";
+import * as FileSizeLib from "../libs/FileSize.js";
 
 //
 // Functions

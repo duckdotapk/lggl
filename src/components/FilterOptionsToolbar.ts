@@ -4,16 +4,16 @@
 
 import { DE } from "@donutteam/document-builder";
 
-import * as LibraryLib from "../../_shared/libs/Library.js";
-
 import { Checkbox } from "./Checkbox.js";
 import { Toolbar } from "./Toolbar.js";
+
+import * as LibrarySchemaLib from "../libs/schemas/Library.js";
 
 //
 // Locals
 //
 
-function Option(value: LibraryLib.FilterOptions["groupMode"], label: string, selected: boolean)
+function Option(value: LibrarySchemaLib.FilterOptions["groupMode"], label: string, selected: boolean)
 {
 	return new DE("option",
 		{
@@ -29,7 +29,7 @@ function Option(value: LibraryLib.FilterOptions["groupMode"], label: string, sel
 // Components
 //
 
-export function FilterOptionsToolbar(filterOptions: LibraryLib.FilterOptions)
+export function FilterOptionsToolbar(filterOptions: LibrarySchemaLib.FilterOptions)
 {
 	return Toolbar("component-filter-options-toolbar", null,
 		[

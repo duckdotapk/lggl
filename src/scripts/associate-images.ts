@@ -11,7 +11,7 @@ import { Prisma } from "@prisma/client";
 
 import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
 
-import { prismaClient } from "../_shared/instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
 //
 // Functions
