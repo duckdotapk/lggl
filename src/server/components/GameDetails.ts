@@ -106,6 +106,28 @@ function DataTable(rows: (DataTableRow | null)[])
 		]);
 }
 
+function buildDateDataTableRow(date: Date, isApproximated: boolean, verb: "played" | "completed")
+{
+	const label = (isApproximated ? "Year " : "Date ") + " first " + verb;
+
+	let value: Child;
+
+	if (DateTime.fromJSDate(date).toSeconds() == 0)
+	{
+		value = "Unknown";
+	}
+	else if (isApproximated)
+	{
+		value = DateTime.fromJSDate(date).year.toString();
+	}
+	else
+	{
+		value = HumanDateTime(DateTime.fromJSDate(date), DateTime.DATE_MED);
+	}
+
+	return { label, value } satisfies DataTableRow;
+}
+
 //
 // Component
 //
@@ -204,24 +226,12 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											: "Never played",
 									},
 									
-									// TODO: show unknown when date is equivilent to 0 unix time
 									game.firstPlayedDate != null
-										? {
-											label: game.firstPlayedDateApproximated ? "Year first played" : "Date first played",
-											value: game.firstPlayedDateApproximated
-												? DateTime.fromJSDate(game.firstPlayedDate).year
-												: HumanDateTime(DateTime.fromJSDate(game.firstPlayedDate), DateTime.DATE_MED),
-										}
+										? buildDateDataTableRow(game.firstPlayedDate, game.firstPlayedDateApproximated, "played")
 										: null,
 
-									// TODO: show unknown when date is equivilent to 0 unix time
 									game.firstCompletedDate != null
-										? {
-											label: game.firstCompletedDateApproximated ? "Year first completed" : "Date first completed",
-											value: game.firstCompletedDateApproximated
-												? DateTime.fromJSDate(game.firstCompletedDate).year
-												: HumanDateTime(DateTime.fromJSDate(game.firstCompletedDate), DateTime.DATE_MED),
-										}
+										? buildDateDataTableRow(game.firstCompletedDate, game.firstCompletedDateApproximated, "completed")
 										: null,
 
 									game.lastPlayedDate != null
