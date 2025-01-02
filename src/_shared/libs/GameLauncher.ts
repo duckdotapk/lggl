@@ -134,6 +134,20 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 	const playSessionStartDateTime = DateTime.now();
 
+	await prismaClient.game.update(
+		{
+			where:
+			{
+				id: game.id,
+			},
+			data:
+			{
+				completionStatus: game.progressionType != "NONE" ? "IN_PROGRESS" : undefined,
+				firstPlayedDate: game.firstPlayedDate == null ? playSessionStartDateTime.toJSDate() : undefined,
+				lastPlayedDate: playSessionStartDateTime.toJSDate(),
+			},
+		});
+
 	const gamePlayActionSession = await prismaClient.gamePlayActionSession.create(
 		{
 			data:
