@@ -20,33 +20,37 @@ import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLA
 
 import { staticMiddleware } from "../instances/server.js";
 
+import * as GameModelLib from "../libs/models/Game.js";
+
 //
 // Locals
 //
 
 function Banner(game: GameDetailsGame)
 {
+	const imageUrls = GameModelLib.getImageUrls(game);
+
 	return new DE("header",
 		{
 			class: "component-game-details-banner",
 		},
 		[
-			game.bannerImagePath != null
+			game.hasBannerImage != null
 				? new DE("img",
 					{
 						class: "image",
 			
-						src: staticMiddleware.getCacheBustedPath(game.bannerImagePath),
+						src: staticMiddleware.getCacheBustedPath(imageUrls.banner),
 						alt: game.name + " banner",
 					})
 				: null,
 
-			game.logoImagePath != null
+			game.hasLogoImage != null
 				? new DE("img",
 					{
 						class: "logo",
 
-						src: staticMiddleware.getCacheBustedPath(game.logoImagePath),
+						src: staticMiddleware.getCacheBustedPath(imageUrls.logo),
 						alt: game.name + " logo",
 					})
 				: new DE("div", "name", game.name),

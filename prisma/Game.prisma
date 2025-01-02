@@ -10,10 +10,10 @@ model Game {
     description String?
     notes       String?
 
-    bannerImagePath String?
-    coverImagePath  String?
-    iconImagePath   String?
-    logoImagePath   String?
+    hasBannerImage Boolean @default(false)
+    hasCoverImage  Boolean @default(false)
+    hasIconImage   Boolean @default(false)
+    hasLogoImage   Boolean @default(false)
 
     isEarlyAccess Boolean
     isFavorite    Boolean
@@ -21,20 +21,20 @@ model Game {
     isNsfw        Boolean
     isShelved     Boolean
 
-    progressionType                String? // GameProgressionType?
-    completionStatus               String? // GameCompletionStatus?
+    progressionType                String?
+    completionStatus               String?
     firstPlayedDate                DateTime?
-    firstPlayedDateApproximated    Boolean
+    firstPlayedDateApproximated    Boolean   @default(false)
     firstCompletedDate             DateTime?
-    firstCompletedDateApproximated Boolean
+    firstCompletedDateApproximated Boolean   @default(false)
     lastPlayedDate                 DateTime?
     playCount                      Int       @default(0)
     playTimeTotalSeconds           Int       @default(0)
 
-    achievementSupport    String? // GameAchievementSupport?
-    controllerSupport     String? // GameControllerSupport?
-    modSupport            String? // GameModSupport?
-    virtualRealitySupport String? // GameVirtualRealitySupport?
+    achievementSupport    String?
+    controllerSupport     String?
+    modSupport            String?
+    virtualRealitySupport String?
 
     playniteGameId String? @unique
     steamAppId     String?

@@ -5,13 +5,12 @@
 import "source-map-support/register.js";
 
 import fs from "node:fs";
-import path from "node:path";
 
 import chalk from "chalk";
 
-import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
-
 import { prismaClient } from "../instances/prismaClient.js";
+
+import * as GameModelLib from "../libs/models/Game.js";
 
 //
 // Functions
@@ -127,6 +126,8 @@ async function main()
 
 	for (const game of games)
 	{
+		const imagePaths = GameModelLib.getImagePaths(game);
+
 		const problems: string[] = [];
 
 		//
@@ -143,40 +144,24 @@ async function main()
 			problems.push(chalk.red("STRICT"), "description is null");
 		}
 
-		if (game.bannerImagePath == null)
+		if (game.hasBannerImage && !fs.existsSync(imagePaths.banner!))
 		{
-			problems.push("bannerImagePath is null");
-		}
-		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.bannerImagePath.slice(5))))
-		{
-			problems.push("bannerImagePath does not exist on disk");
+			problems.push("hasBannerImage is true but banner image does not exist on disk");
 		}
 
-		if (game.coverImagePath == null)
+		if (game.hasCoverImage && !fs.existsSync(imagePaths.cover!))
 		{
-			problems.push("coverImagePath is null");
-		}
-		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.coverImagePath.slice(5))))
-		{
-			problems.push("coverImagePath does not exist on disk");
+			problems.push("hasCoverImage is true but cover image does not exist on disk");
 		}
 
-		if (game.iconImagePath == null)
+		if (game.hasIconImage && !fs.existsSync(imagePaths.icon!))
 		{
-			problems.push("iconImagePath is null");
-		}
-		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.iconImagePath.slice(5))))
-		{
-			problems.push("iconImagePath does not exist on disk");
+			problems.push("hasIconImage is true but icon image does not exist on disk");
 		}
 
-		if (game.logoImagePath == null)
+		if (game.hasLogoImage && !fs.existsSync(imagePaths.logo!))
 		{
-			problems.push("logoImagePath is null");
-		}
-		else if (!fs.existsSync(path.join(LGGL_DATA_DIRECTORY, game.logoImagePath.slice(5))))
-		{
-			problems.push("logoImagePath does not exist on disk");
+			problems.push("hasLogoImage is true but logo image does not exist on disk");
 		}
 
 		if (game.progressionType == null)

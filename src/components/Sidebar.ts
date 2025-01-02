@@ -11,6 +11,8 @@ import { HumanDateTime } from "./HumanDateTime.js";
 
 import { staticMiddleware } from "../instances/server.js";
 
+import * as GameModelLib from "../libs/models/Game.js";
+
 //
 // Locals
 //
@@ -28,6 +30,8 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 
 	itemSearchParameters.set("selectedGameId", game.id.toString());
 
+	const imageUrls = GameModelLib.getImageUrls(game);
+
 	return new DE("a",
 		{
 			class: className,
@@ -40,11 +44,11 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 		[
 			new DE("div", "icon-wrapper",
 				[
-					game.iconImagePath != null
+					game.hasIconImage != null
 						? new DE("img",
 							{
 								class: "icon image",
-								src: staticMiddleware.getCacheBustedPath(game.iconImagePath),
+								src: staticMiddleware.getCacheBustedPath(imageUrls.icon),
 								alt: game.name + " icon",
 							})
 						: new DE("div", "icon font-awesome",
