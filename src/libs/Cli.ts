@@ -32,33 +32,40 @@ export class RetryableError extends Error
 // Utility Functions
 //
 
-export type PromptOptions<T> =
+export type ConfirmOptions =
 {
-	options?: 
-	{ 
-		id: number;
-		description: string;
-	}[];
-	validateAndTransform: (rawInput: string) => Promise<T>;
+	text: string;
+	defaultValue?: boolean;
 };
 
-export async function prompt<T>(readlineInterface: readline.promises.Interface, question: string, promptOptions: PromptOptions<T>)
+export async function confirm(readlineInterface: readline.promises.Interface, options: ConfirmOptions)
 {
-	let text = chalk.bold(question) + ":\n";
-
-	if (promptOptions.options != null)
-	{
-		for (const option of promptOptions.options)
-		{
-			text += "  " + chalk.red(option.id + ":") + " " + option.description + "\n";
-		}
-	}
+	const text = chalk.bold(options.text + " (" + chalk.green("yes") + "/" + chalk.green("no") + "):\n");
 
 	const rawInput = await readlineInterface.question(text);
 
 	try
 	{
-		return await promptOptions.validateAndTransform(rawInput);
+		let input = rawInput.trim().toLowerCase();
+
+		if (input == "" && options.defaultValue !== undefined)
+		{
+			return options.defaultValue;
+		}
+
+		switch (input)
+		{
+			case "yes":
+			case "y":
+				return true;
+
+			case "no":
+			case "n":
+				return false;
+			
+			default:
+				throw new RetryableError("Invalid input, please enter \"yes\" or \"no\"!");
+		}
 	}
 	catch (error)
 	{
@@ -66,13 +73,85 @@ export async function prompt<T>(readlineInterface: readline.promises.Interface, 
 		{
 			console.error(error.message + "\n");
 
-			return await prompt(readlineInterface, question, promptOptions);
+			return await confirm(readlineInterface, options);
 		}
-		else
-		{
-			readlineInterface.close();
 
-			throw error;
+		throw error;
+	}
+}
+
+export async function pause(readlineInterface: readline.promises.Interface, text?: string)
+{
+	await readlineInterface.question(text ?? "Press enter to continue");
+}
+
+export type PromptOptions<T> =
+{
+	text: string;
+	defaultValue?: T;
+	options?: 
+	{ 
+		value: string;
+		description?: string;
+	}[];
+	validateAndTransform: (rawInput: string) => Promise<T>;
+};
+
+export async function prompt<T>(readlineInterface: readline.promises.Interface, options: PromptOptions<T>)
+{
+	let text = chalk.bold(options.text)
+
+	if (options.defaultValue !== undefined)
+	{
+		text += options.defaultValue === null
+			? " (optional)"
+			: " (default: \"" + options.defaultValue + "\")";
+	}
+
+	text += ":\n";
+
+	if (options.options != null)
+	{
+		for (const option of options.options)
+		{
+			text += "  " + chalk.green(option.value);
+
+			if (option.description != null)
+			{
+				text += ": " + option.description;
+			}
+
+			text += "\n";
 		}
+	}
+
+	const rawInput = await readlineInterface.question(text);
+
+	try
+	{
+		let input = rawInput.trim();
+	
+		if (input == "")
+		{
+			if (options.defaultValue !== undefined)
+			{
+				return options.defaultValue;
+			}
+
+			throw new RetryableError("No default value, please enter a value!");
+		}
+
+		return await options.validateAndTransform(rawInput);
+	}
+	catch (error)
+	{
+		if (error instanceof RetryableError)
+		{
+			console.error(error.message + "\n");
+
+			return await prompt(readlineInterface, options);
+		}
+
+		throw error;
 	}
 }
