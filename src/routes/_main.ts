@@ -117,7 +117,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		
 		if (filterOptions.showFavoritesGroup)
 		{
-			const favoriteGames = games.filter((game) => game.isFavorite);
+			const favoriteGames = games.filter((game) => game.isFavorite).sort((a, b) => a.sortName.localeCompare(b.sortName));
 
 			gameGroups.set("Favorites", favoriteGames);
 
