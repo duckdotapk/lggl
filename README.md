@@ -1,4 +1,4 @@
-# LGGL
+# 🕹️ LGGL
 **L**oren **G**oodwin's **G**ame **L**auncher: A cross-platform Node.js based game launcher.
 
 I made this to have an alternative to [Playnite](https://playnite.link/) for my upcoming switch to Linux on my main computer. I also wanted various categorization features that were lacking in Playnite (which is saying a lot, because it's great!).
