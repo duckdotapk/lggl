@@ -236,7 +236,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										: null,
 
 									{
-										label: "Time played",
+										label: "Total time played",
 										value: game.playTimeTotalSeconds > 0
 											? new DE("span",
 												{
@@ -248,7 +248,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											: "No playtime recorded",
 									},
 									{
-										label: "Last played",
+										label: "Date last played",
 										value: game.lastPlayedDate != null
 											? new DE("span",
 												{
@@ -259,20 +259,13 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 												])
 											: "Never played",
 									},
-									
-									game.firstPlayedDate != null
-										? buildDateDataTableRow(game.firstPlayedDate, game.firstPlayedDateApproximated, "played")
-										: null,
 
 									game.firstCompletedDate != null
 										? buildDateDataTableRow(game.firstCompletedDate, game.firstCompletedDateApproximated, "completed")
 										: null,
-
-									game.lastPlayedDate != null
-										? {
-											label: "Date last played",
-											value: HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED),
-										}
+									
+									game.firstPlayedDate != null
+										? buildDateDataTableRow(game.firstPlayedDate, game.firstPlayedDateApproximated, "played")
 										: null,
 								]), 
 						]),
@@ -314,24 +307,20 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 									: "No play sessions recorded."),
 						]),
 
-					game.description != null
-						? Section("Description",
-							[
-								// TODO: render as markdown instead
-								game.description.split("\n").map((line) => Paragraph(line)),
-							])
-						: null,
-
-					Section("Metadata",
+					Section("Game data",
 						[
 							DataTable(
 								[
-									game.releaseDate != null
-										? {
-											label: "Release date",
-											value: HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED),
-										}
-										: null,
+									{
+										label: "Name",
+										value: game.name,
+									},
+									{
+										label: "Release date",
+										value: game.releaseDate != null
+											? HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED)
+											: "Unreleased",
+									},
 									{
 										label: "Progression type",
 										value: game.progressionType, // TODO: map enum value to a friendly string
@@ -366,7 +355,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 						: null,
 
 					game.steamAppId != null
-						? Section("Steam data",
+						? Section("Steam app data",
 							[
 								DataTable(
 									[

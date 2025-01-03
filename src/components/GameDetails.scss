@@ -67,7 +67,6 @@
 		padding: 1rem;
 
 		width: 100%;
-		max-width: 400px;
 	}
 
 	.component-game-details-header
@@ -81,6 +80,9 @@
 
 	.component-game-details-data-table
 	{
+		table-layout: fixed;
+		width: 100%;
+
 		td
 		{
 			padding: 0.5rem 0.5rem 0.5rem 0;
@@ -88,8 +90,13 @@
 			&.label
 			{
 				font-weight: bold;
+			}
 
-				width: 10.5rem;
+			&.value
+			{
+				word-wrap: break-word;
+				overflow-wrap: break-word;
+				white-space: normal;
 			}
 		}
 	}
@@ -98,11 +105,11 @@
 	{
 		> .details-sections
 		{
-			display: flex;
+			display: grid;
 
 			gap: 0.5rem;
 
-			flex-wrap: wrap;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
 		}
 	}
 }
