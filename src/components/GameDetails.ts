@@ -5,7 +5,6 @@
 import { Child, DE } from "@donutteam/document-builder";
 import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
-import humanizeDuration from "humanize-duration";
 import { DateTime } from "luxon";
 
 import { GameFlagsToolbar } from "./toolbar/GameFlagsToolbar.js";
@@ -18,6 +17,7 @@ import { Paragraph } from "./Paragraph.js";
 import { LGGL_DEVELOPER_MODE } from "../env/LGGL_DEVELOPER_MODE.js";
 import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
 
+import { shortEnglishHumanizer } from "../instances/humanizer.js";
 import { staticMiddleware } from "../instances/server.js";
 
 import * as GameModelLib from "../libs/models/Game.js";
@@ -225,7 +225,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 													title: Utilities.NumberLib.format(game.playTimeTotalSeconds) + " seconds",
 												},
 												[
-													humanizeDuration(game.playTimeTotalSeconds * 1000, { units: [ "h", "m", "s" ] }),
+													shortEnglishHumanizer(game.playTimeTotalSeconds * 1000, { units: [ "h", "m", "s" ] }),
 												])
 											: "No playtime recorded",
 									},
@@ -287,7 +287,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 												[
 													new DE("span", gamePlayActionSession.platform.iconName + " fa-fw"),
 													" ",
-													humanizeDuration(gamePlayActionSession.playTimeSeconds * 1000, { units: [ "h", "m", "s" ] }),
+													shortEnglishHumanizer(gamePlayActionSession.playTimeSeconds * 1000, { units: [ "h", "m", "s" ] }),
 												]),
 										};
 									}))
