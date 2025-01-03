@@ -416,7 +416,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 						data:
 						{
 							name: "Launch via Steam",
-							type: GamePlayActionModelLib.TYPE.URL,
+							type: "URL" satisfies GamePlayActionModelLib.Type,
 							path: "steam://run/" + game.steamAppId,
 							trackingPath: gameInstallationPath,
 
