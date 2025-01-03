@@ -46,7 +46,7 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 		[
 			new DE("div", "icon-wrapper",
 				[
-					game.hasIconImage != null
+					game.hasIconImage
 						? new DE("img",
 							{
 								class: "icon image",

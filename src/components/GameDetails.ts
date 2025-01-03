@@ -34,7 +34,7 @@ function Banner(game: GameDetailsGame)
 			class: "component-game-details-banner",
 		},
 		[
-			game.hasBannerImage != null
+			game.hasBannerImage
 				? new DE("img",
 					{
 						class: "image",
@@ -44,7 +44,7 @@ function Banner(game: GameDetailsGame)
 					})
 				: null,
 
-			game.hasLogoImage != null
+			game.hasLogoImage
 				? new DE("img",
 					{
 						class: "logo",
