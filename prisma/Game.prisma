@@ -14,11 +14,12 @@ model Game {
     hasIconImage   Boolean @default(false)
     hasLogoImage   Boolean @default(false)
 
-    isEarlyAccess Boolean
-    isFavorite    Boolean
-    isHidden      Boolean
-    isNsfw        Boolean
-    isShelved     Boolean
+    isEarlyAccess Boolean @default(false)
+    isFavorite    Boolean @default(false)
+    isHidden      Boolean @default(false)
+    isInstalled   Boolean @default(false)
+    isNsfw        Boolean @default(false)
+    isShelved     Boolean @default(false)
 
     progressionType                String?
     completionStatus               String?
