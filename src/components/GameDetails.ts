@@ -7,10 +7,9 @@ import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { GameFlagsToolbar } from "./toolbar/GameFlagsToolbar.js";
-
 import { Anchor } from "./Anchor.js";
 import { Button } from "./Button.js";
+import { Checkbox } from "./Checkbox.js";
 import { HumanDateTime } from "./HumanDateTime.js";
 import { Paragraph } from "./Paragraph.js";
 
@@ -221,7 +220,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 
 			PlayActionButtonGroup(game),
 
-			GameFlagsToolbar(game),
+			// TODO: show game description, if there is one
 
 			new DE("div", "details-sections",
 				[
@@ -338,6 +337,19 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										value: game.progressionType, // TODO: map enum value to a friendly string
 									},
 								]),
+						]),
+
+					Section("Game flags",
+						[
+							Paragraph(Checkbox("isEarlyAccess", "Is Early Access", game.isEarlyAccess)),
+
+							Paragraph(Checkbox("isFavorite", "Is Favorite", game.isFavorite)),
+
+							Paragraph(Checkbox("isHidden", "Is Hidden", game.isHidden)),
+
+							Paragraph(Checkbox("isNsfw", "Is NSFW", game.isNsfw)),
+							
+							Paragraph(Checkbox("isShelved", "Is Shelved", game.isShelved)),
 						]),
 
 					Section("Links",

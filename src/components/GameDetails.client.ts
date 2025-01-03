@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import { launchGame } from "../routes/api/game/launch.schemas.js";
+import { updateGame } from "../routes/api/game/update.schemas.js";
 
 //
 // Locals
@@ -12,32 +13,56 @@ import { launchGame } from "../routes/api/game/launch.schemas.js";
 
 async function initialise(element: HTMLElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(element, "gameId");
+	//
+	// Get Data
+	//
 
-	const buttons = element.querySelectorAll<HTMLButtonElement>(`[data-game-play-action-id]`);
+	const id = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(element, "gameId");
 
-	for (const button of buttons)
+	//
+	// Get Elements
+	//
+
+	const gamePlayActionButtons = element.querySelectorAll<HTMLButtonElement>(`[data-game-play-action-id]`);
+	
+	const isEarlyAccessInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "[name='isEarlyAccess']");
+	const isFavoriteInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "[name='isFavorite']");	
+	const isHiddenInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "[name='isHidden']");
+	const isNsfwInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "[name='isNsfw']");
+	const isShelvedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "[name='isShelved']");
+
+	//
+	// Add Event Listeners
+	//
+
+	for (const gamePlayActionButton of gamePlayActionButtons)
 	{
-		const gamePlayActionId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(button, "gamePlayActionId");
+		const gamePlayActionId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(gamePlayActionButton, "gamePlayActionId");
 
-		button.addEventListener("click",
+		gamePlayActionButton.addEventListener("click",
 			async () =>
 			{
 				try
 				{
-					button.disabled = true;
+					gamePlayActionButton.disabled = true;
 
-					const response = await launchGame(gameId, gamePlayActionId);
+					const response = await launchGame(id, gamePlayActionId);
 
 					// TODO: show errors somewhere
 					console.log("[GamePlayActionButtonGroup] Launched game:", response);
 				}
 				finally
 				{
-					button.disabled = false;
+					gamePlayActionButton.disabled = false;
 				}
 			});
-	}
+	}	
+
+	isEarlyAccessInput.addEventListener("change", () => updateGame(id, { isEarlyAccess: isEarlyAccessInput.checked }));
+	isFavoriteInput.addEventListener("change", () => updateGame(id, { isFavorite: isFavoriteInput.checked }));
+	isHiddenInput.addEventListener("change", () => updateGame(id, { isHidden: isHiddenInput.checked }));
+	isNsfwInput.addEventListener("change", () => updateGame(id, { isNsfw: isNsfwInput.checked }));
+	isShelvedInput.addEventListener("change", () => updateGame(id, { isShelved: isShelvedInput.checked }));
 }
 
 //
