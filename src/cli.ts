@@ -398,7 +398,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 
 				const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(gameInstallationSize);
 
-				await prismaClient.gameInstallation.create(
+				await transactionClient.gameInstallation.create(
 					{
 						data:
 						{
@@ -413,7 +413,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 
 			if (steamAppId != null && gameInstallationPath != null)
 			{
-				await prismaClient.gamePlayAction.create(
+				await transactionClient.gamePlayAction.create(
 					{
 						data:
 						{
