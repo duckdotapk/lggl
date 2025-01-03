@@ -142,7 +142,9 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 			},
 			data:
 			{
-				completionStatus: game.progressionType != "NONE" ? "IN_PROGRESS" : undefined,
+				completionStatus: game.completionStatus == null || game.completionStatus == "TODO"
+					? "IN_PROGRESS"
+					: undefined,
 				firstPlayedDate: game.firstPlayedDate == null ? playSessionStartDateTime.toJSDate() : undefined,
 				lastPlayedDate: playSessionStartDateTime.toJSDate(),
 			},
