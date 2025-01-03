@@ -219,8 +219,6 @@ async function main()
 				{
 					data:
 					{
-						sortOrder: -1,
-
 						startDate: DateTime.fromSeconds(0).toJSDate(),
 						endDate: DateTime.fromSeconds(playTimeSeconds).toJSDate(),
 						playTimeSeconds,

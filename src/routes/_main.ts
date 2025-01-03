@@ -229,12 +229,12 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						})
 						.sort((a, b) =>
 						{
-							if (a.seriesGame.sortOrder < b.seriesGame.sortOrder)
+							if (a.seriesGame.number < b.seriesGame.number)
 							{
 								return -1;
 							}
 
-							if (a.seriesGame.sortOrder > b.seriesGame.sortOrder)
+							if (a.seriesGame.number > b.seriesGame.number)
 							{
 								return 1;
 							}
@@ -289,13 +289,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					orderBy:
 					[
 						{
-							sortOrder: "desc",
-						},
-						{
 							startDate: "desc",
-						},
-						{
-							createdDate: "desc",
 						},
 					],
 				})

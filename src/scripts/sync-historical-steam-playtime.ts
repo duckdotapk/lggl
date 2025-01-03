@@ -284,7 +284,7 @@ async function getNonHistoricalPlaytimeForPlatform(game_id: number, platform_id:
 	return aggregate._sum.playTimeSeconds ?? 0;
 }
 
-async function createHistoricalGameActionPlaySession(sortOrder: number, game_id: number, gamePlayAction_id: number, platform_id: number, playTimeSeconds: number)
+async function createHistoricalGameActionPlaySession(game_id: number, gamePlayAction_id: number, platform_id: number, playTimeSeconds: number)
 {
 	const nonHistoricalPlayTimeSeconds = await getNonHistoricalPlaytimeForPlatform(game_id, platform_id);
 
@@ -298,9 +298,7 @@ async function createHistoricalGameActionPlaySession(sortOrder: number, game_id:
 	await prismaClient.gamePlayActionSession.create(
 		{
 			data:
-			{
-				sortOrder,
-				
+			{				
 				startDate: DateTime.fromSeconds(0).toJSDate(),
 				endDate: DateTime.fromSeconds(playTimeSeconds).toJSDate(),
 				playTimeSeconds: historicalPlayTimeSeconds,
@@ -363,15 +361,15 @@ async function main()
 				},
 			});
 
-		await createHistoricalGameActionPlaySession(-1, game.id, gamePlayAction.id, LGGL_PLATFORM_ID_WINDOWS, playTime.windowsPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_WINDOWS, playTime.windowsPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(-2, game.id, gamePlayAction.id, LGGL_PLATFORM_ID_MAC, playTime.macPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_MAC, playTime.macPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(-3, game.id, gamePlayAction.id, LGGL_PLATFORM_ID_LINUX, playTime.linuxPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_LINUX, playTime.linuxPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(-4, game.id, gamePlayAction.id, LGGL_PLATFORM_ID_STEAM_DECK, playTime.steamDeckPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_STEAM_DECK, playTime.steamDeckPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(-5, game.id, gamePlayAction.id, LGGL_PLATFORM_ID_UNKNOWN, playTime.unknownPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_UNKNOWN, playTime.unknownPlayTimeSeconds);
 
 		await prismaClient.gamePlayActionSession.updateMany(
 			{

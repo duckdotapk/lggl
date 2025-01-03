@@ -26,25 +26,11 @@ async function main()
 		{
 			include:
 			{
-				gameAntiCheats:
-				{
-					include:
-					{
-						antiCheat: true,
-					},
-				},
 				gameDevelopers:
 				{
 					include:
 					{
 						company: true,
-					},
-				},
-				gameDrms:
-				{
-					include:
-					{
-						drm: true,
 					},
 				},
 				gameEngines:
@@ -88,26 +74,6 @@ async function main()
 					include:
 					{
 						company: true,
-					},
-				},
-				gameRatingBoardRatings:
-				{
-					include:
-					{
-						ratingBoardRating:
-						{
-							include:
-							{
-								ratingBoard: true,
-							},
-						},
-					},
-				},
-				gameSources:
-				{
-					include:
-					{
-						source: true,
 					},
 				},
 				seriesGames:
@@ -207,30 +173,12 @@ async function main()
 		}
 
 		//
-		// Check Game Anti Cheats
-		//
-
-		if (strictMode && game.gameAntiCheats.length == 0)
-		{
-			problems.push(chalk.red("STRICT"), "no gameAntiCheats");
-		}
-
-		//
 		// Check Game Developers
 		//
 
 		if (game.gameDevelopers.length == 0)
 		{
 			problems.push("no gameDevelopers");
-		}
-
-		//
-		// Check Game Drms
-		//
-
-		if (strictMode && game.gameDrms.length == 0)
-		{
-			problems.push(chalk.red("STRICT"), "no gameDrms");
 		}
 
 		//
@@ -304,24 +252,6 @@ async function main()
 		if (game.gamePublishers.length == 0)
 		{
 			problems.push("no gamePublishers");
-		}
-
-		//
-		// Check Game Rating Board Ratings
-		//
-
-		if (strictMode && game.gameRatingBoardRatings.length == 0)
-		{
-			problems.push(chalk.red("STRICT"), "no gameRatingBoardRatings");
-		}
-
-		//
-		// Check Game Sources
-		//
-
-		if (game.gameSources.length == 0)
-		{
-			problems.push("no gameSources");
 		}
 
 		//

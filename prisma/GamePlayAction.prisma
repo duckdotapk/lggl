@@ -2,10 +2,9 @@ model GamePlayAction {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
-    sortOrder       Int      @default(0)
 
     name         String
-    type         String // GamePlayActionType
+    type         String
     path         String
     trackingPath String
     isArchived   Boolean @default(false)

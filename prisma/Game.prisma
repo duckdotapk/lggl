@@ -2,7 +2,6 @@ model Game {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
-    sortOrder       Int      @default(0)
 
     name        String    @unique
     sortName    String
@@ -40,17 +39,13 @@ model Game {
     steamAppId     Int?
     steamAppName   String?
 
-    gameAntiCheats         GameAntiCheat[]
-    gameDevelopers         GameDeveloper[]
-    gameDrms               GameDrm[]
-    gameEngines            GameEngine[]
-    gameGenres             GameGenre[]
-    gameInstallations      GameInstallation[]
-    gameModes              GameMode[]
-    gamePlatforms          GamePlatform[]
-    gamePlayActions        GamePlayAction[]
-    gamePublishers         GamePublisher[]
-    gameRatingBoardRatings GameRatingBoardRating[]
-    gameSources            GameSource[]
-    seriesGames            SeriesGame[]
+    gameDevelopers    GameDeveloper[]
+    gameEngines       GameEngine[]
+    gameGenres        GameGenre[]
+    gameInstallations GameInstallation[]
+    gameModes         GameMode[]
+    gamePlatforms     GamePlatform[]
+    gamePlayActions   GamePlayAction[]
+    gamePublishers    GamePublisher[]
+    seriesGames       SeriesGame[]
 }

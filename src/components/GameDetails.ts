@@ -357,10 +357,6 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										label: "Last updated",
 										value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate)),
 									},
-									{
-										label: "Sort order",
-										value: game.sortOrder,
-									},
 								])
 						]),
 				]),
