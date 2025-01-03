@@ -3,6 +3,8 @@ model GameDeveloper {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
+    notes String?
+
     company_id Int
     game_id    Int
 
