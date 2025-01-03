@@ -231,7 +231,7 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 									game.completionStatus != null
 										? {
 											label: "Completion status",
-											value: game.completionStatus, // TODO: map enum value to a friendly string
+											value: GameModelLib.getCompletionStatusName(game),
 										}
 										: null,
 
@@ -321,9 +321,32 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 											? HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED)
 											: "Unreleased",
 									},
+								]),
+						]),
+
+					Section("Game features",
+						[
+							DataTable(
+								[
 									{
 										label: "Progression type",
-										value: game.progressionType, // TODO: map enum value to a friendly string
+										value: GameModelLib.getProgressionTypeName(game),
+									},
+									{
+										label: "Achievement support",
+										value: GameModelLib.getAchievementSupportName(game),
+									},
+									{
+										label: "Controller support",
+										value: GameModelLib.getControllerSupportName(game),
+									},
+									{
+										label: "Mod support",
+										value: GameModelLib.getModSupportName(game),
+									},
+									{
+										label: "VR support",
+										value: GameModelLib.getVirtualRealitySupportName(game),
 									},
 								]),
 						]),
