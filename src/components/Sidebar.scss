@@ -16,6 +16,11 @@
 		gap: 0.25rem;
 		align-items: center;
 
+		&[data-is-installed="false"]
+		{
+			opacity: 0.5;
+		}
+
 		&:hover,
 		&.selected
 		{

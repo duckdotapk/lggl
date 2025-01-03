@@ -40,6 +40,8 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 
 			"data-name": game.name,
 			"data-normalized-name": game.name.toLowerCase().replace(/[^a-z0-9]/g, " "),
+
+			"data-is-installed": game.isInstalled,
 		},
 		[
 			new DE("div", "icon-wrapper",

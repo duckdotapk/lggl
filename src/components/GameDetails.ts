@@ -59,20 +59,30 @@ function Banner(game: GameDetailsGame)
 
 function PlayActionButtonGroup(game: GameDetailsGame)
 {
+	let children: Child;
+
+	if (!game.isInstalled)
+	{
+		children = Button("Not installed", { disabled: true });
+	}
+	else if (game.gamePlayActions.length == 0)
+	{
+		children = Button("No play actions available", { disabled: true });
+	}
+	else
+	{
+		children = game.gamePlayActions.map((gamePlayAction) => Button(gamePlayAction.name, 
+			{ 
+				"data-game-play-action-id": gamePlayAction.id,
+			}));
+	}
+
 	return new DE("div",
 		{
 			class: "component-game-details-play-action-button-group",
 		},
 		[
-			game.gamePlayActions.length == 0
-				? Button("No play actions available",
-					{
-						disabled: true,
-					})
-				: game.gamePlayActions.map((gamePlayAction) => Button(gamePlayAction.name,
-					{
-						"data-game-play-action-id": gamePlayAction.id,
-					})),
+			children,
 		]);
 }
 
