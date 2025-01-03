@@ -27,8 +27,6 @@ const checkInterval = 2000;
 
 async function startProcess(gamePlayAction: Prisma.GamePlayActionGetPayload<null>)
 {
-	// TODO: will this work with EXECUTABLE type GamePlayActions?
-
 	let command: string;
 	let commandArguments: string[];
 
