@@ -16,7 +16,9 @@ import { LGGL_DATA_DIRECTORY } from "./env/LGGL_DATA_DIRECTORY.js";
 import { prismaClient } from "./instances/prismaClient.js";
 
 import * as GameModelLib from "./libs/models/Game.js";
-import * as GamePlayActionModelLib from "./libs/models/GamePlayAction.js";
+
+import * as GameSchemaLib from "./libs/schemas/Game.js";
+import * as GamePlayActionSchemaLib from "./libs/schemas/GamePlayAction.js";
 
 import * as SteamThirdPartyLib from "./libs/third-party/Steam.js";
 
@@ -229,10 +231,10 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		{
 			text: "What kind of progression does this game have?",
 			defaultValue: null,
-			options: GameModelLib.ProgressionTypeSchema.options.map((progressionType) => ({ value: progressionType })),
+			options: GameSchemaLib.ProgressionTypeSchema.options.map((progressionType) => ({ value: progressionType })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = GameModelLib.ProgressionTypeSchema.safeParse(input);
+				const inputParseResult = GameSchemaLib.ProgressionTypeSchema.safeParse(input);
 
 				if (!inputParseResult.success)
 				{
@@ -243,7 +245,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 			}
 		});
 
-	let completionStatus: GameModelLib.CompletionStatus | null = null;
+	let completionStatus: GameSchemaLib.CompletionStatus | null = null;
 	let firstPlayedDate: Date | null = null;
 	let firstPlayedDateApproximated = false;
 	let firstCompletedDate: Date | null = null;
@@ -267,10 +269,10 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		{
 			text: "What kind of achievement support does this game have?",
 			defaultValue: null,
-			options: GameModelLib.AchievementSupportSchema.options.map((achievementSupport) => ({ value: achievementSupport })),
+			options: GameSchemaLib.AchievementSupportSchema.options.map((achievementSupport) => ({ value: achievementSupport })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = GameModelLib.AchievementSupportSchema.safeParse(input);
+				const inputParseResult = GameSchemaLib.AchievementSupportSchema.safeParse(input);
 
 				if (!inputParseResult.success)
 				{
@@ -285,10 +287,10 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		{
 			text: "What kind of controller support does this game have?",
 			defaultValue: null,
-			options: GameModelLib.ControllerSupportSchema.options.map((controllerSupport) => ({ value: controllerSupport })),
+			options: GameSchemaLib.ControllerSupportSchema.options.map((controllerSupport) => ({ value: controllerSupport })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = GameModelLib.ControllerSupportSchema.safeParse(input);
+				const inputParseResult = GameSchemaLib.ControllerSupportSchema.safeParse(input);
 
 				if (!inputParseResult.success)
 				{
@@ -303,10 +305,10 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		{
 			text: "What kind of mod support does this game have?",
 			defaultValue: null,
-			options: GameModelLib.ModSupportSchema.options.map((modSupport) => ({ value: modSupport })),
+			options: GameSchemaLib.ModSupportSchema.options.map((modSupport) => ({ value: modSupport })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = GameModelLib.ModSupportSchema.safeParse(input);
+				const inputParseResult = GameSchemaLib.ModSupportSchema.safeParse(input);
 
 				if (!inputParseResult.success)
 				{
@@ -321,10 +323,10 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		{
 			text: "What kind of virtual reality support does this game have?",
 			defaultValue: null,
-			options: GameModelLib.VirtualRealitySupportSchema.options.map((virtualRealitySupport) => ({ value: virtualRealitySupport })),
+			options: GameSchemaLib.VirtualRealitySupportSchema.options.map((virtualRealitySupport) => ({ value: virtualRealitySupport })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = GameModelLib.VirtualRealitySupportSchema.safeParse(input);
+				const inputParseResult = GameSchemaLib.VirtualRealitySupportSchema.safeParse(input);
 
 				if (!inputParseResult.success)
 				{
@@ -416,7 +418,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 						data:
 						{
 							name: "Launch via Steam",
-							type: "URL" satisfies GamePlayActionModelLib.Type,
+							type: "URL" satisfies GamePlayActionSchemaLib.Type,
 							path: "steam://run/" + game.steamAppId,
 							trackingPath: gameInstallationPath,
 
