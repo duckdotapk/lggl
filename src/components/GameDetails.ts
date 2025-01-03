@@ -170,7 +170,21 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 	{
 		include:
 		{
+			gameDevelopers:
+			{
+				include:
+				{
+					company: true;
+				};
+			};
 			gamePlayActions: true;
+			gamePublishers:
+			{
+				include:
+				{
+					company: true;
+				};
+			};
 		};
 	}>;
 
@@ -320,6 +334,44 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 										value: game.releaseDate != null
 											? HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED)
 											: "Unreleased",
+									},
+									{
+										label: game.gameDevelopers.length > 1
+											? "Developers"
+											: "Developer",
+										value: game.gameDevelopers.length > 0
+											? game.gameDevelopers.map(
+												(gameDeveloper) =>
+												{
+													let text = gameDeveloper.company.name;
+
+													if (gameDeveloper.notes != null)
+													{
+														text += " (" + gameDeveloper.notes + ")";
+													}
+
+													return Paragraph(text);
+												})
+											: "-",
+									},
+									{
+										label: game.gameDevelopers.length > 1
+											? "Publishers"
+											: "Publisher",
+										value: game.gamePublishers.length > 0
+											? game.gamePublishers.map(
+												(gamePublisher) =>
+												{
+													let text = gamePublisher.company.name;
+
+													if (gamePublisher.notes != null)
+													{
+														text += " (" + gamePublisher.notes + ")";
+													}
+
+													return Paragraph(text);
+												})
+											: "-",
 									},
 								]),
 						]),

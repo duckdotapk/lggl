@@ -209,13 +209,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				const seriesWithGamesBySeriesName: Map<string, 
 					{ 
 						series: Prisma.SeriesGetPayload<null>, 
-						games: Prisma.GameGetPayload<
-							{
-								include:
-								{
-									seriesGames: true,
-								},
-							}>[],
+						games: typeof games,
 					}> = new Map();
 
 				for (const game of games)
@@ -335,7 +329,21 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					},
 					include:
 					{
+						gameDevelopers:
+						{
+							include:
+							{
+								company: true,
+							},
+						},
 						gamePlayActions: true,
+						gamePublishers:
+						{
+							include:
+							{
+								company: true,
+							},
+						},
 					},
 				})
 			: null;

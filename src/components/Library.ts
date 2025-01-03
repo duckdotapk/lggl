@@ -7,7 +7,7 @@ import { Prisma } from "@prisma/client";
 
 import { FilterOptionsToolbar } from "./toolbar/FilterOptionsToolbar.js";
 
-import { GameDetails } from "./GameDetails.js";
+import { GameDetails, GameDetailsGame } from "./GameDetails.js";
 import { Sidebar } from "./Sidebar.js";
 
 import { staticMiddleware } from "../instances/server.js";
@@ -23,13 +23,7 @@ export type LibraryOptions =
 	searchParameters: URLSearchParams;
 	filterOptions: LibrarySchemaLib.FilterOptions;
 	gameGroups: Map<string, Prisma.GameGetPayload<null>[]>;
-	selectedGame: Prisma.GameGetPayload<
-		{
-			include:
-			{
-				gamePlayActions: true;
-			};
-		}> | null;
+	selectedGame: GameDetailsGame | null;
 	recentGamePlayActionSessions: Prisma.GamePlayActionSessionGetPayload<
 		{
 			include:
