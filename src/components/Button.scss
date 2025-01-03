@@ -6,24 +6,28 @@
 {
 	.component-button
 	{
-		background-color: #55cdff;
+		background-color: #16a34a; // Tailwind Green 600
 
 		border: none;
 		
-		color: #000000;
+		color: #ffffff;
 
-		padding: 0.5rem 2rem;
+		padding: 1rem 2rem;
 
 		&:disabled
 		{
 			opacity: 0.5;
 		}
 
-		&:hover
+		&:not(:disabled)
 		{
-			background-color: hsl(from #55cdff h s 50%);
-
-			cursor: pointer;
+			&:hover,
+			&:focus
+			{
+				background-color: hsl(from #16a34a h s 30%);
+	
+				cursor: pointer;
+			}
 		}
 	}
 }
