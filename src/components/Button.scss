@@ -2,17 +2,19 @@
 // Component
 //
 
-@mixin Button()
+@mixin Button($color: #16a34a /* Tailwind Green 600 */)
 {
 	.component-button
 	{
-		background-color: #16a34a; // Tailwind Green 600
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 
+		padding: 1rem 1.5rem;
+
+		background-color: $color;
 		border: none;
-		
 		color: #ffffff;
-
-		padding: 1rem 2rem;
 
 		&:disabled
 		{
@@ -24,7 +26,7 @@
 			&:hover,
 			&:focus
 			{
-				background-color: hsl(from #16a34a h s 30%);
+				background-color: hsl(from $color h s 30%);
 	
 				cursor: pointer;
 			}

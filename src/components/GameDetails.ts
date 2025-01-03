@@ -63,17 +63,36 @@ function PlayActionButtonGroup(game: GameDetailsGame)
 
 	if (!game.isInstalled)
 	{
-		children = Button("Not installed", { disabled: true });
+		children = Button(
+			{
+				text: "Not installed",
+				extraAttributes:
+				{
+					disabled: true,
+				},
+			});
 	}
 	else if (game.gamePlayActions.length == 0)
 	{
-		children = Button("No play actions available", { disabled: true });
+		children = Button(
+			{
+				text: "No play actions available",
+				extraAttributes:
+				{
+					disabled: true,
+				},
+			});
 	}
 	else
 	{
-		children = game.gamePlayActions.map((gamePlayAction) => Button(gamePlayAction.name, 
-			{ 
-				"data-game-play-action-id": gamePlayAction.id,
+		children = game.gamePlayActions.map((gamePlayAction) => Button(
+			{
+				iconName: "fa-solid fa-play",
+				text: gamePlayAction.name,
+				extraAttributes:
+				{
+					"data-game-play-action-id": gamePlayAction.id,
+				},
 			}));
 	}
 

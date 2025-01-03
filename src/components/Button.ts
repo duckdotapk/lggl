@@ -8,13 +8,25 @@ import { ButtonElementAttributes, DE } from "@donutteam/document-builder";
 // Component
 //
 
-export function Button(text: string, extraAttributes?: ButtonElementAttributes)
+export type ButtonOptions =
+{
+	iconName?: string;
+	text?: string;
+
+	extraAttributes?: ButtonElementAttributes;
+};
+
+export function Button(options: ButtonOptions)
 {
 	return new DE("button",
 		{
 			class: "component-button",
 
-			...extraAttributes,
+			...options.extraAttributes,
 		},
-		text);
+		[
+			options.iconName != null ? new DE("span", "icon " + options.iconName) : null,
+
+			options.text != null ? new DE("span", "text", options.text) : null,
+		]);
 }
