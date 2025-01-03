@@ -73,12 +73,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		}
 
 		//
-		// Initialise Game Groups Map
-		//
-
-		const gameGroups: LibraryOptions["gameGroups"] = new Map();
-
-		//
 		// Get All Games
 		//
 
@@ -112,17 +106,10 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		}
 
 		//
-		// Create Favorites Group
+		// Initialise Game Groups Map
 		//
-		
-		if (filterOptions.showFavoritesGroup)
-		{
-			const favoriteGames = games.filter((game) => game.isFavorite).sort((a, b) => a.sortName.localeCompare(b.sortName));
 
-			gameGroups.set("Favorites", favoriteGames);
-
-			games = games.filter((game) => !game.isFavorite);
-		}
+		const gameGroups: LibraryOptions["gameGroups"] = new Map();
 
 		//
 		// Group Games by Group Mode
@@ -133,6 +120,16 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			case "name":
 			{
 				games = games.sort((a, b) => a.sortName.localeCompare(b.sortName));
+
+				if (filterOptions.showFavoritesGroup)
+				{
+					const favoriteGames = games.filter((game) => game.isFavorite);
+
+					if (favoriteGames.length > 0)
+					{
+						gameGroups.set("Favorites", favoriteGames);
+					}
+				}
 
 				for (const game of games)
 				{
@@ -163,9 +160,19 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 			case "lastPlayed":
 			{
-				const playedGames = games
-					.filter((game) => game.lastPlayedDate != null && game.playTimeTotalSeconds > 0)
-					.sort((a, b) => b.lastPlayedDate!.getTime() - a.lastPlayedDate!.getTime());
+				games = games.sort((a, b) => (b.lastPlayedDate ?? new Date(0)).getTime() - (a.lastPlayedDate ?? new Date(0)).getTime());
+
+				if (filterOptions.showFavoritesGroup)
+				{
+					const favoriteGames = games.filter((game) => game.isFavorite);
+
+					if (favoriteGames.length > 0)
+					{
+						gameGroups.set("Favorites", favoriteGames);
+					}
+				}
+
+				const playedGames = games.filter((game) => game.lastPlayedDate != null && game.playTimeTotalSeconds > 0);
 
 				if (playedGames.length > 0)
 				{
@@ -195,55 +202,120 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 			case "series":
 			{
-				const gamesBySeries: Map<string, Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>[]> = new Map();
+				//
+				// Group Games by Series
+				//
+
+				const seriesWithGamesBySeriesName: Map<string, 
+					{ 
+						series: Prisma.SeriesGetPayload<null>, 
+						games: Prisma.GameGetPayload<
+							{
+								include:
+								{
+									seriesGames: true,
+								},
+							}>[],
+					}> = new Map();
 
 				for (const game of games)
 				{
+					if (game.seriesGames.length === 0)
+					{
+						continue;
+					}
+
 					for (const seriesGame of game.seriesGames)
 					{
-						const gamesInSeries = gamesBySeries.get(seriesGame.series.name) ?? [];
+						const seriesWithGames = seriesWithGamesBySeriesName.get(seriesGame.series.name) ??
+						{
+							series: seriesGame.series,
+							games: [],
+						};
 
-						gamesInSeries.push(game);
+						seriesWithGames.games.push(game);
 
-						gamesBySeries.set(seriesGame.series.name, gamesInSeries);
+						seriesWithGamesBySeriesName.set(seriesGame.series.name, seriesWithGames);
 					}
 				}
 
-				// TODO: use series sortOrder here (games in the "None" series should be last)
-				const series = Array.from(gamesBySeries.entries())
-					.map(([ seriesName, gamesInSeries ]) => ({ seriesName, gamesInSeries }))
-					.sort((a, b) => a.seriesName.localeCompare(b.seriesName));
+				//
+				// Sort Games in Each Series
+				//
 
-				for (const { seriesName, gamesInSeries } of series)
+				for (const [ seriesName, seriesWithGames ] of seriesWithGamesBySeriesName.entries())
 				{
-					const sortedGamesInSeries = gamesInSeries
-						.map((game) =>
+					seriesWithGamesBySeriesName.set(seriesName,
 						{
-							// Note: Using ! because we know the series game exists
-							const seriesGame = game.seriesGames.find((seriesGame) => seriesGame.series.name === seriesName)!;
+							series: seriesWithGames.series,
+							games: seriesWithGames.games.sort(
+								(a, b) =>
+								{
+									const seriesGameA = a.seriesGames.find((seriesGame) => seriesGame.series_id = seriesWithGames.series.id)!;
 
-							return {
-								seriesGame,
-								game,
-							};
-						})
-						.sort((a, b) =>
+									const seriesGameB = b.seriesGames.find((seriesGame) => seriesGame.series_id = seriesWithGames.series.id)!;
+
+									if (seriesGameA.number < seriesGameB.number)
+									{
+										return -1;
+									}
+
+									if (seriesGameA.number > seriesGameB.number)
+									{
+										return 1;
+									}
+
+									// TODO: sort games by release date after number!
+
+									return a.sortName.localeCompare(b.sortName);
+								}),
+						});
+				}
+
+				//
+				// Group Games with No Series
+				//
+
+				const gamesWithoutSeries = games
+					.filter((game) => game.seriesGames.length == 0)
+					.sort((a, b) => a.sortName.localeCompare(b.sortName));
+
+				if (filterOptions.showFavoritesGroup)
+				{
+					for (const seriesWithGames of Array.from(seriesWithGamesBySeriesName.values()).sort((a, b) => a.series.name.localeCompare(b.series.name)))
+					{
+						const favoriteGames = seriesWithGames.games.filter((game) => game.isFavorite);
+
+						if (favoriteGames.length > 0)
 						{
-							if (a.seriesGame.number < b.seriesGame.number)
-							{
-								return -1;
-							}
+							const favoritesGroup = gameGroups.get("Favorites: " + seriesWithGames.series.name) ?? [];
 
-							if (a.seriesGame.number > b.seriesGame.number)
-							{
-								return 1;
-							}
+							favoritesGroup.push(...favoriteGames);
 
-							return a.game.sortName.localeCompare(b.game.sortName);
-						})
-						.map((wrapper) => wrapper.game);
+							gameGroups.set("Favorites: " + seriesWithGames.series.name, favoritesGroup);
+						}
+					}
 
-					gameGroups.set(seriesName, sortedGamesInSeries);
+					const favoriteGamesWithoutSeries = gamesWithoutSeries.filter((game) => game.isFavorite);
+
+					if (favoriteGamesWithoutSeries.length > 0)
+					{
+						const favoritesGroup = gameGroups.get("Favorites: -") ?? [];
+
+						favoritesGroup.push(...favoriteGamesWithoutSeries);
+
+						gameGroups.set("Favorites: -", favoritesGroup);
+					}
+				}
+
+				for (const seriesWithGames of Array.from(seriesWithGamesBySeriesName.values()).sort((a, b) => a.series.name.localeCompare(b.series.name)))
+				{
+					gameGroups.set(seriesWithGames.series.name, seriesWithGames.games);
+				}
+
+				if (gamesWithoutSeries.length > 0)
+				{
+					gameGroups.set("-", gamesWithoutSeries);
 				}
 
 				break;
