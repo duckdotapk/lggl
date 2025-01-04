@@ -6,6 +6,6 @@ model Platform {
     iconName String @default("fa-solid fa-cube")
     name     String @unique
 
-    gamePlatforms          GamePlatform[]
-    gamePlayActionSessions GamePlayActionSession[]
+    gamePlatforms    GamePlatform[]
+    gamePlaySessions GamePlaySession[]
 }

@@ -24,13 +24,6 @@ export type LibraryOptions =
 	filterOptions: LibrarySchemaLib.FilterOptions;
 	gameGroups: Map<string, Prisma.GameGetPayload<null>[]>;
 	selectedGame: GameDetailsGame | null;
-	recentGamePlayActionSessions: Prisma.GamePlayActionSessionGetPayload<
-		{
-			include:
-			{
-				platform: true;
-			};
-		}>[];
 }
 
 export function Library(options: LibraryOptions)
@@ -79,7 +72,7 @@ export function Library(options: LibraryOptions)
 							Sidebar(options.gameGroups, options.selectedGame, options.searchParameters),
 
 							options.selectedGame != null
-								? GameDetails(options.selectedGame, options.recentGamePlayActionSessions)
+								? GameDetails(options.selectedGame)
 								: null,
 						]),
 				]),

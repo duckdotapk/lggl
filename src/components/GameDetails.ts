@@ -14,7 +14,7 @@ import { HumanDateTime } from "./HumanDateTime.js";
 import { Paragraph } from "./Paragraph.js";
 
 import { LGGL_DEVELOPER_MODE } from "../env/LGGL_DEVELOPER_MODE.js";
-import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
+import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
 
 import { shortEnglishHumanizer } from "../instances/humanizer.js";
 import { staticMiddleware } from "../instances/server.js";
@@ -186,6 +186,13 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 			};
 			gameLinks: true;
 			gamePlayActions: true;
+			gamePlaySessions:
+			{
+				include:
+				{
+					platform: true;
+				};
+			};
 			gamePublishers:
 			{
 				include:
@@ -196,15 +203,7 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 		};
 	}>;
 
-export type GameDetailsRecentGamePlayActionSessions = Prisma.GamePlayActionSessionGetPayload<
-	{
-		include:
-		{
-			platform: true;
-		};
-	}>[];
-
-export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions: GameDetailsRecentGamePlayActionSessions)
+export function GameDetails(game: GameDetailsGame)
 {
 	const links: { title: string; url: string }[] = [];
 
@@ -303,38 +302,39 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 
 					Section("Recent play sessions",
 						[
-							recentGamePlayActionSessions.length > 0
-								? DataTable(recentGamePlayActionSessions.map((gamePlayActionSession) =>
+							game.gamePlaySessions.length > 0
+								? DataTable(game.gamePlaySessions.map(
+									(gamePlaySession) =>
 									{
-										let title = "Played for " + Utilities.NumberLib.format(gamePlayActionSession.playTimeSeconds) + " seconds on " + gamePlayActionSession.platform.name;
+										let title = "Played for " + Utilities.NumberLib.format(gamePlaySession.playTimeSeconds) + " seconds on " + gamePlaySession.platform.name;
 
-										if (gamePlayActionSession.notes != null)
+										if (gamePlaySession.notes != null)
 										{
-											title += "\n\n" + gamePlayActionSession.notes;
+											title += "\n\n" + gamePlaySession.notes;
 										}
 
 										if (LGGL_DEVELOPER_MODE)
 										{
-											title += "\n\nGamePlayActionSession #" + gamePlayActionSession.id;
+											title += "\n\nGamePlaySession #" + gamePlaySession.id;
 										}
 
 										return {
-											label: !gamePlayActionSession.isHistorical
-												? HumanDateTime(DateTime.fromJSDate(gamePlayActionSession.startDate))
+											label: !gamePlaySession.isHistorical
+												? HumanDateTime(DateTime.fromJSDate(gamePlaySession.startDate))
 												: "Historical",
 											value: new DE("span",
 												{
 													title,
 												},
 												[
-													new DE("span", gamePlayActionSession.platform.iconName + " fa-fw"),
+													new DE("span", gamePlaySession.platform.iconName + " fa-fw"),
 													" ",
-													shortEnglishHumanizer(gamePlayActionSession.playTimeSeconds * 1000, { units: [ "h", "m", "s" ] }),
+													shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000, { units: [ "h", "m", "s" ] }),
 												]),
 										};
 									}))
-								: Paragraph(LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS != -1
-									? "No play sessions in the last " + LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS + " days."
+								: Paragraph(LGGL_GAME_PLAY_SESSION_HISTORY_DAYS != -1
+									? "No play sessions in the last " + LGGL_GAME_PLAY_SESSION_HISTORY_DAYS + " days."
 									: "No play sessions recorded."),
 						]),
 

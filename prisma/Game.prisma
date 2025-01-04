@@ -48,6 +48,7 @@ model Game {
     gameModes         GameMode[]
     gamePlatforms     GamePlatform[]
     gamePlayActions   GamePlayAction[]
+    gamePlaySessions  GamePlaySession[]
     gamePublishers    GamePublisher[]
     seriesGames       SeriesGame[]
 }

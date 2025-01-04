@@ -8,7 +8,7 @@ import { DateTime } from "luxon";
 
 import { Library, LibraryOptions } from "../components/Library.js";
 
-import { LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS.js";
+import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
 
 import { prismaClient } from "../instances/prismaClient.js";
 import { ServerFritterContext } from "../instances/server.js";
@@ -345,6 +345,23 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						},
 						gameLinks: true,
 						gamePlayActions: true,
+						gamePlaySessions:
+						{
+							where:
+							{
+								startDate: LGGL_GAME_PLAY_SESSION_HISTORY_DAYS != -1
+									? { gte: DateTime.now().minus({ days: LGGL_GAME_PLAY_SESSION_HISTORY_DAYS }).toJSDate() }
+									: undefined,
+							},
+							include:
+							{
+								platform: true,
+							},
+							orderBy:
+							{
+								startDate: "desc",
+							},
+						},
 						gamePublishers:
 						{
 							include:
@@ -355,33 +372,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					},
 				})
 			: null;
-
-		const recentGamePlayActionSessions = selectedGame != null
-			? await prismaClient.gamePlayActionSession.findMany(
-				{
-					where:
-					{
-						startDate: LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS >= 1
-							? { gt: DateTime.now().minus({ days: LGGL_GAME_PLAY_ACTION_SESSION_HISTORY_DAYS }).toJSDate() }
-							: undefined,
-
-						gamePlayAction:
-						{
-							game_id: selectedGame.id,
-						},
-					},
-					include:
-					{
-						platform: true,
-					},
-					orderBy:
-					[
-						{
-							startDate: "desc",
-						},
-					],
-				})
-			: [];
 
 		//
 		// Render Library
@@ -394,7 +384,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				filterOptions,
 				gameGroups, 
 				selectedGame, 
-				recentGamePlayActionSessions,
 			}).renderToString());
 	},
 };

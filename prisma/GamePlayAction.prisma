@@ -11,6 +11,6 @@ model GamePlayAction {
 
     game_id Int
 
-    game                   Game                    @relation(fields: [game_id], references: [id])
-    gamePlayActionSessions GamePlayActionSession[]
+    game             Game              @relation(fields: [game_id], references: [id])
+    gamePlaySessions GamePlaySession[]
 }

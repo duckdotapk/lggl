@@ -148,7 +148,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 			},
 		});
 
-	const gamePlayActionSession = await prismaClient.gamePlayActionSession.create(
+	const gamePlaySession = await prismaClient.gamePlaySession.create(
 		{
 			data:
 			{
@@ -156,6 +156,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 				endDate: playSessionStartDateTime.toJSDate(),
 				playTimeSeconds: 0,
 
+				game_id: game.id,
 				gamePlayAction_id: gamePlayAction.id,
 				platform_id: LGGL_CURRENT_PLATFORM_ID,
 			},
@@ -176,11 +177,11 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 			{
 				console.log("[GameLauncherLib] Updating game play action session %d with play time: %d", gamePlayAction.id, playTimeSeconds);
 
-				await prismaClient.gamePlayActionSession.update(
+				await prismaClient.gamePlaySession.update(
 					{
 						where:
 						{
-							id: gamePlayActionSession.id,
+							id: gamePlaySession.id,
 						},
 						data:
 						{
@@ -213,11 +214,11 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 								},
 							});
 
-						await transactionClient.gamePlayActionSession.update(
+						await transactionClient.gamePlaySession.update(
 							{
 								where:
 								{
-									id: gamePlayActionSession.id,
+									id: gamePlaySession.id,
 								},
 								data:
 								{

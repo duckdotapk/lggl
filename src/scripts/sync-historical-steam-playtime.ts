@@ -263,7 +263,7 @@ function getPlayTime(steamData: FetchSteamDataResult, steamAppId: number): PlayT
 
 async function getNonHistoricalPlaytimeForPlatform(game_id: number, platform_id: number)
 {
-	const aggregate = await prismaClient.gamePlayActionSession.aggregate(
+	const aggregate = await prismaClient.gamePlaySession.aggregate(
 		{
 			_sum:
 			{
@@ -273,18 +273,15 @@ async function getNonHistoricalPlaytimeForPlatform(game_id: number, platform_id:
 			{
 				isHistorical: false,
 				
-				gamePlayAction:
-				{
-					game_id: game_id,
-				},
-				platform_id: platform_id,
+				game_id,
+				platform_id,
 			},
 		});
 
 	return aggregate._sum.playTimeSeconds ?? 0;
 }
 
-async function createHistoricalGameActionPlaySession(game_id: number, gamePlayAction_id: number, platform_id: number, playTimeSeconds: number)
+async function createHistoricalGameActionPlaySession(game_id: number, platform_id: number, playTimeSeconds: number)
 {
 	const nonHistoricalPlayTimeSeconds = await getNonHistoricalPlaytimeForPlatform(game_id, platform_id);
 
@@ -295,7 +292,7 @@ async function createHistoricalGameActionPlaySession(game_id: number, gamePlayAc
 		return;
 	}
 
-	await prismaClient.gamePlayActionSession.create(
+	await prismaClient.gamePlaySession.create(
 		{
 			data:
 			{				
@@ -306,7 +303,7 @@ async function createHistoricalGameActionPlaySession(game_id: number, gamePlayAc
 				isHistorical: true,
 				notes: "Historical playtime from Steam.",
 
-				gamePlayAction_id: gamePlayAction_id,
+				game_id: game_id,
 				platform_id: platform_id,
 			},
 		});
@@ -322,10 +319,6 @@ async function main()
 			{
 				steamAppId: { not: null },
 			},
-			include:
-			{
-				gamePlayActions: true,
-			},
 			orderBy:
 			{
 				id: "asc",
@@ -334,13 +327,6 @@ async function main()
 
 	for (const game of games)
 	{
-		const gamePlayAction = game.gamePlayActions[0];
-
-		if (gamePlayAction == null)
-		{
-			throw new Error("Game #" + game.id + " has no game play action!");
-		}
-
 		const playTime = await getPlayTime(steamData, game.steamAppId!);
 
 		if (playTime == null)
@@ -350,32 +336,32 @@ async function main()
 
 		console.log("Syncing historical playtime for %s...", game.name);
 
-		await prismaClient.gamePlayActionSession.deleteMany(
+		await prismaClient.gamePlaySession.deleteMany(
 			{
 				where:
 				{
 					isHistorical: true,
 					notes: "Historical playtime from Steam.",
 
-					gamePlayAction_id: gamePlayAction.id,
+					game_id: game.id,
 				},
 			});
 
-		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_WINDOWS, playTime.windowsPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, LGGL_PLATFORM_ID_WINDOWS, playTime.windowsPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_MAC, playTime.macPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, LGGL_PLATFORM_ID_MAC, playTime.macPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_LINUX, playTime.linuxPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, LGGL_PLATFORM_ID_LINUX, playTime.linuxPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_STEAM_DECK, playTime.steamDeckPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, LGGL_PLATFORM_ID_STEAM_DECK, playTime.steamDeckPlayTimeSeconds);
 
-		await createHistoricalGameActionPlaySession(game.id, gamePlayAction.id, LGGL_PLATFORM_ID_UNKNOWN, playTime.unknownPlayTimeSeconds);
+		await createHistoricalGameActionPlaySession(game.id, LGGL_PLATFORM_ID_UNKNOWN, playTime.unknownPlayTimeSeconds);
 
-		await prismaClient.gamePlayActionSession.updateMany(
+		await prismaClient.gamePlaySession.updateMany(
 			{
 				where:
 				{
-					gamePlayAction_id: gamePlayAction.id,
+					game_id: game.id,
 				},
 				data:
 				{
@@ -383,7 +369,7 @@ async function main()
 				},
 			});
 
-		const aggregate = await prismaClient.gamePlayActionSession.aggregate(
+		const aggregate = await prismaClient.gamePlaySession.aggregate(
 			{
 				_sum:
 				{
@@ -391,7 +377,7 @@ async function main()
 				},
 				where:
 				{
-					gamePlayAction_id: gamePlayAction.id,
+					game_id: game.id,
 				},
 			});
 

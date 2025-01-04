@@ -427,7 +427,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 						},
 					});
 
-				// TODO: create historical gamePlayActionSessions
+				// TODO: create historical gamePlaySessions
 			}
 
 			return game;
@@ -513,39 +513,6 @@ async function addGameInstallation(readlineInterface: readline.promises.Interfac
 async function addHistoricalPlaytime(readlineInterface: readline.promises.Interface)
 {
 	const game = await searchForGame(readlineInterface);
-	
-	const gamePlayAction = await CliLib.prompt(readlineInterface, 
-		{
-			text: "Choose which game play action you want to associate this playtime with",
-			options: game.gamePlayActions.map(
-				(gamePlayAction) =>
-				{
-					return {
-						value: gamePlayAction.id.toString(),
-						description: gamePlayAction.name,
-					};
-				}),
-			validateAndTransform: async (input) =>
-			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
-
-				if (!inputParseResult.success)
-				{
-					throw new CliLib.RetryableError("Invalid game play action ID.");
-				}
-
-				const id = inputParseResult.data;
-
-				const gamePlayAction = game.gamePlayActions.find((gamePlayAction) => gamePlayAction.id == id);
-
-				if (gamePlayAction == null)
-				{
-					throw new CliLib.RetryableError("No game play action found with that ID.");
-				}
-
-				return gamePlayAction;
-			},
-		});
 
 	const platforms = await prismaClient.platform.findMany(
 		{
@@ -621,7 +588,7 @@ async function addHistoricalPlaytime(readlineInterface: readline.promises.Interf
 
 	readlineInterface.close();
 
-	const gamePlayActionSession = await prismaClient.$transaction(
+	const gamePlaySession = await prismaClient.$transaction(
 		async (transactionClient) =>
 		{
 			await transactionClient.game.update(
@@ -636,7 +603,7 @@ async function addHistoricalPlaytime(readlineInterface: readline.promises.Interf
 					},
 				});
 
-			return await transactionClient.gamePlayActionSession.create(
+			return await transactionClient.gamePlaySession.create(
 				{
 					data:
 					{
@@ -647,13 +614,13 @@ async function addHistoricalPlaytime(readlineInterface: readline.promises.Interf
 						isHistorical: true,
 						notes,
 		
-						gamePlayAction_id: gamePlayAction.id,
+						game_id: game.id,
 						platform_id: platform.id,
 					},
 				});
 		});
 
-	console.log("Created historical game play action session with ID: %d", gamePlayActionSession.id);
+	console.log("Created historical game play session with ID: %d", gamePlaySession.id);
 
 	await CliLib.pause(readlineInterface);
 }
@@ -888,7 +855,11 @@ async function audit(readlineInterface: readline.promises.Interface)
 			{
 				problems.push("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path);
 
-				if (shouldFixData)
+				if (!shouldFixData)
+				{
+					problems[problems.length - 1] += " (FIXABLE: gameInstallation can be deleted)";
+				}
+				else
 				{
 					problems[problems.length - 1] += " (FIXED: gameInstallation deleted)";
 
@@ -976,34 +947,37 @@ async function audit(readlineInterface: readline.promises.Interface)
 				{
 					game_id: game.id,
 				},
-				include:
-				{
-					gamePlayActionSessions: true,
-				},
 			});
 
 		if (gamePlayActions.length == 0)
 		{
 			problems.push("no gamePlayActions");
 		}
-		else
-		{
-			let playTimeTotalSecondsFromGamePlayActionSessions = 0;
 
-			for (const gamePlayAction of gamePlayActions)
+		//
+		// Check Game Play Sessions
+		//
+
+		const gamePlaySessions = await prismaClient.gamePlaySession.findMany(
 			{
-				for (const gamePlayActionSession of gamePlayAction.gamePlayActionSessions)
+				where:
 				{
-					playTimeTotalSecondsFromGamePlayActionSessions += gamePlayActionSession.playTimeSeconds;
-				}
-			}
+					game_id: game.id,
+				},
+			});
 
-			if (game.playTimeTotalSeconds != playTimeTotalSecondsFromGamePlayActionSessions)
-			{
-				const difference = game.playTimeTotalSeconds - playTimeTotalSecondsFromGamePlayActionSessions;
+		let playTimeTotalSeconds = 0;
 
-				problems.push("playTimeTotalSeconds differs from gamePlayActionSessions total: " + difference);
-			}
+		for (const gamePlaySession of gamePlaySessions)
+		{
+			playTimeTotalSeconds += gamePlaySession.playTimeSeconds;
+		}
+
+		if (game.playTimeTotalSeconds != playTimeTotalSeconds)
+		{
+			const difference = game.playTimeTotalSeconds - playTimeTotalSeconds;
+
+			problems.push("playTimeTotalSeconds differs from gamePlaySessions total: " + difference);
 		}
 
 		//
