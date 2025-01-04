@@ -3,6 +3,7 @@ model GameEngine {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
+    notes   String?
     version String?
 
     engine_id Int
