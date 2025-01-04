@@ -177,6 +177,13 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					company: true;
 				};
 			};
+			gameEngines:
+			{
+				include:
+				{
+					engine: true;
+				};
+			};
 			gamePlayActions: true;
 			gamePublishers:
 			{
@@ -347,10 +354,10 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 
 													if (gameDeveloper.notes != null)
 													{
-														text += " (" + gameDeveloper.notes + ")";
+														text += "*";
 													}
 
-													return Paragraph(text);
+													return Paragraph(new DE("span", { title: gameDeveloper.notes }, text));
 												})
 											: "-",
 									},
@@ -366,13 +373,44 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 
 													if (gamePublisher.notes != null)
 													{
-														text += " (" + gamePublisher.notes + ")";
+														text += "*";
 													}
 
-													return Paragraph(text);
+													return Paragraph(new DE("span", { title: gamePublisher.notes }, text));
 												})
 											: "-",
 									},
+									{
+										label: game.gameEngines.length > 1
+											? "Engines"
+											: "Engine",
+										value: game.gameEngines.length > 0
+											? game.gameEngines.map(
+												(gameEngine) =>
+												{
+													let text = gameEngine.engine.shortName ?? gameEngine.engine.name;
+
+													if (gameEngine.version != null)
+													{
+														text += " " + gameEngine.version;
+													}
+
+													if (gameEngine.notes != null)
+													{
+														text += "*";
+													}
+
+													let tooltip = gameEngine.engine.name;
+
+													if (gameEngine.notes != null)
+													{
+														tooltip += "\n\n" + gameEngine.notes;
+													}
+
+													return Paragraph(new DE("span", { title: tooltip }, text));
+												})
+											: "-",
+									}
 								]),
 						]),
 
