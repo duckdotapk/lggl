@@ -66,7 +66,7 @@ async function downloadGameImage(url: string, game: Prisma.GameGetPayload<null>,
 
 	const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
 
-	const imagePath = path.join(LGGL_DATA_DIRECTORY, "images", "game", game.id.toString(), type + path.extname(url));
+	const imagePath = path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), type + path.extname(url));
 
 	await fs.promises.mkdir(path.dirname(imagePath), { recursive: true });
 
