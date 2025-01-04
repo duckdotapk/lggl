@@ -35,6 +35,7 @@ const ActionNameSchema = z.enum(
 		"addGameInstallation",
 		"addHistoricalPlaytime",
 		"audit",
+		"downloadImagesFromSteam",
 	]);
 
 //
@@ -1022,6 +1023,102 @@ async function audit(readlineInterface: readline.promises.Interface)
 	await CliLib.pause(readlineInterface);
 }
 
+async function downloadImagesFromSteam(readlineInterface: readline.promises.Interface)
+{
+	//
+	// Get Game
+	//
+
+	const game = await searchForGame(readlineInterface);
+
+	//
+	// Get Steam App ID
+	//
+
+	let steamAppId = game.steamAppId;
+
+	if (steamAppId == null)
+	{
+		steamAppId = await CliLib.prompt(readlineInterface,
+			{
+				text: "No steam app ID for game, enter one to use",
+				validateAndTransform: async (input) =>
+				{
+					const inputParseResult = z.number().min(1).safeParse(parseInt(input));
+
+					if (!inputParseResult.success)
+					{
+						throw new CliLib.RetryableError("Invalid steam app ID: " + input);
+					}
+
+					return inputParseResult.data;
+				},
+			});
+	}
+
+	//
+	// Get Image URLs
+	//
+
+	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId);
+
+	console.log(imageUrls);
+
+	//
+	// Download Banner
+	//
+
+	const bannerDownloaded = await downloadGameImage(imageUrls.libraryBackground, game, "banner");
+
+	//
+	// Download Cover
+	//
+
+	const coverDownloaded = await downloadGameImage(imageUrls.libraryCapsule, game, "cover");
+
+	//
+	// Download Icon
+	//
+
+	const iconDownloaded = imageUrls.icon != null
+		? await downloadGameImage(imageUrls.icon, game, "icon")
+		: false;
+
+	//
+	// Download Logo
+	//
+
+	const logoDownloaded = await downloadGameImage(imageUrls.libraryLogo, game, "logo");
+
+	//
+	// Update Game
+	//
+
+	await prismaClient.game.update(
+		{
+			where:
+			{
+				id: game.id,
+			},
+			data:
+			{
+				hasBannerImage: bannerDownloaded,
+				hasCoverImage: coverDownloaded,
+				hasIconImage: iconDownloaded,
+				hasLogoImage: logoDownloaded,
+			},
+		});
+
+	//
+	// Pause
+	//
+
+	console.log("Images downloaded!");
+
+	await CliLib.pause(readlineInterface);
+}
+
+
 const actions: Record<ActionName, Action> =
 {
 	addGame:
@@ -1043,6 +1140,11 @@ const actions: Record<ActionName, Action> =
 	{
 		description: "Audit your game library for potential issues",
 		execute: async (readlineInterface) => audit(readlineInterface),
+	},
+	downloadImagesFromSteam:
+	{
+		description: "Download images for a game from Steam",
+		execute: async (readlineInterface) => downloadImagesFromSteam(readlineInterface),
 	},
 };
 
