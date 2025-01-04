@@ -343,6 +343,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 								engine: true,
 							},
 						},
+						gameLinks: true,
 						gamePlayActions: true,
 						gamePublishers:
 						{

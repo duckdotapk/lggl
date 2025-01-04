@@ -44,6 +44,7 @@ model Game {
     gameEngines       GameEngine[]
     gameGenres        GameGenre[]
     gameInstallations GameInstallation[]
+    gameLinks         GameLink[]
     gameModes         GameMode[]
     gamePlatforms     GamePlatform[]
     gamePlayActions   GamePlayAction[]

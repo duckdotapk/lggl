@@ -184,6 +184,7 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					engine: true;
 				};
 			};
+			gameLinks: true;
 			gamePlayActions: true;
 			gamePublishers:
 			{
@@ -227,6 +228,15 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 
 				// Note: This is a URL they have that will redirect to the correct page, pretty neat
 				url: "https://www.pcgamingwiki.com/api/appid.php?appid=" + game.steamAppId,
+			});
+	}
+
+	for (const gameLink of game.gameLinks)
+	{
+		links.push(
+			{
+				title: gameLink.title,
+				url: gameLink.url,
 			});
 	}
 
@@ -454,10 +464,9 @@ export function GameDetails(game: GameDetailsGame, recentGamePlayActionSessions:
 							Paragraph(Checkbox("isShelved", "Is Shelved", game.isShelved)),
 						]),
 
-					Section("Links",
-						[
-							links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))),
-						]),
+					links.length > 0
+						? Section("Links", links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))))
+						: null,
 
 					game.notes != null
 						? Section("Notes",
