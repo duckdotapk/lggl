@@ -75,18 +75,18 @@ function Group(group: GameGroupManagerGroup, selectedGame: SidebarSelectedGame, 
 		{
 			class: "component-sidebar-group",
 
-			"data-name": group.title,
+			"data-name": group.name,
 		},
 		[
 			new DE("summary", "title",
 				[
-					group.title,
+					group.name,
 					" (",
-					Utilities.NumberLib.format(group.games.length),
+					Utilities.NumberLib.format(group.entries.length),
 					")",
 				]),
 
-			group.games.map((groupGame) => Item(groupGame, selectedGame, searchParameters)),
+			group.entries.map((groupGame) => Item(groupGame, selectedGame, searchParameters)),
 		]);
 }
 

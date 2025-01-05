@@ -8,6 +8,8 @@ import { DateTime } from "luxon";
 
 import { HumanDateTime } from "../components/inline/HumanDateTime.js";
 
+import * as LibrarySchemaLib from "../libs/schemas/Library.js";
+
 //
 // Class
 //
@@ -28,8 +30,8 @@ export type GameGroupManagerGame = Prisma.GameGetPayload<
 
 export type GameGroupManagerGroup =
 {
-	title: string;
-	games: GameGroupManagerGroupEntry[];
+	name: string;
+	entries: GameGroupManagerGroupEntry[];
 };
 
 export type GameGroupManagerGroupEntry =
@@ -40,46 +42,56 @@ export type GameGroupManagerGroupEntry =
 
 export class GameGroupManager
 {
-	#gameGroups: Map<string, GameGroupManagerGroup> = new Map();
+	protected readonly filterOptions: LibrarySchemaLib.FilterOptions;
 
-	addGame(groupName: string | number, game: GameGroupManagerGame)
+	protected readonly games: GameGroupManagerGame[] = [];
+
+	protected readonly gameGroups: Map<string, GameGroupManagerGroup>;
+
+	public constructor(filterOptions: LibrarySchemaLib.FilterOptions, games: GameGroupManagerGame[])
+	{
+		this.filterOptions = filterOptions;
+		this.games = [ ...games ];
+
+		this.gameGroups = new Map();
+
+		this.groupGames();
+	}
+
+	protected getGroup(groupName: string): GameGroupManagerGroup
+	{
+		if (!this.gameGroups.has(groupName))
+		{
+			this.gameGroups.set(groupName, { name: groupName, entries: [] });
+		}
+
+		return this.gameGroups.get(groupName)!;
+	}
+
+	protected addGameToGroup(groupName: string | number, game: GameGroupManagerGame)
 	{
 		groupName = groupName.toString();
 
-		const gameGroup = this.#gameGroups.get(groupName) ?? { title: groupName, games: [] };
+		const group = this.getGroup(groupName);
 
-		gameGroup.games.push(
+		group.entries.push(
 			{
 				game,
 				details: this.getGameDetails(groupName, game),
 			});
-
-		this.#gameGroups.set(groupName, gameGroup);
-
-		return this;
 	}
 
-	addGames(groupName: string | number, games: GameGroupManagerGame[])
+	protected addGamesToGroup(groupName: string | number, games: GameGroupManagerGame[])
 	{
 		groupName = groupName.toString();
 
-		const gameGroup = this.#gameGroups.get(groupName) ?? { title: groupName, games: [] };
-
 		for (const game of games)
 		{
-			gameGroup.games.push(
-				{
-					game,
-					details: this.getGameDetails(groupName, game),
-				});
+			this.addGameToGroup(groupName, game);
 		}
-
-		this.#gameGroups.set(groupName, gameGroup);
-
-		return this;
 	}
 
-	getGameDetails(_groupName: string, game: GameGroupManagerGame): Child
+	protected getGameDetails(_groupName: string, game: GameGroupManagerGame): Child
 	{
 		return [
 			"Last played ",
@@ -89,8 +101,16 @@ export class GameGroupManager
 		];
 	}
 
-	getGroups()
+	protected groupGames()
 	{
-		return Array.from(this.#gameGroups.values()).filter((gameGroup) => gameGroup.games.length > 0);
+		for (const game of this.games)
+		{
+			this.addGameToGroup("All games", game);
+		}
+	}
+
+	public getGroups()
+	{
+		return Array.from(this.gameGroups.values()).filter((group) => group.entries.length > 0);
 	}
 }

@@ -3,10 +3,11 @@
 //
 
 import * as Fritter from "@donutteam/fritter";
-import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { GameGroupManager } from "../classes/GameGroupManager.js";
+import { LastPlayedGameGroupManager } from "../classes/LastPlayedGameGroupManager.js";
+import { NameGameGroupManager } from "../classes/NameGameGroupManager.js";
 import { PlayTimeGameGroupManager } from "../classes/PlayTimeGameGroupManager.js";
 import { SeriesGameGroupManager } from "../classes/SeriesGameGroupManager.js";
 
@@ -117,227 +118,25 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		switch (filterOptions.groupMode)
 		{
-			case "name":
-			{
-				gameGroupManager = new GameGroupManager();
-
-				games = games.sort((a, b) => a.sortName.localeCompare(b.sortName));
-
-				if (filterOptions.showFavoritesGroup)
-				{
-					gameGroupManager.addGames("Favorites", games.filter((game) => game.isFavorite));
-				}
-
-				for (const game of games)
-				{
-					const firstLetter = game.sortName.charAt(0).toUpperCase();
-
-					!isNaN(parseInt(firstLetter))
-						? gameGroupManager.addGame("#", game)
-						: gameGroupManager.addGame(firstLetter, game);
-				}
-
-				break;
-			}
-
 			case "lastPlayed":
-			{
-				gameGroupManager = new GameGroupManager();
-
-				games = games.sort((a, b) => (b.lastPlayedDate ?? new Date(0)).getTime() - (a.lastPlayedDate ?? new Date(0)).getTime());
-
-				if (filterOptions.showFavoritesGroup)
-				{
-					gameGroupManager.addGames("Favorites", games.filter((game) => game.isFavorite));
-				}
-
-				const playedGames = games.filter((game) => game.lastPlayedDate != null && game.playTimeTotalSeconds > 0);
-
-				for (const playedGame of playedGames)
-				{
-					gameGroupManager.addGame(playedGame.lastPlayedDate!.getFullYear(), playedGame);
-				}
-
-				const unplayedGames = games
-					.filter((game) => game.lastPlayedDate == null || game.playTimeTotalSeconds == 0)
-					.sort((a, b) => a.sortName.localeCompare(b.sortName));
-
-				gameGroupManager.addGames("Unplayed", unplayedGames);
+				gameGroupManager = new LastPlayedGameGroupManager(filterOptions, games);
 
 				break;
-			}
 
-			case "series":
-			{
-				gameGroupManager = new SeriesGameGroupManager();
-
-				const seriesWithGamesBySeriesName: Map<string, 
-					{ 
-						series: Prisma.SeriesGetPayload<null>, 
-						games: typeof games,
-					}> = new Map();
-
-				for (const game of games)
-				{
-					if (game.seriesGames.length === 0)
-					{
-						continue;
-					}
-
-					for (const seriesGame of game.seriesGames)
-					{
-						const seriesWithGames = seriesWithGamesBySeriesName.get(seriesGame.series.name) ??
-						{
-							series: seriesGame.series,
-							games: [],
-						};
-
-						seriesWithGames.games.push(game);
-
-						seriesWithGamesBySeriesName.set(seriesGame.series.name, seriesWithGames);
-					}
-				}
-
-				for (const [ seriesName, seriesWithGames ] of seriesWithGamesBySeriesName.entries())
-				{
-					seriesWithGamesBySeriesName.set(seriesName,
-						{
-							series: seriesWithGames.series,
-							games: seriesWithGames.games.sort(
-								(a, b) =>
-								{
-									const seriesGameA = a.seriesGames.find((seriesGame) => seriesGame.series_id = seriesWithGames.series.id)!;
-
-									const seriesGameB = b.seriesGames.find((seriesGame) => seriesGame.series_id = seriesWithGames.series.id)!;
-
-									if (seriesGameA.number < seriesGameB.number)
-									{
-										return -1;
-									}
-
-									if (seriesGameA.number > seriesGameB.number)
-									{
-										return 1;
-									}
-
-									// TODO: sort games by release date after number!
-
-									return a.sortName.localeCompare(b.sortName);
-								}),
-						});
-				}
-
-				const gamesWithoutSeries = games
-					.filter((game) => game.seriesGames.length == 0)
-					.sort((a, b) => a.sortName.localeCompare(b.sortName));
-
-				if (filterOptions.showFavoritesGroup)
-				{
-					for (const seriesWithGames of Array.from(seriesWithGamesBySeriesName.values()).sort((a, b) => a.series.name.localeCompare(b.series.name)))
-					{
-						const favoriteGames = seriesWithGames.games.filter((game) => game.isFavorite);
-
-						gameGroupManager.addGames("Favorites: " + seriesWithGames.series.name, favoriteGames);
-					}
-
-					const favoriteGamesWithoutSeries = gamesWithoutSeries.filter((game) => game.isFavorite);
-
-					gameGroupManager.addGames("Favorites: -", favoriteGamesWithoutSeries);
-				}
-
-				for (const seriesWithGames of Array.from(seriesWithGamesBySeriesName.values()).sort((a, b) => a.series.name.localeCompare(b.series.name)))
-				{
-					gameGroupManager.addGames(seriesWithGames.series.name, seriesWithGames.games);
-				}
-
-				if (gamesWithoutSeries.length > 0)
-				{
-					gameGroupManager.addGames("-", gamesWithoutSeries);
-				}
+			case "name":
+				gameGroupManager = new NameGameGroupManager(filterOptions, games);
 
 				break;
-			}
 
 			case "playTime":
-			{
-				gameGroupManager = new PlayTimeGameGroupManager();
+				gameGroupManager = new PlayTimeGameGroupManager(filterOptions, games);
 
-				games = games.sort((a, b) => b.playTimeTotalSeconds - a.playTimeTotalSeconds);
+				break;
 
-				if (filterOptions.showFavoritesGroup)
-				{
-					gameGroupManager.addGames("Favorites", games.filter((game) => game.isFavorite));
-				}
+			case "series":
+				gameGroupManager = new SeriesGameGroupManager(filterOptions, games);
 
-				const playedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
-
-				if (playedGames.length > 0)
-				{
-					for (const playedGame of playedGames)
-					{
-						const playTimeTotalHours = Math.floor(playedGame.playTimeTotalSeconds / 3600);
-
-						if (playTimeTotalHours >= 1000)
-						{
-							gameGroupManager.addGame("Over 1000 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 750)
-						{
-							gameGroupManager.addGame("Over 750 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 500)
-						{
-							gameGroupManager.addGame("Over 500 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 250)
-						{
-							gameGroupManager.addGame("Over 250 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 100)
-						{
-							gameGroupManager.addGame("Over 100 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 50)
-						{
-							gameGroupManager.addGame("Over 50 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 10)
-						{
-							gameGroupManager.addGame("Over 10 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 5)
-						{
-							gameGroupManager.addGame("Over 5 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 4)
-						{
-							gameGroupManager.addGame("Over 4 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 3)
-						{
-							gameGroupManager.addGame("Over 3 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 2)
-						{
-							gameGroupManager.addGame("Over 2 hours", playedGame);
-						}
-						else if (playTimeTotalHours >= 1)
-						{
-							gameGroupManager.addGame("Over 1 hour", playedGame);
-						}
-						else
-						{
-							gameGroupManager.addGame("Under 1 hour", playedGame);
-						}
-					}
-				}
-
-				const unplayedGames = games
-					.filter((game) => game.playTimeTotalSeconds == 0)
-					.sort((a, b) => a.sortName.localeCompare(b.sortName));
-
-				gameGroupManager.addGames("No play time", unplayedGames);
-			}
+				break;
 		}
 
 		//
