@@ -7,7 +7,7 @@ import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { HumanDateTime } from "./HumanDateTime.js";
+import { HumanDateTime } from "./inline/HumanDateTime.js";
 import { Muted } from "./inline/Muted.js";
 
 import { staticMiddleware } from "../instances/server.js";

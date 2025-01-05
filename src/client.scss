@@ -6,11 +6,11 @@
 
 @use "components/_Global.scss";
 
+@use "components/inline/Anchor.scss";
 @use "components/inline/Muted.scss";
 
 @use "components/toolbar/Toolbar.scss";
 
-@use "components/Anchor.scss";
 @use "components/Button.scss";
 @use "components/Checkbox.scss";
 @use "components/GameDetails.scss";
