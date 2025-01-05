@@ -26,32 +26,6 @@ import * as CliLib from "./libs/Cli.js";
 import * as FileSizeLib from "./libs/FileSize.js";
 
 //
-// Schemas
-//
-
-const ActionNameSchema = z.enum(
-	[
-		"addGame",
-		"addGameInstallation",
-		"addHistoricalPlaytime",
-		"addSeriesGame",
-		"audit",
-		"downloadImagesFromSteam",
-	]);
-
-//
-// Types
-//
-
-type ActionName = z.infer<typeof ActionNameSchema>;
-
-type Action =
-{
-	description: string;
-	execute: (readlineInterface: readline.promises.Interface) => Promise<void>;
-};
-
-//
 // Utility Functions
 //
 
@@ -535,6 +509,67 @@ async function addGame(readlineInterface: readline.promises.Interface)
 	await CliLib.pause(readlineInterface);
 }
 
+async function downloadGameImagesFromSteam(readlineInterface: readline.promises.Interface)
+{
+	const game = await searchForGame(readlineInterface);
+
+	//
+	// Get Steam App ID
+	//
+
+	let steamAppId = game.steamAppId;
+
+	if (steamAppId == null)
+	{
+		steamAppId = await CliLib.prompt(readlineInterface,
+			{
+				text: "No steam app ID for game, enter one to use",
+				validateAndTransform: async (input) =>
+				{
+					const inputParseResult = z.number().min(1).safeParse(parseInt(input));
+
+					if (!inputParseResult.success)
+					{
+						throw new CliLib.RetryableError("Invalid steam app ID: " + input);
+					}
+
+					return inputParseResult.data;
+				},
+			});
+	}
+
+	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId);
+
+	const bannerDownloaded = await downloadGameImage(imageUrls.libraryBackground, game, "banner");
+
+	const coverDownloaded = await downloadGameImage(imageUrls.libraryCapsule, game, "cover");
+
+	const iconDownloaded = imageUrls.icon != null
+		? await downloadGameImage(imageUrls.icon, game, "icon")
+		: false;
+
+	const logoDownloaded = await downloadGameImage(imageUrls.libraryLogo, game, "logo");
+
+	await prismaClient.game.update(
+		{
+			where:
+			{
+				id: game.id,
+			},
+			data:
+			{
+				hasBannerImage: bannerDownloaded,
+				hasCoverImage: coverDownloaded,
+				hasIconImage: iconDownloaded,
+				hasLogoImage: logoDownloaded,
+			},
+		});
+
+	console.log("Images downloaded!");
+
+	await CliLib.pause(readlineInterface);
+}
+
 async function addGameInstallation(readlineInterface: readline.promises.Interface)
 {
 	const game = await searchForGame(readlineInterface);
@@ -576,7 +611,7 @@ async function addGameInstallation(readlineInterface: readline.promises.Interfac
 	await CliLib.pause(readlineInterface);
 }
 
-async function addHistoricalPlaytime(readlineInterface: readline.promises.Interface)
+async function addGamePlaySession(readlineInterface: readline.promises.Interface)
 {
 	const game = await searchForGame(readlineInterface);
 
@@ -1126,122 +1161,39 @@ async function audit(readlineInterface: readline.promises.Interface)
 	await CliLib.pause(readlineInterface);
 }
 
-async function downloadImagesFromSteam(readlineInterface: readline.promises.Interface)
+//
+// Actions Record
+//
+
+type Action =
 {
-	//
-	// Get Game
-	//
+	description: string;
+	execute: (readlineInterface: readline.promises.Interface) => Promise<void>;
+};
 
-	const game = await searchForGame(readlineInterface);
-
-	//
-	// Get Steam App ID
-	//
-
-	let steamAppId = game.steamAppId;
-
-	if (steamAppId == null)
-	{
-		steamAppId = await CliLib.prompt(readlineInterface,
-			{
-				text: "No steam app ID for game, enter one to use",
-				validateAndTransform: async (input) =>
-				{
-					const inputParseResult = z.number().min(1).safeParse(parseInt(input));
-
-					if (!inputParseResult.success)
-					{
-						throw new CliLib.RetryableError("Invalid steam app ID: " + input);
-					}
-
-					return inputParseResult.data;
-				},
-			});
-	}
-
-	//
-	// Get Image URLs
-	//
-
-	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId);
-
-	console.log(imageUrls);
-
-	//
-	// Download Banner
-	//
-
-	const bannerDownloaded = await downloadGameImage(imageUrls.libraryBackground, game, "banner");
-
-	//
-	// Download Cover
-	//
-
-	const coverDownloaded = await downloadGameImage(imageUrls.libraryCapsule, game, "cover");
-
-	//
-	// Download Icon
-	//
-
-	const iconDownloaded = imageUrls.icon != null
-		? await downloadGameImage(imageUrls.icon, game, "icon")
-		: false;
-
-	//
-	// Download Logo
-	//
-
-	const logoDownloaded = await downloadGameImage(imageUrls.libraryLogo, game, "logo");
-
-	//
-	// Update Game
-	//
-
-	await prismaClient.game.update(
-		{
-			where:
-			{
-				id: game.id,
-			},
-			data:
-			{
-				hasBannerImage: bannerDownloaded,
-				hasCoverImage: coverDownloaded,
-				hasIconImage: iconDownloaded,
-				hasLogoImage: logoDownloaded,
-			},
-		});
-
-	//
-	// Pause
-	//
-
-	console.log("Images downloaded!");
-
-	await CliLib.pause(readlineInterface);
-}
-
-const actions: Record<ActionName, Action> =
+const actions: Record<string, Action> =
 {
 	addGame:
 	{
 		description: "Add a new game to your library",
 		execute: async (readlineInterface) => addGame(readlineInterface),
 	},
+	downloadGameImagesFromSteam:
+	{
+		description: "Download images for a game from Steam",
+		execute: async (readlineInterface) => downloadGameImagesFromSteam(readlineInterface),
+	},
+
 	addGameInstallation:
 	{
 		description: "Add a new game installation to an existing game",
 		execute: async (readlineInterface) => addGameInstallation(readlineInterface),
 	},
-	addHistoricalPlaytime:
+
+	addGamePlaySession:
 	{
-		description: "Add historical playtime to an existing game",
-		execute: async (readlineInterface) => addHistoricalPlaytime(readlineInterface),
-	},
-	downloadImagesFromSteam:
-	{
-		description: "Download images for a game from Steam",
-		execute: async (readlineInterface) => downloadImagesFromSteam(readlineInterface),
+		description: "Add a historical game play session to an existing game",
+		execute: async (readlineInterface) => addGamePlaySession(readlineInterface),
 	},
 
 	addSeriesGame:
@@ -1273,7 +1225,7 @@ async function main()
 	{
 		console.clear();
 	
-		const actionName = await CliLib.prompt(readlineInterface,
+		const action = await CliLib.prompt(readlineInterface,
 			{
 				text: "Choose an action",
 				options:
@@ -1296,29 +1248,25 @@ async function main()
 				{
 					if (input == "exit")
 					{
-						return "exit";
+						return null;
 					}
 
-					const inputParseResult = ActionNameSchema.safeParse(input);
-	
-					if (!inputParseResult.success)
+					const action = actions[input];
+
+					if (action == null)
 					{
 						throw new CliLib.RetryableError("Invalid action: " + input);
 					}
-	
-					return inputParseResult.data;
+
+					return action;
 				},
 			});
 	
-		if (actionName == "exit")
+		if (action == null)
 		{
 			break loop;
 		}
-	
-		console.clear();
-	
-		const action = actions[actionName];
-	
+
 		await action.execute(readlineInterface);
 	}
 	
