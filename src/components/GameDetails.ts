@@ -274,7 +274,7 @@ export function GameDetails(game: GameDetailsGame)
 													title: Utilities.NumberLib.format(game.playTimeTotalSeconds) + " seconds",
 												},
 												[
-													shortEnglishHumanizer(game.playTimeTotalSeconds * 1000, { units: [ "h", "m", "s" ] }),
+													shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
 												])
 											: "No playtime recorded",
 									},
@@ -330,7 +330,7 @@ export function GameDetails(game: GameDetailsGame)
 												[
 													new DE("span", gamePlaySession.platform.iconName + " fa-fw"),
 													" ",
-													shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000, { units: [ "h", "m", "s" ] }),
+													shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000),
 												]),
 										};
 									}))

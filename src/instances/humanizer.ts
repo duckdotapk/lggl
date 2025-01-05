@@ -26,6 +26,8 @@ export const shortEnglishHumanizer = humanizeDuration.humanizer(
 			},
 		},
 
+		units: [ "h", "m", "s" ],
+
 		delimiter: " ",
 		spacer: "",
 		conjunction: "",
