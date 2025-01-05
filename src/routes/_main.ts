@@ -314,6 +314,133 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 				break;
 			}
+
+			case "playTime":
+			{
+				games = games.sort((a, b) => b.playTimeTotalSeconds - a.playTimeTotalSeconds);
+
+				if (filterOptions.showFavoritesGroup)
+				{
+					const favoriteGames = games.filter((game) => game.isFavorite);
+
+					if (favoriteGames.length > 0)
+					{
+						gameGroups.set("Favorites", favoriteGames);
+					}
+				}
+
+				const playedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
+
+				if (playedGames.length > 0)
+				{
+					for (const playedGame of playedGames)
+					{
+						const playTimeHours = Math.floor(playedGame.playTimeTotalSeconds / 3600);
+
+						if (playTimeHours >= 1000)
+						{
+							const playTimeGroup = gameGroups.get("Over 1000 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 1000 hours", playTimeGroup);
+
+							continue;
+						}
+						else if (playTimeHours >= 750)
+						{
+							const playTimeGroup = gameGroups.get("Over 750 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 750 hours", playTimeGroup);
+
+							continue;
+						}
+						else if (playTimeHours >= 500)
+						{
+							const playTimeGroup = gameGroups.get("Over 500 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 500 hours", playTimeGroup);
+
+							continue;
+						}
+						else if (playTimeHours >= 250)
+						{
+							const playTimeGroup = gameGroups.get("Over 250 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 250 hours", playTimeGroup);
+
+							continue;
+						}
+						else if (playTimeHours >= 100)
+						{
+							const playTimeGroup = gameGroups.get("Over 100 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 100 hours", playTimeGroup);
+
+							continue;
+						}
+						else if (playTimeHours >= 50)
+						{
+							const playTimeGroup = gameGroups.get("Over 50 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 50 hours", playTimeGroup);
+
+							continue;
+						}
+						else if (playTimeHours >= 10)
+						{
+							const playTimeGroup = gameGroups.get("Over 10 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 10 hours", playTimeGroup);
+						}
+						else if (playTimeHours >= 5)
+						{
+							const playTimeGroup = gameGroups.get("Over 5 hours") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 5 hours", playTimeGroup);
+						}
+						else if (playTimeHours >= 1)
+						{
+							const playTimeGroup = gameGroups.get("Over 1 hour") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Over 1 hour", playTimeGroup);
+						}
+						else
+						{
+							const playTimeGroup = gameGroups.get("Under 1 hour") ?? [];
+
+							playTimeGroup.push(playedGame);
+
+							gameGroups.set("Under 1 hour", playTimeGroup);
+						}
+					}
+				}
+
+				const unplayedGames = games
+					.filter((game) => game.playTimeTotalSeconds == 0)
+					.sort((a, b) => a.sortName.localeCompare(b.sortName));
+
+				if (unplayedGames.length > 0)
+				{
+					gameGroups.set("No play time", unplayedGames);
+				}
+			}
 		}
 
 		//

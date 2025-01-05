@@ -44,6 +44,8 @@ export function FilterOptionsToolbar(filterOptions: LibrarySchemaLib.FilterOptio
 					Option("lastPlayed", "Group by Last played", filterOptions.groupMode === "lastPlayed"),
 
 					Option("series", "Group by Series", filterOptions.groupMode === "series"),
+
+					Option("playTime", "Group by Play time", filterOptions.groupMode === "playTime"),
 				]),
 
 			Checkbox("showFavoritesGroup", "Show favorites group", filterOptions.showFavoritesGroup),

@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const FilterOptionsSchema = z.object(
 	{
-		groupMode: z.enum([ "name", "lastPlayed", "series" ]),
+		groupMode: z.enum([ "name", "lastPlayed", "series", "playTime" ]),
 
 		showFavoritesGroup: z.boolean(),
 
