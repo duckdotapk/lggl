@@ -6,7 +6,11 @@ import * as Fritter from "@donutteam/fritter";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { Library, LibraryOptions } from "../components/Library.js";
+import { GameGroupManager } from "../classes/GameGroupManager.js";
+import { PlayTimeGameGroupManager } from "../classes/PlayTimeGameGroupManager.js";
+import { SeriesGameGroupManager } from "../classes/SeriesGameGroupManager.js";
+
+import { Library } from "../components/Library.js";
 
 import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
 
@@ -106,53 +110,31 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		}
 
 		//
-		// Initialise Game Groups Map
-		//
-
-		const gameGroups: LibraryOptions["gameGroups"] = new Map();
-
-		//
 		// Group Games by Group Mode
 		//
+
+		let gameGroupManager: GameGroupManager;
 
 		switch (filterOptions.groupMode)
 		{
 			case "name":
 			{
+				gameGroupManager = new GameGroupManager();
+
 				games = games.sort((a, b) => a.sortName.localeCompare(b.sortName));
 
 				if (filterOptions.showFavoritesGroup)
 				{
-					const favoriteGames = games.filter((game) => game.isFavorite);
-
-					if (favoriteGames.length > 0)
-					{
-						gameGroups.set("Favorites", favoriteGames);
-					}
+					gameGroupManager.addGames("Favorites", games.filter((game) => game.isFavorite));
 				}
 
 				for (const game of games)
 				{
 					const firstLetter = game.sortName.charAt(0).toUpperCase();
 
-					if (!isNaN(parseInt(firstLetter)))
-					{
-						const numberGroup = gameGroups.get("#") ?? [];
-
-						numberGroup.push(game);
-
-						gameGroups.set("#", numberGroup);
-					}
-					else
-					{
-						const groupName = firstLetter.toUpperCase();
-
-						const letterGroup = gameGroups.get(groupName) ?? [];
-	
-						letterGroup.push(game);
-	
-						gameGroups.set(groupName, letterGroup);
-					}
+					!isNaN(parseInt(firstLetter))
+						? gameGroupManager.addGame("#", game)
+						: gameGroupManager.addGame(firstLetter, game);
 				}
 
 				break;
@@ -160,51 +142,34 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 			case "lastPlayed":
 			{
+				gameGroupManager = new GameGroupManager();
+
 				games = games.sort((a, b) => (b.lastPlayedDate ?? new Date(0)).getTime() - (a.lastPlayedDate ?? new Date(0)).getTime());
 
 				if (filterOptions.showFavoritesGroup)
 				{
-					const favoriteGames = games.filter((game) => game.isFavorite);
-
-					if (favoriteGames.length > 0)
-					{
-						gameGroups.set("Favorites", favoriteGames);
-					}
+					gameGroupManager.addGames("Favorites", games.filter((game) => game.isFavorite));
 				}
 
 				const playedGames = games.filter((game) => game.lastPlayedDate != null && game.playTimeTotalSeconds > 0);
 
-				if (playedGames.length > 0)
+				for (const playedGame of playedGames)
 				{
-					for (const playedGame of playedGames)
-					{
-						const year = playedGame.lastPlayedDate?.getFullYear() ?? 0;
-
-						const yearGroup = gameGroups.get(year.toString()) ?? [];
-
-						yearGroup.push(playedGame);
-
-						gameGroups.set(year.toString(), yearGroup);
-					}
+					gameGroupManager.addGame(playedGame.lastPlayedDate!.getFullYear(), playedGame);
 				}
 
 				const unplayedGames = games
 					.filter((game) => game.lastPlayedDate == null || game.playTimeTotalSeconds == 0)
 					.sort((a, b) => a.sortName.localeCompare(b.sortName));
 
-				if (unplayedGames.length > 0)
-				{
-					gameGroups.set("Unplayed Games", unplayedGames);
-				}
+				gameGroupManager.addGames("Unplayed", unplayedGames);
 
 				break;
 			}
 
 			case "series":
 			{
-				//
-				// Group Games by Series
-				//
+				gameGroupManager = new SeriesGameGroupManager();
 
 				const seriesWithGamesBySeriesName: Map<string, 
 					{ 
@@ -232,10 +197,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						seriesWithGamesBySeriesName.set(seriesGame.series.name, seriesWithGames);
 					}
 				}
-
-				//
-				// Sort Games in Each Series
-				//
 
 				for (const [ seriesName, seriesWithGames ] of seriesWithGamesBySeriesName.entries())
 				{
@@ -266,10 +227,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						});
 				}
 
-				//
-				// Group Games with No Series
-				//
-
 				const gamesWithoutSeries = games
 					.filter((game) => game.seriesGames.length == 0)
 					.sort((a, b) => a.sortName.localeCompare(b.sortName));
@@ -280,36 +237,22 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					{
 						const favoriteGames = seriesWithGames.games.filter((game) => game.isFavorite);
 
-						if (favoriteGames.length > 0)
-						{
-							const favoritesGroup = gameGroups.get("Favorites: " + seriesWithGames.series.name) ?? [];
-
-							favoritesGroup.push(...favoriteGames);
-
-							gameGroups.set("Favorites: " + seriesWithGames.series.name, favoritesGroup);
-						}
+						gameGroupManager.addGames("Favorites: " + seriesWithGames.series.name, favoriteGames);
 					}
 
 					const favoriteGamesWithoutSeries = gamesWithoutSeries.filter((game) => game.isFavorite);
 
-					if (favoriteGamesWithoutSeries.length > 0)
-					{
-						const favoritesGroup = gameGroups.get("Favorites: -") ?? [];
-
-						favoritesGroup.push(...favoriteGamesWithoutSeries);
-
-						gameGroups.set("Favorites: -", favoritesGroup);
-					}
+					gameGroupManager.addGames("Favorites: -", favoriteGamesWithoutSeries);
 				}
 
 				for (const seriesWithGames of Array.from(seriesWithGamesBySeriesName.values()).sort((a, b) => a.series.name.localeCompare(b.series.name)))
 				{
-					gameGroups.set(seriesWithGames.series.name, seriesWithGames.games);
+					gameGroupManager.addGames(seriesWithGames.series.name, seriesWithGames.games);
 				}
 
 				if (gamesWithoutSeries.length > 0)
 				{
-					gameGroups.set("-", gamesWithoutSeries);
+					gameGroupManager.addGames("-", gamesWithoutSeries);
 				}
 
 				break;
@@ -317,16 +260,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 			case "playTime":
 			{
+				gameGroupManager = new PlayTimeGameGroupManager();
+
 				games = games.sort((a, b) => b.playTimeTotalSeconds - a.playTimeTotalSeconds);
 
 				if (filterOptions.showFavoritesGroup)
 				{
-					const favoriteGames = games.filter((game) => game.isFavorite);
-
-					if (favoriteGames.length > 0)
-					{
-						gameGroups.set("Favorites", favoriteGames);
-					}
+					gameGroupManager.addGames("Favorites", games.filter((game) => game.isFavorite));
 				}
 
 				const playedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
@@ -335,99 +275,59 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				{
 					for (const playedGame of playedGames)
 					{
-						const playTimeHours = Math.floor(playedGame.playTimeTotalSeconds / 3600);
+						const playTimeTotalHours = Math.floor(playedGame.playTimeTotalSeconds / 3600);
 
-						if (playTimeHours >= 1000)
+						if (playTimeTotalHours >= 1000)
 						{
-							const playTimeGroup = gameGroups.get("Over 1000 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 1000 hours", playTimeGroup);
-
-							continue;
+							gameGroupManager.addGame("Over 1000 hours", playedGame);
 						}
-						else if (playTimeHours >= 750)
+						else if (playTimeTotalHours >= 750)
 						{
-							const playTimeGroup = gameGroups.get("Over 750 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 750 hours", playTimeGroup);
-
-							continue;
+							gameGroupManager.addGame("Over 750 hours", playedGame);
 						}
-						else if (playTimeHours >= 500)
+						else if (playTimeTotalHours >= 500)
 						{
-							const playTimeGroup = gameGroups.get("Over 500 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 500 hours", playTimeGroup);
-
-							continue;
+							gameGroupManager.addGame("Over 500 hours", playedGame);
 						}
-						else if (playTimeHours >= 250)
+						else if (playTimeTotalHours >= 250)
 						{
-							const playTimeGroup = gameGroups.get("Over 250 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 250 hours", playTimeGroup);
-
-							continue;
+							gameGroupManager.addGame("Over 250 hours", playedGame);
 						}
-						else if (playTimeHours >= 100)
+						else if (playTimeTotalHours >= 100)
 						{
-							const playTimeGroup = gameGroups.get("Over 100 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 100 hours", playTimeGroup);
-
-							continue;
+							gameGroupManager.addGame("Over 100 hours", playedGame);
 						}
-						else if (playTimeHours >= 50)
+						else if (playTimeTotalHours >= 50)
 						{
-							const playTimeGroup = gameGroups.get("Over 50 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 50 hours", playTimeGroup);
-
-							continue;
+							gameGroupManager.addGame("Over 50 hours", playedGame);
 						}
-						else if (playTimeHours >= 10)
+						else if (playTimeTotalHours >= 10)
 						{
-							const playTimeGroup = gameGroups.get("Over 10 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 10 hours", playTimeGroup);
+							gameGroupManager.addGame("Over 10 hours", playedGame);
 						}
-						else if (playTimeHours >= 5)
+						else if (playTimeTotalHours >= 5)
 						{
-							const playTimeGroup = gameGroups.get("Over 5 hours") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 5 hours", playTimeGroup);
+							gameGroupManager.addGame("Over 5 hours", playedGame);
 						}
-						else if (playTimeHours >= 1)
+						else if (playTimeTotalHours >= 4)
 						{
-							const playTimeGroup = gameGroups.get("Over 1 hour") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Over 1 hour", playTimeGroup);
+							gameGroupManager.addGame("Over 4 hours", playedGame);
+						}
+						else if (playTimeTotalHours >= 3)
+						{
+							gameGroupManager.addGame("Over 3 hours", playedGame);
+						}
+						else if (playTimeTotalHours >= 2)
+						{
+							gameGroupManager.addGame("Over 2 hours", playedGame);
+						}
+						else if (playTimeTotalHours >= 1)
+						{
+							gameGroupManager.addGame("Over 1 hour", playedGame);
 						}
 						else
 						{
-							const playTimeGroup = gameGroups.get("Under 1 hour") ?? [];
-
-							playTimeGroup.push(playedGame);
-
-							gameGroups.set("Under 1 hour", playTimeGroup);
+							gameGroupManager.addGame("Under 1 hour", playedGame);
 						}
 					}
 				}
@@ -436,10 +336,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					.filter((game) => game.playTimeTotalSeconds == 0)
 					.sort((a, b) => a.sortName.localeCompare(b.sortName));
 
-				if (unplayedGames.length > 0)
-				{
-					gameGroups.set("No play time", unplayedGames);
-				}
+				gameGroupManager.addGames("No play time", unplayedGames);
 			}
 		}
 
@@ -509,7 +406,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			{
 				searchParameters,
 				filterOptions,
-				gameGroups, 
+				gameGroupManager,
 				selectedGame, 
 			}).renderToString());
 	},

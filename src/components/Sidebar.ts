@@ -5,9 +5,9 @@
 import { DE } from "@donutteam/document-builder";
 import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
-import { DateTime } from "luxon";
 
-import { HumanDateTime } from "./inline/HumanDateTime.js";
+import { GameGroupManager, GameGroupManagerGroup, GameGroupManagerGroupEntry } from "../classes/GameGroupManager.js";
+
 import { Muted } from "./inline/Muted.js";
 
 import { staticMiddleware } from "../instances/server.js";
@@ -18,20 +18,20 @@ import * as GameModelLib from "../libs/models/Game.js";
 // Locals
 //
 
-function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
+function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
 {
 	let className = "component-sidebar-group-item";
 
-	if (selectedGame != null && selectedGame.id == game.id)
+	if (selectedGame != null && groupGame.game.id == selectedGame.id)
 	{
 		className += " selected";
 	}
 
 	const itemSearchParameters = new URLSearchParams(searchParameters);
 
-	itemSearchParameters.set("selectedGameId", game.id.toString());
+	itemSearchParameters.set("selectedGameId", groupGame.game.id.toString());
 
-	const imageUrls = GameModelLib.getImageUrls(game);
+	const imageUrls = GameModelLib.getImageUrls(groupGame.game);
 
 	return new DE("a",
 		{
@@ -39,20 +39,20 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 
 			href: "/?" + itemSearchParameters.toString(),
 
-			"data-name": game.name,
-			"data-normalized-name": game.name.toLowerCase().replace(/[^a-z0-9]/g, " "),
+			"data-name": groupGame.game.name,
+			"data-normalized-name": groupGame.game.name.toLowerCase().replace(/[^a-z0-9]/g, " "), // TODO: move this to GameModelLib utility function
 
-			"data-is-installed": game.isInstalled,
+			"data-is-installed": groupGame.game.isInstalled,
 		},
 		[
 			new DE("div", "icon-wrapper",
 				[
-					game.hasIconImage
+					groupGame.game.hasIconImage
 						? new DE("img",
 							{
 								class: "icon image",
 								src: staticMiddleware.getCacheBustedPath(imageUrls.icon),
-								alt: game.name + " icon",
+								alt: groupGame.game.name + " icon",
 							})
 						: new DE("div", "icon font-awesome",
 							[
@@ -62,38 +62,31 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 
 			new DE("div", "text-wrapper",
 				[
-					new DE("div", "name", game.name),
+					new DE("div", "name", groupGame.game.name),
 
-					// TODO: make what details are shown here, or whether they are at all, configurable
-					new DE("div", "details", Muted(
-						[
-							"Last played ",
-							game.lastPlayedDate != null
-								? HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED)
-								: "never",
-						])),
+					new DE("div", "details", Muted(groupGame.details)),
 				]),
 		]);
 }
 
-function Group(title: string, games: SidebarGames, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
+function Group(group: GameGroupManagerGroup, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
 {
 	return new DE("details",
 		{
 			class: "component-sidebar-group",
 
-			"data-name": title,
+			"data-name": group.title,
 		},
 		[
 			new DE("summary", "title",
 				[
-					title,
+					group.title,
 					" (",
-					Utilities.NumberLib.format(games.length),
+					Utilities.NumberLib.format(group.games.length),
 					")",
 				]),
 
-			games.map((game) => Item(game, selectedGame, searchParameters)),
+			group.games.map((groupGame) => Item(groupGame, selectedGame, searchParameters)),
 		]);
 }
 
@@ -111,20 +104,14 @@ function Search()
 // Component
 //
 
-export type SidebarGameGroups = Map<string, SidebarGames>;
-
-export type SidebarGames = SidebarGame[];
-
-export type SidebarGame = Prisma.GameGetPayload<null>;
-
 export type SidebarSelectedGame = Prisma.GameGetPayload<null> | null;
 
-export function Sidebar(gameGroups: SidebarGameGroups, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
+export function Sidebar(gameGroupManager: GameGroupManager, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
 {
 	return new DE("aside", "component-sidebar",
 		[
 			Search(),
 
-			Array.from(gameGroups.entries()).map(([ title, games ]) => Group(title, games, selectedGame, searchParameters)),
+			gameGroupManager.getGroups().map((group) => Group(group, selectedGame, searchParameters)),
 		]);
 }

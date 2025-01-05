@@ -3,7 +3,8 @@
 //
 
 import { DE } from "@donutteam/document-builder";
-import { Prisma } from "@prisma/client";
+
+import { GameGroupManager } from "../classes/GameGroupManager.js";
 
 import { FilterOptionsToolbar } from "./toolbar/FilterOptionsToolbar.js";
 
@@ -22,9 +23,9 @@ export type LibraryOptions =
 {
 	searchParameters: URLSearchParams;
 	filterOptions: LibrarySchemaLib.FilterOptions;
-	gameGroups: Map<string, Prisma.GameGetPayload<null>[]>;
+	gameGroupManager: GameGroupManager;
 	selectedGame: GameDetailsGame | null;
-}
+};
 
 export function Library(options: LibraryOptions)
 {
@@ -69,7 +70,7 @@ export function Library(options: LibraryOptions)
 						[
 							FilterOptionsToolbar(options.filterOptions),
 
-							Sidebar(options.gameGroups, options.selectedGame, options.searchParameters),
+							Sidebar(options.gameGroupManager, options.selectedGame, options.searchParameters),
 
 							options.selectedGame != null
 								? GameDetails(options.selectedGame)
