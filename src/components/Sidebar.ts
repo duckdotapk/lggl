@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { HumanDateTime } from "./HumanDateTime.js";
+import { Muted } from "./inline/Muted.js";
 
 import { staticMiddleware } from "../instances/server.js";
 
@@ -64,13 +65,13 @@ function Item(game: SidebarGame, selectedGame: SidebarSelectedGame, searchParame
 					new DE("div", "name", game.name),
 
 					// TODO: make what details are shown here, or whether they are at all, configurable
-					new DE("div", "details",
+					new DE("div", "details", Muted(
 						[
 							"Last played ",
 							game.lastPlayedDate != null
 								? HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED)
 								: "never",
-						]),
+						])),
 				]),
 		]);
 }

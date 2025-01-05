@@ -6,6 +6,8 @@
 
 @use "components/_Global.scss";
 
+@use "components/inline/Muted.scss";
+
 @use "components/toolbar/Toolbar.scss";
 
 @use "components/Anchor.scss";
@@ -21,6 +23,8 @@
 //
 
 @include Global.Resets();
+
+@include Muted.Muted();
 
 @include Toolbar.Toolbar();
 
