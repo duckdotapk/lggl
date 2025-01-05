@@ -34,6 +34,7 @@ const ActionNameSchema = z.enum(
 		"addGame",
 		"addGameInstallation",
 		"addHistoricalPlaytime",
+		"addSeriesGame",
 		"audit",
 		"downloadImagesFromSteam",
 	]);
@@ -142,6 +143,70 @@ async function searchForGame(readlineInterface: readline.promises.Interface)
 		});
 
 	return game;
+}
+
+async function searchForSeries(readlineInterface: readline.promises.Interface)
+{
+	const seriesList = await CliLib.prompt(readlineInterface,
+		{
+			text: "Search for a series by name",
+			validateAndTransform: async (input) =>
+			{
+				const series = await prismaClient.series.findMany(
+					{
+						where:
+						{
+							name: { contains: input },
+						},
+						orderBy:
+						{
+							id: "asc",
+						},
+					});
+
+				if (series.length == 0)
+				{
+					throw new CliLib.RetryableError("No series found.");
+				}
+
+				return series;
+			},
+		});
+
+	const series = await CliLib.prompt(readlineInterface,
+		{
+			text: "Choose a series",
+			options: seriesList.map(
+				(series) =>
+				{
+					return {
+						value: series.id.toString(),
+						description: series.name,
+					};
+				}),
+			validateAndTransform: async (input) =>
+			{
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
+
+				if (!inputParseResult.success)
+				{
+					throw new CliLib.RetryableError("Invalid series ID.");
+				}
+
+				const id = inputParseResult.data;
+
+				const series = seriesList.find((series) => series.id == id);
+
+				if (series == null)
+				{
+					throw new CliLib.RetryableError("No series found with that ID.");
+				}
+
+				return series;
+			},
+		});
+
+	return series;
 }
 
 //
@@ -622,6 +687,44 @@ async function addHistoricalPlaytime(readlineInterface: readline.promises.Interf
 		});
 
 	console.log("Created historical game play session with ID: %d", gamePlaySession.id);
+
+	await CliLib.pause(readlineInterface);
+}
+
+async function addSeriesGame(readlineInterface: readline.promises.Interface)
+{
+	const game = await searchForGame(readlineInterface);
+
+	const series = await searchForSeries(readlineInterface);
+
+	const seriesGameNumber = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter the game's number in the series",
+			validateAndTransform: async (input) =>
+			{
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
+
+				if (!inputParseResult.success)
+				{
+					throw new CliLib.RetryableError("Invalid series game number.");
+				}
+
+				return inputParseResult.data;
+			},
+		});
+
+	const seriesGame = await prismaClient.seriesGame.create(
+		{
+			data:
+			{
+				number: seriesGameNumber,
+
+				game_id: game.id,
+				series_id: series.id,
+			},
+		});
+
+	console.log("Series game #%d created!", seriesGame.id);
 
 	await CliLib.pause(readlineInterface);
 }
@@ -1118,7 +1221,6 @@ async function downloadImagesFromSteam(readlineInterface: readline.promises.Inte
 	await CliLib.pause(readlineInterface);
 }
 
-
 const actions: Record<ActionName, Action> =
 {
 	addGame:
@@ -1136,15 +1238,22 @@ const actions: Record<ActionName, Action> =
 		description: "Add historical playtime to an existing game",
 		execute: async (readlineInterface) => addHistoricalPlaytime(readlineInterface),
 	},
-	audit:
-	{
-		description: "Audit your game library for potential issues",
-		execute: async (readlineInterface) => audit(readlineInterface),
-	},
 	downloadImagesFromSteam:
 	{
 		description: "Download images for a game from Steam",
 		execute: async (readlineInterface) => downloadImagesFromSteam(readlineInterface),
+	},
+
+	addSeriesGame:
+	{
+		description: "Add a game to a series",
+		execute: async (readlineInterface) => addSeriesGame(readlineInterface),
+	},
+
+	audit:
+	{
+		description: "Audit your game library for potential issues",
+		execute: async (readlineInterface) => audit(readlineInterface),
 	},
 };
 
