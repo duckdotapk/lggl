@@ -1069,8 +1069,6 @@ async function addGamePlaySession(readlineInterface: readline.promises.Interface
 			},
 		});
 
-	readlineInterface.close();
-
 	const gamePlaySession = await prismaClient.$transaction(
 		async (transactionClient) =>
 		{
@@ -1104,6 +1102,27 @@ async function addGamePlaySession(readlineInterface: readline.promises.Interface
 		});
 
 	console.log("Created historical game play session with ID: %d", gamePlaySession.id);
+
+	await CliLib.pause(readlineInterface);
+}
+
+async function addSeries(readlineInterface: readline.promises.Interface)
+{
+	const name = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter the series' name",
+			validateAndTransform: async (input) => input,
+		});
+
+	const series = await prismaClient.series.create(
+		{
+			data:
+			{
+				name,
+			},
+		});
+
+	console.log("Series #%d created!", series.id);
 
 	await CliLib.pause(readlineInterface);
 }
@@ -1587,6 +1606,12 @@ const actions: Record<string, Action> =
 	{
 		description: "Add a historical game play session to an existing game",
 		execute: async (readlineInterface) => addGamePlaySession(readlineInterface),
+	},
+
+	addSeries:
+	{
+		description: "Add a new series to your library",
+		execute: async (readlineInterface) => addSeries(readlineInterface),
 	},
 
 	addSeriesGame:
