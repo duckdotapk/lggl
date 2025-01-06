@@ -53,6 +53,52 @@ async function downloadGameImage(url: string, game: Prisma.GameGetPayload<null>,
 	return true;
 }
 
+async function searchForEngine(readlineInterface: readline.promises.Interface)
+{
+	const engines = await prismaClient.engine.findMany(
+		{
+			orderBy:
+			{
+				name: "asc",
+			},
+		});
+
+	const engine = await CliLib.prompt(readlineInterface,
+		{
+			text: "Choose an engine",
+			options: engines.map(
+				(engine) =>
+				{
+					return {
+						value: engine.id.toString(),
+						description: engine.name,
+					};
+				}),
+			validateAndTransform: async (input) =>
+			{
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
+
+				if (!inputParseResult.success)
+				{
+					throw new CliLib.RetryableError("Invalid engine ID.");
+				}
+
+				const id = inputParseResult.data;
+
+				const engine = engines.find((engine) => engine.id == id);
+
+				if (engine == null)
+				{
+					throw new CliLib.RetryableError("No engine found with that ID.");
+				}
+
+				return engine;
+			},
+		});
+
+	return engine;
+}
+
 async function searchForGame(readlineInterface: readline.promises.Interface)
 {
 	const games = await CliLib.prompt(readlineInterface,
@@ -618,6 +664,26 @@ async function downloadGameImagesFromSteam(readlineInterface: readline.promises.
 		});
 
 	console.log("Images downloaded!");
+
+	await CliLib.pause(readlineInterface);
+}
+
+async function addGameEngine(readlineInterface: readline.promises.Interface)
+{
+	const game = await searchForGame(readlineInterface);
+
+	const engine = await searchForEngine(readlineInterface);
+
+	const gameEngine = await prismaClient.gameEngine.create(
+		{
+			data:
+			{
+				engine_id: engine.id,
+				game_id: game.id,
+			},
+		});
+
+	console.log("Game engine #%d created!", gameEngine.id);
 
 	await CliLib.pause(readlineInterface);
 }
@@ -1238,6 +1304,11 @@ const actions: Record<string, Action> =
 		execute: async (readlineInterface) => downloadGameImagesFromSteam(readlineInterface),
 	},
 
+	addGameEngine:
+	{
+		description: "Add an engine to an existing game",
+		execute: async (readlineInterface) => addGameEngine(readlineInterface),
+	},
 	addGameInstallation:
 	{
 		description: "Add a new game installation to an existing game",
