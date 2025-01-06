@@ -411,6 +411,7 @@ async function addGame(readlineInterface: readline.promises.Interface)
 						isEarlyAccess,
 						isFavorite,
 						isHidden,
+						isInstalled: gameInstallationPath != null,
 						isNsfw,
 						isShelved,
 
