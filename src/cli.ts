@@ -12,6 +12,8 @@ import { DateTime } from "luxon";
 import { z } from "zod";
 
 import { LGGL_DATA_DIRECTORY } from "./env/LGGL_DATA_DIRECTORY.js";
+import { LGGL_STEAM_API_KEY } from "./env/LGGL_STEAM_API_KEY.js";
+import { LGGL_STEAM_USER_ID } from "./env/LGGL_STEAM_USER_ID.js";
 
 import { prismaClient } from "./instances/prismaClient.js";
 
@@ -191,10 +193,19 @@ async function addGame(readlineInterface: readline.promises.Interface)
 {
 	const steamAppId = await CliLib.prompt(readlineInterface,
 		{
-			text: "Enter the game's steam app ID",
+			text: "Enter the game's steam app ID or store page URL",
 			defaultValue: null,
 			validateAndTransform: async (input) =>
 			{
+				if (URL.canParse(input))
+				{
+					const url = new URL(input);
+
+					const urlPathComponents = url.pathname.split("/");
+
+					input = urlPathComponents[2] ?? "";
+				}
+
 				const inputParseResult = z.number().min(1).safeParse(parseInt(input));
 
 				if (!inputParseResult.success)
@@ -206,11 +217,22 @@ async function addGame(readlineInterface: readline.promises.Interface)
 			},
 		});
 
-	// TODO: pull Steam App Info to use as default values
+	let appDetails: Extract<SteamThirdPartyLib.AppDetailsResponse["response"], { success: true }>["data"] | null = null;
+	let ownedGame: SteamThirdPartyLib.IPlayerServiceGetOwnedGamesResponse["response"]["games"][0] | null = null;
+
+	if (steamAppId != null)
+	{
+		appDetails = await SteamThirdPartyLib.fetchAppDetails(steamAppId);
+
+		const ownedGames = await SteamThirdPartyLib.fetchOwnedGames(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID);
+
+		ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
+	}
 
 	const name = await CliLib.prompt(readlineInterface,
 		{
 			text: "Enter the game's name",
+			defaultValue: ownedGame?.name ?? appDetails?.name ?? undefined,
 			validateAndTransform: async (input) => input,
 		});
 
@@ -486,7 +508,11 @@ async function addGame(readlineInterface: readline.promises.Interface)
 
 		if (downloadImages)
 		{
-			const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId);
+			const ownedGames = await SteamThirdPartyLib.fetchOwnedGames(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID);
+
+			const ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
+
+			const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
 
 			await prismaClient.game.update(
 				{
@@ -539,7 +565,11 @@ async function downloadGameImagesFromSteam(readlineInterface: readline.promises.
 			});
 	}
 
-	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId);
+	const ownedGames = await SteamThirdPartyLib.fetchOwnedGames(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID);
+
+	const ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
+
+	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
 
 	const bannerDownloaded = await downloadGameImage(imageUrls.libraryBackground, game, "banner");
 
