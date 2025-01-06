@@ -3,11 +3,12 @@ model GamePlayAction {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
-    name         String
-    type         String
-    path         String
-    trackingPath String
-    isArchived   Boolean @default(false)
+    name          String
+    type          String
+    path          String
+    trackingPath  String
+    argumentsJson String  @default("[]")
+    isArchived    Boolean @default(false)
 
     game_id Int
 

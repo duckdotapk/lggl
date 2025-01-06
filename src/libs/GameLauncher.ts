@@ -44,6 +44,13 @@ async function startProcess(gamePlayAction: Prisma.GamePlayActionGetPayload<null
 			throw new Error("Unsupported platform: " + process.platform);
 	}
 
+	if (gamePlayAction.argumentsJson != null)
+	{
+		const additionalCommandArguments = JSON.parse(gamePlayAction.argumentsJson);
+
+		commandArguments.push(...additionalCommandArguments);
+	}
+
 	const child = child_process.spawn(command, commandArguments,
 		{
 			detached: true,
