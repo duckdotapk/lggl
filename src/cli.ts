@@ -189,6 +189,27 @@ async function searchForSeries(readlineInterface: readline.promises.Interface)
 // Actions
 //
 
+async function addEngine(readlineInterface: readline.promises.Interface)
+{
+	const name = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter the engine's name",
+			validateAndTransform: async (input) => input,
+		});
+
+	const engine = await prismaClient.engine.create(
+		{
+			data:
+			{
+				name,
+			},
+		});
+
+	console.log("Engine #%d created!", engine.id);
+
+	await CliLib.pause(readlineInterface);
+}
+
 async function addGame(readlineInterface: readline.promises.Interface)
 {
 	const steamAppId = await CliLib.prompt(readlineInterface,
@@ -1200,6 +1221,12 @@ type Action =
 
 const actions: Record<string, Action> =
 {
+	addEngine:
+	{
+		description: "Add a new engine to your library",
+		execute: async (readlineInterface) => addEngine(readlineInterface),
+	},
+
 	addGame:
 	{
 		description: "Add a new game to your library",
