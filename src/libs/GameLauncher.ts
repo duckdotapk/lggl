@@ -8,18 +8,11 @@ import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { LGGL_CURRENT_PLATFORM_ID } from "../env/LGGL_CURRENT_PLATFORM_ID.js";
+import { LGGL_LAUNCH_CHECK_INTERVAL } from "../env/LGGL_LAUNCH_CHECK_INTERVAL.js";
+import { LGGL_LAUNCH_INITIAL_CHECK_DELAY } from "../env/LGGL_LAUNCH_INITIAL_CHECK_DELAY.js";
+import { LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS } from "../env/LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS.js";
 
 import { prismaClient } from "../instances/prismaClient.js";
-
-//
-// Constants
-//
-
-const initialCheckDelay = 2000;
-
-const maxTrackingAttempts = 5;
-
-const checkInterval = 2000;
 
 //
 // Utility Functions
@@ -110,19 +103,19 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 	console.log("[GameLauncherLib] Process started, using game play action %d tracking path: %s", gamePlayAction.id, gamePlayAction.trackingPath);
 
-	await new Promise(resolve => setTimeout(resolve, initialCheckDelay));
+	await new Promise(resolve => setTimeout(resolve, LGGL_LAUNCH_INITIAL_CHECK_DELAY));
 
 	let gameProcess: string | null = null;
 
-	for (let i = 0; i < maxTrackingAttempts; i++)
+	for (let i = 0; i < LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS; i++)
 	{
 		gameProcess = await findGameProcess(gamePlayAction.trackingPath);
 
 		if (gameProcess == null)
 		{
-			console.log("[GameLauncherLib] Game process not found, retrying %d more times...", maxTrackingAttempts - i);
+			console.log("[GameLauncherLib] Game process not found, retrying %d more times...", LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS - i);
 
-			await new Promise(resolve => setTimeout(resolve, checkInterval));
+			await new Promise(resolve => setTimeout(resolve, LGGL_LAUNCH_CHECK_INTERVAL));
 
 			continue;
 		}
@@ -134,7 +127,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 	if (gameProcess == null)
 	{
-		throw new Error("Game process not found after " + maxTrackingAttempts + " attempts!");
+		throw new Error("Game process not found after " + LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS + " attempts!");
 	}
 
 	const playSessionStartDateTime = DateTime.now();
@@ -237,5 +230,5 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 					});
 			}
 		},
-		checkInterval);
+		LGGL_LAUNCH_CHECK_INTERVAL);
 }
