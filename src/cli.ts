@@ -98,7 +98,7 @@ async function searchForGame(readlineInterface: readline.promises.Interface)
 				}),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
 
 				if (!inputParseResult.success)
 				{
@@ -162,7 +162,7 @@ async function searchForSeries(readlineInterface: readline.promises.Interface)
 				}),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
 
 				if (!inputParseResult.success)
 				{
@@ -569,7 +569,7 @@ async function downloadGameImagesFromSteam(readlineInterface: readline.promises.
 
 	const ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
 
-	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
+	const imageUrls = SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
 
 	const bannerDownloaded = await downloadGameImage(imageUrls.libraryBackground, game, "banner");
 
@@ -610,8 +610,6 @@ async function addGameInstallation(readlineInterface: readline.promises.Interfac
 			text: "Enter the game's installation path",
 			validateAndTransform: async (input) =>
 			{
-				input = input.trim();
-
 				if (!fs.existsSync(input))
 				{
 					throw new CliLib.RetryableError("Path does not exist.");
@@ -667,7 +665,7 @@ async function addGamePlaySession(readlineInterface: readline.promises.Interface
 				}),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
 
 				if (!inputParseResult.success)
 				{
@@ -712,8 +710,6 @@ async function addGamePlaySession(readlineInterface: readline.promises.Interface
 			text: "Enter any notes you want to add to this playtime",
 			validateAndTransform: async (input) =>
 			{
-				input = input.trim();
-
 				return input.length > 0 ? input : null;
 			},
 		});
@@ -768,7 +764,7 @@ async function addSeriesGame(readlineInterface: readline.promises.Interface)
 			text: "Enter the game's number in the series",
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input.trim()));
+				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
 
 				if (!inputParseResult.success)
 				{
