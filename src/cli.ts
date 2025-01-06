@@ -12,6 +12,9 @@ import { DateTime } from "luxon";
 import { z } from "zod";
 
 import { LGGL_DATA_DIRECTORY } from "./env/LGGL_DATA_DIRECTORY.js";
+import { LGGL_PLATFORM_ID_LINUX } from "./env/LGGL_PLATFORM_ID_LINUX.js";
+import { LGGL_PLATFORM_ID_MAC } from "./env/LGGL_PLATFORM_ID_MAC.js";
+import { LGGL_PLATFORM_ID_WINDOWS } from "./env/LGGL_PLATFORM_ID_WINDOWS.js";
 import { LGGL_STEAM_API_KEY } from "./env/LGGL_STEAM_API_KEY.js";
 import { LGGL_STEAM_USER_ID } from "./env/LGGL_STEAM_USER_ID.js";
 
@@ -258,6 +261,10 @@ async function addEngine(readlineInterface: readline.promises.Interface)
 
 async function addGame(readlineInterface: readline.promises.Interface)
 {
+	//
+	// Get Steam App ID
+	//
+
 	const steamAppId = await CliLib.prompt(readlineInterface,
 		{
 			text: "Enter the game's steam app ID or store page URL",
@@ -296,6 +303,10 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
 	}
 
+	//
+	// Get Game Data
+	//
+
 	const name = await CliLib.prompt(readlineInterface,
 		{
 			text: "Enter the game's name",
@@ -327,35 +338,15 @@ async function addGame(readlineInterface: readline.promises.Interface)
 			},
 		});
 
-	const isEarlyAccess = await CliLib.confirm(readlineInterface,
-		{
-			text: "Is this game in early access?",
-			defaultValue: false,
-		});
+	const isEarlyAccess = await CliLib.confirm(readlineInterface, { text: "Is this game in early access?", defaultValue: false });
 
-	const isFavorite = await CliLib.confirm(readlineInterface,
-		{
-			text: "Is this game a favorite?",
-			defaultValue: false,
-		});
+	const isFavorite = await CliLib.confirm(readlineInterface, { text: "Is this game a favorite?", defaultValue: false });
 
-	const isHidden = await CliLib.confirm(readlineInterface, 
-		{
-			text: "Is this game hidden?", 
-			defaultValue: false
-		});
+	const isHidden = await CliLib.confirm(readlineInterface, { text: "Is this game hidden?",  defaultValue: false });
 
-	const isNsfw = await CliLib.confirm(readlineInterface, 
-		{
-			text: "Is this game NSFW?", 
-			defaultValue: false
-		});
+	const isNsfw = await CliLib.confirm(readlineInterface, { text: "Is this game NSFW?",  defaultValue: false });
 
-	const isShelved = await CliLib.confirm(readlineInterface, 
-		{
-			text: "Is this game shelved?", 
-			defaultValue: false
-		});
+	const isShelved = await CliLib.confirm(readlineInterface, { text: "Is this game shelved?",  defaultValue: false });
 
 	const progressionType = await CliLib.prompt(readlineInterface,
 		{
@@ -376,12 +367,19 @@ async function addGame(readlineInterface: readline.promises.Interface)
 		});
 
 	let completionStatus: GameSchemaLib.CompletionStatus | null = null;
+
 	let firstPlayedDate: Date | null = null;
+
 	let firstPlayedDateApproximated = false;
+
 	let firstCompletedDate: Date | null = null;
+
 	let firstCompletedDateApproximated = false;
+
 	let lastPlayedDate: Date | null = null;
+
 	let playCount = 0;
+
 	let playTimeTotalSeconds = 0;
 
 	const hasPlayed = await CliLib.confirm(readlineInterface,
@@ -467,28 +465,188 @@ async function addGame(readlineInterface: readline.promises.Interface)
 			},
 		});
 
-	// TODO: prompt for gameDeveloperNames
+	//
+	// Get Game Developers Names
+	//
 
-	// TODO: prompt for gameEngineNames
+	const developerCompanyNames = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter the game's developers (separate multiple developers with ' | ')",
+			defaultValue: appDetails?.developers ?? [],
+			validateAndTransform: async (input) =>
+			{
+				const developers = input.split(" | ").map((developer) => developer.trim());
 
-	// TODO: prompt for gameGenreNames
+				return developers;
+			},
+		});
+
+	//
+	// Get Game Publishers Names
+	//
+
+	const publisherCompanyNames = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter the game's publishers (separate multiple publishers with ' | ')",
+			defaultValue: appDetails?.publishers ?? [],
+			validateAndTransform: async (input) =>
+			{
+				const publishers = input.split(" | ").map((publisher) => publisher.trim());
+
+				return publishers;
+			},
+		});
+
+	//
+	// Create Game Engine
+	//
+
+	const engines = await prismaClient.engine.findMany(
+		{
+			orderBy:
+			{
+				name: "asc",
+			},
+		});
+
+	const engineIds = await CliLib.prompt(readlineInterface,
+		{
+			text: "What engine does this game use? (separate multiple engines with ',')",
+			defaultValue: [],
+			options: engines.map(
+				(engine) =>
+				{
+					return {
+						value: engine.id.toString(),
+						description: engine.name,
+					};
+				}),
+			validateAndTransform: async (input) =>
+			{
+				const inputParseResult = z.array(z.coerce.number().int().min(1)).safeParse(input.split(","));
+
+				if (!inputParseResult.success)
+				{
+					throw new CliLib.RetryableError("Invalid engine IDs: " + input);
+				}
+
+				for (const engineId of inputParseResult.data)
+				{
+					const engine = engines.find((engine) => engine.id == engineId);
+
+					if (engine == null)
+					{
+						throw new CliLib.RetryableError("No engine found with ID: " + engineId);
+					}
+				}
+
+				return inputParseResult.data;
+			},
+		});
+
+	//
+	// Create Game Platform
+	//
+
+	let platformIds: number[] = [];
+
+	if (appDetails != null)
+	{
+		if (appDetails.platforms.windows)
+		{
+			platformIds.push(LGGL_PLATFORM_ID_WINDOWS);
+		}
+
+		if (appDetails.platforms.mac)
+		{
+			platformIds.push(LGGL_PLATFORM_ID_MAC);
+		}
+
+		if (appDetails.platforms.linux)
+		{
+			platformIds.push(LGGL_PLATFORM_ID_LINUX);
+		}
+	}
+	else
+	{
+		const platforms = await prismaClient.platform.findMany(
+			{
+				orderBy:
+				{
+					name: "asc",
+				},
+			});
+
+		platformIds = await CliLib.prompt(readlineInterface,
+			{
+				text: "What platform is this game for? (separate multiple platforms with ',')",
+				options: platforms.map(
+					(platform) =>
+					{
+						return {
+							value: platform.id.toString(),
+							description: platform.name,
+						};
+					}),
+				validateAndTransform: async (input) =>
+				{
+					const inputParseResult = z.array(z.coerce.number().int().min(1)).safeParse(input.split(","));
+
+					if (!inputParseResult.success)
+					{
+						throw new CliLib.RetryableError("Invalid platform ID.");
+					}
+
+					for (const platformId of inputParseResult.data)
+					{
+						const platform = platforms.find((platform) => platform.id == platformId);
+
+						if (platform == null)
+						{
+							throw new CliLib.RetryableError("No platform found with ID: " + platformId);
+						}
+					}
+
+					return inputParseResult.data;
+				},
+			});
+	}
+
+	//
+	// Create Game Installation
+	//
 
 	const gameInstallationPath = await CliLib.prompt(readlineInterface,
 		{
 			text: "Enter the game's installation path",
 			defaultValue: null,
-			validateAndTransform: async (input) => input,
+			validateAndTransform: async (input) =>
+			{
+				if (input == "")
+				{
+					return null;
+				}
+
+				if (!fs.existsSync(input))
+				{
+					throw new CliLib.RetryableError("Path does not exist.");
+				}
+
+				return input;
+			},
 		});
 
-	// TODO: prompt for gameModes
+	//
+	// Create Data
+	//
 
-	// TODO: prompt for gamePlatforms
-
-	// TODO: prompt for gamePublisherNames
-
-	const game = await prismaClient.$transaction(
+	await prismaClient.$transaction(
 		async (transactionClient) =>
 		{
+			//
+			// Create Game
+			//
+
 			const game = await transactionClient.game.create(
 				{
 					data:
@@ -520,85 +678,195 @@ async function addGame(readlineInterface: readline.promises.Interface)
 						virtualRealitySupport,
 
 						steamAppId,
+						steamAppName: ownedGame?.name ?? null, // Note: does not use the appDetails because that isn't always the library name
 					},
 				});
 
-			if (gameInstallationPath != null)
+			console.log("Game #%d (%s) created!", game.id, game.name);
+
+			//
+			// Download Images from Steam
+			//
+
+			if (steamAppId != null)
 			{
+				const ownedGames = await SteamThirdPartyLib.fetchOwnedGames(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID);
+		
+				const ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
+		
+				const imageUrls = SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
+		
+				await transactionClient.game.update(
+					{
+						where:
+						{
+							id: game.id,
+						},
+						data:
+						{
+							hasBannerImage: await downloadGameImage(imageUrls.libraryBackground, game, "banner"),
+							hasCoverImage: await downloadGameImage(imageUrls.libraryCapsule, game, "cover"),
+							hasIconImage: imageUrls.icon != null 
+								? await downloadGameImage(imageUrls.icon, game, "icon")
+								: false,
+							hasLogoImage: await downloadGameImage(imageUrls.libraryLogo, game, "logo"),
+						},
+					});
+		
+				const numberOfImagesDownloaded = Object.values(imageUrls).filter((url) => url != null).length;
+		
+				console.log("Downloaded %d images from Steam!", numberOfImagesDownloaded);
+			}
+
+			//
+			// Create Game Developers
+			//
+
+			for (const companyName of developerCompanyNames)
+			{
+				const company = await transactionClient.company.upsert(
+					{
+						where:
+						{
+							name: companyName,
+						},
+						create:
+						{
+							name: companyName,
+						},
+						update: {},
+					})
+	
+				const gameDeveloper = await transactionClient.gameDeveloper.create(
+					{
+						data:
+						{
+							company_id: company.id,
+							game_id: game.id,
+						},
+					});
+	
+				console.log("Game developer #%d created!", gameDeveloper.id);
+			}
+
+			//
+			// Create Game Publishers
+			//
+
+			for (const companyName of publisherCompanyNames)
+			{
+				const company = await transactionClient.company.upsert(
+					{
+						where:
+						{
+							name: companyName,
+						},
+						create:
+						{
+							name: companyName,
+						},
+						update: {},
+					})
+	
+				const gamePublisher = await transactionClient.gamePublisher.create(
+					{
+						data:
+						{
+							company_id: company.id,
+							game_id: game.id,
+						},
+					});
+	
+				console.log("Game publisher #%d created!", gamePublisher.id);
+			}
+
+			//
+			// Create Game Engines
+			//
+
+			for (const engineId of engineIds)
+			{
+				const gameEngine = await transactionClient.gameEngine.create(
+					{
+						data:
+						{
+							engine_id: engineId,
+							game_id: game.id,
+						},
+					});
+		
+				console.log("Game engine #%d created!", gameEngine.id);
+			}
+			
+			//
+			// Create Game Platforms
+			//
+			
+			for (const platformId of platformIds)
+			{
+				const gamePlatform = await transactionClient.gamePlatform.create(
+					{
+						data:
+						{
+							game_id: game.id,
+							platform_id: platformId,
+						},
+					});
+
+				console.log("Game platform #%d created!", gamePlatform.id);
+			}
+
+			//
+			// Create Game Installation
+			//
+
+			if (gameInstallationPath != null)
+			{		
 				const gameInstallationSize = await FileSizeLib.getFolderSize(gameInstallationPath);
-
+		
 				const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(gameInstallationSize);
-
-				await transactionClient.gameInstallation.create(
+		
+				const gameInstallation = await transactionClient.gameInstallation.create(
 					{
 						data:
 						{
 							path: gameInstallationPath,
 							fileSizeGibiBytes,
 							fileSizeBytes,
-
+		
 							game_id: game.id,
 						},
 					});
+		
+				console.log("Game installation #%d created!", gameInstallation.id);
 			}
 
+			//
+			// Create Game Play Action
+			//
+			
 			if (steamAppId != null && gameInstallationPath != null)
 			{
-				await transactionClient.gamePlayAction.create(
+				const gamePlayAction = await transactionClient.gamePlayAction.create(
 					{
 						data:
 						{
-							name: "Launch via Steam",
+							name: "Play",
 							type: "URL" satisfies GamePlayActionSchemaLib.Type,
 							path: "steam://run/" + game.steamAppId,
 							trackingPath: gameInstallationPath,
-
+		
 							game_id: game.id,
 						},
 					});
-
-				// TODO: create historical gamePlaySessions
+		
+				console.log("Game play action #%d created!", gamePlayAction.id);
 			}
-
-			return game;
 		});
 
-	console.log("Game #%d (%s) created!", game.id, game.name);
-
-	if (steamAppId != null)
-	{
-		const downloadImages = await CliLib.confirm(readlineInterface,
-			{
-				text: "Would you like to pull images for this game from Steam?",
-				defaultValue: true,
-			});
-
-		if (downloadImages)
-		{
-			const ownedGames = await SteamThirdPartyLib.fetchOwnedGames(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID);
-
-			const ownedGame = ownedGames.games.find((game) => game.appid == steamAppId) ?? null;
-
-			const imageUrls = await SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
-
-			await prismaClient.game.update(
-				{
-					where:
-					{
-						id: game.id,
-					},
-					data:
-					{
-						hasBannerImage: await downloadGameImage(imageUrls.libraryBackground, game, "banner"),
-						hasCoverImage: await downloadGameImage(imageUrls.libraryCapsule, game, "cover"),
-						hasIconImage: imageUrls.icon != null 
-							? await downloadGameImage(imageUrls.icon, game, "icon")
-							: false,
-						hasLogoImage: await downloadGameImage(imageUrls.libraryLogo, game, "logo"),
-					},
-				});
-		}
-	}
+	//
+	// Pause
+	//
 
 	await CliLib.pause(readlineInterface);
 }
