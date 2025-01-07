@@ -184,6 +184,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 							{
 								startDate: "desc",
 							},
+							take: 5,
 						},
 					},
 				})
