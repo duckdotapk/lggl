@@ -4,31 +4,47 @@
 
 import readline from "node:readline";
 
+import { Prisma } from "@prisma/client";
+
 import { prismaClient } from "../../instances/prismaClient.js";
 
-import * as EngineCliLib from "./Engine.js";
-import * as GameCliLib from "./Game.js";
+import * as CliLib from "../Cli.js";
 
 //
 // Utility Functions
 //
 
-export async function create(readlineInterface: readline.promises.Interface)
+export type CreateOptions =
 {
-	const games = await GameCliLib.search(readlineInterface);
+	game: Prisma.GameGetPayload<null>;
+	engine: Prisma.EngineGetPayload<null>;
+};
 
-	const game = await GameCliLib.choose(readlineInterface, games);
+export async function create(readlineInterface: readline.promises.Interface, options: CreateOptions)
+{
+	const notes = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter notes for this engine",
+			defaultValue: null,
+			validateAndTransform: async (input) => input,
+		});
 
-	const engines = await EngineCliLib.search(readlineInterface);
-
-	const engine = await EngineCliLib.choose(readlineInterface, engines);
+	const version = await CliLib.prompt(readlineInterface,
+		{
+			text: "Enter the engine version",
+			defaultValue: null,
+			validateAndTransform: async (input) => input,
+		});
 
 	return await prismaClient.gameEngine.create(
 		{
 			data:
 			{
-				engine_id: engine.id,
-				game_id: game.id,
+				notes,
+				version,
+
+				engine_id: options.engine.id,
+				game_id: options.game.id,
 			},
 		});
 }

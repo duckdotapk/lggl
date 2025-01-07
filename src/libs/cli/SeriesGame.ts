@@ -4,12 +4,10 @@
 
 import readline from "node:readline";
 
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { prismaClient } from "../../instances/prismaClient.js";
-
-import * as GameCliLib from "./Game.js";
-import * as SeriesCliLib from "./Series.js";
 
 import * as CliLib from "../Cli.js";
 
@@ -17,30 +15,18 @@ import * as CliLib from "../Cli.js";
 // Utility Functions
 //
 
-export async function create(readlineInterface: readline.promises.Interface)
+export type CreateOptions =
 {
-	const games = await GameCliLib.search(readlineInterface);
+	series: Prisma.SeriesGetPayload<null>;
+	game: Prisma.GameGetPayload<null>;
+};
 
-	const game = await GameCliLib.choose(readlineInterface, games);
-
-	const seriesList = await SeriesCliLib.search(readlineInterface);
-
-	const series = await SeriesCliLib.choose(readlineInterface, seriesList);
-
+export async function create(readlineInterface: readline.promises.Interface, options: CreateOptions)
+{
 	const seriesGameNumber = await CliLib.prompt(readlineInterface,
 		{
 			text: "Enter the game's number in the series",
-			validateAndTransform: async (input) =>
-			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
-
-				if (!inputParseResult.success)
-				{
-					throw new CliLib.RetryableError("Invalid series game number.");
-				}
-
-				return inputParseResult.data;
-			},
+			validateAndTransform: async (input) => z.coerce.number().int().min(1).parse(input),
 		});
 
 	return await prismaClient.seriesGame.create(
@@ -49,8 +35,8 @@ export async function create(readlineInterface: readline.promises.Interface)
 			{
 				number: seriesGameNumber,
 
-				game_id: game.id,
-				series_id: series.id,
+				game_id: options.game.id,
+				series_id: options.series.id,
 			},
 		});
 }

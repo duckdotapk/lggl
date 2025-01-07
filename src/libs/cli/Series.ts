@@ -37,27 +37,17 @@ export async function search(readlineInterface: readline.promises.Interface)
 	return await CliLib.prompt(readlineInterface,
 		{
 			text: "Search for a series",
-			validateAndTransform: async (input) =>
-			{
-				const series = await prismaClient.series.findMany(
-					{
-						where:
-						{
-							name: { contains: input },
-						},
-						orderBy:
-						{
-							name: "asc",
-						},
-					});
-
-				if (series.length == 0)
+			validateAndTransform: async (input) => await prismaClient.series.findMany(
 				{
-					throw new CliLib.RetryableError("No series found.");
-				}
-
-				return series;
-			},
+					where:
+					{
+						name: { contains: input },
+					},
+					orderBy:
+					{
+						name: "asc",
+					},
+				}),
 		});
 }
 
@@ -66,24 +56,10 @@ export async function choose(readlineInterface: readline.promises.Interface, ser
 	return await CliLib.prompt(readlineInterface,
 		{
 			text: "Choose a series",
-			options: seriesList.map(
-				(series) =>
-				{
-					return {
-						value: series.id.toString(),
-						description: series.name,
-					};
-				}),
+			options: seriesList.map((series) => ({ value: series.id.toString(), description: series.name })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
-
-				if (!inputParseResult.success)
-				{
-					throw new CliLib.RetryableError("Invalid series ID.");
-				}
-
-				const id = inputParseResult.data;
+				const id = z.coerce.number().int().min(1).parse(input);
 
 				const series = seriesList.find((series) => series.id == id);
 
@@ -95,4 +71,21 @@ export async function choose(readlineInterface: readline.promises.Interface, ser
 				return series;
 			},
 		});
+}
+
+export async function searchAndChooseOne(readlineInterface: readline.promises.Interface)
+{
+	while (true)
+	{
+		const seriesList = await search(readlineInterface);
+
+		if (seriesList.length == 0)
+		{
+			console.log("No series found. Please try again.");
+
+			continue;
+		}
+
+		return await choose(readlineInterface, seriesList);
+	}
 }

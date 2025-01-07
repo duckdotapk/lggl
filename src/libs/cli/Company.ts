@@ -19,11 +19,11 @@ export async function create(readlineInterface: readline.promises.Interface)
 {
 	const name = await CliLib.prompt(readlineInterface,
 		{
-			text: "Enter the engine's name",
+			text: "Enter the company's name",
 			validateAndTransform: async (input) => input,
 		});
 
-	return await prismaClient.engine.create(
+	return await prismaClient.company.create(
 		{
 			data:
 			{
@@ -36,8 +36,8 @@ export async function search(readlineInterface: readline.promises.Interface)
 {
 	return await CliLib.prompt(readlineInterface,
 		{
-			text: "Search for an engine",
-			validateAndTransform: async (input) => await prismaClient.engine.findMany(
+			text: "Search for a company",
+			validateAndTransform: async (input) => await prismaClient.company.findMany(
 				{
 					where:
 					{
@@ -51,24 +51,24 @@ export async function search(readlineInterface: readline.promises.Interface)
 		});
 }
 
-export async function choose(readlineInterface: readline.promises.Interface, engines: Prisma.EngineGetPayload<null>[])
+export async function choose(readlineInterface: readline.promises.Interface, companies: Prisma.CompanyGetPayload<null>[])
 {
 	return await CliLib.prompt(readlineInterface,
 		{
-			text: "Choose an engine",
-			options: engines.map((engine) => ({ value: engine.id.toString(), description: engine.name })),
+			text: "Choose a company",
+			options: companies.map((company) => ({ value: company.id.toString(), description: company.name })),
 			validateAndTransform: async (input) =>
 			{
 				const id = z.coerce.number().int().min(1).parse(input);
 
-				const engine = engines.find((engine) => engine.id == id);
+				const company = companies.find((company) => company.id == id);
 
-				if (engine == null)
+				if (company == null)
 				{
-					throw new CliLib.RetryableError("No engine found with that ID.");
+					throw new CliLib.RetryableError("No company found with that ID.");
 				}
 
-				return engine;
+				return company;
 			},
 		});
 }

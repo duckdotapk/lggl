@@ -5,7 +5,7 @@
 import readline from "node:readline";
 
 import chalk from "chalk";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 //
 // Classes
@@ -40,7 +40,12 @@ export type ConfirmOptions =
 
 export async function confirm(readlineInterface: readline.promises.Interface, options: ConfirmOptions)
 {
-	const text = chalk.bold(options.text + " (" + chalk.green("yes") + "/" + chalk.green("no") + "):\n");
+	let text = chalk.bold(options.text + " (" + chalk.green("yes") + "/" + chalk.green("no") + "):\n");
+
+	if (options.defaultValue !== undefined)
+	{
+		text += " (default: " + (options.defaultValue ? "yes" : "no") + ")\n";
+	}
 
 	const rawInput = await readlineInterface.question(text);
 
@@ -148,6 +153,15 @@ export async function prompt<T>(readlineInterface: readline.promises.Interface, 
 		if (error instanceof RetryableError)
 		{
 			console.error(error.message + "\n");
+
+			return await prompt(readlineInterface, options);
+		}
+		else if (error instanceof ZodError)
+		{
+			for (const issue of error.issues)
+			{
+				console.error(issue.message);
+			}
 
 			return await prompt(readlineInterface, options);
 		}

@@ -5,9 +5,9 @@
 import fs from "node:fs";
 import readline from "node:readline";
 
-import { prismaClient } from "../../instances/prismaClient.js";
+import { Prisma } from "@prisma/client";
 
-import * as GameCliLib from "./Game.js";
+import { prismaClient } from "../../instances/prismaClient.js";
 
 import * as CliLib from "../Cli.js";
 import * as FileSizeLib from "../FileSize.js";
@@ -16,12 +16,13 @@ import * as FileSizeLib from "../FileSize.js";
 // Utility Functions
 //
 
-export async function create(readlineInterface: readline.promises.Interface)
+export type CreateOptions =
 {
-	const games = await GameCliLib.search(readlineInterface);
+	game: Prisma.GameGetPayload<null>;
+};
 
-	const game = await GameCliLib.choose(readlineInterface, games);
-
+export async function create(readlineInterface: readline.promises.Interface, options: CreateOptions)
+{
 	const gameInstallationPath = await CliLib.prompt(readlineInterface, 
 		{
 			text: "Enter the game's installation path",
@@ -29,7 +30,7 @@ export async function create(readlineInterface: readline.promises.Interface)
 			{
 				if (!fs.existsSync(input))
 				{
-					throw new CliLib.RetryableError("Path does not exist.");
+					throw new CliLib.RetryableError("Path does not exist. Please try again.");
 				}
 
 				return input;
@@ -48,7 +49,7 @@ export async function create(readlineInterface: readline.promises.Interface)
 				fileSizeGibiBytes,
 				fileSizeBytes,
 
-				game_id: game.id,
+				game_id: options.game.id,
 			},
 		});
 }

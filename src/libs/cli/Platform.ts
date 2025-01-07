@@ -45,27 +45,17 @@ export async function search(readlineInterface: readline.promises.Interface)
 	return await CliLib.prompt(readlineInterface,
 		{
 			text: "Search for a platform",
-			validateAndTransform: async (input) =>
-			{
-				const platforms = await prismaClient.platform.findMany(
-					{
-						where:
-						{
-							name: { contains: input },
-						},
-						orderBy:
-						{
-							name: "asc",
-						},
-					});
-
-				if (platforms.length == 0)
+			validateAndTransform: async (input) => await prismaClient.platform.findMany(
 				{
-					throw new CliLib.RetryableError("No platforms found.");
-				}
-
-				return platforms;
-			},
+					where:
+					{
+						name: { contains: input },
+					},
+					orderBy:
+					{
+						name: "asc",
+					},
+				}),
 		});
 }
 
@@ -74,24 +64,10 @@ export async function choose(readlineInterface: readline.promises.Interface, pla
 	return await CliLib.prompt(readlineInterface, 
 		{
 			text: "Choose a platform",
-			options: platforms.map(
-				(platform) =>
-				{
-					return {
-						value: platform.id.toString(),
-						description: platform.name,
-					};
-				}),
+			options: platforms.map((platform) => ({ value: platform.id.toString(), description: platform.name })),
 			validateAndTransform: async (input) =>
 			{
-				const inputParseResult = z.number().int().min(1).safeParse(parseInt(input));
-
-				if (!inputParseResult.success)
-				{
-					throw new CliLib.RetryableError("Invalid platform ID.");
-				}
-
-				const id = inputParseResult.data;
+				const id = z.coerce.number().int().min(1).parse(input);
 
 				const platform = platforms.find((platform) => platform.id == id);
 

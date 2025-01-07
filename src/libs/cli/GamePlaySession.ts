@@ -4,13 +4,11 @@
 
 import readline from "node:readline";
 
+import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 import { z } from "zod";
 
 import { prismaClient } from "../../instances/prismaClient.js";
-
-import * as GameCliLib from "./Game.js";
-import * as PlatformCliLib from "./Platform.js";
 
 import * as CliLib from "../Cli.js";
 
@@ -18,16 +16,14 @@ import * as CliLib from "../Cli.js";
 // Utility Functions
 //
 
-export async function create(readlineInterface: readline.promises.Interface)
+export type CreateOptions =
 {
-	const games = await GameCliLib.search(readlineInterface);
+	game: Prisma.GameGetPayload<null>;
+	platform: Prisma.PlatformGetPayload<null>;
+};
 
-	const game = await GameCliLib.choose(readlineInterface, games);
-
-	const platforms = await PlatformCliLib.search(readlineInterface);
-
-	const platform = await PlatformCliLib.choose(readlineInterface, platforms);
-
+export async function create(readlineInterface: readline.promises.Interface, options: CreateOptions)
+{
 	const playTimeSeconds = await CliLib.prompt(readlineInterface, 
 		{
 			text: "Enter the playtime in HH:MM:SS format",
@@ -65,7 +61,7 @@ export async function create(readlineInterface: readline.promises.Interface)
 				{
 					where:
 					{
-						id: game.id,
+						id: options.game.id,
 					},
 					data:
 					{
@@ -84,8 +80,8 @@ export async function create(readlineInterface: readline.promises.Interface)
 						isHistorical: true,
 						notes,
 		
-						game_id: game.id,
-						platform_id: platform.id,
+						game_id: options.game.id,
+						platform_id: options.platform.id,
 					},
 				});
 		});
