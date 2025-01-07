@@ -70,8 +70,6 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 
 	const isHidden = await CliLib.confirm(readlineInterface, { text: "Is this game hidden?",  defaultValue: false });
 
-	const isInstalled = false;
-
 	const isNsfw = await CliLib.confirm(readlineInterface, { text: "Is this game NSFW?",  defaultValue: false });
 
 	const isShelved = await CliLib.confirm(readlineInterface, { text: "Is this game shelved?",  defaultValue: false });
@@ -81,42 +79,15 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 			text: "What kind of progression does this game have?",
 			defaultValue: null,
 			options: GameSchemaLib.ProgressionTypeSchema.options.map((progressionType) => ({ value: progressionType })),
-			validateAndTransform: async (input) => GameSchemaLib.ProgressionTypeSchema.parse(input),
+			validateAndTransform: async (input) => GameSchemaLib.ProgressionTypeSchema.parse(input.toUpperCase()),
 		});
-
-	let completionStatus: GameSchemaLib.CompletionStatus | null = null;
-
-	let firstPlayedDate: Date | null = null;
-
-	let firstPlayedDateApproximated = false;
-
-	let firstCompletedDate: Date | null = null;
-
-	let firstCompletedDateApproximated = false;
-
-	let lastPlayedDate: Date | null = null;
-
-	let playCount = 0;
-
-	let playTimeTotalSeconds = 0;
-
-	const hasPlayed = await CliLib.confirm(readlineInterface,
-		{
-			text: "Have you played this game?",
-			defaultValue: false,
-		});
-
-	if (hasPlayed)
-	{
-		// TODO: prompts to fill the above fields
-	}
 
 	const achievementSupport = await CliLib.prompt(readlineInterface,
 		{
 			text: "What kind of achievement support does this game have?",
 			defaultValue: null,
 			options: GameSchemaLib.AchievementSupportSchema.options.map((achievementSupport) => ({ value: achievementSupport })),
-			validateAndTransform: async (input) => GameSchemaLib.AchievementSupportSchema.parse(input),
+			validateAndTransform: async (input) => GameSchemaLib.AchievementSupportSchema.parse(input.toUpperCase()),
 		});
 
 	const controllerSupport = await CliLib.prompt(readlineInterface,
@@ -124,7 +95,7 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 			text: "What kind of controller support does this game have?",
 			defaultValue: null,
 			options: GameSchemaLib.ControllerSupportSchema.options.map((controllerSupport) => ({ value: controllerSupport })),
-			validateAndTransform: async (input) => GameSchemaLib.ControllerSupportSchema.parse(input),
+			validateAndTransform: async (input) => GameSchemaLib.ControllerSupportSchema.parse(input.toUpperCase()),
 		});
 
 	const modSupport = await CliLib.prompt(readlineInterface,
@@ -132,7 +103,7 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 			text: "What kind of mod support does this game have?",
 			defaultValue: null,
 			options: GameSchemaLib.ModSupportSchema.options.map((modSupport) => ({ value: modSupport })),
-			validateAndTransform: async (input) => GameSchemaLib.ModSupportSchema.parse(input),
+			validateAndTransform: async (input) => GameSchemaLib.ModSupportSchema.parse(input.toUpperCase()),
 		});
 
 	const virtualRealitySupport = await CliLib.prompt(readlineInterface,
@@ -140,7 +111,7 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 			text: "What kind of virtual reality support does this game have?",
 			defaultValue: null,
 			options: GameSchemaLib.VirtualRealitySupportSchema.options.map((virtualRealitySupport) => ({ value: virtualRealitySupport })),
-			validateAndTransform: async (input) => GameSchemaLib.VirtualRealitySupportSchema.parse(input),
+			validateAndTransform: async (input) => GameSchemaLib.VirtualRealitySupportSchema.parse(input.toUpperCase()),
 		});
 
 	return await prismaClient.game.create(
@@ -154,19 +125,19 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 				isEarlyAccess,
 				isFavorite,
 				isHidden,
-				isInstalled,
+				isInstalled: false,
 				isNsfw,
 				isShelved,
 
 				progressionType,
-				completionStatus,
-				firstPlayedDate,
-				firstPlayedDateApproximated,
-				firstCompletedDate,
-				firstCompletedDateApproximated,
-				lastPlayedDate,
-				playCount,
-				playTimeTotalSeconds,
+				completionStatus: null,
+				firstPlayedDate: null,
+				firstPlayedDateApproximated: false,
+				firstCompletedDate: null,
+				firstCompletedDateApproximated: false,
+				lastPlayedDate: null,
+				playCount: 0,
+				playTimeTotalSeconds: 0,
 
 				achievementSupport,
 				controllerSupport,
