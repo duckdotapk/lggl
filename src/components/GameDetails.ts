@@ -22,6 +22,8 @@ import { staticMiddleware } from "../instances/server.js";
 
 import * as GameModelLib from "../libs/models/Game.js";
 
+import * as GameCompanySchemaLib from "../libs/schemas/GameCompany.js";
+
 //
 // Locals
 //
@@ -171,7 +173,7 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 	{
 		include:
 		{
-			gameDevelopers:
+			gameCompanies:
 			{
 				include:
 				{
@@ -194,18 +196,15 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					platform: true;
 				};
 			};
-			gamePublishers:
-			{
-				include:
-				{
-					company: true;
-				};
-			};
 		};
 	}>;
 
 export function GameDetails(game: GameDetailsGame)
 {
+	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type);
+
+	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);
+
 	const links: { title: string; url: string }[] = [];
 
 	if (game.steamAppId != null)
@@ -354,11 +353,11 @@ export function GameDetails(game: GameDetailsGame)
 											: "Unreleased",
 									},
 									{
-										label: game.gameDevelopers.length > 1
+										label: gameDevelopers.length > 1
 											? "Developers"
 											: "Developer",
-										value: game.gameDevelopers.length > 0
-											? game.gameDevelopers.map(
+										value: gameDevelopers.length > 0
+											? gameDevelopers.map(
 												(gameDeveloper) =>
 												{
 													let text = gameDeveloper.company.name;
@@ -373,11 +372,11 @@ export function GameDetails(game: GameDetailsGame)
 											: "-",
 									},
 									{
-										label: game.gameDevelopers.length > 1
+										label: gamePublishers.length > 1
 											? "Publishers"
 											: "Publisher",
-										value: game.gamePublishers.length > 0
-											? game.gamePublishers.map(
+										value: gamePublishers.length > 0
+											? gamePublishers.map(
 												(gamePublisher) =>
 												{
 													let text = gamePublisher.company.name;

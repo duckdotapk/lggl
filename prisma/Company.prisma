@@ -5,6 +5,5 @@ model Company {
 
     name String @unique
 
-    gameDevelopers GameDeveloper[]
-    gamePublishers GamePublisher[]
+    gameCompanies GameCompany[]
 }

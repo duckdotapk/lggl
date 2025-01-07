@@ -152,7 +152,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					},
 					include:
 					{
-						gameDevelopers:
+						gameCompanies:
 						{
 							include:
 							{
@@ -183,13 +183,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 							orderBy:
 							{
 								startDate: "desc",
-							},
-						},
-						gamePublishers:
-						{
-							include:
-							{
-								company: true,
 							},
 						},
 					},
