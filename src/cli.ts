@@ -2,21 +2,24 @@
 // Imports
 //
 
-import fs from "node:fs";
 import readline from "node:readline";
 
 import { Prisma } from "@prisma/client";
 import chalk from "chalk";
+import { DateTime } from "luxon";
 import { z } from "zod";
 
 import { LGGL_PLATFORM_ID_LINUX } from "./env/LGGL_PLATFORM_ID_LINUX.js";
 import { LGGL_PLATFORM_ID_MAC } from "./env/LGGL_PLATFORM_ID_MAC.js";
+import { LGGL_PLATFORM_ID_STEAM_DECK } from "./env/LGGL_PLATFORM_ID_STEAM_DECK.js";
+import { LGGL_PLATFORM_ID_UNKNOWN } from "./env/LGGL_PLATFORM_ID_UNKNOWN.js";
 import { LGGL_PLATFORM_ID_WINDOWS } from "./env/LGGL_PLATFORM_ID_WINDOWS.js";
 import { LGGL_STEAM_API_KEY } from "./env/LGGL_STEAM_API_KEY.js";
 import { LGGL_STEAM_USER_ID } from "./env/LGGL_STEAM_USER_ID.js"
 
 import { prismaClient } from "./instances/prismaClient.js";
 
+import * as AuditCliLib from "./libs/cli/Audit.js";
 import * as CompanyCliLib from "./libs/cli/Company.js";
 import * as EngineCliLib from "./libs/cli/Engine.js";
 import * as GameCliLib from "./libs/cli/Game.js";
@@ -29,10 +32,6 @@ import * as PlatformCliLib from "./libs/cli/Platform.js";
 import * as SeriesCliLib from "./libs/cli/Series.js";
 import * as SeriesGameCliLib from "./libs/cli/SeriesGame.js";
 
-import * as GameModelLib from "./libs/models/Game.js";
-
-import * as GameCompanySchemaLib from "./libs/schemas/GameCompany.js";
-
 import * as SteamThirdPartyLib from "./libs/third-party/Steam.js";
 
 import * as CliLib from "./libs/Cli.js";
@@ -43,390 +42,68 @@ import * as CliLib from "./libs/Cli.js";
 
 async function audit(readlineInterface: readline.promises.Interface)
 {
-	const shouldFixData = await CliLib.confirm(readlineInterface,
+	const autoFixProblems = await CliLib.confirm(readlineInterface,
 		{
-			text: "Would you like automatically fix issues where possible?",
-			defaultValue: false,
-		});
-
-	const strictMode = await CliLib.confirm(readlineInterface,
-		{
-			text: "Would you like to enable strict mode?",
+			text: "Automatically fix problems where possible?",
 			defaultValue: false,
 		});
 
 	const games = await prismaClient.game.findMany(
 		{
+			include:
+			{
+				gameCompanies: true,
+				gameEngines: true,
+				gameGenres: true,
+				gameInstallations: true,
+				gameLinks: true,
+				gameModes: true,
+				gamePlatforms: true,
+				gamePlayActions: true,
+				gamePlaySessions: true,
+				seriesGames: true,
+			},
 			orderBy:
 			{
 				id: "asc",
 			},
 		});
 
+	const problemLists: AuditCliLib.ProblemList[] = [];
+
 	for (const game of games)
 	{
-		const imagePaths = GameModelLib.getImagePaths(game);
+		const problemList = await AuditCliLib.auditGame(game, autoFixProblems);
 
-		const problems: string[] = [];
-
-		//
-		// Check Game Model
-		//
-
-		if (game.releaseDate == null)
-		{
-			problems.push("releaseDate is null");
-		}
-
-		if (strictMode && game.description == null)
-		{
-			problems.push(chalk.red("STRICT"), "description is null");
-		}
-
-		if (game.hasBannerImage && !fs.existsSync(imagePaths.banner!))
-		{
-			problems.push("hasBannerImage is true but banner image does not exist on disk");
-
-			if (shouldFixData)
-			{
-				problems[problems.length - 1] += " (FIXED)";
-
-				await prismaClient.game.update(
-					{
-						where:
-						{
-							id: game.id,
-						},
-						data:
-						{
-							hasBannerImage: false,
-						},
-					});
-			}
-		}
-
-		if (game.hasCoverImage && !fs.existsSync(imagePaths.cover!))
-		{
-			problems.push("hasCoverImage is true but cover image does not exist on disk");
-
-			if (shouldFixData)
-			{
-				problems[problems.length - 1] += " (FIXED)";
-
-				await prismaClient.game.update(
-					{
-						where:
-						{
-							id: game.id,
-						},
-						data:
-						{
-							hasCoverImage: false,
-						},
-					});
-			}
-		}
-
-		if (game.hasIconImage && !fs.existsSync(imagePaths.icon!))
-		{
-			problems.push("hasIconImage is true but icon image does not exist on disk");
-
-			if (shouldFixData)
-			{
-				problems[problems.length - 1] += " (FIXED)";
-
-				await prismaClient.game.update(
-					{
-						where:
-						{
-							id: game.id,
-						},
-						data:
-						{
-							hasIconImage: false,
-						},
-					});
-			}
-		}
-
-		if (game.hasLogoImage && !fs.existsSync(imagePaths.logo!))
-		{
-			problems.push("hasLogoImage is true but logo image does not exist on disk");
-
-			if (shouldFixData)
-			{
-				problems[problems.length - 1] += " (FIXED)";
-
-				await prismaClient.game.update(
-					{
-						where:
-						{
-							id: game.id,
-						},
-						data:
-						{
-							hasLogoImage: false,
-						},
-					});
-			}
-		}
-
-		if (game.progressionType == null)
-		{
-			problems.push("progressionType is null");
-		}
-
-		if (strictMode && game.completionStatus == null)
-		{
-			problems.push("completionStatus is null");
-		}
-		
-		if (game.completionStatus == "TODO" && game.playCount > 0)
-		{
-			problems.push("completionStatus is TODO but playCount is greater than 0");
-		}
-
-		if (game.completionStatus == "TODO" && game.playTimeTotalSeconds > 0)
-		{
-			problems.push("completionStatus is TODO but playTimeTotalSeconds is greater than 0");
-
-			if (shouldFixData)
-			{
-				problems[problems.length - 1] += " (FIXED)";
-
-				await prismaClient.game.update(
-					{
-						where:
-						{
-							id: game.id,
-						},
-						data:
-						{
-							completionStatus: "IN_PROGRESS",
-						},
-					});
-			}
-		}
-
-		if (game.steamAppId != null && game.steamAppName == null)
-		{
-			problems.push("steamAppId is set but steamAppName is null");
-		}
-
-		//
-		// Check Game Companies
-		//
-
-		if (strictMode)
-		{
-			const gameDevelopers = await prismaClient.gameCompany.findMany(
-				{
-					where:
-					{
-						type: "DEVELOPER" satisfies GameCompanySchemaLib.Type,
-
-						game_id: game.id,
-					},
-				});
-	
-			if (gameDevelopers.length == 0)
-			{
-				problems.push("no gameDevelopers");
-			}
-
-			const gamePublishers = await prismaClient.gameCompany.findMany(
-				{
-					where:
-					{
-						type: "PUBLISHER" satisfies GameCompanySchemaLib.Type,
-
-						game_id: game.id,
-					},
-				});
-
-			if (gamePublishers.length == 0)
-			{
-				problems.push("no gamePublishers");
-			}
-		}
-
-		//
-		// Check Game Engines
-		//
-
-		if (strictMode)
-		{
-			const gameEngines = await prismaClient.gameEngine.findMany(
-				{
-					where:
-					{
-						game_id: game.id,
-					},
-				});
-
-			if (gameEngines.length == 0)
-			{
-				problems.push("no gameEngines");
-			}
-		}
-
-		//
-		// Check Game Installations
-		//
-
-		let gameInstallations = await prismaClient.gameInstallation.findMany(
-			{
-				where:
-				{
-					game_id: game.id,
-				},
-			});
-
-		for (const gameInstallation of gameInstallations)
-		{
-			if (!fs.existsSync(gameInstallation.path))
-			{
-				problems.push("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path);
-
-				if (!shouldFixData)
-				{
-					problems[problems.length - 1] += " (FIXABLE: gameInstallation can be deleted)";
-				}
-				else
-				{
-					problems[problems.length - 1] += " (FIXED: gameInstallation deleted)";
-
-					await prismaClient.gameInstallation.delete(
-						{
-							where:
-							{
-								id: gameInstallation.id,
-							},
-						});
-				}
-			}
-		}
-
-		gameInstallations = await prismaClient.gameInstallation.findMany(
-			{
-				where:
-				{
-					game_id: game.id,
-				},
-			});
-
-		if (game.isInstalled)
-		{
-			if (gameInstallations.length == 0)
-			{
-				problems.push("isInstalled is true but game has no gameInstallations");
-			}
-		}
-		else
-		{
-			if (gameInstallations.length > 0)
-			{
-				problems.push("isInstalled is false but game has " + gameInstallations.length + " gameInstallations");
-			}
-		}
-
-		//
-		// Check Game Modes
-		//
-
-		if (strictMode)
-		{
-			const gameModes = await prismaClient.gameMode.findMany(
-				{
-					where:
-					{
-						game_id: game.id,
-					},
-				});
-
-			if (gameModes.length == 0)
-			{
-				problems.push("no gameModes");
-			}
-		}
-
-		//
-		// Check Game Platforms
-		//
-
-		if (strictMode)
-		{
-			const gamePlatforms = await prismaClient.gamePlatform.findMany(
-				{
-					where:
-					{
-						game_id: game.id,
-					},
-				});
-
-			if (gamePlatforms.length == 0)
-			{
-				problems.push("no gamePlatforms");
-			}
-		}
-
-		//
-		// Check Game Play Actions
-		//
-
-		const gamePlayActions = await prismaClient.gamePlayAction.findMany(
-			{
-				where:
-				{
-					game_id: game.id,
-				},
-			});
-
-		if (gamePlayActions.length == 0)
-		{
-			problems.push("no gamePlayActions");
-		}
-
-		//
-		// Check Game Play Sessions
-		//
-
-		const gamePlaySessions = await prismaClient.gamePlaySession.findMany(
-			{
-				where:
-				{
-					game_id: game.id,
-				},
-			});
-
-		let playTimeTotalSeconds = 0;
-
-		for (const gamePlaySession of gamePlaySessions)
-		{
-			playTimeTotalSeconds += gamePlaySession.playTimeSeconds;
-		}
-
-		if (game.playTimeTotalSeconds != playTimeTotalSeconds)
-		{
-			const difference = game.playTimeTotalSeconds - playTimeTotalSeconds;
-
-			problems.push("playTimeTotalSeconds differs from gamePlaySessions total: " + difference);
-		}
-
-		//
-		// Log Problems
-		//
-
-		if (problems.length == 0)
+		if (problemList.problems.length == 0)
 		{
 			continue;
 		}
 
-		console.group("game #" + game.id + ": " + game.name + " (Steam app ID: " + game.steamAppId + ")");
+		problemLists.push(problemList);
+	}
 
-		for (const problem of problems)
+	for (const problemList of problemLists)
+	{
+		console.group(problemList.game.name + " (Game ID: " + problemList.game.id + ")");
+
+		for (const problem of problemList.problems)
 		{
-			console.log(problem);
+			if (autoFixProblems && problem.isAutoFixable)
+			{
+				if (problem.wasAutomaticallyFixed)
+				{
+					console.log(chalk.green("%s (Auto-fixed)"), problem.description);
+				}
+				else
+				{
+					console.log(chalk.red("%s (Was not auto-fixed)"), problem.description);
+				}
+			}
+			else
+			{
+				console.log("%s (Auto-fixable: %s)", problem.description, problem.isAutoFixable);
+			}
 		}
 
 		console.groupEnd();
@@ -576,9 +253,148 @@ async function createGame(readlineInterface: readline.promises.Interface)
 	// Automatically Create Game Play Sessions (if steamOwnedGame is available)
 	//
 
-	if (gameCreateOptions.steamOwnedGame != null)
+	if (game.steamAppId != null)
 	{
-		// TODO
+		const clientLastPlayedTimes = await SteamThirdPartyLib.fetchClientLastPlayedTimes(LGGL_STEAM_API_KEY);
+
+		const steamPlayedGame = await clientLastPlayedTimes.games.find((steamPlayedGame) => steamPlayedGame.appid == game.steamAppId);
+
+		if (steamPlayedGame != null)
+		{
+			const firstPlayedTimestamp = steamPlayedGame.first_playtime;
+			const lastPlayedTimestamp = steamPlayedGame.last_playtime;
+
+			const windowsPlayTimeSeconds = steamPlayedGame.playtime_windows_forever * 60;
+			const macPlayTimeSeconds = steamPlayedGame.playtime_mac_forever * 60;
+			const linuxPlayTimeSeconds = (steamPlayedGame.playtime_linux_forever - steamPlayedGame.playtime_deck_forever) * 60;
+			const steamDeckPlayTimeSeconds = steamPlayedGame.playtime_deck_forever * 60;
+			const unknownPlayTimeSeconds =
+			(
+				(
+					steamPlayedGame.playtime_forever -
+					steamPlayedGame.playtime_windows_forever -
+					steamPlayedGame.playtime_mac_forever -
+					steamPlayedGame.playtime_linux_forever
+				) +
+				steamPlayedGame.playtime_disconnected
+			) * 60;
+
+			await prismaClient.game.update(
+				{
+					where:
+					{
+						id: game.id,
+					},
+					data:
+					{
+						firstPlayedDate: DateTime.fromSeconds(firstPlayedTimestamp).toJSDate(),
+						firstPlayedDateApproximated: false,
+						lastPlayedDate: DateTime.fromSeconds(lastPlayedTimestamp).toJSDate(),
+						playCount: 1,
+						playTimeTotalSeconds: 
+							windowsPlayTimeSeconds + 
+							macPlayTimeSeconds + 
+							linuxPlayTimeSeconds + 
+							steamDeckPlayTimeSeconds + 
+							unknownPlayTimeSeconds,
+					},
+				});
+
+			if (windowsPlayTimeSeconds > 0)
+			{
+				await prismaClient.gamePlaySession.create(
+					{
+						data:
+						{
+							startDate: DateTime.fromSeconds(0).toJSDate(),
+							endDate: DateTime.fromSeconds(windowsPlayTimeSeconds).toJSDate(),
+							playTimeSeconds: windowsPlayTimeSeconds,
+							addedToTotal: true,
+							isHistorical: true,
+							notes: "Historical playtime from Steam.",
+
+							game_id: game.id,
+							platform_id: LGGL_PLATFORM_ID_WINDOWS,
+						},
+					});
+			}
+
+			if (macPlayTimeSeconds > 0)
+			{
+				await prismaClient.gamePlaySession.create(
+					{
+						data:
+						{
+							startDate: DateTime.fromSeconds(0).toJSDate(),
+							endDate: DateTime.fromSeconds(macPlayTimeSeconds).toJSDate(),
+							playTimeSeconds: macPlayTimeSeconds,
+							addedToTotal: true,
+							isHistorical: true,
+							notes: "Historical playtime from Steam.",
+
+							game_id: game.id,
+							platform_id: LGGL_PLATFORM_ID_MAC,
+						},
+					});
+			}
+
+			if (linuxPlayTimeSeconds > 0)
+			{
+				await prismaClient.gamePlaySession.create(
+					{
+						data:
+						{
+							startDate: DateTime.fromSeconds(0).toJSDate(),
+							endDate: DateTime.fromSeconds(linuxPlayTimeSeconds).toJSDate(),
+							playTimeSeconds: linuxPlayTimeSeconds,
+							addedToTotal: true,
+							isHistorical: true,
+							notes: "Historical playtime from Steam.",
+
+							game_id: game.id,
+							platform_id: LGGL_PLATFORM_ID_LINUX,
+						},
+					});
+			}
+
+			if (steamDeckPlayTimeSeconds > 0)
+			{
+				await prismaClient.gamePlaySession.create(
+					{
+						data:
+						{
+							startDate: DateTime.fromSeconds(0).toJSDate(),
+							endDate: DateTime.fromSeconds(steamDeckPlayTimeSeconds).toJSDate(),
+							playTimeSeconds: steamDeckPlayTimeSeconds,
+							addedToTotal: true,
+							isHistorical: true,
+							notes: "Historical playtime from Steam.",
+
+							game_id: game.id,
+							platform_id: LGGL_PLATFORM_ID_STEAM_DECK,
+						},
+					});
+			}
+
+			if (unknownPlayTimeSeconds > 0)
+			{
+				await prismaClient.gamePlaySession.create(
+					{
+						data:
+						{
+							startDate: DateTime.fromSeconds(0).toJSDate(),
+							endDate: DateTime.fromSeconds(unknownPlayTimeSeconds).toJSDate(),
+							playTimeSeconds: unknownPlayTimeSeconds,
+							addedToTotal: true,
+							isHistorical: true,
+							notes: "Historical playtime from Steam.",
+
+							game_id: game.id,
+							platform_id: LGGL_PLATFORM_ID_UNKNOWN,
+						}
+					});
+			}
+		}
 	}
 
 	//
