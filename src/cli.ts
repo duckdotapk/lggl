@@ -27,6 +27,7 @@ import * as GameCompanyCliLib from "./libs/cli/GameCompany.js";
 import * as GameEngineCliLib from "./libs/cli/GameEngine.js";
 import * as GameInstallationCliLib from "./libs/cli/GameInstallation.js";
 import * as GamePlatformCliLib from "./libs/cli/GamePlatform.js";
+import * as GamePlayActionCliLib from "./libs/cli/GamePlayAction.js";
 import * as GamePlaySessionCliLib from "./libs/cli/GamePlaySession.js";
 import * as PlatformCliLib from "./libs/cli/Platform.js";
 import * as SeriesCliLib from "./libs/cli/Series.js";
@@ -181,7 +182,7 @@ async function createGame(readlineInterface: readline.promises.Interface)
 	console.log(chalk.green("Created %s! (Game ID: %d)"), game.name, game.id);
 
 	//
-	// Download Game Images
+	// Automatically Download Game Images
 	//
 
 	const numberOfImagesDownloadedFromSteam = await GameCliLib.downloadImagesFromSteam(readlineInterface, game);
@@ -189,7 +190,7 @@ async function createGame(readlineInterface: readline.promises.Interface)
 	console.log(chalk.green("Downloaded %d images from Steam for %s!", game.name), numberOfImagesDownloadedFromSteam);
 
 	//
-	// Create Game Platforms (if steamAppDetails is available)
+	// Automatically Create Game Platforms (if steamAppDetails is available)
 	//
 
 	if (gameCreateOptions.steamAppDetails?.platforms.windows)
@@ -398,7 +399,7 @@ async function createGame(readlineInterface: readline.promises.Interface)
 	}
 
 	//
-	// Add Related Data
+	// Add Other Related Data
 	//
 
 	await addGameCompanies(readlineInterface, game);
@@ -409,7 +410,13 @@ async function createGame(readlineInterface: readline.promises.Interface)
 
 	await addGameInstallations(readlineInterface, game);
 
+	await addGamePlayActions(readlineInterface, game);
+
 	await addGamePlaySessions(readlineInterface, game);
+
+	//
+	// Add Series
+	//
 
 	const isPartOfSeries = await CliLib.confirm(readlineInterface,
 		{
@@ -439,9 +446,35 @@ async function downloadGameImagesFromSteam(readlineInterface: readline.promises.
 }
 
 async function addGameCompanies(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
-{	
+{
 	loop: while (true)
 	{
+		const gameCompanies = await prismaClient.gameCompany.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				include:
+				{
+					company: true,
+				},
+			});
+
+		console.group("Game companies for " + game.name + " (Game ID: " + game.id + "):");
+
+		for (const gameCompany of gameCompanies)
+		{
+			console.log("%s (ID: %d) (Type: %s) (Notes: %s) (Company ID: %d)", 
+				gameCompany.company.name,
+				gameCompany.id,
+				gameCompany.type,
+				gameCompany.notes, 
+				gameCompany.company.id);
+		}
+
+		console.groupEnd();
+
 		const OptionSchema = z.enum([ "createNew", "addExisting", "done" ]);
 
 		type Option = z.infer<typeof OptionSchema>;
@@ -499,6 +532,22 @@ async function addGameCompanies(readlineInterface: readline.promises.Interface, 
 				break loop;
 			}
 		}
+		
+		const existingGameCompany = await prismaClient.gameCompany.findFirst(
+			{
+				where:
+				{
+					game_id: game.id,
+					company_id: company.id,
+				},
+			});
+
+		if (existingGameCompany != null)
+		{
+			console.log("Company %s is already associated with %s! (Game Company #%s)", company.name, game.name, existingGameCompany.id);
+
+			continue loop;
+		}
 
 		const gameCompany = await GameCompanyCliLib.create(readlineInterface,
 			{
@@ -514,6 +563,31 @@ async function addGameEngines(readlineInterface: readline.promises.Interface, ga
 {
 	loop: while (true)
 	{
+		const gameEngines = await prismaClient.gameEngine.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				include:
+				{
+					engine: true,
+				},
+			});
+
+		console.group("Game engines for " + game.name + " (Game ID: " + game.id + "):");
+
+		for (const gameEngine of gameEngines)
+		{
+			console.log("%s (ID: %d) (Notes: %s) (Engine ID: %d)", 
+				gameEngine.engine.name, 
+				gameEngine.id, 
+				gameEngine.notes, 
+				gameEngine.engine.id);
+		}
+
+		console.groupEnd();
+
 		const OptionSchema = z.enum([ "createNew", "addExisting", "done" ]);
 
 		type Option = z.infer<typeof OptionSchema>;
@@ -572,6 +646,23 @@ async function addGameEngines(readlineInterface: readline.promises.Interface, ga
 			}
 		}
 
+		
+		const existingGameEngine = await prismaClient.gameEngine.findFirst(
+			{
+				where:
+				{
+					game_id: game.id,
+					engine_id: engine.id,
+				},
+			});
+
+		if (existingGameEngine != null)
+		{
+			console.log("Engine %s is already associated with %s! (Game Engine #%s)", engine.name, game.name, existingGameEngine.id);
+
+			continue loop;
+		}
+
 		const gameEngine = await GameEngineCliLib.create(readlineInterface,
 			{
 				game,
@@ -588,6 +679,25 @@ async function addGameInstallations(readlineInterface: readline.promises.Interfa
 {
 	loop: while (true)
 	{
+		const gameInstallations = await prismaClient.gameInstallation.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+			});
+
+		console.group("Game installations for " + game.name + " (Game ID: " + game.id + "):");
+
+		for (const gameInstallation of gameInstallations)
+		{
+			console.log("%s (ID: %d)", 
+				gameInstallation.path, 
+				gameInstallation.id);
+		}
+
+		console.groupEnd();
+
 		const OptionSchema = z.enum([ "createNew", "done" ]);
 
 		type Option = z.infer<typeof OptionSchema>;
@@ -629,6 +739,29 @@ async function addGameInstallations(readlineInterface: readline.promises.Interfa
 
 		console.log(chalk.green("Created game installation #%d!"), gameInstallation.id);
 	}
+
+	const gameInstallations = await prismaClient.gameInstallation.findMany(
+		{
+			where:
+			{
+				game_id: game.id,
+			},
+		});
+
+	if (gameInstallations.length > 0)
+	{
+		await prismaClient.game.update(
+			{
+				where:
+				{
+					id: game.id,
+				},
+				data:
+				{
+					isInstalled: true,
+				},
+			});
+	}
 }
 
 // TODO: addGameLinks
@@ -639,6 +772,30 @@ async function addGamePlatforms(readlineInterface: readline.promises.Interface, 
 {
 	loop: while (true)
 	{
+		const gamePlatforms = await prismaClient.gamePlatform.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				include:
+				{
+					platform: true,
+				},
+			});
+
+		console.group("Game platforms for " + game.name + " (Game ID: " + game.id + "):");
+
+		for (const gamePlatform of gamePlatforms)
+		{
+			console.log("%s (ID: %d) (Platform ID: %d)", 
+				gamePlatform.platform.name, 
+				gamePlatform.id,
+				gamePlatform.platform.id);
+		}
+
+		console.groupEnd();
+
 		const OptionSchema = z.enum([ "createNew", "addExisting", "done" ]);
 
 		type Option = z.infer<typeof OptionSchema>;
@@ -697,6 +854,15 @@ async function addGamePlatforms(readlineInterface: readline.promises.Interface, 
 			}
 		}
 
+		const existingGamePlatform = gamePlatforms.find((gamePlatform) => gamePlatform.platform_id == platform.id);
+
+		if (existingGamePlatform != null)
+		{
+			console.log("Platform %s is already associated with %s! (Game Platform #%s)", platform.name, game.name, existingGamePlatform.id);
+
+			continue loop;
+		}
+
 		const gamePlatform = await prismaClient.gamePlatform.create(
 			{
 				data:
@@ -710,7 +876,72 @@ async function addGamePlatforms(readlineInterface: readline.promises.Interface, 
 	}
 }
 
-// TODO: addGamePlayActions
+async function addGamePlayActions(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
+{
+	loop: while (true)
+	{
+		const gamePlayActions = await prismaClient.gamePlayAction.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+			});
+
+		console.group("Game play actions for " + game.name + " (Game ID: " + game.id + "):");
+
+		for (const gamePlayAction of gamePlayActions)
+		{
+			console.log("%s (ID: %d) (Path: %s)", 
+				gamePlayAction.name, 
+				gamePlayAction.id,
+				gamePlayAction.trackingPath);
+		}
+
+		console.groupEnd();
+
+		const OptionSchema = z.enum([ "createNew", "done" ]);
+
+		type Option = z.infer<typeof OptionSchema>;
+
+		const option = await CliLib.prompt(readlineInterface,
+			{
+				text: "Add a play action to this game",
+				options:
+				[
+					{
+						value: "createNew" satisfies Option,
+						description: "Create a new play action",
+					},
+					{
+						value: "done" satisfies Option,
+						description: "Finish adding play actions",
+					},
+				],
+				validateAndTransform: async (input) => OptionSchema.parse(input),
+			});
+
+		switch (option)
+		{
+			case "createNew":
+			{
+				break;
+			}
+
+			case "done":
+			{		
+				break loop;
+			}
+		}
+
+		const gamePlayAction = await GamePlayActionCliLib.create(readlineInterface,
+			{
+				game,
+			});
+
+		console.log(chalk.green("Created game play action #%d!"), gamePlayAction.id);
+	}
+}
 
 async function addGamePlaySessions(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
 {
@@ -951,6 +1182,16 @@ const actions: Record<string, Action> =
 			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
 
 			await addGamePlatforms(readlineInterface, game);
+		},
+	},
+	addGamePlayActions:
+	{
+		description: "Add play actions to an existing game",
+		execute: async (readlineInterface) =>
+		{
+			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
+
+			await addGamePlayActions(readlineInterface, game);
 		},
 	},
 	addGamePlaySessions:

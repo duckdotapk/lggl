@@ -40,12 +40,14 @@ export type ConfirmOptions =
 
 export async function confirm(readlineInterface: readline.promises.Interface, options: ConfirmOptions)
 {
-	let text = chalk.bold(options.text + " (" + chalk.green("yes") + "/" + chalk.green("no") + "):\n");
+	let text = chalk.bold(options.text + " (yes/no)");
 
 	if (options.defaultValue !== undefined)
 	{
-		text += " (default: " + (options.defaultValue ? "yes" : "no") + ")\n";
+		text += " (default: " + (options.defaultValue ? "yes" : "no") + ")";
 	}
+
+	text += ":\n";
 
 	const rawInput = await readlineInterface.question(text);
 
