@@ -27,17 +27,7 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 	const type = await CliLib.prompt(readlineInterface,
 		{
 			text: "Choose company type",
-			options:
-			[
-				{
-					value: "DEVELOPER" satisfies GameCompanySchemaLib.Type,
-					description: "Developer",
-				},
-				{
-					value: "PUBLISHER" satisfies GameCompanySchemaLib.Type,
-					description: "Publisher",
-				},
-			],
+			options: GameCompanySchemaLib.TypeSchema.options.map((type) => ({ value: type })),
 			validateAndTransform: async (input) => GameCompanySchemaLib.TypeSchema.parse(input.toUpperCase()),
 		});
 
