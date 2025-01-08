@@ -534,22 +534,6 @@ async function addGameCompanies(readlineInterface: readline.promises.Interface, 
 				break loop;
 			}
 		}
-		
-		const existingGameCompany = await prismaClient.gameCompany.findFirst(
-			{
-				where:
-				{
-					game_id: game.id,
-					company_id: company.id,
-				},
-			});
-
-		if (existingGameCompany != null)
-		{
-			console.log("Company %s is already associated with %s! (Game Company #%s)", company.name, game.name, existingGameCompany.id);
-
-			continue loop;
-		}
 
 		const gameCompany = await GameCompanyCliLib.create(readlineInterface,
 			{
@@ -646,23 +630,6 @@ async function addGameEngines(readlineInterface: readline.promises.Interface, ga
 			{		
 				break loop;
 			}
-		}
-
-		
-		const existingGameEngine = await prismaClient.gameEngine.findFirst(
-			{
-				where:
-				{
-					game_id: game.id,
-					engine_id: engine.id,
-				},
-			});
-
-		if (existingGameEngine != null)
-		{
-			console.log("Engine %s is already associated with %s! (Game Engine #%s)", engine.name, game.name, existingGameEngine.id);
-
-			continue loop;
 		}
 
 		const gameEngine = await GameEngineCliLib.create(readlineInterface,
@@ -854,15 +821,6 @@ async function addGamePlatforms(readlineInterface: readline.promises.Interface, 
 			{		
 				break loop;
 			}
-		}
-
-		const existingGamePlatform = gamePlatforms.find((gamePlatform) => gamePlatform.platform_id == platform.id);
-
-		if (existingGamePlatform != null)
-		{
-			console.log("Platform %s is already associated with %s! (Game Platform #%s)", platform.name, game.name, existingGamePlatform.id);
-
-			continue loop;
 		}
 
 		const gamePlatform = await prismaClient.gamePlatform.create(
