@@ -7,6 +7,7 @@
 @use "components/_Global.scss";
 
 @use "components/inline/Anchor.scss";
+@use "components/basic/Header.scss";
 @use "components/inline/Muted.scss";
 
 @use "components/toolbar/Toolbar.scss";
@@ -26,11 +27,12 @@
 
 @include Global.Resets();
 
+@include Anchor.Anchor();
+@include Header.Header();
 @include Muted.Muted();
 
 @include Toolbar.Toolbar();
 
-@include Anchor.Anchor();
 @include Button.Button();
 @include Checkbox.Checkbox();
 @include GameDetails.GameDetails();

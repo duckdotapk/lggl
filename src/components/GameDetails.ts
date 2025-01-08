@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { Anchor } from "./inline/Anchor.js";
+import { Header } from "./basic/Header.js";
 import { HumanDateTime } from "./inline/HumanDateTime.js";
 
 import { Button } from "./Button.js";
@@ -107,16 +108,11 @@ function PlayActionButtonGroup(game: GameDetailsGame)
 		]);
 }
 
-function Header(text: string)
-{
-	return new DE("header", "component-game-details-header", text);
-}
-
 function Section(headerText: string, children: Child)
 {
 	return new DE("section", "component-game-details-section",
 		[
-			Header(headerText),
+			Header(3, headerText),
 
 			children,
 		]);

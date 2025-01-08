@@ -1,0 +1,15 @@
+//
+// Component
+//
+
+@mixin Header()
+{
+	.component-header
+	{
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
+
+		margin: 0.5rem 0 0.5rem 0;
+
+		padding-bottom: 0.5rem;
+	}
+}
