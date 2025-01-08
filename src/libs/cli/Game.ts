@@ -222,11 +222,7 @@ export async function downloadImagesFromSteam(readlineInterface: readline.promis
 		return 0;
 	}
 
-	const ownedGames = await SteamThirdPartyLib.fetchOwnedGames(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID);
-
-	const ownedGame = ownedGames.games.find((ownedGame) => ownedGame.appid == steamAppId) ?? null;
-
-	const imageUrls = SteamThirdPartyLib.fetchImageUrls(steamAppId, ownedGame);
+	const imageUrls = await SteamThirdPartyLib.fetchImageUrls(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID, steamAppId);
 
 	const bannerDownloaded = await NetworkLib.downloadUrl(imageUrls.libraryBackground, [ "images", "games", game.id.toString(), "banner.jpg" ]);
 

@@ -59,38 +59,6 @@ export const AppDetailsResponseSchema = z.record(z.string(), z.union(
 			}),
 	]));
 
-export const IFamilyGroupsServiceGetFamilyGroupForUserV1ResponseSchema = z.object(
-	{
-		response: z.object(
-			{
-				family_groupid: z.string(),
-			}),
-	});
-
-export const IFamilyGroupsServiceGetPlaytimeSummaryV1ResponseSchema = z.object(
-	{
-		response: z.object(
-			{
-				entries: z.array(z.object(
-					{
-						steamid: z.string(),
-						appid: z.number(),
-						first_played: z.number(),
-						latest_played: z.number(),
-						seconds_played: z.number(),
-					})),
-
-				entries_by_owner: z.array(z.object(
-					{
-						steamid: z.string(),
-						appid: z.number(),
-						first_played: z.number(),
-						latest_played: z.number(),
-						seconds_played: z.number(),
-					})),
-			}),
-	});
-
 export const IPlayerServiceClientGetLastPlayedTimesV1ResponseSchema = z.object(
 	{
 		response: z.object(
@@ -145,10 +113,6 @@ export const IPlayerServiceGetOwnedGamesResponseSchema = z.object(
 
 export type AppDetailsResponse = z.infer<typeof AppDetailsResponseSchema>;
 
-export type IFamilyGroupsServiceGetFamilyGroupForUserV1Response = z.infer<typeof IFamilyGroupsServiceGetFamilyGroupForUserV1ResponseSchema>;
-
-export type IFamilyGroupsServiceGetPlaytimeSummaryV1Response = z.infer<typeof IFamilyGroupsServiceGetPlaytimeSummaryV1ResponseSchema>;
-
 export type IPlayerServiceClientGetLastPlayedTimesV1Response = z.infer<typeof IPlayerServiceClientGetLastPlayedTimesV1ResponseSchema>;
 
 export type IPlayerServiceGetOwnedGamesResponse = z.infer<typeof IPlayerServiceGetOwnedGamesResponseSchema>;
@@ -179,53 +143,11 @@ export async function fetchAppDetails(steamAppId: number)
 	return appDetails.data;
 }
 
-export async function fetchFamilyGroupForUser(accessToken: string, steamUserId: string)
-{
-	const searchParameters = new URLSearchParams();
-
-	searchParameters.set("access_token", accessToken);
-
-	searchParameters.set("steamid", steamUserId);
-
-	const response = await fetch("https://api.steampowered.com/IFamilyGroupsService/GetFamilyGroupForUser/v1?" + searchParameters.toString());
-
-	const responseJson = await response.json();
-
-	const responseParseResult = IFamilyGroupsServiceGetFamilyGroupForUserV1ResponseSchema.safeParse(responseJson);
-
-	return !responseParseResult.success
-		? null
-		: responseParseResult.data.response;
-}
-
-export async function fetchFamilyGroupPlaytimeSummary(accessToken: string, familyGroupId: string)
-{
-	const familyGroupPlaytimeSummarySearchParameters = new URLSearchParams();
-
-	familyGroupPlaytimeSummarySearchParameters.set("access_token", accessToken);
-
-	familyGroupPlaytimeSummarySearchParameters.set("family_groupid", familyGroupId);
-
-	const response = await fetch("https://api.steampowered.com/IFamilyGroupsService/GetPlaytimeSummary/v1?" + familyGroupPlaytimeSummarySearchParameters.toString(),
-		{
-			method: "POST",
-		});
-
-	const responseParseResult = IFamilyGroupsServiceGetPlaytimeSummaryV1ResponseSchema.safeParse(await response.json());
-
-	if (!responseParseResult.success)
-	{
-		throw new Error("Failed to get family group playtime summary: " + JSON.stringify(responseParseResult.error));
-	}
-
-	return responseParseResult.data.response;
-}
-
-export async function fetchClientLastPlayedTimes(apiKey: string)
+export async function fetchClientLastPlayedTimes(steamApiKey: string)
 {
 	const playerLastPlayedTimesSearchParameters = new URLSearchParams();
 
-	playerLastPlayedTimesSearchParameters.set("key", apiKey);
+	playerLastPlayedTimesSearchParameters.set("key", steamApiKey);
 
 	const playerLastPlayedTimesResponse = await fetch("https://api.steampowered.com/IPlayerService/ClientGetLastPlayedTimes/v1?" + playerLastPlayedTimesSearchParameters.toString());
 
@@ -239,11 +161,11 @@ export async function fetchClientLastPlayedTimes(apiKey: string)
 	return playerLastPlayedTimesResponseParseResult.data.response;
 }
 
-export async function fetchOwnedGames(apiKey: string, steamUserId: string)
+export async function fetchOwnedGames(steamApiKey: string, steamUserId: string)
 {
 	const searchParameters = new URLSearchParams();
 
-	searchParameters.set("key",apiKey);
+	searchParameters.set("key", steamApiKey);
 	
 	searchParameters.set("input_json", JSON.stringify(
 		{
@@ -266,8 +188,12 @@ export async function fetchOwnedGames(apiKey: string, steamUserId: string)
 // Utility Functions
 //
 
-export function fetchImageUrls(steamAppId: number, ownedGame: IPlayerServiceGetOwnedGamesResponse["response"]["games"][0] | null)
+export async function fetchImageUrls(steamApiKey: string, steamUserId: string, steamAppId: number)
 {
+	const ownedGames = await fetchOwnedGames(steamApiKey, steamUserId);
+
+	const ownedGame = ownedGames.games.find((ownedGame) => ownedGame.appid == steamAppId) ?? null;
+
 	return {
 		icon: ownedGame != null
 			? ("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/" + steamAppId + "/" + ownedGame.img_icon_url + ".jpg")
