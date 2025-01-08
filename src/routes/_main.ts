@@ -11,14 +11,14 @@ import { NameGameGroupManager } from "../classes/NameGameGroupManager.js";
 import { PlayTimeGameGroupManager } from "../classes/PlayTimeGameGroupManager.js";
 import { SeriesGameGroupManager } from "../classes/SeriesGameGroupManager.js";
 
-import { Library } from "../components/Library.js";
-
 import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
 
 import { prismaClient } from "../instances/prismaClient.js";
 import { ServerFritterContext } from "../instances/server.js";
 
 import * as LibrarySchemaLib from "../libs/schemas/Library.js";
+
+import { view } from "../views/_main.js";
 
 //
 // Route
@@ -194,13 +194,12 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		// Render Library
 		//
 
-		context.fritterResponse.setContentType("text/html");
-		context.fritterResponse.setBody(Library(
+		context.renderComponent(view(
 			{
 				searchParameters,
 				filterOptions,
 				gameGroupManager,
 				selectedGame, 
-			}).renderToString());
+			}));
 	},
 };

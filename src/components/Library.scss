@@ -6,8 +6,7 @@
 {
 	.component-library
 	{
-		width: 100dvw;
-		height: 100dvh;
+		height: 100%;
 
 		display: grid;
 		grid-template-areas:
@@ -15,17 +14,13 @@
 			"sidebar                game-details-wrapper";
 		grid-template-columns: auto 1fr;
 		grid-template-rows: auto 1fr;
-		
-		background-color: #1f2937; // Tailwind Gray 800
-		color: #f3f4f6; // Tailwind Gray 100
-		font-family: Arial, Helvetica, "sans-serif";
 
 		> .component-filter-options-toolbar
 		{
 			grid-area: filter-options-toolbar;
 		}
 
-		> .component-sidebar
+		> .component-game-list
 		{
 			grid-area: sidebar;
 		}

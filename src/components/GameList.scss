@@ -2,9 +2,9 @@
 // Component
 //
 
-@mixin Sidebar()
+@mixin GameList()
 {
-	.component-sidebar-group-item
+	.component-game-list-group-item
 	{
 		color: inherit;
 		text-decoration: none;
@@ -63,7 +63,7 @@
 		}
 	}
 	
-	.component-sidebar-group
+	.component-game-list-group
 	{
 		> .title
 		{
@@ -80,7 +80,7 @@
 		}
 	}
 
-	.component-sidebar-search
+	.component-game-list-search
 	{
 		width: 100%;
 
@@ -92,7 +92,7 @@
 		color: inherit;
 	}
 	
-	.component-sidebar
+	.component-game-list
 	{
 		border-right: 1px solid #374151; // Tailwind Gray 700
 

@@ -6,7 +6,11 @@ import path from "node:path";
 
 import * as Fritter from "@donutteam/fritter";
 
+import { Site, SiteOptions } from "../components/Site.js";
+
 import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
+
+import * as RenderComponentMiddleware from "../middlewares/RenderComponent.js";
 
 //
 // Server Middlewares
@@ -40,6 +44,17 @@ const logRequestMiddleware = Fritter.LogRequestMiddleware.create();
 
 const bodyParserMiddleware = Fritter.BodyParserMiddleware.create();
 
+const renderComponentMiddleware = RenderComponentMiddleware.create<SiteOptions, ServerFritterContext>(
+	{
+		componentFunction: Site,
+		getOptionsFunction: (_context, partialOptions) =>
+		{
+			return {
+				...Object.fromEntries(Object.entries(partialOptions).filter(([ _key, value ]) => value !== undefined)),
+			};
+		},
+	});
+
 export const routerMiddleware = Fritter.RouterMiddleware.create();
 
 //
@@ -54,6 +69,8 @@ server.use(logRequestMiddleware.execute);
 
 server.use(bodyParserMiddleware.execute);
 
+server.use(renderComponentMiddleware.execute);
+
 server.use(routerMiddleware.execute);
 
 export type ServerFritterContext =
@@ -61,4 +78,5 @@ export type ServerFritterContext =
 	Fritter.StaticMiddleware.MiddlewareFritterContext &
 	Fritter.LogRequestMiddleware.MiddlewareFritterContext &
 	Fritter.BodyParserMiddleware.MiddlewareFritterContext &
+	RenderComponentMiddleware.MiddlewareFritterContext<SiteOptions> &
 	Fritter.RouterMiddleware.MiddlewareFritterContext;

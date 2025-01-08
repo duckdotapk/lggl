@@ -18,9 +18,9 @@ import * as GameModelLib from "../libs/models/Game.js";
 // Locals
 //
 
-function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
+function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: GameListSelectedGame, searchParameters: URLSearchParams)
 {
-	let className = "component-sidebar-group-item";
+	let className = "component-game-list-group-item";
 
 	if (selectedGame != null && groupGame.game.id == selectedGame.id)
 	{
@@ -69,11 +69,11 @@ function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: SidebarSelect
 		]);
 }
 
-function Group(group: GameGroupManagerGroup, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
+function Group(group: GameGroupManagerGroup, selectedGame: GameListSelectedGame, searchParameters: URLSearchParams)
 {
 	return new DE("details",
 		{
-			class: "component-sidebar-group",
+			class: "component-game-list-group",
 
 			"data-name": group.name,
 		},
@@ -94,7 +94,7 @@ function Search()
 {
 	return new DE("input",
 		{
-			class: "component-sidebar-search",
+			class: "component-game-list-search",
 			name: "search",
 			placeholder: "Search for a game...",
 		});
@@ -104,11 +104,11 @@ function Search()
 // Component
 //
 
-export type SidebarSelectedGame = Prisma.GameGetPayload<null> | null;
+export type GameListSelectedGame = Prisma.GameGetPayload<null> | null;
 
-export function Sidebar(gameGroupManager: GameGroupManager, selectedGame: SidebarSelectedGame, searchParameters: URLSearchParams)
+export function GameList(gameGroupManager: GameGroupManager, selectedGame: GameListSelectedGame, searchParameters: URLSearchParams)
 {
-	return new DE("aside", "component-sidebar",
+	return new DE("aside", "component-game-list",
 		[
 			Search(),
 

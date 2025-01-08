@@ -14,9 +14,10 @@
 @use "components/Button.scss";
 @use "components/Checkbox.scss";
 @use "components/GameDetails.scss";
+@use "components/GameList.scss";
 @use "components/Library.scss";
 @use "components/Paragraph.scss";
-@use "components/Sidebar.scss";
+@use "components/Site.scss";
 
 //
 // Client
@@ -32,6 +33,7 @@
 @include Button.Button();
 @include Checkbox.Checkbox();
 @include GameDetails.GameDetails();
+@include GameList.GameList();
 @include Library.Library();
 @include Paragraph.Paragraph();
-@include Sidebar.Sidebar();
+@include Site.Site();
