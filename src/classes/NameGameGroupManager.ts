@@ -14,7 +14,7 @@ export class NameGameGroupManager extends GameGroupManager
 	{
 		const games = this.games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
 
-		if (this.filterOptions.showFavoritesGroup)
+		if (this.settings.showFavoritesGroup)
 		{
 			this.addGamesToGroup("Favorites", games.filter((game) => game.isFavorite));
 		}

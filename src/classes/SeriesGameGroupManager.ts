@@ -76,7 +76,7 @@ export class SeriesGameGroupManager extends GameGroupManager
 			.filter((game) => game.seriesGames.length == 0)
 			.sort((a, b) => a.sortName.localeCompare(b.sortName));
 
-		if (this.filterOptions.showFavoritesGroup)
+		if (this.settings.showFavoritesGroup)
 		{
 			for (const seriesWithGames of Array.from(seriesWithGamesBySeriesName.values()).sort((a, b) => a.series.name.localeCompare(b.series.name)))
 			{

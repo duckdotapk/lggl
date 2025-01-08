@@ -16,8 +16,6 @@ import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSI
 import { prismaClient } from "../instances/prismaClient.js";
 import { ServerFritterContext } from "../instances/server.js";
 
-import * as LibrarySchemaLib from "../libs/schemas/Library.js";
-
 import { view } from "../views/_main.js";
 
 //
@@ -37,34 +35,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		//
 
 		const searchParameters = context.fritterRequest.getSearchParams();
-
-		//
-		// Get Filter Options
-		//
-
-		const filterOptionsParseResult = LibrarySchemaLib.FilterOptionsSchema.safeParse(JSON.parse(searchParameters.get("filterOptions") ?? "{}"));
-
-		if (!filterOptionsParseResult.success)
-		{
-			const defaultFilterOptions: LibrarySchemaLib.FilterOptions =
-			{
-				groupMode: "lastPlayed",
-
-				showFavoritesGroup: true,
-
-				showVisibleGames: true,
-				showHiddenGames: false,
-				showNsfwGames: false,
-			};
-
-			const newSearchParameters = new URLSearchParams(searchParameters);
-
-			newSearchParameters.set("filterOptions", JSON.stringify(defaultFilterOptions));
-
-			return context.fritterResponse.setRedirect("/?" + newSearchParameters.toString());
-		}
-
-		const filterOptions = filterOptionsParseResult.data;
 
 		//
 		// Get Selected Game ID
@@ -95,17 +65,17 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				},
 			});
 
-		if (!filterOptions.showVisibleGames)
+		if (!context.settings.showVisibleGames)
 		{
 			games = games.filter((game) => game.isHidden || game.isNsfw);
 		}
 
-		if (!filterOptions.showHiddenGames)
+		if (!context.settings.showHiddenGames)
 		{
 			games = games.filter((game) => !game.isHidden);
 		}
 
-		if (!filterOptions.showNsfwGames)
+		if (!context.settings.showNsfwGames)
 		{
 			games = games.filter((game) => !game.isNsfw);
 		}
@@ -116,25 +86,25 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		let gameGroupManager: GameGroupManager;
 
-		switch (filterOptions.groupMode)
+		switch (context.settings.groupMode)
 		{
 			case "lastPlayed":
-				gameGroupManager = new LastPlayedGameGroupManager(filterOptions, games);
+				gameGroupManager = new LastPlayedGameGroupManager(context.settings, games);
 
 				break;
 
 			case "name":
-				gameGroupManager = new NameGameGroupManager(filterOptions, games);
+				gameGroupManager = new NameGameGroupManager(context.settings, games);
 
 				break;
 
 			case "playTime":
-				gameGroupManager = new PlayTimeGameGroupManager(filterOptions, games);
+				gameGroupManager = new PlayTimeGameGroupManager(context.settings, games);
 
 				break;
 
 			case "series":
-				gameGroupManager = new SeriesGameGroupManager(filterOptions, games);
+				gameGroupManager = new SeriesGameGroupManager(context.settings, games);
 
 				break;
 		}
@@ -196,8 +166,8 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		context.renderComponent(view(
 			{
+				settings: context.settings,
 				searchParameters,
-				filterOptions,
 				gameGroupManager,
 				selectedGame, 
 			}));

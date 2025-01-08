@@ -10,14 +10,14 @@
 
 		display: grid;
 		grid-template-areas:
-			"filter-options-toolbar filter-options-toolbar"
+			"filter-settings-toolbar filter-settings-toolbar"
 			"sidebar                game-details-wrapper";
 		grid-template-columns: auto 1fr;
 		grid-template-rows: auto 1fr;
 
-		> .component-filter-options-toolbar
+		> .component-filter-settings-toolbar
 		{
-			grid-area: filter-options-toolbar;
+			grid-area: filter-settings-toolbar;
 		}
 
 		> .component-game-list

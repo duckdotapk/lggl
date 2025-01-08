@@ -6,12 +6,12 @@ import { DE } from "@donutteam/document-builder";
 
 import { GameGroupManager } from "../classes/GameGroupManager.js";
 
-import { FilterOptionsToolbar } from "./toolbar/FilterOptionsToolbar.js";
+import { FilterSettingsToolbar } from "./toolbar/FilterSettingsToolbar.js";
 
 import { GameDetails, GameDetailsGame } from "./GameDetails.js";
 import { GameList } from "./GameList.js";
 
-import * as LibrarySchemaLib from "../libs/schemas/Library.js";
+import * as SettingModelLib from "../libs/models/Setting.js";
 
 //
 // Component
@@ -20,7 +20,7 @@ import * as LibrarySchemaLib from "../libs/schemas/Library.js";
 export type LibraryOptions =
 {
 	searchParameters: URLSearchParams;
-	filterOptions: LibrarySchemaLib.FilterOptions;
+	settings: SettingModelLib.Settings;
 	gameGroupManager: GameGroupManager;
 	game: GameDetailsGame | null;
 };
@@ -29,7 +29,7 @@ export function Library(options: LibraryOptions)
 {
 	return new DE("div", "component-library",
 		[
-			FilterOptionsToolbar(options.filterOptions),
+			FilterSettingsToolbar(options.settings),
 
 			GameList(options.gameGroupManager, options.game, options.searchParameters),
 

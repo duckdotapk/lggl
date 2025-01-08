@@ -16,7 +16,7 @@ export class PlayTimeGameGroupManager extends GameGroupManager
 	{
 		const games = this.games.toSorted((a, b) => b.playTimeTotalSeconds - a.playTimeTotalSeconds);
 
-		if (this.filterOptions.showFavoritesGroup)
+		if (this.settings.showFavoritesGroup)
 		{
 			this.addGamesToGroup("Favorites", games.filter((game) => game.isFavorite));
 		}

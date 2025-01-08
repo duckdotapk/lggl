@@ -11,6 +11,7 @@ import { Site, SiteOptions } from "../components/Site.js";
 import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
 
 import * as RenderComponentMiddleware from "../middlewares/RenderComponent.js";
+import * as SettingsMiddleware from "../middlewares/Settings.js";
 
 //
 // Server Middlewares
@@ -44,6 +45,8 @@ const logRequestMiddleware = Fritter.LogRequestMiddleware.create();
 
 const bodyParserMiddleware = Fritter.BodyParserMiddleware.create();
 
+const settingsMiddleware = SettingsMiddleware.create();
+
 const renderComponentMiddleware = RenderComponentMiddleware.create<SiteOptions, ServerFritterContext>(
 	{
 		componentFunction: Site,
@@ -71,6 +74,8 @@ server.use(logRequestMiddleware.execute);
 
 server.use(bodyParserMiddleware.execute);
 
+server.use(settingsMiddleware.execute);
+
 server.use(renderComponentMiddleware.execute);
 
 server.use(routerMiddleware.execute);
@@ -80,5 +85,6 @@ export type ServerFritterContext =
 	Fritter.StaticMiddleware.MiddlewareFritterContext &
 	Fritter.LogRequestMiddleware.MiddlewareFritterContext &
 	Fritter.BodyParserMiddleware.MiddlewareFritterContext &
+	SettingsMiddleware.MiddlewareFritterContext &
 	RenderComponentMiddleware.MiddlewareFritterContext<SiteOptions> &
 	Fritter.RouterMiddleware.MiddlewareFritterContext;

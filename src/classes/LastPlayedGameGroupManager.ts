@@ -14,7 +14,7 @@ export class LastPlayedGameGroupManager extends GameGroupManager
 	{
 		const games = this.games.toSorted((a, b) => (b.lastPlayedDate ?? new Date(0)).getTime() - (a.lastPlayedDate ?? new Date(0)).getTime());
 
-		if (this.filterOptions.showFavoritesGroup)
+		if (this.settings.showFavoritesGroup)
 		{
 			this.addGamesToGroup("Favorites", games.filter((game) => game.isFavorite));
 		}

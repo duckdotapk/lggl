@@ -8,7 +8,7 @@ import { DateTime } from "luxon";
 
 import { HumanDateTime } from "../components/basic/HumanDateTime.js";
 
-import * as LibrarySchemaLib from "../libs/schemas/Library.js";
+import * as SettingModelLib from "../libs/models/Setting.js";
 
 //
 // Class
@@ -42,15 +42,15 @@ export type GameGroupManagerGroupEntry =
 
 export class GameGroupManager
 {
-	protected readonly filterOptions: LibrarySchemaLib.FilterOptions;
+	protected readonly settings: SettingModelLib.Settings;
 
 	protected readonly games: GameGroupManagerGame[] = [];
 
 	protected readonly gameGroups: Map<string, GameGroupManagerGroup>;
 
-	public constructor(filterOptions: LibrarySchemaLib.FilterOptions, games: GameGroupManagerGame[])
+	public constructor(settings: SettingModelLib.Settings, games: GameGroupManagerGame[])
 	{
-		this.filterOptions = filterOptions;
+		this.settings = settings;
 		this.games = [ ...games ];
 
 		this.gameGroups = new Map();

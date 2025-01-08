@@ -8,7 +8,7 @@ import { GameDetailsGame } from "../components/GameDetails.js";
 import { Library } from "../components/Library.js";
 import { SiteOptions } from "../components/Site.js";
 
-import * as LibrarySchemaLib from "../libs/schemas/Library.js";
+import * as SettingModelLib from "../libs/models/Setting.js";
 
 //
 // View
@@ -16,8 +16,8 @@ import * as LibrarySchemaLib from "../libs/schemas/Library.js";
 
 export type ViewOptions =
 {
+	settings: SettingModelLib.Settings;
 	searchParameters: URLSearchParams;
-	filterOptions: LibrarySchemaLib.FilterOptions;
 	gameGroupManager: GameGroupManager;
 	selectedGame: GameDetailsGame | null;
 };
@@ -28,8 +28,8 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "library",
 		content: Library(
 			{
+				settings: options.settings,
 				searchParameters: options.searchParameters,
-				filterOptions: options.filterOptions,
 				gameGroupManager: options.gameGroupManager,
 				game: options.selectedGame,
 			}),
