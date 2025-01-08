@@ -203,6 +203,10 @@ export async function searchAndChooseOne(readlineInterface: readline.promises.In
 
 			continue;
 		}
+		else if (games.length == 1)
+		{
+			return games[0]!;
+		}
 
 		return await choose(readlineInterface, games);
 	}

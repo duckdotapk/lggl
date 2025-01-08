@@ -523,8 +523,14 @@ async function addGameCompanies(readlineInterface: readline.promises.Interface, 
 
 					continue loop;
 				}
-
-				company = await CompanyCliLib.choose(readlineInterface, companies);
+				else if (companies.length == 1)
+				{
+					company = companies[0]!;
+				}
+				else
+				{
+					company = await CompanyCliLib.choose(readlineInterface, companies);
+				}
 
 				break;
 			}
@@ -620,8 +626,15 @@ async function addGameEngines(readlineInterface: readline.promises.Interface, ga
 
 					continue loop;
 				}
+				else if (engines.length == 1)
+				{
+					engine = engines[0]!;
+				}
+				else
+				{
+					engine = await EngineCliLib.choose(readlineInterface, engines);
+				}
 
-				engine = await EngineCliLib.choose(readlineInterface, engines);
 
 				break;
 			}
@@ -811,8 +824,14 @@ async function addGamePlatforms(readlineInterface: readline.promises.Interface, 
 
 					continue loop;
 				}
-
-				platform = await PlatformCliLib.choose(readlineInterface, platforms);
+				else if (platforms.length == 1)
+				{
+					platform = platforms[0]!;
+				}
+				else
+				{
+					platform = await PlatformCliLib.choose(readlineInterface, platforms);
+				}
 
 				break;
 			}
