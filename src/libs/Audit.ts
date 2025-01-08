@@ -240,14 +240,14 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 
 	if (gameDevelopers.length == 0)
 	{
-		problemList.addProblem("no gameDevelopers", false);
+		problemList.addProblem("no gameCompanies with DEVELOPER type", false);
 	}
 
 	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);
 
 	if (gamePublishers.length == 0)
 	{
-		problemList.addProblem("no gamePublishers", false);
+		problemList.addProblem("no gameCompanies with PUBLISHER type", false);
 	}
 
 	//
