@@ -41,7 +41,7 @@ function Item(options: ItemOptions)
 // Component
 //
 
-export type SidebarPage = "library" | null;
+export type SidebarPage = "library" | "audit" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -53,6 +53,14 @@ export function Sidebar(currentPage: SidebarPage)
 					href: "/",
 					iconName: "fa-solid fa-books",
 					text: "Library",
+				}),
+
+			Item(
+				{
+					isCurrent: currentPage == "audit",
+					href: "/audit",
+					iconName: "fa-solid fa-clipboard-list",
+					text: "Audit",
 				}),
 		]);
 }
