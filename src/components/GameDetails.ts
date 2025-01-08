@@ -250,8 +250,7 @@ export function GameDetails(game: GameDetailsGame)
 
 			PlayActionButtonGroup(game),
 
-			// TODO: show game description, if there is one
-
+			// TODO: this is getting a little bloated and arbitrarily sorted, probably restructure this at some point
 			new DE("div", "details-sections",
 				[
 					Section("Play data",
@@ -338,7 +337,7 @@ export function GameDetails(game: GameDetailsGame)
 									: "No play sessions recorded."),
 						]),
 
-					Section("Game data",
+					Section("Info",
 						[
 							DataTable(
 								[
@@ -424,7 +423,14 @@ export function GameDetails(game: GameDetailsGame)
 								]),
 						]),
 
-					Section("Game features",
+					Section("Description",
+						[
+							game.description != null
+								? game.description.split("\n").map((line) => Paragraph(line))
+								: Paragraph("No description available."),
+						]),
+
+					Section("Features",
 						[
 							DataTable(
 								[
@@ -451,7 +457,7 @@ export function GameDetails(game: GameDetailsGame)
 								]),
 						]),
 
-					Section("Game flags",
+					Section("Flags",
 						[
 							Paragraph(Checkbox("isEarlyAccess", "Is Early Access", game.isEarlyAccess)),
 
@@ -477,7 +483,7 @@ export function GameDetails(game: GameDetailsGame)
 						: null,
 
 					game.steamAppId != null
-						? Section("Steam app data",
+						? Section("Steam app",
 							[
 								DataTable(
 									[
@@ -493,7 +499,7 @@ export function GameDetails(game: GameDetailsGame)
 							])
 						: null,
 
-					Section("Library data",
+					Section("Library",
 						[
 							DataTable(
 								[
