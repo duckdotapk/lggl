@@ -36,9 +36,8 @@ model Game {
     modSupport            String?
     virtualRealitySupport String?
 
-    playniteGameId String? @unique
-    steamAppId     Int?
-    steamAppName   String?
+    steamAppId   Int?
+    steamAppName String?
 
     gameCompanies     GameCompany[]
     gameEngines       GameEngine[]
