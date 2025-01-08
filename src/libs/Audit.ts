@@ -6,11 +6,11 @@ import fs from "node:fs";
 
 import { Prisma } from "@prisma/client";
 
-import { prismaClient } from "../../instances/prismaClient.js";
+import { prismaClient } from "../instances/prismaClient.js";
 
-import * as GameModelLib from "../models/Game.js";
+import * as GameModelLib from "./models/Game.js";
 
-import * as GameCompanySchemaLib from "../schemas/GameCompany.js";
+import * as GameCompanySchemaLib from "./schemas/GameCompany.js";
 
 //
 // Classes

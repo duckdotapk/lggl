@@ -19,7 +19,6 @@ import { LGGL_STEAM_USER_ID } from "./env/LGGL_STEAM_USER_ID.js"
 
 import { prismaClient } from "./instances/prismaClient.js";
 
-import * as AuditCliLib from "./libs/cli/Audit.js";
 import * as CompanyCliLib from "./libs/cli/Company.js";
 import * as EngineCliLib from "./libs/cli/Engine.js";
 import * as GameCliLib from "./libs/cli/Game.js";
@@ -35,6 +34,7 @@ import * as SeriesGameCliLib from "./libs/cli/SeriesGame.js";
 
 import * as SteamThirdPartyLib from "./libs/third-party/Steam.js";
 
+import * as AuditLib from "./libs/Audit.js";
 import * as CliLib from "./libs/Cli.js";
 
 //
@@ -70,11 +70,11 @@ async function audit(readlineInterface: readline.promises.Interface)
 			},
 		});
 
-	const problemLists: AuditCliLib.ProblemList[] = [];
+	const problemLists: AuditLib.ProblemList[] = [];
 
 	for (const game of games)
 	{
-		const problemList = await AuditCliLib.auditGame(game, autoFixProblems);
+		const problemList = await AuditLib.auditGame(game, autoFixProblems);
 
 		if (problemList.problems.length == 0)
 		{
