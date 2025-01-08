@@ -281,7 +281,7 @@ export function GameDetails(game: GameDetailsGame)
 										value: game.lastPlayedDate != null
 											? new DE("span",
 												{
-													title: DateTime.fromJSDate(game.lastPlayedDate).toLocaleString(DateTime.DATETIME_MED),
+													title: DateTime.fromJSDate(game.lastPlayedDate).toLocaleString(DateTime.DATE_MED),
 												},
 												[
 													HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)),
@@ -509,11 +509,11 @@ export function GameDetails(game: GameDetailsGame)
 									},
 									{
 										label: "Created",
-										value: HumanDateTime(DateTime.fromJSDate(game.createdDate)),
+										value: HumanDateTime(DateTime.fromJSDate(game.createdDate), DateTime.DATE_MED),
 									},
 									{
 										label: "Last updated",
-										value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate)),
+										value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate), DateTime.DATE_MED),
 									},
 								])
 						]),
