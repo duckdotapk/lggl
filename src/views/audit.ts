@@ -44,7 +44,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						new DE("strong", null, options.problemLists.length),
 						" game",
 						options.problemLists.length == 1 ? "" : "s",
-						" with weird or missing data in your library:",
+						" in your library:",
 					]),
 
 				options.problemLists.map(
