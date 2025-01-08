@@ -6,7 +6,7 @@ import { Child } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { HumanDateTime } from "../components/inline/HumanDateTime.js";
+import { HumanDateTime } from "../components/basic/HumanDateTime.js";
 
 import * as LibrarySchemaLib from "../libs/schemas/Library.js";
 

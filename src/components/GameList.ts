@@ -8,7 +8,7 @@ import { Prisma } from "@prisma/client";
 
 import { GameGroupManager, GameGroupManagerGroup, GameGroupManagerGroupEntry } from "../classes/GameGroupManager.js";
 
-import { Muted } from "./inline/Muted.js";
+import { Muted } from "./basic/Muted.js";
 
 import { staticMiddleware } from "../instances/server.js";
 

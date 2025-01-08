@@ -5,7 +5,7 @@
 import { DE } from "@donutteam/document-builder";
 
 import { Header } from "../components/basic/Header.js";
-import { Paragraph } from "../components/Paragraph.js";
+import { Paragraph } from "../components/basic/Paragraph.js";
 
 import { SiteOptions } from "../components/Site.js";
 

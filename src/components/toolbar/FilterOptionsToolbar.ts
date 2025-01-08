@@ -4,9 +4,9 @@
 
 import { DE } from "@donutteam/document-builder";
 
-import { Toolbar } from "./Toolbar.js";
+import { Checkbox } from "../input/Checkbox.js";
 
-import { Checkbox } from "../Checkbox.js";
+import { Toolbar } from "./Toolbar.js";
 
 import * as LibrarySchemaLib from "../../libs/schemas/Library.js";
 

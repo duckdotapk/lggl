@@ -7,17 +7,18 @@
 @use "components/_Global.scss";
 
 @use "components/inline/Anchor.scss";
-@use "components/basic/Header.scss";
+@use "components/inline/Header.scss";
 @use "components/inline/Muted.scss";
+@use "components/inline/Paragraph.scss";
+
+@use "components/input/Button.scss";
+@use "components/input/Checkbox.scss";
 
 @use "components/toolbar/Toolbar.scss";
 
-@use "components/Button.scss";
-@use "components/Checkbox.scss";
 @use "components/GameDetails.scss";
 @use "components/GameList.scss";
 @use "components/Library.scss";
-@use "components/Paragraph.scss";
 @use "components/Sidebar.scss";
 @use "components/Site.scss";
 
@@ -30,14 +31,15 @@
 @include Anchor.Anchor();
 @include Header.Header();
 @include Muted.Muted();
-
-@include Toolbar.Toolbar();
+@include Paragraph.Paragraph();
 
 @include Button.Button();
 @include Checkbox.Checkbox();
+
+@include Toolbar.Toolbar();
+
 @include GameDetails.GameDetails();
 @include GameList.GameList();
 @include Library.Library();
-@include Paragraph.Paragraph();
 @include Sidebar.Sidebar();
 @include Site.Site();

@@ -7,13 +7,13 @@ import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { Anchor } from "./inline/Anchor.js";
+import { Anchor } from "./basic/Anchor.js";
 import { Header } from "./basic/Header.js";
-import { HumanDateTime } from "./inline/HumanDateTime.js";
+import { HumanDateTime } from "./basic/HumanDateTime.js";
+import { Paragraph } from "./basic/Paragraph.js";
 
-import { Button } from "./Button.js";
-import { Checkbox } from "./Checkbox.js";
-import { Paragraph } from "./Paragraph.js";
+import { Button } from "./input/Button.js";
+import { Checkbox } from "./input/Checkbox.js";
 
 import { LGGL_DEVELOPER_MODE } from "../env/LGGL_DEVELOPER_MODE.js";
 import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
