@@ -38,7 +38,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 	console.log("[LauncherLib] Parsing additional arguments for game play action %d...", gamePlayAction.id);
 
-	const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
+	const additionalArgumentsParseResult = z.array(z.string()).safeParse(JSON.parse(gamePlayAction.argumentsJson));
 
 	if (!additionalArgumentsParseResult.success)
 	{
@@ -75,6 +75,8 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 
 	for (let trackingAttempt = 1; trackingAttempt <= LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS; trackingAttempt++)
 	{
+		console.log("[LauncherLib] Checking for game process for %s, attempt %d...", game.name, trackingAttempt);
+
 		const isGameProcessRunning = await SystemLib.isProcessRunning(gamePlayAction.trackingPath);
 
 		if (isGameProcessRunning)
@@ -83,7 +85,9 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 		}
 
 		if (trackingAttempt == LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS)
-		{
+		{	
+			console.log("[LauncherLib] Game process not found after %d attempts!", LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS);
+
 			return {
 				success: false,
 				message: "Game process not found after " + LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS + " attempts!",
