@@ -22,6 +22,8 @@ export const AppDetailsResponseSchema = z.record(z.string(), z.union(
 						name: z.string(),
 						steam_appid: z.number(),
 
+						short_description: z.string(),
+
 						developers: z.array(z.string()),
 						publishers: z.array(z.string()),
 
