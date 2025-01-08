@@ -17,6 +17,7 @@
 @use "components/GameList.scss";
 @use "components/Library.scss";
 @use "components/Paragraph.scss";
+@use "components/Sidebar.scss";
 @use "components/Site.scss";
 
 //
@@ -36,4 +37,5 @@
 @include GameList.GameList();
 @include Library.Library();
 @include Paragraph.Paragraph();
+@include Sidebar.Sidebar();
 @include Site.Site();

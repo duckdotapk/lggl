@@ -25,6 +25,7 @@ export type ViewOptions =
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
 	return {
+		currentPage: "library",
 		content: Library(
 			{
 				searchParameters: options.searchParameters,

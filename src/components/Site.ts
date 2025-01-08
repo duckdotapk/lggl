@@ -4,11 +4,9 @@
 
 import { Child, DE } from "@donutteam/document-builder";
 
-import { staticMiddleware } from "../instances/server.js";
+import { Sidebar, SidebarPage } from "./Sidebar.js";
 
-//
-// Locals
-//
+import { staticMiddleware } from "../instances/server.js";
 
 //
 // Component
@@ -16,6 +14,7 @@ import { staticMiddleware } from "../instances/server.js";
 
 export type SiteOptions =
 {
+	currentPage: SidebarPage;
 	pageTitle?: string;
 	content?: Child;
 };
@@ -67,10 +66,7 @@ export function Site(options: SiteOptions)
 				[
 					new DE("div", "component-site",
 						[
-							new DE("div", "sidebar",
-								[
-									
-								]),
+							new DE("div", "sidebar", Sidebar(options.currentPage)),
 
 							new DE("div", "content", content),
 						]),

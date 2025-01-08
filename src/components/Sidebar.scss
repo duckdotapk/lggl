@@ -1,0 +1,36 @@
+//
+// Component
+//
+
+@mixin Sidebar()
+{
+	.component-sidebar-item
+	{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 48px;
+		height: 48px;
+
+		border-left: 3px solid transparent;
+
+		color: inherit;
+
+		font-size: 1.5rem;
+
+		&:hover,
+		&.current
+		{
+			border-left-color: #f3f4f6; // Tailwind Gray 100
+		}
+	}
+
+	.component-sidebar
+	{
+		height: 100%;
+		overflow-y: scroll;
+
+		border-right: 1px solid #374151; // Tailwind Gray 700
+	}
+}

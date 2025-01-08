@@ -50,6 +50,8 @@ const renderComponentMiddleware = RenderComponentMiddleware.create<SiteOptions, 
 		getOptionsFunction: (_context, partialOptions) =>
 		{
 			return {
+				currentPage: null,
+
 				...Object.fromEntries(Object.entries(partialOptions).filter(([ _key, value ]) => value !== undefined)),
 			};
 		},
