@@ -84,6 +84,9 @@ async function audit(readlineInterface: readline.promises.Interface)
 		problemLists.push(problemList);
 	}
 
+	let totalProblems = 0;
+	let totalAutoFixableProblems = 0;
+
 	for (const problemList of problemLists)
 	{
 		console.group(problemList.game.name + " (Game ID: " + problemList.game.id + ")");
@@ -103,12 +106,18 @@ async function audit(readlineInterface: readline.promises.Interface)
 			}
 			else
 			{
-				console.log("%s (Auto-fixable: %s)", problem.description, problem.isAutoFixable);
+				console.log("%s", problem.description);
 			}
 		}
 
 		console.groupEnd();
+
+		totalProblems += problemList.problems.length;
+		totalAutoFixableProblems += problemList.problems.filter((problem) => problem.isAutoFixable).length;
 	}
+
+	console.log(chalk.bold("Total problems: %d"), totalProblems);
+	console.log(chalk.bold("Total auto-fixable problems: %d"), totalAutoFixableProblems);
 }
 
 //
@@ -436,13 +445,6 @@ async function createGame(readlineInterface: readline.promises.Interface)
 
 		console.log(chalk.green("Added %s to %s! (Series Game #%d)"), game.name, series.name, seriesGame.id);
 	}
-}
-
-async function downloadGameImagesFromSteam(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
-{
-	const numberOfImagesDownloadedFromSteam = await GameCliLib.downloadImagesFromSteam(readlineInterface, game);
-
-	console.log(chalk.green("%d images downloaded from Steam!"), numberOfImagesDownloadedFromSteam);
 }
 
 async function addGameCompanies(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
@@ -1100,6 +1102,98 @@ async function addSeriesGames(readlineInterface: readline.promises.Interface, se
 }
 
 //
+// Steam Actions
+//
+
+async function downloadGameImagesFromSteam(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
+{
+	const numberOfImagesDownloadedFromSteam = await GameCliLib.downloadImagesFromSteam(readlineInterface, game);
+
+	console.log(chalk.green("%d images downloaded from Steam!"), numberOfImagesDownloadedFromSteam);
+}
+
+async function pullMissingDescriptionsFromSteam(readlineInterface: readline.promises.Interface)
+{
+	const games = await prismaClient.game.findMany(
+		{
+			where:
+			{
+				description: null,
+
+				steamAppId: { not: null },
+			},
+		});
+
+	for (const [ gameIndex, game ] of games.entries())
+	{
+		//
+		// Clear Console
+		//
+
+		console.clear();
+
+		console.log("%d left...", games.length - gameIndex);
+
+		//
+		// Fetch Steam App Details
+		//
+
+		const steamAppDetails = await SteamThirdPartyLib.fetchAppDetails(game.steamAppId!);
+
+		if (steamAppDetails == null)
+		{
+			console.log(chalk.red("Failed to fetch Steam app details for %s!"), game.name);
+
+			continue;
+		}
+
+		//
+		// Log Description
+		//
+
+		const lines = await steamAppDetails.short_description.split("\n");
+
+		console.group("%s description:", game.name);
+
+		for (const line of lines)
+		{
+			console.log(line);
+		}
+
+		console.groupEnd();
+
+		//
+		// Prompt to Use Description
+		//
+
+		console.log("");
+
+		const description = await CliLib.prompt(readlineInterface,
+			{
+				text: "Description:",
+				defaultValue: steamAppDetails.short_description.trim(),
+				validateAndTransform: async (input) => z.string().nonempty().parse(input),
+			});
+
+		//
+		// Update Game
+		//
+
+		await prismaClient.game.update(
+			{
+				where:
+				{
+					id: game.id,
+				},
+				data:
+				{
+					description,
+				},
+			});
+	}
+}
+
+//
 // Actions Record
 //
 
@@ -1133,16 +1227,6 @@ const actions: Record<string, Action> =
 	{
 		description: "Add a new game to your library",
 		execute: createGame,
-	},
-	downloadGameImagesFromSteam:
-	{
-		description: "Download images for a game from Steam",
-		execute: async (readlineInterface) =>
-		{
-			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
-
-			await downloadGameImagesFromSteam(readlineInterface, game);
-		},
 	},
 	addGameCompanies:
 	{
@@ -1225,6 +1309,22 @@ const actions: Record<string, Action> =
 
 			await addSeriesGames(readlineInterface, series);
 		},
+	},
+
+	downloadGameImagesFromSteam:
+	{
+		description: "Download images for a game from Steam",
+		execute: async (readlineInterface) =>
+		{
+			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
+
+			await downloadGameImagesFromSteam(readlineInterface, game);
+		},
+	},
+	pullMissingDescriptionsFromSteam:
+	{
+		description: "Pull missing descriptions from Steam",
+		execute: pullMissingDescriptionsFromSteam,
 	},
 };
 

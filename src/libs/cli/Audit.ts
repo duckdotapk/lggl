@@ -85,7 +85,8 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	// Check Game
 	//
 
-	if (game.releaseDate == null)
+	// Metadata
+	if (game.releaseDate == null && !game.isUnreleased)
 	{
 		problemList.addProblem("releaseDate is null", false);
 	}
@@ -95,6 +96,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		problemList.addProblem("description is null", false);
 	}
 
+	// Images
 	const imagePaths = GameModelLib.getImagePaths(game);
 
 	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner!))
@@ -185,12 +187,15 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		}
 	}
 
+	// Flags
+
+	// Play Data
 	if (game.progressionType == null)
 	{
 		problemList.addProblem("progressionType is null", false);
 	}
 
-	if (game.completionStatus == null)
+	if (game.completionStatus == null && game.progressionType != "NONE")
 	{
 		problemList.addProblem("completionStatus is null", false);
 	}
@@ -257,9 +262,14 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 			},
 		});
 
-	if (gameEngines.length == 0)
+	if (gameEngines.length == 0 && !game.isUnknownEngine)
 	{
-		problemList.addProblem("no gameEngines", false);
+		problemList.addProblem("game is not marked as having an unknown engine but has no gameEngines", false);
+	}
+
+	if (gameEngines.length > 0 && game.isUnknownEngine)
+	{
+		problemList.addProblem("game is marked as having an unknown engine but has gameEngines", false);
 	}
 
 	//
@@ -344,10 +354,10 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	// Check Game Modes
 	//
 
-	if (game.gameModes.length == 0)
-	{
-		problemList.addProblem("no gameModes", false);
-	}
+	// if (game.gameModes.length == 0)
+	// {
+	// 	problemList.addProblem("no gameModes", false);
+	// }
 
 	//
 	// Check Game Platforms
