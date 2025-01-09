@@ -15,6 +15,7 @@
 @use "components/input/Checkbox.scss";
 @use "components/input/Control.scss";
 @use "components/input/Label.scss";
+@use "components/input/TabControl.scss";
 
 @use "components/layout/AutomaticGridColumns.scss";
 
@@ -42,6 +43,7 @@
 @include Checkbox.Checkbox();
 @include Control.Control();
 @include Label.Label();
+@include TabControl.TabControl();
 
 @include AutomaticGridColumns.AutomaticGridColumns();
 

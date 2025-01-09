@@ -1,0 +1,52 @@
+//
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
+// Component
+//
+
+@mixin TabControl()
+{
+	.component-tab-control-tabs
+	{
+		display: flex;
+		margin-bottom: 0.75rem;
+	}
+
+	.component-tab-control-tab
+	{
+		padding: 0.75rem;
+
+		background: none;
+
+		border-bottom: 3px solid transparent;
+		border-radius: 0;
+
+		&[data-active="false"]
+		{
+			cursor: pointer;
+		}
+
+		&[data-active="true"],
+		&:hover
+		{
+			border-bottom-color: currentcolor;
+		}
+	}
+
+	.component-tab-control-tab-content
+	{
+		&[data-active="false"]
+		{
+			display: none;
+		}
+	}
+
+	.component-tab-control
+	{
+		@include Mixins.Margins();
+	}
+}
