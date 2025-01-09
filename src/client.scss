@@ -16,6 +16,8 @@
 @use "components/input/Control.scss";
 @use "components/input/Label.scss";
 
+@use "components/layout/AutomaticGridColumns.scss";
+
 @use "components/toolbar/Toolbar.scss";
 
 @use "components/GameDetails.scss";
@@ -40,6 +42,8 @@
 @include Checkbox.Checkbox();
 @include Control.Control();
 @include Label.Label();
+
+@include AutomaticGridColumns.AutomaticGridColumns();
 
 @include Toolbar.Toolbar();
 

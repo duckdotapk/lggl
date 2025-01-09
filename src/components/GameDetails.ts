@@ -15,6 +15,8 @@ import { Paragraph } from "./basic/Paragraph.js";
 import { Button } from "./input/Button.js";
 import { Checkbox } from "./input/Checkbox.js";
 
+import { AutomaticGridColumns } from "./layout/AutomaticGridColumns.js";
+
 import { LGGL_DEVELOPER_MODE } from "../env/LGGL_DEVELOPER_MODE.js";
 import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
 
@@ -253,7 +255,7 @@ export function GameDetails(game: GameDetailsGame)
 			PlayActionButtonGroup(game),
 
 			// TODO: this is getting a little bloated and arbitrarily sorted, probably restructure this at some point
-			new DE("div", "details-sections",
+			AutomaticGridColumns("380px",
 				[
 					Section("Play data",
 						[

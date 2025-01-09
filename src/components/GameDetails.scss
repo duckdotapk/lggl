@@ -100,16 +100,4 @@
 			}
 		}
 	}
-
-	.component-game-details
-	{
-		> .details-sections
-		{
-			display: grid;
-
-			gap: 0.5rem;
-
-			grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
-		}
-	}
 }
