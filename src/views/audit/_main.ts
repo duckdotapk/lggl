@@ -53,6 +53,8 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 							Header(2,
 								[
 									Anchor(problemList.game.name, "/?selectedGameId=" + problemList.game.id),
+									" ",
+									Anchor(new DE("span", "fa-solid fa-pen-to-square"), "/games/edit/" + problemList.game.id, "_blank"),
 
 									problemList.game.steamAppId != null
 										? [

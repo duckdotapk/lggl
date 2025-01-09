@@ -110,6 +110,14 @@ function PlayActionButtonGroup(game: GameDetailsGame)
 		}
 	}
 
+	children.push(Button(
+		{
+			style: "secondary",
+			href: "/games/edit/" + game.id,
+			iconName: "fa-solid fa-pen-to-square",
+			text: "Edit",
+		}));
+
 	return new DE("div",
 		{
 			class: "component-game-details-play-action-button-group",

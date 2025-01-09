@@ -17,5 +17,10 @@
 		align-items: center;
 
 		@include Mixins.Margins();
+
+		&[data-dirty="true"]
+		{
+			font-weight: bold;
+		}
 	}
 }
