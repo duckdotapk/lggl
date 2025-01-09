@@ -112,3 +112,23 @@ export function clearDirtyInputs(form: HTMLFormElement)
 		}
 	}
 }
+
+export function disableButtons(form: HTMLFormElement)
+{
+	const buttons = form.querySelectorAll<HTMLButtonElement>("button");
+
+	for (const button of buttons)
+	{
+		button.disabled = true;
+	}
+}
+
+export function enableButtons(form: HTMLFormElement)
+{
+	const buttons = form.querySelectorAll<HTMLButtonElement>("button");
+
+	for (const button of buttons)
+	{
+		button.disabled = false;
+	}
+}
