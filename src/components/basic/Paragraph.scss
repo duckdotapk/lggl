@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
 // Component
 //
 
@@ -8,19 +14,6 @@
 	{		
 		line-height: 1.5;
 
-		margin: 0;
-
-		&:not(:only-child)
-		{
-			&:not(:first-child)
-			{
-				margin-top: 0.25rem;
-			}
-
-			&:not(:last-child)
-			{
-				margin-bottom: 0.25rem;
-			}
-		}
+		@include Mixins.Margins(0.25rem);
 	}
 }
