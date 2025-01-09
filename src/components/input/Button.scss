@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
 // Component
 //
 
@@ -15,6 +21,8 @@
 		background-color: $color;
 		border: none;
 		color: #ffffff;
+
+		@include Mixins.Margin();
 
 		&:disabled
 		{
