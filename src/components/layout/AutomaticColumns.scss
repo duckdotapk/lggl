@@ -11,5 +11,10 @@
 		gap: 0.75rem;
 
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--component-automatic-columns-minimum-column-width)), 1fr));
+
+		> *
+		{
+			margin: 0 !important;
+		}
 	}
 }
