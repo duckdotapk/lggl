@@ -8,7 +8,7 @@
 	{
 		display: grid;
 
-		gap: 0.5rem;
+		gap: var(--component-automatic-grid-columns-gap, 1rem);
 
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--component-automatic-grid-columns-minimum-column-width)), 1fr));
 	}

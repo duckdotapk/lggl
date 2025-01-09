@@ -255,7 +255,7 @@ export function GameDetails(game: GameDetailsGame)
 			PlayActionButtonGroup(game),
 
 			// TODO: this is getting a little bloated and arbitrarily sorted, probably restructure this at some point
-			AutomaticGridColumns("380px",
+			AutomaticGridColumns("0.75rem", "380px",
 				[
 					Section("Play data",
 						[
