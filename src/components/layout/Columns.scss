@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
 // Component
 //
 
@@ -10,7 +16,9 @@
 
 		gap: 0.75rem;
 
-		grid-template-columns: repeat(1fr, var(--component-columns-number-of-columns, 1));
+		grid-template-columns: repeat(var(--component-columns-number-of-columns, 1), 1fr);
+
+		@include Mixins.Margins();
 
 		> *
 		{
