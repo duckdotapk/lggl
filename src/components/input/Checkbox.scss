@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
 // Component
 //
 
@@ -9,5 +15,7 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+
+		@include Mixins.Margin();
 	}
 }

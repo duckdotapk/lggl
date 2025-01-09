@@ -1,0 +1,21 @@
+//
+// Mixins
+//
+
+@mixin Margin($size: 0.75rem)
+{
+	&
+	{
+		margin: 0;
+	}
+
+	&:not(:first-child)
+	{
+		margin-top: $size;
+	}
+
+	&:not(:last-child)
+	{
+		margin-bottom: $size;
+	}
+}
