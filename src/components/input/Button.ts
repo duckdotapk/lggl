@@ -10,6 +10,7 @@ import { ButtonElementAttributes, DE } from "@donutteam/document-builder";
 
 export type ButtonOptions =
 {
+	type?: "button" | "submit";
 	iconName?: string;
 	text?: string;
 
@@ -18,10 +19,14 @@ export type ButtonOptions =
 
 export function Button(options: ButtonOptions)
 {
+	const type = options.type ?? "button";
+
 	return new DE("button",
 		{
 			class: "component-button",
 
+			type,
+			
 			...options.extraAttributes,
 		},
 		[
