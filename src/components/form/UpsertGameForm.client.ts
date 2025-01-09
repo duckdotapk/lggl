@@ -68,11 +68,21 @@ async function initialise(form: HTMLFormElement)
 		saveButton.addEventListener("click",
 			async () =>
 			{
-				InputClientLib.disableButtons(form);
+				try
+				{
+					InputClientLib.disableInputs(form);
 
-				// TODO: this
-
-				InputClientLib.enableButtons(form);
+					// TODO: this
+					throw new Error("Not implemented.");
+				}
+				catch (error)
+				{
+					console.error("[UpsertGameForm] Error creating Game:", error);
+				}
+				finally
+				{
+					InputClientLib.enableInputs(form);
+				}
 			});
 	}
 	else
@@ -80,71 +90,90 @@ async function initialise(form: HTMLFormElement)
 		deleteButton?.addEventListener("click",
 			async () =>
 			{
-				InputClientLib.disableButtons(form);
+				try
+				{
+					InputClientLib.disableInputs(form);
 
-				// TODO: this (prompt for confirmation?)
+					// TODO: prompt for confirmation
 
-				InputClientLib.enableButtons(form);
+					// TODO: this
+					throw new Error("Not implemented.");
+				}
+				catch (error)
+				{
+					console.error("[UpsertGameForm] Error deleting Game:", error);
+				}
+				finally
+				{
+					InputClientLib.enableInputs(form);
+				}
 			});
 
 		saveButton.addEventListener("click",
 			async () =>
 			{
-				saveButton.disabled = true;
-
-				const response = await updateGame(gameId,
-					{
-						name: InputClientLib.getStringValue(nameInput),
-						sortName: InputClientLib.getStringValue(sortNameInput),
-						releaseDate: InputClientLib.getDateValueNullable(releaseDateInput),
-						description: InputClientLib.getStringValueNullable(descriptionInput),
-						notes: InputClientLib.getStringValueNullable(notesInput),
-						progressionType: InputClientLib.getEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
-
-						hasBannerImage: InputClientLib.getBooleanValue(hasBannerImageInput),
-						hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
-						hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
-						hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
-
-						isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
-						isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
-						isHidden: InputClientLib.getBooleanValue(isHiddenInput),
-						isInstalled: InputClientLib.getBooleanValue(isInstalledInput),
-						isNsfw: InputClientLib.getBooleanValue(isNsfwInput),
-						isShelved: InputClientLib.getBooleanValue(isShelvedInput),
-						isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
-						isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
-
-						completionStatus: InputClientLib.getEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
-						firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
-						firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
-						firstCompletedDate: InputClientLib.getDateTimeValueNullable(firstCompletedDateInput),
-						firstCompletedDateApproximated: InputClientLib.getBooleanValue(firstCompletedDateApproximatedInput),
-						lastPlayedDate: InputClientLib.getDateTimeValueNullable(lastPlayedDateInput),
-						playCount: InputClientLib.getNumberValue(playCountInput),
-						playTimeTotalSeconds: InputClientLib.getNumberValue(playTimeTotalSecondsInput),
-
-						achievementSupport: InputClientLib.getEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
-						controllerSupport: InputClientLib.getEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
-						modSupport: InputClientLib.getEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
-						virtualRealitySupport: InputClientLib.getEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
-
-						steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
-						steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
-					});
-
-				// TODO: show notifications on success/failure
-
-				if (!response.success)
+				try
 				{
-					console.error("[UpsertGameForm] Error updating game:", response.errors);
+					InputClientLib.disableInputs(form);
 
-					return;
+					const response = await updateGame(gameId,
+						{
+							name: InputClientLib.getStringValue(nameInput),
+							sortName: InputClientLib.getStringValue(sortNameInput),
+							releaseDate: InputClientLib.getDateValueNullable(releaseDateInput),
+							description: InputClientLib.getStringValueNullable(descriptionInput),
+							notes: InputClientLib.getStringValueNullable(notesInput),
+							progressionType: InputClientLib.getEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
+	
+							hasBannerImage: InputClientLib.getBooleanValue(hasBannerImageInput),
+							hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
+							hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
+							hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
+	
+							isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
+							isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
+							isHidden: InputClientLib.getBooleanValue(isHiddenInput),
+							isInstalled: InputClientLib.getBooleanValue(isInstalledInput),
+							isNsfw: InputClientLib.getBooleanValue(isNsfwInput),
+							isShelved: InputClientLib.getBooleanValue(isShelvedInput),
+							isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
+							isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
+	
+							completionStatus: InputClientLib.getEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
+							firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
+							firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
+							firstCompletedDate: InputClientLib.getDateTimeValueNullable(firstCompletedDateInput),
+							firstCompletedDateApproximated: InputClientLib.getBooleanValue(firstCompletedDateApproximatedInput),
+							lastPlayedDate: InputClientLib.getDateTimeValueNullable(lastPlayedDateInput),
+							playCount: InputClientLib.getNumberValue(playCountInput),
+							playTimeTotalSeconds: InputClientLib.getNumberValue(playTimeTotalSecondsInput),
+	
+							achievementSupport: InputClientLib.getEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
+							controllerSupport: InputClientLib.getEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
+							modSupport: InputClientLib.getEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
+							virtualRealitySupport: InputClientLib.getEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
+	
+							steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
+							steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
+						});
+	
+					// TODO: show notifications on success/failure
+	
+					if (!response.success)
+					{
+						return console.error("[UpsertGameForm] Error updating Game:", response.errors);
+					}
+	
+					InputClientLib.clearDirtyInputs(form);
 				}
-
-				InputClientLib.clearDirtyInputs(form);
-
-				saveButton.disabled = false;
+				catch (error)
+				{
+					console.error("[UpsertGameForm] Error updating Game:", error);
+				}
+				finally
+				{
+					InputClientLib.enableInputs(form);
+				}
 			});
 	}
 }

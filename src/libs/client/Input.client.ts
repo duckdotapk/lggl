@@ -113,22 +113,22 @@ export function clearDirtyInputs(form: HTMLFormElement)
 	}
 }
 
-export function disableButtons(form: HTMLFormElement)
+export function disableInputs(form: HTMLFormElement)
 {
-	const buttons = form.querySelectorAll<HTMLButtonElement>("button");
+	const inputs = form.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("button, input, select, textarea");
 
-	for (const button of buttons)
+	for (const input of inputs)
 	{
-		button.disabled = true;
+		input.disabled = true;
 	}
 }
 
-export function enableButtons(form: HTMLFormElement)
+export function enableInputs(form: HTMLFormElement)
 {
-	const buttons = form.querySelectorAll<HTMLButtonElement>("button");
+	const inputs = form.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("button, input, select, textarea");
 
-	for (const button of buttons)
+	for (const input of inputs)
 	{
-		button.disabled = false;
+		input.disabled = false;
 	}
 }
