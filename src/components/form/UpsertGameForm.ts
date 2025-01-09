@@ -12,7 +12,7 @@ import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 import { TabControl } from "../input/TabControl.js";
 
-import { AutomaticGridColumns } from "../layout/AutomaticGridColumns.js";
+import { Columns } from "../layout/Columns.js";
 
 import * as GameModelLib from "../../libs/models/Game.js";
 
@@ -40,7 +40,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 						title: "General data",
 						content:
 						[
-							AutomaticGridColumns("0.75rem", "20rem",
+							Columns(2,
 								[
 									new DE("div", null,
 										[
