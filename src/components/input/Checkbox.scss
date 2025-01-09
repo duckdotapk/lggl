@@ -18,7 +18,7 @@
 
 		@include Mixins.Margins();
 
-		&[data-dirty="true"]
+		&:has(> [data-dirty="true"])
 		{
 			font-weight: bold;
 		}

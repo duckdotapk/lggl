@@ -12,12 +12,12 @@ async function initialise(element: HTMLElement)
 {
 	const input = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "input");
 
-	const inputInitialValue = input.checked;
+	input.dataset["initialValue"] = input.checked.toString();
 
 	element.addEventListener("input",
 		() =>
 		{
-			element.dataset["dirty"] = (input.checked != inputInitialValue).toString();
+			input.dataset["dirty"] = (input.checked.toString() != input.dataset["initialValue"]).toString();
 		});
 }
 

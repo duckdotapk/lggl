@@ -4,12 +4,12 @@
 
 async function initialise(element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
 {
-	const initialValue = element.value;
+	element.dataset["initialValue"] = element.value;
 
 	element.addEventListener("input",
 		() =>
 		{
-			element.dataset["dirty"] = (element.value != initialValue).toString();
+			element.dataset["dirty"] = (element.value != element.dataset["initialValue"]).toString();
 		});
 }
 
