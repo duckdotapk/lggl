@@ -28,7 +28,21 @@ export async function create(readlineInterface: readline.promises.Interface, opt
 		{
 			text: "Choose company type",
 			options: GameCompanySchemaLib.TypeSchema.options.map((type) => ({ value: type })),
-			validateAndTransform: async (input) => GameCompanySchemaLib.TypeSchema.parse(input.toUpperCase()),
+			validateAndTransform: async (input) =>
+			{
+				input = input.toUpperCase();
+
+				if (input == "D" || input == "DEV")
+				{
+					input = "DEVELOPER";
+				}
+				else if (input == "P" || input == "PUB")
+				{
+					input = "PUBLISHER";
+				}
+
+				return GameCompanySchemaLib.TypeSchema.parse(input);
+			},
 		});
 
 	const notes = await CliLib.prompt(readlineInterface,
