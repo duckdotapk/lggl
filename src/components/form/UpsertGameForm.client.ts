@@ -3,9 +3,10 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
-import { ZodTypeAny } from "zod";
 
 import { updateGame } from "../../routes/api/game/update.schemas.js";
+
+import * as InputClientLib from "../../libs/client/Input.client.js";
 
 import * as GameSchemaLib from "../../libs/schemas/Game.js";
 
@@ -13,94 +14,7 @@ import * as GameSchemaLib from "../../libs/schemas/Game.js";
 // Locals
 //
 
-function isInputDirty(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
-{
-	return BrowserUtilities.ElementClientLib.getBooleanData(input, "dirty") ?? false;
-}
 
-function getBooleanValue(input: HTMLInputElement)
-{
-	return isInputDirty(input) ? input.checked : undefined;
-}
-
-function getDateValueNullable(input: HTMLInputElement)
-{
-	if (!isInputDirty(input))
-	{
-		return undefined;
-	}
-
-	return input.value != "" ? input.value : null;
-}
-
-function getDateTimeValueNullable(input: HTMLInputElement)
-{
-	if (!isInputDirty(input))
-	{
-		return undefined;
-	}
-
-	return input.value.trim().length > 0 ? input.value : null;
-}
-
-function getEnumValueNullable<T extends ZodTypeAny>(input: HTMLSelectElement, schema: T)
-{
-	if (!isInputDirty(input))
-	{
-		return undefined;
-	}
-
-	return input.value != "" ? schema.parse(input.value) : null;
-}
-
-function getNumberValue(input: HTMLInputElement)
-{
-	return isInputDirty(input) ? Number(input.value) : undefined;
-}
-
-function getNumberValueNullable(input: HTMLInputElement)
-{
-	if (!isInputDirty(input))
-	{
-		return undefined;
-	}
-
-	return input.value.trim() == "" ? null : Number(input.value);
-}
-
-function getStringValue(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
-{
-	return isInputDirty(input) ? input.value : undefined;
-}
-
-function getStringValueNullable(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
-{
-	if (!isInputDirty(input))
-	{
-		return undefined;
-	}
-
-	return input.value.trim().length > 0 ? input.value : null;
-}
-
-function clearDirtyInputs(form: HTMLFormElement)
-{
-	const inputs = form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea");
-
-	for (const input of inputs)
-	{
-		if (input instanceof HTMLInputElement && input.type == "checkbox")
-		{
-			input.dataset["dirty"] = "false";
-			input.dataset["initialValue"] = input.checked.toString();
-		}
-		else
-		{
-			input.dataset["dirty"] = "false";
-			input.dataset["initialValue"] = input.value;
-		}
-	}
-}
 
 async function initialise(form: HTMLFormElement)
 {
@@ -161,47 +75,45 @@ async function initialise(form: HTMLFormElement)
 				{
 					saveButton.disabled = true;
 
-					getDateValueNullable(releaseDateInput);
-
 					const response = await updateGame(gameId,
 						{
-							name: getStringValue(nameInput),
-							sortName: getStringValue(sortNameInput),
-							releaseDate: getDateValueNullable(releaseDateInput),
-							description: getStringValueNullable(descriptionInput),
-							notes: getStringValueNullable(notesInput),
-							progressionType: getEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
+							name: InputClientLib.getStringValue(nameInput),
+							sortName: InputClientLib.getStringValue(sortNameInput),
+							releaseDate: InputClientLib.getDateValueNullable(releaseDateInput),
+							description: InputClientLib.getStringValueNullable(descriptionInput),
+							notes: InputClientLib.getStringValueNullable(notesInput),
+							progressionType: InputClientLib.getEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
 
-							hasBannerImage: getBooleanValue(hasBannerImageInput),
-							hasCoverImage: getBooleanValue(hasCoverImageInput),
-							hasIconImage: getBooleanValue(hasIconImageInput),
-							hasLogoImage: getBooleanValue(hasLogoImageInput),
+							hasBannerImage: InputClientLib.getBooleanValue(hasBannerImageInput),
+							hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
+							hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
+							hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
 
-							isEarlyAccess: getBooleanValue(isEarlyAccessInput),
-							isFavorite: getBooleanValue(isFavoriteInput),
-							isHidden: getBooleanValue(isHiddenInput),
-							isInstalled: getBooleanValue(isInstalledInput),
-							isNsfw: getBooleanValue(isNsfwInput),
-							isShelved: getBooleanValue(isShelvedInput),
-							isUnknownEngine: getBooleanValue(isUnknownEngineInput),
-							isUnreleased: getBooleanValue(isUnreleasedInput),
+							isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
+							isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
+							isHidden: InputClientLib.getBooleanValue(isHiddenInput),
+							isInstalled: InputClientLib.getBooleanValue(isInstalledInput),
+							isNsfw: InputClientLib.getBooleanValue(isNsfwInput),
+							isShelved: InputClientLib.getBooleanValue(isShelvedInput),
+							isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
+							isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
 
-							completionStatus: getEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
-							firstPlayedDate: getDateTimeValueNullable(firstPlayedDateInput),
-							firstPlayedDateApproximated: getBooleanValue(firstPlayedDateApproximatedInput),
-							firstCompletedDate: getDateTimeValueNullable(firstCompletedDateInput),
-							firstCompletedDateApproximated: getBooleanValue(firstCompletedDateApproximatedInput),
-							lastPlayedDate: getDateTimeValueNullable(lastPlayedDateInput),
-							playCount: getNumberValue(playCountInput),
-							playTimeTotalSeconds: getNumberValue(playTimeTotalSecondsInput),
+							completionStatus: InputClientLib.getEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
+							firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
+							firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
+							firstCompletedDate: InputClientLib.getDateTimeValueNullable(firstCompletedDateInput),
+							firstCompletedDateApproximated: InputClientLib.getBooleanValue(firstCompletedDateApproximatedInput),
+							lastPlayedDate: InputClientLib.getDateTimeValueNullable(lastPlayedDateInput),
+							playCount: InputClientLib.getNumberValue(playCountInput),
+							playTimeTotalSeconds: InputClientLib.getNumberValue(playTimeTotalSecondsInput),
 
-							achievementSupport: getEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
-							controllerSupport: getEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
-							modSupport: getEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
-							virtualRealitySupport: getEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
+							achievementSupport: InputClientLib.getEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
+							controllerSupport: InputClientLib.getEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
+							modSupport: InputClientLib.getEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
+							virtualRealitySupport: InputClientLib.getEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
 
-							steamAppId: getNumberValueNullable(steamAppIdInput),
-							steamAppName: getStringValueNullable(steamAppNameInput),
+							steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
+							steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
 						});
 
 					if (!response.success)
@@ -212,7 +124,7 @@ async function initialise(form: HTMLFormElement)
 						return;
 					}
 
-					clearDirtyInputs(form);
+					InputClientLib.clearDirtyInputs(form);
 				}
 				finally
 				{
