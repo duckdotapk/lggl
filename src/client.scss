@@ -21,6 +21,7 @@
 @use "components/Library.scss";
 @use "components/Sidebar.scss";
 @use "components/Site.scss";
+@use "components/Wrapper.scss";
 
 //
 // Client
@@ -43,3 +44,4 @@
 @include Library.Library();
 @include Sidebar.Sidebar();
 @include Site.Site();
+@include Wrapper.Wrapper();

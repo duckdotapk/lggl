@@ -9,6 +9,7 @@ import { Header } from "../components/basic/Header.js";
 import { Paragraph } from "../components/basic/Paragraph.js";
 
 import { SiteOptions } from "../components/Site.js";
+import { Wrapper } from "../components/Wrapper.js";
 
 import * as AuditLib from "../libs/Audit.js";
 
@@ -28,10 +29,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "audit",
 		pageTitle: "Audit (" + totalProblems + " problem" + (totalProblems == 1 ? "" : "s") + ")",
-		content: new DE("div",
-			{
-				style: "height: 100%; overflow-y: scroll; padding: 1rem",
-			},
+		content: Wrapper(
 			[
 				Header(1, "Audit"),
 
