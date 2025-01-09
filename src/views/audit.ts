@@ -27,6 +27,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 	return {
 		currentPage: "audit",
+		pageTitle: "Audit (" + totalProblems + " problem" + (totalProblems == 1 ? "" : "s") + ")",
 		content: new DE("div",
 			{
 				style: "height: 100%; overflow-y: scroll; padding: 1rem",
@@ -51,13 +52,23 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 					(problemList) =>
 					{
 						return [
-							Header(2, Anchor(problemList.game.name, "/?selectedGameId=" + problemList.game.id)),
+							Header(2,
+								[
+									Anchor(problemList.game.name, "/?selectedGameId=" + problemList.game.id),
 
-							new DE("ul", null, problemList.problems.map(
-								(problem) =>
-								{
-									return new DE("li", null, problem.description);
-								})),
+									problemList.game.steamAppId != null
+										? [
+											" ",
+											Anchor(new DE("span", "fa-brands fa-steam"), "https://store.steampowered.com/app/" + problemList.game.steamAppId, "_blank"),
+											" ",
+											Anchor(new DE("span", "fa-solid fa-database"), "https://steamdb.info/app/" + problemList.game.steamAppId, "_blank"),
+											" ",
+											Anchor(new DE("span", "fa-solid fa-desktop"), "https://www.pcgamingwiki.com/api/appid.php?appid=" + problemList.game.steamAppId, "_blank")
+										]
+										: null,
+								]),
+
+							new DE("ul", null, problemList.problems.map((problem) => new DE("li", null, problem.description))),
 						];
 					}),
 			]),

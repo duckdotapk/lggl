@@ -26,6 +26,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 {
 	return {
 		currentPage: "library",
+		pageTitle: options.selectedGame != null ? options.selectedGame.name : "Library",
 		content: Library(
 			{
 				settings: options.settings,
