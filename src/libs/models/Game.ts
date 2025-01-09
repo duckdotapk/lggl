@@ -81,86 +81,116 @@ export function getImagePaths(game: Prisma.GameGetPayload<null>)
 	}
 }
 
-export function getCompletionStatusName(game: Prisma.GameGetPayload<null>)
+export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameSchemaLib.CompletionStatus)
 {
-	if (game.completionStatus == null)
+	if (typeof gameOrCompletionStatus == "string")
+	{
+		return completionStatusNames[gameOrCompletionStatus];
+	}
+
+	if (gameOrCompletionStatus.completionStatus == null)
 	{
 		return "-";
 	}
 
-	const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(game.completionStatus);
+	const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(gameOrCompletionStatus.completionStatus);
 
 	return completionStatusParseResult.success
 		? completionStatusNames[completionStatusParseResult.data]
-		: "Invalid: " + game.completionStatus;
+		: "Invalid: " + gameOrCompletionStatus.completionStatus;
 }
 
-export function getProgressionTypeName(game: Prisma.GameGetPayload<null>)
+export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayload<null> | GameSchemaLib.ProgressionType)
 {
-	if (game.progressionType == null)
+	if (typeof gameOrProgressionType == "string")
+	{
+		return progressionTypeNames[gameOrProgressionType];
+	}
+
+	if (gameOrProgressionType.progressionType == null)
 	{
 		return "-";
 	}
 
-	const progressionTypeParseResult = GameSchemaLib.ProgressionTypeSchema.safeParse(game.progressionType);
+	const progressionTypeParseResult = GameSchemaLib.ProgressionTypeSchema.safeParse(gameOrProgressionType.progressionType);
 
 	return progressionTypeParseResult.success
 		? progressionTypeNames[progressionTypeParseResult.data]
-		: "Invalid: " + game.progressionType;
+		: "Invalid: " + gameOrProgressionType.progressionType;
 }
 
-export function getAchievementSupportName(game: Prisma.GameGetPayload<null>)
+export function getAchievementSupportName(gameOrAchievementSupport: Prisma.GameGetPayload<null> | GameSchemaLib.AchievementSupport)
 {
-	if (game.achievementSupport == null)
+	if (typeof gameOrAchievementSupport == "string")
+	{
+		return achievementSupportNames[gameOrAchievementSupport];
+	}
+
+	if (gameOrAchievementSupport.achievementSupport == null)
 	{
 		return "-";
 	}
 
-	const achievementSupportParseResult = GameSchemaLib.AchievementSupportSchema.safeParse(game.achievementSupport);
+	const achievementSupportParseResult = GameSchemaLib.AchievementSupportSchema.safeParse(gameOrAchievementSupport.achievementSupport);
 
 	return achievementSupportParseResult.success
 		? achievementSupportNames[achievementSupportParseResult.data]
-		: "Invalid: " + game.achievementSupport;
+		: "Invalid: " + gameOrAchievementSupport.achievementSupport;
 }
 
-export function getControllerSupportName(game: Prisma.GameGetPayload<null>)
+export function getControllerSupportName(gameOrControllerSupport: Prisma.GameGetPayload<null> | GameSchemaLib.ControllerSupport)
 {
-	if (game.controllerSupport == null)
+	if (typeof gameOrControllerSupport == "string")
+	{
+		return controllerSupportNames[gameOrControllerSupport];
+	}
+
+	if (gameOrControllerSupport.controllerSupport == null)
 	{
 		return "-";
 	}
 
-	const controllerSupportParseResult = GameSchemaLib.ControllerSupportSchema.safeParse(game.controllerSupport);
+	const controllerSupportParseResult = GameSchemaLib.ControllerSupportSchema.safeParse(gameOrControllerSupport.controllerSupport);
 
 	return controllerSupportParseResult.success
 		? controllerSupportNames[controllerSupportParseResult.data]
-		: "Invalid: " + game.controllerSupport;
+		: "Invalid: " + gameOrControllerSupport.controllerSupport;
 }
 
-export function getModSupportName(game: Prisma.GameGetPayload<null>)
+export function getModSupportName(gameOrModSupport: Prisma.GameGetPayload<null> | GameSchemaLib.ModSupport)
 {
-	if (game.modSupport == null)
+	if (typeof gameOrModSupport == "string")
+	{
+		return modSupportNames[gameOrModSupport];
+	}
+
+	if (gameOrModSupport.modSupport == null)
 	{
 		return "-";
 	}
 
-	const modSupportParseResult = GameSchemaLib.ModSupportSchema.safeParse(game.modSupport);
+	const modSupportParseResult = GameSchemaLib.ModSupportSchema.safeParse(gameOrModSupport.modSupport);
 
 	return modSupportParseResult.success
 		? modSupportNames[modSupportParseResult.data]
-		: "Invalid: " + game.modSupport;
+		: "Invalid: " + gameOrModSupport.modSupport;
 }
 
-export function getVirtualRealitySupportName(game: Prisma.GameGetPayload<null>)
+export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma.GameGetPayload<null> | GameSchemaLib.VirtualRealitySupport)
 {
-	if (game.virtualRealitySupport == null)
+	if (typeof gameOrVirtualRealitySupport == "string")
+	{
+		return virtualRealitySupportNames[gameOrVirtualRealitySupport];
+	}
+
+	if (gameOrVirtualRealitySupport.virtualRealitySupport == null)
 	{
 		return "-";
 	}
 
-	const virtualRealitySupportParseResult = GameSchemaLib.VirtualRealitySupportSchema.safeParse(game.virtualRealitySupport);
+	const virtualRealitySupportParseResult = GameSchemaLib.VirtualRealitySupportSchema.safeParse(gameOrVirtualRealitySupport.virtualRealitySupport);
 
 	return virtualRealitySupportParseResult.success
 		? virtualRealitySupportNames[virtualRealitySupportParseResult.data]
-		: "Invalid: " + game.virtualRealitySupport;
+		: "Invalid: " + gameOrVirtualRealitySupport.virtualRealitySupport;
 }
