@@ -1,0 +1,30 @@
+//
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
+// Component
+//
+
+@mixin Control()
+{
+	.component-control
+	{
+		display: block;
+
+		width: 100%;
+
+		padding: 0.5rem;
+
+		@include Mixins.Margin();
+	}
+
+	textarea.component-control
+	{
+		min-height: 5rem;
+
+		resize: vertical;
+	}
+}

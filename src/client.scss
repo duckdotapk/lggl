@@ -13,6 +13,7 @@
 
 @use "components/input/Button.scss";
 @use "components/input/Checkbox.scss";
+@use "components/input/Control.scss";
 @use "components/input/Label.scss";
 
 @use "components/toolbar/Toolbar.scss";
@@ -37,6 +38,7 @@
 
 @include Button.Button();
 @include Checkbox.Checkbox();
+@include Control.Control();
 @include Label.Label();
 
 @include Toolbar.Toolbar();
