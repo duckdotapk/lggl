@@ -34,7 +34,7 @@ export function getDateTimeValueNullable(input: HTMLInputElement)
 	return input.value.trim() != "" ? input.value.trim() : null;
 }
 
-export function getNumberValue(input: HTMLInputElement)
+export function getNumberValue(input: HTMLInputElement | HTMLSelectElement)
 {
 	return Number(input.value);
 }
@@ -114,12 +114,12 @@ export function getChangedEnumValueNullable<T extends ZodTypeAny>(input: HTMLSel
 	return input.value.trim() != "" ? schema.parse(input.value.trim()) : null;
 }
 
-export function getChangedNumberValue(input: HTMLInputElement)
+export function getChangedNumberValue(input: HTMLInputElement | HTMLSelectElement)
 {
 	return isInputDirty(input) ? Number(input.value) : undefined;
 }
 
-export function getChangedNumberValueNullable(input: HTMLInputElement)
+export function getChangedNumberValueNullable(input: HTMLInputElement | HTMLSelectElement)
 {
 	if (!isInputDirty(input))
 	{

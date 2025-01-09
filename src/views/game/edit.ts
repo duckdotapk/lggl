@@ -10,11 +10,13 @@ import { Header } from "../../components/basic/Header.js";
 import { Muted } from "../../components/basic/Muted.js";
 
 import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/UpsertGameForm.js";
+import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
 import * as SettingModelLib from "../../libs/models/Setting.js";
+import { TabControl } from "../../components/input/TabControl.js";
 
 //
 // View
@@ -23,7 +25,9 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
+	companies: UpsertGameCompanyFormOptions["companies"];
 	game: NonNullable<UpsertGameFormGame>;
+	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -37,27 +41,73 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				Header(1, "Edit " + options.game.name),
 
-				Header(2, "Game"),
+				Header(2, "Game #" + options.game.id),
 
 				UpsertGameForm(options.game),
 
-				Header(2, "Game companies"),
+				Header(2, "Related data"),
 
-				Header(2, "Game engines"),
+				TabControl(
+					[
+						{
+							title: "Companies",
+							content:
+							[				
+								options.gameCompanies.map((gameCompany) =>
+									[
+										Header(3, "Game company #" + gameCompany.id),
+				
+										UpsertGameCompanyForm(
+											{
+												companies: options.companies, 
+												game: options.game,
+												gameCompany,
+											}),
+									]),
 
-				Header(2, "Game genres"),
-
-				Header(2, "Game installations"),
-
-				Header(2, "Game links"),
-
-				Header(2, "Game modes"),
-
-				Header(2, "Game platforms"),
-
-				Header(2, "Game play actions"),
-
-				Header(2, "Game play sessions"),
+								Header(3, "Add new game company"),
+					
+								UpsertGameCompanyForm(
+									{
+										companies: options.companies,
+										game: options.game,
+										gameCompany: null,
+									}),
+							],
+						},
+						{
+							title: "Engines",
+							content: [],
+						},
+						{
+							title: "Genres",
+							content: [],
+						},
+						{
+							title: "Installations",
+							content: [],
+						},
+						{
+							title: "Links",
+							content: [],
+						},
+						{
+							title: "Modes",
+							content: [],
+						},
+						{
+							title: "Platforms",
+							content: [],
+						},
+						{
+							title: "Play actions",
+							content: [],
+						},
+						{
+							title: "Play sessions",
+							content: [],
+						},
+					]),
 			]),
 	};
 }
