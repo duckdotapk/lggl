@@ -310,16 +310,33 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 					},
 				]),
 
-			Button(
-				{
-					style: "success",
-					type: "submit",
-					iconName: game == null
-						? "fa-solid fa-plus"
-						: "fa-solid fa-save",
-					text: game == null
-						? "Create"
-						: "Save",
-				}),
+			Columns(game != null ? 2 : 1,
+				[
+					game != null
+						? Button(
+							{
+								style: "danger",
+								type: "button",
+								extraAttributes:
+								{
+									"data-action": "delete",
+								},
+								iconName: "fa-solid fa-trash",
+								text: "Delete",
+							})
+						: null,
+
+					Button(
+						{
+							style: "success",
+							type: "submit",
+							extraAttributes:
+							{
+								"data-action": "save",
+							},
+							iconName: game == null ? "fa-solid fa-plus" : "fa-solid fa-save",
+							text: game == null ? "Create" : "Save",
+						}),
+				]),
 		]);
 }
