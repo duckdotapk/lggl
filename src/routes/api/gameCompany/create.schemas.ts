@@ -47,7 +47,7 @@ export const path = "/api/gameCompanies/create";
 // Utility Functions
 //
 
-export function updateGameCompany(requestBody: RequestBody)
+export function createGameCompany(requestBody: RequestBody)
 {
 	return FritterApiUtilities.request(method, path,
 		{
