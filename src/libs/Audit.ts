@@ -85,7 +85,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	// Check Game
 	//
 
-	// Metadata
+	// General data
 	if (game.releaseDate == null && !game.isUnreleased)
 	{
 		problemList.addProblem("releaseDate is null", false);
@@ -96,7 +96,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		problemList.addProblem("description is null", false);
 	}
 
-	// Images
+	// Image flags
 	const imagePaths = GameModelLib.getImagePaths(game);
 
 	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner!))
@@ -187,9 +187,10 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		}
 	}
 
-	// Flags
+	// Other flags
+	// TODO
 
-	// Play Data
+	// Play data
 	if (game.progressionType == null)
 	{
 		problemList.addProblem("progressionType is null", false);
@@ -227,6 +228,10 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		}
 	}
 
+	// Supported features
+	// TODO
+
+	// Steam data
 	if (game.steamAppId != null && game.steamAppName == null)
 	{
 		problemList.addProblem("steamAppId is set but steamAppName is null", false);
