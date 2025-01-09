@@ -128,6 +128,10 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 							{
 								company: true,
 							},
+							orderBy:
+							[
+								{ company: { name: "asc" } },
+							],
 						},
 						gameEngines:
 						{
@@ -135,6 +139,11 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 							{
 								engine: true,
 							},
+							orderBy:
+							[
+								{ engine: { name: "asc" } },
+								{ version: "asc" },
+							],
 						},
 						gameLinks: true,
 						gamePlayActions: true,
