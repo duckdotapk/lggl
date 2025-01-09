@@ -29,8 +29,8 @@ export type ControlOptions =
 	} |
 	{
 		type: "select",
-		value: string | null;
-		options: { value: string, label: string }[];
+		value?: string | number | null;
+		options: { value: string | number, label: string }[];
 	} |
 	{
 		type: "text";
