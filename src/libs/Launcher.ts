@@ -176,6 +176,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 					? gamePlaySessionStartDateTime.toJSDate()
 					: undefined,
 				lastPlayedDate: gamePlaySessionStartDateTime.toJSDate(),
+				playCount: { increment: 1 },
 			},
 		});
 
@@ -216,17 +217,33 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 			{
 				console.log("[LauncherLib] Updating game play action session %d with play time: %d", gamePlayAction.id, playTimeSeconds);
 
-				await prismaClient.gamePlaySession.update(
+				await prismaClient.$transaction(
+					async (transactionClient) =>
 					{
-						where:
-						{
-							id: gamePlaySession.id,
-						},
-						data:
-						{
-							endDate: DateTime.now().toJSDate(),
-							playTimeSeconds,
-						},
+						await transactionClient.game.update(
+							{
+								where:
+								{
+									id: game.id,
+								},
+								data:
+								{
+									lastPlayedDate: gamePlaySessionEndDateTime.toJSDate(),
+								},
+							});
+
+						await transactionClient.gamePlaySession.update(
+							{
+								where:
+								{
+									id: gamePlaySession.id,
+								},
+								data:
+								{
+									endDate: DateTime.now().toJSDate(),
+									playTimeSeconds,
+								},
+							});
 					});
 
 				return;
@@ -248,7 +265,6 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 							data:
 							{
 								lastPlayedDate: gamePlaySessionEndDateTime.toJSDate(),
-								playCount: { increment: 1 },
 								playTimeTotalSeconds: { increment: playTimeSeconds },
 							},
 						});
