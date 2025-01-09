@@ -10,21 +10,32 @@ import { ButtonElementAttributes, DE } from "@donutteam/document-builder";
 
 export type ButtonOptions =
 {
-	type?: "button" | "submit";
+	style: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "link";
+	extraAttributes?: ButtonElementAttributes;
 	iconName?: string;
 	text?: string;
-
-	extraAttributes?: ButtonElementAttributes;
-};
+} &
+(
+	{
+		href: string;
+	} |
+	{
+		type: "button" | "submit";
+	}
+);
 
 export function Button(options: ButtonOptions)
 {
-	const type = options.type ?? "button";
+	const tagName = "href" in options ? "a" : "button";
 
-	return new DE("button",
+	const href = "href" in options ? options.href : null;
+	const type = "type" in options ? options.type : null;
+
+	return new DE(tagName,
 		{
-			class: "component-button",
+			class: "component-button " + options.style,
 
+			href,
 			type,
 			
 			...options.extraAttributes,

@@ -8,10 +8,14 @@
 // Component
 //
 
-@mixin Button($color: #16a34a /* Tailwind Green 600 */)
+@mixin Button()
 {
 	.component-button
 	{
+		--background-color: transparent;
+
+		background-color: var(--background-color);
+
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -19,9 +23,7 @@
 
 		padding: 1rem 1.5rem;
 
-		background-color: $color;
 		border: none;
-		color: #ffffff;
 
 		width: 100%;
 
@@ -37,10 +39,70 @@
 			&:hover,
 			&:focus
 			{
-				background-color: hsl(from $color h s 30%);
+				background-color: hsl(from var(--background-color) h s 30%);
 	
 				cursor: pointer;
 			}
 		}
+
+		// Style names taken from Bootstrap
+		&.primary
+		{
+			--background-color: #0284c7; // Tailwind Sky 600
+
+			color: #f3f4f6; // Tailwind Gray 100
+		}
+		
+		&.secondary
+		{
+			--background-color: #4b5563; // Tailwind Gray 600
+
+			color: #f3f4f6; // Tailwind Gray 100
+		}
+
+		&.success
+		{
+			--background-color: #16a34a; // Tailwind Green 600
+
+			color: #f3f4f6; // Tailwind Gray 100
+		}
+
+		&.danger
+		{
+			--background-color: #dc2626; // Tailwind Red 600
+
+			color: #f3f4f6; // Tailwind Gray 100
+		}
+
+		&.warning
+		{
+			--background-color: #facc15; // Tailwind Yellow 400
+
+			color: #000000;
+		}
+
+		&.info
+		{
+			--background-color: #22d3ee; // Tailwind Cyan 400
+
+			color: #000000;
+		}
+
+		&.link
+		{
+			--background-color: transparent;
+
+			color: #0ea5e9; // Tailwind Sky 500
+
+			&:hover
+			{
+				text-decoration: underline;
+			}
+		}
+	}
+
+	a.component-button
+	{
+		text-decoration: none;
 	}
 }

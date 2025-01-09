@@ -64,41 +64,50 @@ function Banner(game: GameDetailsGame)
 
 function PlayActionButtonGroup(game: GameDetailsGame)
 {
-	let children: Child;
+	let children: Child[] = [];
 
 	if (!game.isInstalled)
 	{
-		children = Button(
+		children.push(Button(
 			{
-				text: "Not installed",
+				style: "secondary",
+				type: "button",
 				extraAttributes:
 				{
 					disabled: true,
 				},
-			});
+				text: "Not installed",
+			}));
 	}
 	else if (game.gamePlayActions.length == 0)
 	{
-		children = Button(
+		children.push(Button(
 			{
-				text: "No play actions available",
+				style: "secondary",
+				type: "button",
 				extraAttributes:
 				{
 					disabled: true,
 				},
-			});
+				text: "No play actions available",
+			}));
 	}
 	else
 	{
-		children = game.gamePlayActions.map((gamePlayAction) => Button(
-			{
-				iconName: "fa-solid fa-play",
-				text: gamePlayAction.name,
-				extraAttributes:
+		for (const gamePlayAction of game.gamePlayActions)
+		{
+			children.push(Button(
 				{
-					"data-game-play-action-id": gamePlayAction.id,
-				},
-			}));
+					style: "success",
+					type: "button",
+					extraAttributes:
+					{
+						"data-game-play-action-id": gamePlayAction.id,
+					},
+					iconName: "fa-solid fa-play",
+					text: gamePlayAction.name,
+				}));
+		}
 	}
 
 	return new DE("div",
