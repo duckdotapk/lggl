@@ -1,0 +1,20 @@
+//
+// Imports
+//
+
+@use "../_Mixins.scss";
+
+//
+// Component
+//
+
+@mixin Label()
+{
+	.component-label
+	{
+		display: block;
+		font-weight: bold;
+
+		@include Mixins.Margin();
+	}
+}
