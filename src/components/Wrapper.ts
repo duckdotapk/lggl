@@ -10,5 +10,5 @@ import { Child, DE } from "@donutteam/document-builder";
 
 export function Wrapper(children: Child)
 {
-	return new DE("div", "component-wrapper", children);
+	return new DE("div", "component-wrapper", new DE("div", "content", children));
 }
