@@ -35,7 +35,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (gameCompany == null)
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game company not found." });
+				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "GameCompany not found." });
 			}
 
 			const gameCompanyUpdateData: Prisma.GameCompanyUpdateArgs["data"] = {};
@@ -52,7 +52,20 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (requestBody.updateData.company_id !== undefined)
 			{
-				gameCompanyUpdateData.company_id = requestBody.updateData.company_id;
+				const company = await prismaClient.company.findUnique(
+					{
+						where:
+						{
+							id: requestBody.updateData.company_id,
+						},
+					});
+				
+				if (company == null)
+				{
+					throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Company not found." });
+				}
+
+				gameCompanyUpdateData.company_id = company.id;
 			}
 
 			if (Object.keys(gameCompanyUpdateData).length == 0)
