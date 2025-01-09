@@ -224,6 +224,12 @@ export function GameDetails(game: GameDetailsGame)
 				// Note: This is a URL they have that will redirect to the correct page, pretty neat
 				url: "https://www.pcgamingwiki.com/api/appid.php?appid=" + game.steamAppId,
 			});
+
+		links.push(
+			{
+				title: "ProtonDB",
+				url: "https://www.protondb.com/app/" + game.steamAppId,
+			});
 	}
 
 	for (const gameLink of game.gameLinks)
