@@ -18,7 +18,7 @@ import * as GameModelLib from "../libs/models/Game.js";
 // Locals
 //
 
-function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: GameListSelectedGame, searchParameters: URLSearchParams)
+function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: GameListSelectedGame)
 {
 	let className = "component-game-list-group-item";
 
@@ -27,17 +27,13 @@ function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: GameListSelec
 		className += " selected";
 	}
 
-	const itemSearchParameters = new URLSearchParams(searchParameters);
-
-	itemSearchParameters.set("selectedGameId", groupGame.game.id.toString());
-
 	const imageUrls = GameModelLib.getImageUrls(groupGame.game);
 
 	return new DE("a",
 		{
 			class: className,
 
-			href: "/?" + itemSearchParameters.toString(),
+			href: "/games/view/" + groupGame.game.id,
 
 			"data-name": groupGame.game.name,
 			"data-normalized-name": groupGame.game.name.toLowerCase().replace(/[^a-z0-9]/g, " "), // TODO: move this to GameModelLib utility function
@@ -69,7 +65,7 @@ function Item(groupGame: GameGroupManagerGroupEntry, selectedGame: GameListSelec
 		]);
 }
 
-function Group(group: GameGroupManagerGroup, selectedGame: GameListSelectedGame, searchParameters: URLSearchParams)
+function Group(group: GameGroupManagerGroup, selectedGame:GameListSelectedGame)
 {
 	return new DE("details",
 		{
@@ -86,7 +82,7 @@ function Group(group: GameGroupManagerGroup, selectedGame: GameListSelectedGame,
 					")",
 				]),
 
-			group.entries.map((groupGame) => Item(groupGame, selectedGame, searchParameters)),
+			group.entries.map((groupGame) => Item(groupGame, selectedGame)),
 		]);
 }
 
@@ -106,12 +102,12 @@ function Search()
 
 export type GameListSelectedGame = Prisma.GameGetPayload<null> | null;
 
-export function GameList(gameGroupManager: GameGroupManager, selectedGame: GameListSelectedGame, searchParameters: URLSearchParams)
+export function GameList(gameGroupManager: GameGroupManager, selectedGame: GameListSelectedGame)
 {
 	return new DE("aside", "component-game-list",
 		[
 			Search(),
 
-			gameGroupManager.getGroups().map((group) => Group(group, selectedGame, searchParameters)),
+			gameGroupManager.getGroups().map((group) => Group(group, selectedGame)),
 		]);
 }

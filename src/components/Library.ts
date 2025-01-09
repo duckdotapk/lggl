@@ -19,10 +19,9 @@ import * as SettingModelLib from "../libs/models/Setting.js";
 
 export type LibraryOptions =
 {
-	searchParameters: URLSearchParams;
 	settings: SettingModelLib.Settings;
 	gameGroupManager: GameGroupManager;
-	game: GameDetailsGame | null;
+	selectedGame: GameDetailsGame | null;
 };
 
 export function Library(options: LibraryOptions)
@@ -31,10 +30,8 @@ export function Library(options: LibraryOptions)
 		[
 			FilterSettingsToolbar(options.settings),
 
-			GameList(options.gameGroupManager, options.game, options.searchParameters),
+			GameList(options.gameGroupManager, options.selectedGame),
 
-			options.game != null
-				? GameDetails(options.game)
-				: null,
+			options.selectedGame != null ? GameDetails(options.selectedGame) : null,
 		]);
 }

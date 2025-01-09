@@ -4,12 +4,12 @@
 
 import * as Fritter from "@donutteam/fritter";
 
-import { ServerFritterContext } from "../instances/server.js";
+import { prismaClient } from "../../instances/prismaClient.js";
+import { ServerFritterContext } from "../../instances/server.js";
 
-import * as AuditLib from "../libs/Audit.js";
+import * as AuditLib from "../../libs/Audit.js";
 
-import { view } from "../views/audit.js";
-import { prismaClient } from "../instances/prismaClient.js";
+import { view } from "../../views/audit/_main.js";
 
 //
 // Route

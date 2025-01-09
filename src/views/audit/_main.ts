@@ -4,14 +4,14 @@
 
 import { DE } from "@donutteam/document-builder";
 
-import { Anchor } from "../components/basic/Anchor.js";
-import { Header } from "../components/basic/Header.js";
-import { Paragraph } from "../components/basic/Paragraph.js";
+import { Anchor } from "../../components/basic/Anchor.js";
+import { Header } from "../../components/basic/Header.js";
+import { Paragraph } from "../../components/basic/Paragraph.js";
 
-import { SiteOptions } from "../components/Site.js";
-import { Wrapper } from "../components/Wrapper.js";
+import { SiteOptions } from "../../components/Site.js";
+import { Wrapper } from "../../components/Wrapper.js";
 
-import * as AuditLib from "../libs/Audit.js";
+import * as AuditLib from "../../libs/Audit.js";
 
 //
 // View
