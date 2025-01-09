@@ -204,9 +204,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.steamAppName = requestBody.updateData.steamAppName;
 			}
 
-			// TODO: remove this
-			console.log("[/api/games/update] Update data:", gameUpdateData);
-
 			if (Object.keys(gameUpdateData).length == 0)
 			{
 				return {
