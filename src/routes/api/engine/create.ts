@@ -42,6 +42,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 					data:
 					{
 						name: requestBody.name,
+						shortName: requestBody.shortName,
 					},
 				});
 
