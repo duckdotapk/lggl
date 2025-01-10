@@ -26,15 +26,14 @@ async function initialise(form: HTMLFormElement)
 	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
 	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-	const saveButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="save"]`);
-
-	form.addEventListener("submit", (event) => event.preventDefault());
 
 	if (gameCompanyId == null)
 	{
-		saveButton.addEventListener("click",
-			async () =>
+		form.addEventListener("submit",
+			async (event) =>
 			{
+				event.preventDefault();
+
 				try
 				{
 					InputClientLib.disableInputs(form);
@@ -100,9 +99,11 @@ async function initialise(form: HTMLFormElement)
 				}
 			});
 
-		saveButton.addEventListener("click",
-			async () =>
+		form.addEventListener("submit",
+			async (event) =>
 			{
+				event.preventDefault();
+
 				try
 				{
 					InputClientLib.disableInputs(form);
