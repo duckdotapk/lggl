@@ -1,5 +1,11 @@
 //
-// Component
+// Constants
+//
+
+$border-color: #374151;
+
+//
+// Mixins 
 //
 
 @mixin Resets()
@@ -32,5 +38,23 @@
 		display: block;
 
 		max-width: 100%;
+	}
+}
+
+@mixin Margins($size: 0.75rem)
+{
+	&
+	{
+		margin: 0;
+	}
+
+	&:not(:first-child)
+	{
+		margin-top: $size;
+	}
+
+	&:not(:last-child)
+	{
+		margin-bottom: $size;
 	}
 }

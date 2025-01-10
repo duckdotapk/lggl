@@ -2,7 +2,7 @@
 // Imports
 //
 
-@use "../_Mixins.scss";
+@use "../_Globals.scss";
 
 //
 // Component
@@ -48,6 +48,6 @@
 
 	.component-tab-control
 	{
-		@include Mixins.Margins();
+		@include Globals.Margins();
 	}
 }

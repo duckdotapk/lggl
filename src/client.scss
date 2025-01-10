@@ -4,7 +4,7 @@
 
 @use "../node_modules/normalize.css/normalize.css";
 
-@use "components/_Global.scss";
+@use "components/_Globals.scss";
 
 @use "components/basic/Anchor.scss";
 @use "components/basic/Breadcrumbs.scss";
@@ -34,7 +34,7 @@
 // Client
 //
 
-@include Global.Resets();
+@include Globals.Resets();
 
 @include Anchor.Anchor();
 @include Breadcrumbs.Breadcrumbs();

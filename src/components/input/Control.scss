@@ -2,7 +2,7 @@
 // Imports
 //
 
-@use "../_Mixins.scss";
+@use "../_Globals.scss";
 
 //
 // Component
@@ -21,7 +21,7 @@
 
 		padding: 0.5rem;
 
-		@include Mixins.Margins();
+		@include Globals.Margins();
 
 		&:user-invalid
 		{

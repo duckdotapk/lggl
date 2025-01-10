@@ -2,7 +2,7 @@
 // Imports
 //
 
-@use "../_Mixins.scss";
+@use "../_Globals.scss";
 
 //
 // Component
@@ -27,7 +27,7 @@
 
 		width: 100%;
 
-		@include Mixins.Margins();
+		@include Globals.Margins();
 
 		&:disabled
 		{

@@ -2,7 +2,7 @@
 // Imports
 //
 
-@use "../_Mixins.scss";
+@use "../_Globals.scss";
 
 //
 // Component
@@ -15,6 +15,6 @@
 		display: block;
 		font-weight: bold;
 
-		@include Mixins.Margins();
+		@include Globals.Margins();
 	}
 }

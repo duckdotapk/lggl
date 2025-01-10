@@ -2,7 +2,7 @@
 // Imports
 //
 
-@use "../_Mixins.scss";
+@use "../_Globals.scss";
 
 //
 // Component
@@ -16,7 +16,7 @@
 		gap: 0.5rem;
 		align-items: center;
 
-		@include Mixins.Margins();
+		@include Globals.Margins();
 
 		&:has(> [data-dirty="true"])
 		{

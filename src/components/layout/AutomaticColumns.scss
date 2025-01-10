@@ -2,7 +2,7 @@
 // Imports
 //
 
-@use "../_Mixins.scss";
+@use "../_Globals.scss";
 
 //
 // Component
@@ -18,7 +18,7 @@
 
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--component-automatic-columns-minimum-column-width)), 1fr));
 
-		@include Mixins.Margins();
+		@include Globals.Margins();
 
 		> *
 		{
