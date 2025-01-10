@@ -45,7 +45,6 @@ async function initialise(form: HTMLFormElement)
 						return console.error("[UpsertCompanyForm] Error creating Company:", response.errors);
 					}
 
-					// TODO: don't reload the page here
 					window.location.href = "/companies/view/" + response.company.id;
 				}
 				catch (error)

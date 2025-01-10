@@ -38,7 +38,7 @@ export function UpsertCompanyForm(company: UpsertCompanyFormCompany)
 							type: "text",
 							name: "name",
 							required: true,
-							placeholder: "Company name",
+							placeholder: "Name",
 							value: company?.name,
 						}),
 				]),

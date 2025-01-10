@@ -26,7 +26,7 @@ type ViewOptions =
 
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
-	const pageTitle = "Edit " + options.company.name;
+	const pageTitle = options.company.name;
 
 	return {
 		currentPage: "companies",
@@ -46,7 +46,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						style: "success",
 						href: "/companies/edit/" + options.company.id,
 						iconName: "fa-solid fa-pen-to-square",
-						text: "Edit company",
+						text: "Edit",
 					}),
 
 				options.gamesDeveloped.length > 0

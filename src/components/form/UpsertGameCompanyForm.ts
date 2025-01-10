@@ -76,7 +76,7 @@ export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
 									type: "text",
 									name: "notes",
 									required: false,
-									placeholder: "Enter additional notes",
+									placeholder: "Notes",
 									value: options.gameCompany?.notes,
 								}),
 						]),
