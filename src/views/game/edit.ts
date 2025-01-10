@@ -6,8 +6,9 @@ import { DE } from "@donutteam/document-builder";
 
 import { Anchor } from "../../components/basic/Anchor.js";
 import { Header } from "../../components/basic/Header.js";
-
 import { Muted } from "../../components/basic/Muted.js";
+
+import { TabControl } from "../../components/input/TabControl.js";
 
 import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/UpsertGameForm.js";
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
@@ -15,8 +16,6 @@ import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../compo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as SettingModelLib from "../../libs/models/Setting.js";
-import { TabControl } from "../../components/input/TabControl.js";
 
 //
 // View
@@ -24,7 +23,6 @@ import { TabControl } from "../../components/input/TabControl.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
 	companies: UpsertGameCompanyFormOptions["companies"];
 	game: NonNullable<UpsertGameFormGame>;
 	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
