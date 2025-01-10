@@ -41,7 +41,7 @@ function Item(options: ItemOptions)
 // Component
 //
 
-export type SidebarPage = "games" | "audit" | null;
+export type SidebarPage = "games" | "companies" | "audit" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -53,6 +53,14 @@ export function Sidebar(currentPage: SidebarPage)
 					href: "/games",
 					iconName: "fa-solid fa-joystick",
 					text: "Games",
+				}),
+
+			Item(
+				{
+					isCurrent: currentPage == "companies",
+					href: "/companies",
+					iconName: "fa-solid fa-building",
+					text: "Companies",
 				}),
 
 			Item(
