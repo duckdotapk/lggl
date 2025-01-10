@@ -2,11 +2,8 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
-
-import { Anchor } from "../../components/basic/Anchor.js";
+import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
-import { Muted } from "../../components/basic/Muted.js";
 
 import { TabControl } from "../../components/input/TabControl.js";
 
@@ -35,11 +32,14 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		pageTitle: "Edit " + options.game.name,
 		content: Wrapper("45rem",
 			[
-				Muted(Anchor([ new DE("span", "fa-solid fa-arrow-left"), " Back to game" ], "/games/view/" + options.game.id)),
+				Breadcrumbs(
+					[
+						{ href: "/games", text: "Games" },
+						{ href: "/games/view/" + options.game.id, text: options.game.name },
+						{ href: "/games/edit/" + options.game.id, text: "Edit" },
+					]),
 
 				Header(1, "Edit " + options.game.name),
-
-				Header(2, "Game #" + options.game.id),
 
 				UpsertGameForm(options.game),
 
@@ -72,38 +72,6 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 										gameCompany: null,
 									}),
 							],
-						},
-						{
-							title: "Engines",
-							content: [],
-						},
-						{
-							title: "Genres",
-							content: [],
-						},
-						{
-							title: "Installations",
-							content: [],
-						},
-						{
-							title: "Links",
-							content: [],
-						},
-						{
-							title: "Modes",
-							content: [],
-						},
-						{
-							title: "Platforms",
-							content: [],
-						},
-						{
-							title: "Play actions",
-							content: [],
-						},
-						{
-							title: "Play sessions",
-							content: [],
 						},
 					]),
 			]),
