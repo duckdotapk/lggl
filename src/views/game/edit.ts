@@ -31,7 +31,7 @@ export type ViewOptions =
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
 	return {
-		currentPage: null,
+		currentPage: "games",
 		pageTitle: "Edit " + options.game.name,
 		content: Wrapper("45rem",
 			[
