@@ -3,6 +3,7 @@
 //
 
 import { initialiseUpsertCompanyForms } from "./components/form/UpsertCompanyForm.client.js";
+import { initialiseUpsertEngineForms } from "./components/form/UpsertEngineForm.client.js";
 import { initialiseUpsertGameForms } from "./components/form/UpsertGameForm.client.js";
 import { initialiseUpsertGameCompanyForms } from "./components/form/UpsertGameCompanyForm.client.js";
 
@@ -20,6 +21,7 @@ import { initialiseGameLists } from "./components/GameList.client.js";
 //
 
 initialiseUpsertCompanyForms();
+initialiseUpsertEngineForms();
 initialiseUpsertGameForms();
 initialiseUpsertGameCompanyForms();
 

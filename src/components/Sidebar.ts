@@ -46,7 +46,7 @@ function Separator()
 // Component
 //
 
-export type SidebarPage = "games" | "companies" | "audit" | null;
+export type SidebarPage = "games" | "companies" | "engines" | "audit" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -70,7 +70,13 @@ export function Sidebar(currentPage: SidebarPage)
 					text: "Companies",
 				}),
 
-			// TODO: Engines item
+			Item(
+				{
+					isCurrent: currentPage == "engines",
+					href: "/engines",
+					iconName: "fa-solid fa-engine",
+					text: "Engines",
+				}),
 
 			// TODO: Modes item
 
