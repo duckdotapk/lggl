@@ -7,6 +7,7 @@
 @use "components/_Globals.scss";
 
 @use "components/basic/Anchor.scss";
+@use "components/basic/Block.scss";
 @use "components/basic/Breadcrumbs.scss";
 @use "components/basic/Header.scss";
 @use "components/basic/Muted.scss";
@@ -37,6 +38,7 @@
 @include Globals.Resets();
 
 @include Anchor.Anchor();
+@include Block.Block();
 @include Breadcrumbs.Breadcrumbs();
 @include Header.Header();
 @include Muted.Muted();

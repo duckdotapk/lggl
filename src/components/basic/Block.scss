@@ -1,0 +1,21 @@
+//
+// Imports
+//
+
+@use "../_Globals.scss";
+
+//
+// Component
+//
+
+@mixin Block()
+{
+	.component-block
+	{
+		border: 1px solid Globals.$border-color;
+
+		padding: 0.75rem;
+
+		@include Globals.Margins();
+	}
+}
