@@ -29,10 +29,10 @@ export function UpsertCompanyForm(company: UpsertCompanyFormCompany)
 			"data-company-id": company?.id,
 		},
 		[
-			Label("name", "Name"),
-
 			Block(
 				[
+					Label("name", "Name"),
+
 					Control(
 						{
 							type: "text",
