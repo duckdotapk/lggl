@@ -34,7 +34,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (existingCompany != null)
 			{
-				throw new FritterApiUtilities.APIError({ code: "COMPANY_ALREADY_EXISTS", message: "A company with this name already exists." });
+				throw new FritterApiUtilities.APIError({ code: "DATA_ALREADY_EXISTS", message: "A company with this name already exists." });
 			}
 
 			const company = await prismaClient.company.create(

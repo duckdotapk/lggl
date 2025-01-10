@@ -34,7 +34,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (company == null)
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT FOUND", message: "Company not found." });
+				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Company not found." });
 			}
 
 			await prismaClient.company.delete(

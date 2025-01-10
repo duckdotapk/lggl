@@ -35,7 +35,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (company == null)
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "GameCompany not found." });
+				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Company not found." });
 			}
 
 			const companyUpdateData: Prisma.CompanyUpdateArgs["data"] = {};
@@ -52,7 +52,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				};
 			}
 
-			await prismaClient.gameCompany.update(
+			await prismaClient.company.update(
 				{
 					where:
 					{
