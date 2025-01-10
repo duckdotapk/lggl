@@ -2,6 +2,7 @@
 // Imports
 //
 
+import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
@@ -43,34 +44,25 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				UpsertGameForm(options.game),
 
-				Header(2, "Related data"),
-
 				TabControl(
 					[
 						{
 							title: "Companies",
 							content:
 							[				
-								options.gameCompanies.map((gameCompany) =>
-									[
-										Header(3, "Game company #" + gameCompany.id),
-				
-										UpsertGameCompanyForm(
-											{
-												companies: options.companies, 
-												game: options.game,
-												gameCompany,
-											}),
-									]),
-
-								Header(3, "Add new game company"),
+								options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
+									{
+										companies: options.companies, 
+										game: options.game,
+										gameCompany,
+									}))),
 					
-								UpsertGameCompanyForm(
+								Block(UpsertGameCompanyForm(
 									{
 										companies: options.companies,
 										game: options.game,
 										gameCompany: null,
-									}),
+									})),
 							],
 						},
 					]),

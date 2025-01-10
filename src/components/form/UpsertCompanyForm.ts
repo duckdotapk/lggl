@@ -5,6 +5,8 @@
 import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 
+import { Block } from "../basic/Block.js";
+
 import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
@@ -29,14 +31,17 @@ export function UpsertCompanyForm(company: UpsertCompanyFormCompany)
 		[
 			Label("name", "Name"),
 
-			Control(
-				{
-					type: "text",
-					name: "name",
-					required: true,
-					placeholder: "Company name",
-					value: company?.name,
-				}),
+			Block(
+				[
+					Control(
+						{
+							type: "text",
+							name: "name",
+							required: true,
+							placeholder: "Company name",
+							value: company?.name,
+						}),
+				]),
 
 			Columns(company != null ? 2 : 1,
 				[

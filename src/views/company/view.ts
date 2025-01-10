@@ -37,8 +37,6 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				Header(1, pageTitle),
 
-				Header(2, "Edit company"),
-
 				Button(
 					{
 						style: "success",

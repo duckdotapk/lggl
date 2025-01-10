@@ -5,9 +5,11 @@
 import { Prisma } from "@prisma/client";
 
 import { Anchor } from "../../components/basic/Anchor.js";
+import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
-import { Paragraph } from "../../components/basic/Paragraph.js";
+
+import { AutomaticColumns } from "../../components/layout/AutomaticColumns.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -36,8 +38,6 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				Header(1, "Companies"),
 
-				Header(2, "Create company"),
-
 				Button(
 					{
 						href: "/companies/create",
@@ -46,9 +46,8 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						text: "Create company",
 					}),
 
-				Header(2, "Existing companies"),
 
-				options.companies.map((company) => Paragraph(Anchor(company.name, "/companies/view/" + company.id))),
+				AutomaticColumns("14rem", options.companies.map((company) => Block(Anchor(company.name, "/companies/view/" + company.id))))
 			]),
 	};
 }
