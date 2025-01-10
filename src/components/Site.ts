@@ -34,6 +34,10 @@ export function Site(options: SiteOptions)
 		[
 			new DE("head", null,
 				[
+					new DE("meta", { charset: "utf-8" }),
+					
+					new DE("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
+
 					new DE("title", null, pageTitle),
 
 					new DE("link",
