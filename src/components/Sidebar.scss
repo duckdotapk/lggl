@@ -26,6 +26,11 @@
 		}
 	}
 
+	.component-sidebar-separator
+	{
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
+	}
+
 	.component-sidebar
 	{
 		height: 100%;

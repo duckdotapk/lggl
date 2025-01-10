@@ -37,6 +37,11 @@ function Item(options: ItemOptions)
 		]);
 }
 
+function Separator()
+{
+	return new DE("div", "component-sidebar-separator");
+}
+
 //
 // Component
 //
@@ -55,6 +60,8 @@ export function Sidebar(currentPage: SidebarPage)
 					text: "Games",
 				}),
 
+			Separator(),
+
 			Item(
 				{
 					isCurrent: currentPage == "companies",
@@ -63,6 +70,18 @@ export function Sidebar(currentPage: SidebarPage)
 					text: "Companies",
 				}),
 
+			// TODO: Engines item
+
+			// TODO: Modes item
+
+			// TODO: Genres item
+
+			// TODO: Platforms item
+
+			// TODO: Series item
+
+			Separator(),
+
 			Item(
 				{
 					isCurrent: currentPage == "audit",
@@ -70,5 +89,7 @@ export function Sidebar(currentPage: SidebarPage)
 					iconName: "fa-solid fa-clipboard-list",
 					text: "Audit",
 				}),
+
+			// TODO: Settings item
 		]);
 }
