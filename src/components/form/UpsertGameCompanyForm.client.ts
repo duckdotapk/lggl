@@ -44,7 +44,7 @@ async function initialise(form: HTMLFormElement)
 							game_id: gameId,
 							company_id: InputClientLib.getNumberValue(companyIdSelect),
 							type: InputClientLib.getEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
-							notes: InputClientLib.getStringValue(notesInput),
+							notes: InputClientLib.getStringValueNullable(notesInput),
 						});
 
 					// TODO: show notifications on success/failure
