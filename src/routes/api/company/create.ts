@@ -24,7 +24,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 		responseBodySchema: Schemas.ResponseBodySchema,
 		handler: async (requestBody) =>
 		{
-			const company = await prismaClient.company.findUnique(
+			const existingCompany = await prismaClient.company.findUnique(
 				{
 					where:
 					{
@@ -32,12 +32,12 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 					},
 				});
 
-			if (company != null)
+			if (existingCompany != null)
 			{
 				throw new FritterApiUtilities.APIError({ code: "COMPANY_ALREADY_EXISTS", message: "A company with this name already exists." });
 			}
 
-			await prismaClient.company.create(
+			const company = await prismaClient.company.create(
 				{
 					data:
 					{
@@ -47,6 +47,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			return {
 				success: true,
+				company,
 			};
 		},
 	});

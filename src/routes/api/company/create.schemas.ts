@@ -16,7 +16,13 @@ export const RequestBodySchema = z.object(
 
 export const ResponseBodySchema = z.union(
 	[
-		FritterApiUtilities.SuccessResponseBodySchema,
+		FritterApiUtilities.SuccessResponseBodySchema.extend(
+			{
+				company: z.object(
+					{
+						id: z.number(),
+					}),
+			}),
 
 		FritterApiUtilities.ErrorResponseBodySchema,
 	]);
