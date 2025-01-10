@@ -7,6 +7,8 @@ import * as Fritter from "@donutteam/fritter";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
+import * as GameCompanySchemaLib from "../../libs/schemas/GameCompany.js";
+
 import { view } from "../../views/company/view.js";
 
 //
@@ -47,9 +49,51 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			return;
 		}
 
+		const gamesDeveloped = await prismaClient.game.findMany(
+			{
+				where:
+				{
+					gameCompanies:
+					{
+						some:
+						{
+							type: "DEVELOPER" satisfies GameCompanySchemaLib.Type,
+
+							company_id: companyId,
+						},
+					},
+				},
+				orderBy:
+				[
+					{ sortName: "asc" },
+				],
+			});
+
+		const gamesPublished = await prismaClient.game.findMany(
+			{
+				where:
+				{
+					gameCompanies:
+					{
+						some:
+						{
+							type: "PUBLISHER" satisfies GameCompanySchemaLib.Type,
+
+							company_id: companyId,
+						},
+					},
+				},
+				orderBy:
+				[
+					{ sortName: "asc" },
+				],
+			});
+
 		context.renderComponent(view(
 			{
 				company,
+				gamesDeveloped,
+				gamesPublished,
 			}));
 	},
 };

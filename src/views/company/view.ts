@@ -10,6 +10,8 @@ import { Header } from "../../components/basic/Header.js";
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 import { Button } from "../../components/input/Button.js";
+import { Block } from "../../components/basic/Block.js";
+import { Anchor } from "../../components/basic/Anchor.js";
 
 //
 // View
@@ -18,6 +20,8 @@ import { Button } from "../../components/input/Button.js";
 type ViewOptions =
 {
 	company: Prisma.CompanyGetPayload<null>;
+	gamesDeveloped: Prisma.GameGetPayload<null>[];
+	gamesPublished: Prisma.GameGetPayload<null>[];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -45,7 +49,23 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						text: "Edit company",
 					}),
 
-				// TODO: List games by this company?
+				options.gamesDeveloped.length > 0
+					? [
+						Header(2, "Games developed"),
+		
+						// TODO: make a "grid" component that shows the game's cover art?
+						options.gamesDeveloped.map((game) => Block(Anchor(game.name, "/games/view/" + game.id))),
+					]
+					: null,
+
+				options.gamesPublished.length > 0
+					? [
+						Header(2, "Games published"),
+		
+						// TODO: make a "grid" component that shows the game's cover art?
+						options.gamesPublished.map((game) => Block(Anchor(game.name, "/games/view/" + game.id))),
+					]
+					: null,
 			]),
 	};
 }
