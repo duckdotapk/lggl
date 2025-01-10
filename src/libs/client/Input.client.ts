@@ -59,6 +59,11 @@ export function getStringValue(input: HTMLInputElement | HTMLSelectElement | HTM
 	return input.value;
 }
 
+export function getStringValueNullable(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
+{
+	return input.value.trim() != "" ? input.value.trim() : null;
+}
+
 export function isInputDirty(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
 {
 	return BrowserUtilities.ElementClientLib.getBooleanData(input, "dirty") ?? false;
