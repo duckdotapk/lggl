@@ -112,7 +112,7 @@ async function initialise(form: HTMLFormElement)
 						{
 							company_id: InputClientLib.getChangedNumberValue(companyIdSelect),
 							type: InputClientLib.getChangedEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
-							notes: InputClientLib.getChangedStringValue(notesInput),
+							notes: InputClientLib.getChangedStringValueNullable(notesInput),
 						});
 
 					// TODO: show notifications on success/failure
