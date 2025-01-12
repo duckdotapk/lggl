@@ -65,7 +65,6 @@ export type AuditGameGame = Prisma.GameGetPayload<
 			gameGenres: true;
 			gameInstallations: true;
 			gameLinks: true;
-			gameModes: true;
 			gamePlatforms: true;
 			gamePlayActions: true;
 			gamePlaySessions: true;

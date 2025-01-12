@@ -32,7 +32,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					gameGenres: true,
 					gameInstallations: true,
 					gameLinks: true,
-					gameModes: true,
 					gamePlatforms: true,
 					gamePlayActions: true,
 					gamePlaySessions: true,
