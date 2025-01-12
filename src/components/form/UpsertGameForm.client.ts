@@ -4,17 +4,16 @@
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
-import { updateGame } from "../../routes/api/game/update.schemas.js";
-
 import * as InputClientLib from "../../libs/client/Input.client.js";
 
 import * as GameSchemaLib from "../../libs/schemas/Game.js";
 
+import { createGame } from "../../routes/api/game/create.schemas.js";
+import { updateGame } from "../../routes/api/game/update.schemas.js";
+
 //
 // Locals
 //
-
-
 
 async function initialise(form: HTMLFormElement)
 {
@@ -73,8 +72,55 @@ async function initialise(form: HTMLFormElement)
 				{
 					InputClientLib.disableInputs(form);
 
-					// TODO: this
-					throw new Error("Not implemented.");
+					const response = await createGame(
+						{
+							name: InputClientLib.getStringValue(nameInput),
+							sortName: InputClientLib.getStringValue(sortNameInput),
+							releaseDate: InputClientLib.getDateValueNullable(releaseDateInput),
+							description: InputClientLib.getStringValueNullable(descriptionInput),
+							notes: InputClientLib.getStringValueNullable(notesInput),
+							progressionType: InputClientLib.getEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
+
+							hasBannerImage: InputClientLib.getBooleanValue(hasBannerImageInput),
+							hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
+							hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
+							hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
+
+							isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
+							isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
+							isHidden: InputClientLib.getBooleanValue(isHiddenInput),
+							isInstalled: InputClientLib.getBooleanValue(isInstalledInput),
+							isNsfw: InputClientLib.getBooleanValue(isNsfwInput),
+							isShelved: InputClientLib.getBooleanValue(isShelvedInput),
+							isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
+							isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
+
+							completionStatus: InputClientLib.getEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
+							firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
+							firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
+							firstCompletedDate: InputClientLib.getDateTimeValueNullable(firstCompletedDateInput),
+							firstCompletedDateApproximated: InputClientLib.getBooleanValue(firstCompletedDateApproximatedInput),
+							lastPlayedDate: InputClientLib.getDateTimeValueNullable(lastPlayedDateInput),
+							playCount: InputClientLib.getNumberValue(playCountInput),
+							playTimeTotalSeconds: InputClientLib.getNumberValue(playTimeTotalSecondsInput),
+
+							achievementSupport: InputClientLib.getEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
+							controllerSupport: InputClientLib.getEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
+							modSupport: InputClientLib.getEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
+							virtualRealitySupport: InputClientLib.getEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
+
+							steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
+							steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
+						});
+	
+					// TODO: show notifications on success/failure
+
+					if (!response.success)
+					{
+						return console.error("[UpsertGameForm] Error creating Game:", response.errors);
+					}
+
+					window.location.href = "/games/edit/" + response.game.id;
 				}
 				catch (error)
 				{

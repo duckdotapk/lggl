@@ -46,7 +46,7 @@ function Separator()
 // Component
 //
 
-export type SidebarPage = "games" | "companies" | "engines" | "audit" | null;
+export type SidebarPage = "games" | "games/create" | "companies" | "engines" | "audit" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -58,6 +58,14 @@ export function Sidebar(currentPage: SidebarPage)
 					href: "/games",
 					iconName: "fa-solid fa-joystick",
 					text: "Games",
+				}),
+
+			Item(
+				{
+					isCurrent: currentPage == "games/create",
+					href: "/games/create",
+					iconName: "fa-solid fa-plus",
+					text: "Create game",
 				}),
 
 			Separator(),
