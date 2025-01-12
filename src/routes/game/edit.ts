@@ -59,7 +59,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			{
 				orderBy:
 				[
-					{ shortName: "asc" },
+					{ name: "asc" },
 				],
 			});
 
