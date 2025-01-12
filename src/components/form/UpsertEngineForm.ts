@@ -53,7 +53,7 @@ export function UpsertEngineForm(engine: UpsertEngineFormEngine)
 								{
 									type: "text",
 									name: "shortName",
-									required: true,
+									required: false,
 									placeholder: "Short name",
 									value: engine?.shortName,
 								}),
