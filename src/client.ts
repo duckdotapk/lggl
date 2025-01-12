@@ -6,6 +6,7 @@ import { initialiseUpsertCompanyForms } from "./components/form/UpsertCompanyFor
 import { initialiseUpsertEngineForms } from "./components/form/UpsertEngineForm.client.js";
 import { initialiseUpsertGameForms } from "./components/form/UpsertGameForm.client.js";
 import { initialiseUpsertGameCompanyForms } from "./components/form/UpsertGameCompanyForm.client.js";
+import { initialiseUpsertGameEngineForms } from "./components/form/UpsertGameEngineForm.client.js";
 
 import { initialiseCheckboxes } from "./components/input/Checkbox.client.js";
 import { initialiseControls } from "./components/input/Control.client.js";
@@ -24,6 +25,7 @@ initialiseUpsertCompanyForms();
 initialiseUpsertEngineForms();
 initialiseUpsertGameForms();
 initialiseUpsertGameCompanyForms();
+initialiseUpsertGameEngineForms();
 
 initialiseCheckboxes();
 initialiseControls();

@@ -55,6 +55,14 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
+		const engines = await prismaClient.engine.findMany(
+			{
+				orderBy:
+				[
+					{ shortName: "asc" },
+				],
+			});
+
 		const gameCompanies = await prismaClient.gameCompany.findMany(
 			{
 				where:
@@ -72,11 +80,29 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
+		const gameEngines = await prismaClient.gameEngine.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				include:
+				{
+					engine: true,
+				},
+				orderBy:
+				[
+					{ engine: { shortName: "asc" } },
+				],
+			});
+
 		context.renderComponent(view(
 			{
 				companies,
+				engines,
 				game,
 				gameCompanies,
+				gameEngines,
 			}));
 	},
 };

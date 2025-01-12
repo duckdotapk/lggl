@@ -10,6 +10,7 @@ import { TabControl } from "../../components/input/TabControl.js";
 
 import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/UpsertGameForm.js";
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
+import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../components/form/UpsertGameEngineForm.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -22,8 +23,10 @@ import { Wrapper } from "../../components/Wrapper.js";
 export type ViewOptions =
 {
 	companies: UpsertGameCompanyFormOptions["companies"];
+	engines: UpsertGameEngineFormOptions["engines"];
 	game: NonNullable<UpsertGameFormGame>;
 	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
+	gameEngines: NonNullable<UpsertGameEngineFormOptions["gameEngine"]>[];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -65,6 +68,25 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 									})),
 							],
 						},
+						{
+							title: "Engines",
+							content:
+							[
+								options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
+									{
+										engines: options.engines,
+										game: options.game,
+										gameEngine,
+									}))),
+					
+								Block(UpsertGameEngineForm(
+									{
+										engines: options.engines,
+										game: options.game,
+										gameEngine: null,
+									})),
+							],
+						}
 					]),
 			]),
 	};
