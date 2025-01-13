@@ -24,6 +24,7 @@ export function CompanySettingsToolbar(settings: SettingModelLib.Settings)
 					name: "companyGroupMode",
 					value: settings.companyGroupMode,
 					required: true,
+					showEmptyOption: false,
 					options:
 					[
 						{ value: "name" satisfies SettingSchemaLib.CompanyGroupMode, label: "Group by Name" },

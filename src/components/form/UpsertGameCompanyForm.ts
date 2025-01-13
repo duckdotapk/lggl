@@ -49,6 +49,7 @@ export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
 									name: "company_id",
 									required: true,
 									value: options.gameCompany?.company_id,
+									showEmptyOption: true,
 									options: options.companies.map((company) => ({ value: company.id, label: company.name }))
 								}),
 						]),
@@ -63,6 +64,7 @@ export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
 									name: "type",
 									required: true,
 									value: options.gameCompany?.type,
+									showEmptyOption: true,
 									options: GameCompanySchemaLib.TypeSchema.options.map((type) => ({ value: type, label: GameCompanyModelLib.getTypeName(type) }))
 								}),
 						]),

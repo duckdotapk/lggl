@@ -24,6 +24,7 @@ export function PlatformSettingsToolbar(settings: SettingModelLib.Settings)
 					name: "platformGroupMode",
 					value: settings.platformGroupMode,
 					required: true,
+					showEmptyOption: false,
 					options:
 					[
 						{ value: "name" satisfies SettingSchemaLib.PlatformGroupMode, label: "Group by Name" },

@@ -45,6 +45,7 @@ export function UpsertGameEngineForm(options: UpsertGameEngineFormOptions)
 									name: "engine_id",
 									required: true,
 									value: options.gameEngine?.engine_id,
+									showEmptyOption: true,
 									options: options.engines.map((engine) => ({ value: engine.id, label: engine.name }))
 								}),
 						]),

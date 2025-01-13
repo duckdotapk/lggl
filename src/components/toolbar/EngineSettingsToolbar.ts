@@ -24,6 +24,7 @@ export function EngineSettingsToolbar(settings: SettingModelLib.Settings)
 					name: "engineGroupMode",
 					value: settings.engineGroupMode,
 					required: true,
+					showEmptyOption: false,
 					options:
 					[
 						{ value: "name" satisfies SettingSchemaLib.EngineGroupMode, label: "Group by Name" },

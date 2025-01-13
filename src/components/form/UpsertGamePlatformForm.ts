@@ -41,6 +41,7 @@ export function UpsertGamePlatformForm(options: UpsertGamePlatformFormOptions)
 					name: "platform_id",
 					required: true,
 					value: options.gamePlatform?.platform_id,
+					showEmptyOption: true,
 					options: options.platforms.map((platform) => ({ value: platform.id, label: platform.name }))
 				}),
 

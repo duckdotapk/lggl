@@ -63,6 +63,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 									name: "type",
 									required: true,
 									value: options.gamePlayAction?.type,
+									showEmptyOption: true,
 									options: GamePlayActionSchemaLib.TypeSchema.options.map((option) => ({ value: option, label: GamePlayActionModelLib.getTypeName(option) }))
 								}),
 						]),

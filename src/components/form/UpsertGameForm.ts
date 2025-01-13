@@ -97,6 +97,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 														name: "progressionType",
 														required: false,
 														value: game?.progressionType ?? null,
+														showEmptyOption: true,
 														options: GameSchemaLib.ProgressionTypeSchema.options.map((option) => ({ value: option, label: GameModelLib.getProgressionTypeName(option) }))
 													}),
 											]),
@@ -171,6 +172,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										name: "completionStatus",
 										required: false,
 										value: game?.completionStatus ?? null,
+										showEmptyOption: true,
 										options: GameSchemaLib.CompletionStatusSchema.options.map((option) => ({ value: option, label: GameModelLib.getCompletionStatusName(option) }))
 									}),
 					
@@ -247,6 +249,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										name: "achievementSupport",
 										required: false,
 										value: game?.achievementSupport ?? null,
+										showEmptyOption: true,
 										options: GameSchemaLib.AchievementSupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getAchievementSupportName(option) }))
 									}),
 					
@@ -258,6 +261,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										name: "controllerSupport",
 										required: false,
 										value: game?.controllerSupport ?? null,
+										showEmptyOption: true,
 										options: GameSchemaLib.ControllerSupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getControllerSupportName(option) }))
 									}),
 					
@@ -269,6 +273,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										name: "modSupport",
 										required: false,
 										value: game?.modSupport ?? null,
+										showEmptyOption: true,
 										options: GameSchemaLib.ModSupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getModSupportName(option) }))
 									}),
 					
@@ -280,6 +285,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										name: "virtualRealitySupport",
 										required: false,
 										value: game?.virtualRealitySupport ?? null,
+										showEmptyOption: true,
 										options: GameSchemaLib.VirtualRealitySupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getVirtualRealitySupportName(option) }))
 									}),
 							]),

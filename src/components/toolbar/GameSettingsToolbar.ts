@@ -25,6 +25,7 @@ export function GameSettingsToolbar(settings: SettingModelLib.Settings)
 					name: "gameGroupMode",
 					value: settings.gameGroupMode,
 					required: true,
+					showEmptyOption: false,
 					options:
 					[
 						{ value: "name" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Name" },

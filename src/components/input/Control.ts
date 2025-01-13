@@ -30,6 +30,7 @@ export type ControlOptions =
 	{
 		type: "select",
 		value?: string | number | null;
+		showEmptyOption: boolean;
 		options: { value: string | number, label: string }[];
 	} |
 	{
@@ -93,12 +94,14 @@ export function Control(options: ControlOptions)
 					required: options.required,
 				},
 				[
-					new DE("option",
-						{
-							value: "",
-							selected: options.value == null,
-						},
-						"- Choose an option -"),
+					options.showEmptyOption
+						? new DE("option",
+							{
+								value: "",
+								selected: options.value == null,
+							},
+							"- Choose an option -")
+						: null,
 
 					...options.options.map(option => new DE("option",
 						{
