@@ -8,7 +8,6 @@
 
 @use "components/basic/Anchor.scss";
 @use "components/basic/Block.scss";
-@use "components/basic/Breadcrumbs.scss";
 @use "components/basic/Header.scss";
 @use "components/basic/Muted.scss";
 @use "components/basic/Paragraph.scss";
@@ -38,7 +37,6 @@
 
 @include Anchor.Anchor();
 @include Block.Block();
-@include Breadcrumbs.Breadcrumbs();
 @include Header.Header();
 @include Muted.Muted();
 @include Paragraph.Paragraph();
