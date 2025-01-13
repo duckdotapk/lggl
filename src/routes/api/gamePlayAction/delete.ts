@@ -52,7 +52,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 							},
 						});
 
-					await transactionClient.gamePlaySession.delete(
+					await transactionClient.gamePlayAction.delete(
 						{
 							where:
 							{
