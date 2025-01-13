@@ -44,7 +44,7 @@ async function initialise(form: HTMLFormElement)
 			}
 			catch (error)
 			{
-				console.error("[DownloadGameImagesForm] Error creating Company:", error);
+				console.error("[DownloadGameImagesForm] Error downloading images:", error);
 			}
 			finally
 			{

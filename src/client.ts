@@ -3,6 +3,7 @@
 //
 
 import { initialiseDownloadGameImagesForms } from "./components/form/DownloadGameImagesForm.client.js";
+import { initialiseSyncGameHistoricalSteamPlayTimeForm } from "./components/form/SyncGameHistoricalPlayTimeForm.client.js";
 import { initialiseUpsertCompanyForms } from "./components/form/UpsertCompanyForm.client.js";
 import { initialiseUpsertEngineForms } from "./components/form/UpsertEngineForm.client.js";
 import { initialiseUpsertGameForms } from "./components/form/UpsertGameForm.client.js";
@@ -23,6 +24,7 @@ import { initialiseGameLists } from "./components/GameList.client.js";
 //
 
 initialiseDownloadGameImagesForms();
+initialiseSyncGameHistoricalSteamPlayTimeForm();
 initialiseUpsertCompanyForms();
 initialiseUpsertEngineForms();
 initialiseUpsertGameForms();

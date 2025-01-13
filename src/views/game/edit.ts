@@ -7,6 +7,7 @@ import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { DownloadGameImagesForm } from "../../components/form/DownloadGameImagesForm.js";
+import { SyncGameHistoricalPlayTimeForm } from "../../components/form/SyncGameHistoricalPlayTimeForm.js";
 import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/UpsertGameForm.js";
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
 import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../components/form/UpsertGameEngineForm.js";
@@ -84,9 +85,16 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				Block(
 					[
-						Header(3, "Download images"),
+						Header(3, "Download images from Steam"),
 
 						DownloadGameImagesForm(options.game),
+					]),
+
+				Block(
+					[
+						Header(3, "Sync historical play time from Steam"),
+
+						SyncGameHistoricalPlayTimeForm(options.game),
 					]),
 			]),
 	};
