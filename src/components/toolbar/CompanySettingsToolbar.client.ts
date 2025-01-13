@@ -30,8 +30,8 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "gameGroupMode",
-							value: companyGroupModeSelect.value as SettingSchemaLib.GameGroupMode,
+							name: "companyGroupMode",
+							value: companyGroupModeSelect.value as SettingSchemaLib.CompanyGroupMode,
 						},
 					],
 				}),
