@@ -46,7 +46,7 @@ function Separator()
 // Component
 //
 
-export type SidebarPage = "games" | "games/create" | "companies" | "engines" | "audit" | null;
+export type SidebarPage = "games" | "games/create" | "companies" | "engines" | "platforms" | "audit" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -86,11 +86,15 @@ export function Sidebar(currentPage: SidebarPage)
 					text: "Engines",
 				}),
 
-			// TODO: Modes item
-
 			// TODO: Genres item
 
-			// TODO: Platforms item
+			Item(
+				{
+					isCurrent: currentPage == "platforms",
+					href: "/platforms",
+					iconName: "fa-solid fa-layer-group",
+					text: "Platforms",
+				}),
 
 			// TODO: Series item
 
