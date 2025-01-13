@@ -169,7 +169,7 @@ export async function launchGame(game: Prisma.GameGetPayload<null>, gamePlayActi
 			},
 			data:
 			{
-				completionStatus: game.completionStatus == null || game.completionStatus == ("TODO" satisfies GameSchemaLib.CompletionStatus)
+				completionStatus: game.progressionType != "NONE" satisfies GameSchemaLib.ProgressionType && (game.completionStatus == null || game.completionStatus == "TODO" satisfies GameSchemaLib.CompletionStatus)
 					? "IN_PROGRESS" satisfies GameSchemaLib.CompletionStatus
 					: undefined,
 				firstPlayedDate: game.firstPlayedDate == null
