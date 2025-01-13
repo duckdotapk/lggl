@@ -96,6 +96,19 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
+		const gamePlayActions = await prismaClient.gamePlayAction.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				orderBy:
+				[
+					{ isArchived: "asc" },
+					{ name: "asc" },
+				],
+			});
+
 		context.renderComponent(view(
 			{
 				companies,
@@ -103,6 +116,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				game,
 				gameCompanies,
 				gameEngines,
+				gamePlayActions,
 			}));
 	},
 };
