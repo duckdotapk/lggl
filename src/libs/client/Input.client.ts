@@ -56,7 +56,7 @@ export function getEnumValueNullable<T extends ZodTypeAny>(input: HTMLSelectElem
 
 export function getStringValue(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
 {
-	return input.value;
+	return input.value.trim();
 }
 
 export function getStringValueNullable(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
