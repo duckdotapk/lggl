@@ -8,7 +8,7 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 // Variables
 //
 
-const defaultSelector = ".component-site .content";
+export const defaultSelector = ".component-site .content";
 
 let xhr: XMLHttpRequest | null = null;
 
@@ -217,11 +217,9 @@ export function changeView(href: string)
 	load(href, "push", defaultSelector);
 }
 
-export function reloadView()
+export function reloadView(selector?: string)
 {
-	const selector = window.history.state?.selector ?? defaultSelector;
-
 	const currentUrl = window.location.href;
 
-	load(currentUrl, "replace", selector);
+	load(currentUrl, "replace", selector ?? window.history.state?.selector ?? defaultSelector);
 }

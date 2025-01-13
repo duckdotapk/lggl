@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
 
@@ -43,7 +44,7 @@ async function initialise(toolbar: HTMLFormElement)
 						},
 					],
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
 		});
 
 	InputClientLib.initialiseForm(
@@ -61,7 +62,7 @@ async function initialise(toolbar: HTMLFormElement)
 						},
 					],
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
 		});
 
 	InputClientLib.initialiseForm(
@@ -79,7 +80,7 @@ async function initialise(toolbar: HTMLFormElement)
 						},
 					],
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
 		});
 
 	InputClientLib.initialiseForm(
@@ -97,7 +98,7 @@ async function initialise(toolbar: HTMLFormElement)
 						},
 					],
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
 		});
 
 	InputClientLib.initialiseForm(
@@ -115,7 +116,7 @@ async function initialise(toolbar: HTMLFormElement)
 						},
 					],
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
 		});
 }
 
