@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { Child, DE } from "@donutteam/document-builder";
 
 import { Anchor } from "../../components/basic/Anchor.js";
 import { Header } from "../../components/basic/Header.js";
@@ -86,16 +86,17 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 							new DE("ul", null, problemList.problems.map((problem) =>
 								{
-									let textComponents = [];
+									let children: Child[] = [];
 
 									if (problem.isStrictModeOnly)
 									{
-										textComponents.push(new DE("strong", null, "Strict Mode: "));
+										children.push(new DE("strong", null, "Strict Mode:"));
+										children.push(" ");
 									}
 
-									textComponents.push(problem.description);
+									children.push(problem.description);
 
-									return new DE("li", null, textComponents.join(""));
+									return new DE("li", null, children);
 								})),
 						];
 					}),
