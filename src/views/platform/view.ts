@@ -14,8 +14,12 @@ import { Button } from "../../components/input/Button.js";
 
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
+import { PlatformSettingsToolbar } from "../../components/toolbar/PlatformSettingsToolbar.js";
+
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
+
+import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
 // View
@@ -23,6 +27,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
+	settings: SettingModelLib.Settings;
 	groupManager: GroupManager<Prisma.PlatformGetPayload<null>>;
 	platform: Prisma.PlatformGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
@@ -37,7 +42,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		pageTitle,
 		content: ListLayout(
 			{
-				toolbar: null,
+				toolbar: PlatformSettingsToolbar(options.settings),
 				groupManager: options.groupManager,
 				createHref: "/platforms/create",
 				content: Wrapper("45rem",

@@ -75,6 +75,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		context.renderComponent(view(
 			{
+				settings: context.settings,
 				groupManager,
 				platform,
 				games,
