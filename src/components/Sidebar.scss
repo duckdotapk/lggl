@@ -22,7 +22,7 @@
 		text-decoration: none;
 
 		&:hover,
-		&.current
+		&.selected
 		{
 			border-left-color: #f3f4f6; // Tailwind Gray 100
 		}

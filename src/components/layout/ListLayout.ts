@@ -130,6 +130,6 @@ export function ListLayout(options: ListLayoutOptions)
 						}),
 				]),
 
-			new DE("main", "details", options.content),
+			new DE("main", "content", options.content),
 		]);
 }

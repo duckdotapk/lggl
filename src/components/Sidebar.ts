@@ -10,7 +10,8 @@ import { DE } from "@donutteam/document-builder";
 
 type ItemOptions =
 {
-	isCurrent: boolean;
+	page: SidebarPage;
+	currentPage: SidebarPage;
 	href: string;
 	iconName: string;
 	text: string;
@@ -20,9 +21,9 @@ function Item(options: ItemOptions)
 {
 	let className = "component-sidebar-item";
 
-	if (options.isCurrent)
+	if (options.page != null && options.page == options.currentPage)
 	{
-		className += " current";
+		className += " selected";
 	}
 
 	return new DE("a",
@@ -31,6 +32,8 @@ function Item(options: ItemOptions)
 
 			href: options.href,
 			title: options.text,
+
+			"data-page": options.page,
 		},
 		[
 			new DE("span", options.iconName),
@@ -54,7 +57,8 @@ export function Sidebar(currentPage: SidebarPage)
 		[
 			Item(
 				{
-					isCurrent: currentPage == "games",
+					page: "games",
+					currentPage,
 					href: "/games",
 					iconName: "fa-solid fa-joystick",
 					text: "Games",
@@ -64,7 +68,8 @@ export function Sidebar(currentPage: SidebarPage)
 
 			Item(
 				{
-					isCurrent: currentPage == "companies",
+					page: "companies",
+					currentPage,
 					href: "/companies",
 					iconName: "fa-solid fa-building",
 					text: "Companies",
@@ -72,7 +77,8 @@ export function Sidebar(currentPage: SidebarPage)
 
 			Item(
 				{
-					isCurrent: currentPage == "engines",
+					page: "engines",
+					currentPage,
 					href: "/engines",
 					iconName: "fa-solid fa-engine",
 					text: "Engines",
@@ -82,7 +88,8 @@ export function Sidebar(currentPage: SidebarPage)
 
 			Item(
 				{
-					isCurrent: currentPage == "platforms",
+					page: "platforms",
+					currentPage,
 					href: "/platforms",
 					iconName: "fa-solid fa-layer-group",
 					text: "Platforms",
@@ -94,7 +101,8 @@ export function Sidebar(currentPage: SidebarPage)
 
 			Item(
 				{
-					isCurrent: currentPage == "audit",
+					page: "audit",
+					currentPage,
 					href: "/audit",
 					iconName: "fa-solid fa-clipboard-list",
 					text: "Audit",
