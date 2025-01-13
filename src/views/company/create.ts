@@ -12,8 +12,12 @@ import { UpsertCompanyForm } from "../../components/form/UpsertCompanyForm.js";
 
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
+import { CompanySettingsToolbar } from "../../components/toolbar/CompanySettingsToolbar.js";
+
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
+
+import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
 // View
@@ -21,6 +25,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 export type ViewOptions =
 {
+	settings: SettingModelLib.Settings;
 	groupManager: GroupManager<Prisma.CompanyGetPayload<null>>;
 };
 
@@ -31,7 +36,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		pageTitle: "Create | Companies",
 		content: ListLayout(
 			{
-				toolbar: null,
+				toolbar: CompanySettingsToolbar(options.settings),
 				groupManager: options.groupManager,
 				createHref: "/companies/create",
 				content: Wrapper("45rem",
