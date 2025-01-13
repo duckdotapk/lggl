@@ -19,8 +19,8 @@
 @use "components/input/Label.scss";
 @use "components/input/TabControl.scss";
 
-@use "components/layout/AutomaticColumns.scss";
-@use "components/layout/Columns.scss";
+@use "components/layout/AutomaticColumnLayout.scss";
+@use "components/layout/ColumnLayout.scss";
 
 @use "components/toolbar/Toolbar.scss";
 
@@ -50,8 +50,8 @@
 @include Label.Label();
 @include TabControl.TabControl();
 
-@include AutomaticColumns.AutomaticColumns();
-@include Columns.Columns();
+@include AutomaticColumnLayout.AutomaticColumnLayout();
+@include ColumnLayout.ColumnLayout();
 
 @include Toolbar.Toolbar();
 
