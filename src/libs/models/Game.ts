@@ -178,7 +178,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 				groupManager.addItemsToGroup("Favorites", sortedGames.filter((game) => game.isFavorite));
 			}
 
-			const playedSortedGames = games.filter((game) => game.playTimeTotalSeconds > 0);
+			const playedSortedGames = sortedGames.filter((game) => game.playTimeTotalSeconds > 0);
 
 			for (const playedGame of playedSortedGames)
 			{
