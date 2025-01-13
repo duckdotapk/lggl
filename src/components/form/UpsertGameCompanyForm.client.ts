@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import * as GameCompanySchemaLib from "../../libs/schemas/GameCompany.js";
 
@@ -39,7 +40,7 @@ async function initialise(form: HTMLFormElement)
 						type: InputClientLib.getEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
 						notes: InputClientLib.getStringValueNullable(notesInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 	else
@@ -52,7 +53,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deleteGameCompany(gameCompanyId),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 
 		InputClientLib.initialiseForm(
@@ -66,7 +67,7 @@ async function initialise(form: HTMLFormElement)
 						type: InputClientLib.getChangedEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
 						notes: InputClientLib.getChangedStringValueNullable(notesInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

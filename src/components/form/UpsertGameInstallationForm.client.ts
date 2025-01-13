@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { createGameInstallation } from "../../routes/api/gameInstallation/create.schemas.js";
 import { deleteGameInstallation } from "../../routes/api/gameInstallation/delete.schemas.js";
@@ -33,7 +34,7 @@ async function initialise(form: HTMLFormElement)
 						game_id: gameId,
 						path: InputClientLib.getStringValue(pathInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 	else
@@ -46,7 +47,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deleteGameInstallation(gameInstallationId),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 
 		InputClientLib.initialiseForm(
@@ -58,7 +59,7 @@ async function initialise(form: HTMLFormElement)
 					{
 						path: InputClientLib.getChangedStringValue(pathInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

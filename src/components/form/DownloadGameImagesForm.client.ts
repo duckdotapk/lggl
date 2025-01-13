@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { downloadImages } from "../../routes/api/game/downloadImages.schemas.js";
 
@@ -28,7 +29,7 @@ async function initialise(form: HTMLFormElement)
 					name: "steam",
 					steamAppId: InputClientLib.getNumberValue(steamAppIdInput),
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(),
 		});
 }
 

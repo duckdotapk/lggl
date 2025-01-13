@@ -114,6 +114,10 @@ function PlayActionButtonGroup(game: GameDetailsGame)
 		{
 			style: "secondary",
 			href: "/games/edit/" + game.id,
+			extraAttributes:
+			{
+				"data-pjax-selector": "main",
+			},
 			iconName: "fa-solid fa-pen-to-square",
 			text: "Edit",
 		}));

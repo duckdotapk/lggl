@@ -41,3 +41,29 @@ export async function initialiseListLayouts()
 		}
 	}
 }
+
+export async function updateListLayouts()
+{
+	const listLayouts = document.querySelectorAll<HTMLElement>(".component-list-layout");
+
+	for (const listLayout of listLayouts)
+	{
+		const listLayoutGroupItems = listLayout.querySelectorAll<HTMLAnchorElement>(".component-list-layout-group-item");
+
+		for (const listLayoutGroupItem of listLayoutGroupItems)
+		{
+			// HACK: this feels fragile...
+			const id = listLayoutGroupItem.href.split("/").pop();
+			const selectedId = window.location.href.split("/").pop();
+
+			if (id == selectedId)
+			{
+				listLayoutGroupItem.classList.add("selected");
+			}
+			else
+			{
+				listLayoutGroupItem.classList.remove("selected");
+			}
+		}
+	}
+}

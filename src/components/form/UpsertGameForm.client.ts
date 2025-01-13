@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import * as GameSchemaLib from "../../libs/schemas/Game.js";
 
@@ -106,7 +107,7 @@ async function initialise(form: HTMLFormElement)
 						steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
 						steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
 					}),
-				onSuccess: async (response) => { window.location.href = "/games/edit/" + response.game.id },
+				onSuccess: async (response) => PjaxClientLib.changeView("/games/view/" + response.game.id),
 			}
 		)
 	}
@@ -120,7 +121,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => { throw new Error("Not implemented.") }, // TODO: this
-				onSuccess: async () => { window.location.href = "/games" },
+				onSuccess: async () => PjaxClientLib.changeView("/games"),
 			});
 
 		InputClientLib.initialiseForm(
@@ -168,7 +169,7 @@ async function initialise(form: HTMLFormElement)
 						steamAppId: InputClientLib.getChangedNumberValueNullable(steamAppIdInput),
 						steamAppName: InputClientLib.getChangedStringValueNullable(steamAppNameInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

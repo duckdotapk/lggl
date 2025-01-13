@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { createEngine } from "../../routes/api/engine/create.schemas.js";
 import { deleteEngine } from "../../routes/api/engine/delete.schemas.js";
@@ -33,7 +34,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getStringValue(nameInput),
 						shortName: InputClientLib.getStringValueNullable(shortNameInput),
 					}),
-				onSuccess: async (response) => { window.location.href = "/engines/view/" + response.engine.id },
+				onSuccess: async (response) => PjaxClientLib.changeView("/engines/view/" + response.engine.id),
 			});
 	}
 	else
@@ -46,7 +47,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deleteEngine(engineId),
-				onSuccess: async () => { window.location.href = "/engines" },
+				onSuccess: async () => PjaxClientLib.changeView("/engines"),
 			});
 
 		InputClientLib.initialiseForm(
@@ -59,7 +60,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getStringValue(nameInput),
 						shortName: InputClientLib.getStringValueNullable(shortNameInput),
 					}),
-				onSuccess: async () => { window.location.href = "/engines/view/" + engineId },
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

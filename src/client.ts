@@ -18,7 +18,7 @@ import { initialiseCheckboxes } from "./components/input/Checkbox.client.js";
 import { initialiseControls } from "./components/input/Control.client.js";
 import { initialiseTabControls } from "./components/input/TabControl.client.js";
 
-import { initialiseListLayouts } from "./components/layout/ListLayout.client.js";
+import { initialiseListLayouts, updateListLayouts } from "./components/layout/ListLayout.client.js";
 
 import { initialiseCompanySettingsToolbars } from "./components/toolbar/CompanySettingsToolbar.client.js";
 import { initialiseEngineSettingsToolbars } from "./components/toolbar/EngineSettingsToolbar.client.js";
@@ -26,32 +26,54 @@ import { initialiseGameSettingsToolbars } from "./components/toolbar/GameSetting
 import { initialisePlatformSettingsToolbars } from "./components/toolbar/PlatformSettingsToolbar.client.js";
 
 import { initialiseGameDetails } from "./components/GameDetails.client.js";
+import { updateSidebars } from "./components/Sidebar.client.js";
+
+import * as PjaxClientLib from "./libs/client/Pjax.client.js";
 
 //
 // Client
 //
 
-initialiseDownloadGameImagesForms();
-initialiseSyncGameHistoricalSteamPlayTimeForm();
-initialiseUpsertCompanyForms();
-initialiseUpsertEngineForms();
-initialiseUpsertGameForms();
-initialiseUpsertGameCompanyForms();
-initialiseUpsertGameEngineForms();
-initialiseUpsertGameInstallationForms();
-initialiseUpsertGamePlatformForms();
-initialiseUpsertGamePlayActionForms();
-initialiseUpsertPlatformForms();
+async function initialiseComponents()
+{
+	//
+	// Initialise Components
+	//
 
-initialiseCheckboxes();
-initialiseControls();
-initialiseTabControls();
+	initialiseDownloadGameImagesForms();
+	initialiseSyncGameHistoricalSteamPlayTimeForm();
+	initialiseUpsertCompanyForms();
+	initialiseUpsertEngineForms();
+	initialiseUpsertGameForms();
+	initialiseUpsertGameCompanyForms();
+	initialiseUpsertGameEngineForms();
+	initialiseUpsertGameInstallationForms();
+	initialiseUpsertGamePlatformForms();
+	initialiseUpsertGamePlayActionForms();
+	initialiseUpsertPlatformForms();
+	
+	initialiseCheckboxes();
+	initialiseControls();
+	initialiseTabControls();
+	
+	initialiseListLayouts();
+	
+	initialiseCompanySettingsToolbars();
+	initialiseEngineSettingsToolbars();
+	initialiseGameSettingsToolbars();
+	initialisePlatformSettingsToolbars();
+	
+	initialiseGameDetails();
 
-initialiseListLayouts();
+	//
+	// Update Components
+	//
 
-initialiseCompanySettingsToolbars();
-initialiseEngineSettingsToolbars();
-initialiseGameSettingsToolbars();
-initialisePlatformSettingsToolbars();
+	updateListLayouts();
+	
+	updateSidebars();
+}
 
-initialiseGameDetails();
+initialiseComponents();
+
+PjaxClientLib.initialise(() => initialiseComponents());

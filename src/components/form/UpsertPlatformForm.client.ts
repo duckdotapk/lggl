@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { createPlatform } from "../../routes/api/platform/create.schemas.js";
 import { deletePlatform } from "../../routes/api/platform/delete.schemas.js";
@@ -33,7 +34,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getStringValue(nameInput),
 						iconName: InputClientLib.getStringValue(iconNameInput),
 					}),
-				onSuccess: async (response) => { window.location.href = "/platforms/view/" + response.platform.id; },
+				onSuccess: async (response) => PjaxClientLib.changeView("/platforms/view/" + response.platform.id),
 			});
 	}
 	else
@@ -46,7 +47,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deletePlatform(platformId),
-				onSuccess: async () => { window.location.href = "/platforms"; },
+				onSuccess: async () => PjaxClientLib.changeView("/platforms"),
 			});
 
 		InputClientLib.initialiseForm(
@@ -59,7 +60,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getChangedStringValue(nameInput),
 						iconName: InputClientLib.getChangedStringValue(iconNameInput),
 					}),
-				onSuccess: async () => { window.location.href = "/platforms/view/" + platformId; },
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

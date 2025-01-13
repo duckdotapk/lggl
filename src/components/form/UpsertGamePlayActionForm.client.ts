@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import * as GamePlayActionSchemaLib from "../../libs/schemas/GamePlayAction.js";
 
@@ -46,7 +47,7 @@ async function initialise(form: HTMLFormElement)
 						argumentsJson: InputClientLib.getStringValue(argumentsJsonTextArea),
 						isArchived: InputClientLib.getBooleanValue(isArchivedInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 	else
@@ -59,7 +60,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deleteGamePlayAction(gamePlayActionId),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 
 		InputClientLib.initialiseForm(
@@ -76,7 +77,7 @@ async function initialise(form: HTMLFormElement)
 						argumentsJson: InputClientLib.getChangedStringValue(argumentsJsonTextArea),
 						isArchived: InputClientLib.getChangedBooleanValue(isArchivedInput),
 					}),
-				onSuccess: async () => window.location.reload(),
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

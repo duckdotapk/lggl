@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { createCompany } from "../../routes/api/company/create.schemas.js";
 import { deleteCompany } from "../../routes/api/company/delete.schemas.js";
@@ -31,7 +32,7 @@ async function initialise(form: HTMLFormElement)
 					{
 						name: InputClientLib.getStringValue(nameInput),
 					}),
-				onSuccess: async (response) => { window.location.href = "/companies/view/" + response.company.id },
+				onSuccess: async (response) => PjaxClientLib.changeView("/companies/view/" + response.company.id),
 			});
 	}
 	else
@@ -44,7 +45,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deleteCompany(companyId),
-				onSuccess: async () => { window.location.href = "/companies" },
+				onSuccess: async () => PjaxClientLib.changeView("/companies"),
 			});
 
 		InputClientLib.initialiseForm(
@@ -56,7 +57,7 @@ async function initialise(form: HTMLFormElement)
 					{
 						name: InputClientLib.getChangedStringValue(nameInput),
 					}),
-				onSuccess: async () => { window.location.href = "/companies/view/" + companyId },
+				onSuccess: async () => PjaxClientLib.reloadView(),
 			});
 	}
 }

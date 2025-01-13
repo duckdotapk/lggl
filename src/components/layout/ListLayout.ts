@@ -42,6 +42,8 @@ function GroupItem(options: ListLayoutGroupItemOptions)
 
 			"data-name": options.name,
 			"data-normalized-name": options.name.toLowerCase().replace(/[^a-z0-9]/g, " "),
+
+			"data-pjax-selector": ".component-list-layout .content",
 		},
 		[
 			new DE("div", "icon-wrapper",
@@ -125,6 +127,10 @@ export function ListLayout(options: ListLayoutOptions)
 						{
 							style: "success",
 							href: options.createHref,
+							extraAttributes:
+							{
+								"data-pjax-selector": "main",
+							},
 							iconName: "fa-solid fa-plus",
 							text: "Create new",
 						}),

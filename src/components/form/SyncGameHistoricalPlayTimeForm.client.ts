@@ -5,6 +5,7 @@
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { syncHistoricalPlayTime } from "../../routes/api/game/syncHistoricalPlaytime.schemas.js";
 
@@ -32,7 +33,7 @@ async function initialise(form: HTMLFormElement)
 					updateFirstPlayedDate: InputClientLib.getBooleanValue(updateFirstPlayedDateInput),
 					updateLastPlayedDate: InputClientLib.getBooleanValue(updateLastPlayedDateInput),
 				}),
-			onSuccess: async () => window.location.reload(),
+			onSuccess: async () => PjaxClientLib.reloadView(),
 		});
 }
 
