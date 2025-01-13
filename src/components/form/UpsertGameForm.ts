@@ -14,7 +14,7 @@ import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 import { TabControl } from "../input/TabControl.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 import * as GameModelLib from "../../libs/models/Game.js";
 
@@ -42,7 +42,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 						title: "General data",
 						content: Block(
 							[
-								Columns(2,
+								ColumnLayout(2,
 									[
 										new DE("div", null,
 											[
@@ -312,7 +312,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 					},
 				]),
 
-			Columns(game != null ? 2 : 1,
+			ColumnLayout(game != null ? 2 : 1,
 				[
 					game != null
 						? Button(

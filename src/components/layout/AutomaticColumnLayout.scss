@@ -1,0 +1,28 @@
+//
+// Imports
+//
+
+@use "../_Globals.scss";
+
+//
+// Component
+//
+
+@mixin AutomaticColumnLayout()
+{
+	.component-automatic-column-layout
+	{
+		display: grid;
+
+		gap: 0.75rem;
+
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--component-automatic-column-layout-minimum-column-width)), 1fr));
+
+		@include Globals.Margins();
+
+		> *
+		{
+			margin: 0 !important;
+		}
+	}
+}

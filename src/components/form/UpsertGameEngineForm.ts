@@ -9,7 +9,7 @@ import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 //
 // Component
@@ -33,7 +33,7 @@ export function UpsertGameEngineForm(options: UpsertGameEngineFormOptions)
 			"data-game-engine-id": options.gameEngine?.id ?? null,
 		},
 		[
-			Columns(3,
+			ColumnLayout(3,
 				[
 					new DE("div", null,
 						[
@@ -78,7 +78,7 @@ export function UpsertGameEngineForm(options: UpsertGameEngineFormOptions)
 						]),
 				]),
 
-			Columns(options.gameEngine != null ? 2 : 1,
+			ColumnLayout(options.gameEngine != null ? 2 : 1,
 				[
 					options.gameEngine != null
 						? Button(

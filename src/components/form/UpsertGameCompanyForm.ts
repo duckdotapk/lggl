@@ -9,7 +9,7 @@ import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 import * as GameCompanyModelLib from "../../libs/models/GameCompany.js";
 
@@ -37,7 +37,7 @@ export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
 			"data-game-company-id": options.gameCompany?.id ?? null,
 		},
 		[
-			Columns(3,
+			ColumnLayout(3,
 				[
 					new DE("div", null,
 						[
@@ -82,7 +82,7 @@ export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
 						]),
 				]),
 
-			Columns(options.gameCompany != null ? 2 : 1,
+			ColumnLayout(options.gameCompany != null ? 2 : 1,
 				[
 					options.gameCompany != null
 						? Button(

@@ -9,7 +9,7 @@ import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 //
 // Component
@@ -44,7 +44,7 @@ export function UpsertGamePlatformForm(options: UpsertGamePlatformFormOptions)
 					options: options.platforms.map((platform) => ({ value: platform.id, label: platform.name }))
 				}),
 
-			Columns(options.gamePlatform != null ? 2 : 1,
+			ColumnLayout(options.gamePlatform != null ? 2 : 1,
 				[
 					options.gamePlatform != null
 						? Button(

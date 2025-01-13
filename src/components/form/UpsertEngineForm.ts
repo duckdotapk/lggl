@@ -11,7 +11,7 @@ import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 //
 // Component
@@ -29,7 +29,7 @@ export function UpsertEngineForm(engine: UpsertEngineFormEngine)
 			"data-engine-id": engine?.id,
 		},
 		[
-			Block(Columns(2,
+			Block(ColumnLayout(2,
 				[
 					new DE("div", null,
 						[
@@ -60,7 +60,7 @@ export function UpsertEngineForm(engine: UpsertEngineFormEngine)
 						]),
 				])),
 
-			Columns(engine != null ? 2 : 1,
+			ColumnLayout(engine != null ? 2 : 1,
 				[
 					engine != null
 						? Button(

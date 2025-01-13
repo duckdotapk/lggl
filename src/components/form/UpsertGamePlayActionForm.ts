@@ -10,7 +10,7 @@ import { Checkbox } from "../input/Checkbox.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 import * as GamePlayActionModelLib from "../../libs/models/GamePlayAction.js";
 
@@ -37,7 +37,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 			"data-game-play-action-id": options.gamePlayAction?.id ?? null,
 		},
 		[
-			Columns(2,
+			ColumnLayout(2,
 				[
 					new DE("div", null,
 						[
@@ -103,7 +103,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 
 			Checkbox("isArchived", "Is archived", options.gamePlayAction?.isArchived ?? false),
 
-			Columns(options.gamePlayAction != null ? 2 : 1,
+			ColumnLayout(options.gamePlayAction != null ? 2 : 1,
 				[
 					options.gamePlayAction != null
 						? Button(

@@ -9,7 +9,7 @@ import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
 import { Label } from "../input/Label.js";
 
-import { Columns } from "../layout/Columns.js";
+import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 //
 // Component
@@ -43,7 +43,7 @@ export function UpsertGameInstallationForm(options: UpsertGameInstallationFormOp
 					placeholder: "Path",
 				}),
 
-			Columns(options.gameInstallation != null ? 2 : 1,
+			ColumnLayout(options.gameInstallation != null ? 2 : 1,
 				[
 					options.gameInstallation != null
 						? Button(
