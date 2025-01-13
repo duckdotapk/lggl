@@ -12,6 +12,7 @@ import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/Upsert
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
 import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../components/form/UpsertGameEngineForm.js";
 import { UpsertGameInstallationForm, UpsertGameInstallationFormOptions } from "../../components/form/UpsertGameInstallationForm.js";
+import { UpsertGamePlatformForm, UpsertGamePlatformFormOptions } from "../../components/form/UpsertGamePlatformForm.js";
 import { UpsertGamePlayActionForm, UpsertGamePlayActionFormOptions } from "../../components/form/UpsertGamePlayActionForm.js";
 
 import { TabControl } from "../../components/input/TabControl.js";
@@ -32,7 +33,9 @@ export type ViewOptions =
 	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
 	gameEngines: NonNullable<UpsertGameEngineFormOptions["gameEngine"]>[];
 	gameInstallations: NonNullable<UpsertGameInstallationFormOptions["gameInstallation"]>[];
+	gamePlatforms: NonNullable<UpsertGamePlatformFormOptions["gamePlatform"]>[];
 	gamePlayActions: NonNullable<UpsertGamePlayActionFormOptions["gamePlayAction"]>[];
+	platforms: UpsertGamePlatformFormOptions["platforms"];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -107,6 +110,25 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 									{
 										game: options.game,
 										gameInstallation: null,
+									})),
+							],
+						},
+						{
+							title: "Platforms",
+							content:
+							[
+								options.gamePlatforms.map((gamePlatform) => Block(UpsertGamePlatformForm(
+									{
+										platforms: options.platforms,
+										game: options.game,
+										gamePlatform,
+									}))),
+				
+								Block(UpsertGamePlatformForm(
+									{
+										platforms: options.platforms,
+										game: options.game,
+										gamePlatform: null,
 									})),
 							],
 						},

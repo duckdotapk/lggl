@@ -108,6 +108,18 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
+		const gamePlatforms = await prismaClient.gamePlatform.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				orderBy:
+				[
+					{ platform: { name: "asc" } },
+				],
+			});
+
 		const gamePlayActions = await prismaClient.gamePlayAction.findMany(
 			{
 				where:
@@ -121,6 +133,14 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
+		const platforms = await prismaClient.platform.findMany(
+			{
+				orderBy:
+				[
+					{ name: "asc" },
+				],
+			});
+
 		context.renderComponent(view(
 			{
 				companies,
@@ -129,7 +149,9 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				gameCompanies,
 				gameEngines,
 				gameInstallations,
+				gamePlatforms,
 				gamePlayActions,
+				platforms,
 			}));
 	},
 };
