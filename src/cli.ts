@@ -19,11 +19,7 @@ import { LGGL_STEAM_USER_ID } from "./env/LGGL_STEAM_USER_ID.js"
 
 import { prismaClient } from "./instances/prismaClient.js";
 
-import * as CompanyCliLib from "./libs/cli/Company.js";
-import * as EngineCliLib from "./libs/cli/Engine.js";
 import * as GameCliLib from "./libs/cli/Game.js";
-import * as GameCompanyCliLib from "./libs/cli/GameCompany.js";
-import * as GameEngineCliLib from "./libs/cli/GameEngine.js";
 import * as GameInstallationCliLib from "./libs/cli/GameInstallation.js";
 import * as GamePlatformCliLib from "./libs/cli/GamePlatform.js";
 import * as GamePlayActionCliLib from "./libs/cli/GamePlayAction.js";
@@ -34,112 +30,7 @@ import * as SeriesGameCliLib from "./libs/cli/SeriesGame.js";
 
 import * as SteamThirdPartyLib from "./libs/third-party/Steam.js";
 
-import * as AuditLib from "./libs/Audit.js";
 import * as CliLib from "./libs/Cli.js";
-
-//
-// General Actions
-//
-
-async function audit(readlineInterface: readline.promises.Interface)
-{
-	const autoFixProblems = await CliLib.confirm(readlineInterface,
-		{
-			text: "Automatically fix problems where possible?",
-			defaultValue: false,
-		});
-
-	const games = await prismaClient.game.findMany(
-		{
-			include:
-			{
-				gameCompanies: true,
-				gameEngines: true,
-				gameGenres: true,
-				gameInstallations: true,
-				gameLinks: true,
-				gamePlatforms: true,
-				gamePlayActions: true,
-				gamePlaySessions: true,
-				seriesGames: true,
-			},
-			orderBy:
-			{
-				id: "asc",
-			},
-		});
-
-	const problemLists: AuditLib.ProblemList[] = [];
-
-	for (const game of games)
-	{
-		const problemList = await AuditLib.auditGame(game, autoFixProblems);
-
-		if (problemList.problems.length == 0)
-		{
-			continue;
-		}
-
-		problemLists.push(problemList);
-	}
-
-	let totalProblems = 0;
-	let totalAutoFixableProblems = 0;
-
-	for (const problemList of problemLists)
-	{
-		console.group(problemList.game.name + " (Game ID: " + problemList.game.id + ")");
-
-		for (const problem of problemList.problems)
-		{
-			if (autoFixProblems && problem.isAutoFixable)
-			{
-				if (problem.wasAutomaticallyFixed)
-				{
-					console.log(chalk.green("%s (Auto-fixed)"), problem.description);
-				}
-				else
-				{
-					console.log(chalk.red("%s (Was not auto-fixed)"), problem.description);
-				}
-			}
-			else
-			{
-				console.log("%s", problem.description);
-			}
-		}
-
-		console.groupEnd();
-
-		totalProblems += problemList.problems.length;
-		totalAutoFixableProblems += problemList.problems.filter((problem) => problem.isAutoFixable).length;
-	}
-
-	console.log(chalk.bold("Total problems: %d"), totalProblems);
-	console.log(chalk.bold("Total auto-fixable problems: %d"), totalAutoFixableProblems);
-}
-
-//
-// Company Actions
-//
-
-async function createCompany(readlineInterface: readline.promises.Interface)
-{
-	const company = await CompanyCliLib.create(readlineInterface);
-
-	console.log(chalk.green("Created %s! (Company ID: %d)"), company.name, company.id);
-}
-
-//
-// Engine Actions
-//
-
-async function createEngine(readlineInterface: readline.promises.Interface)
-{
-	const engine = await EngineCliLib.create(readlineInterface);
-
-	console.log(chalk.green("Engine #%d created!"), engine.id);
-}
 
 //
 // Game Actions
@@ -410,10 +301,6 @@ async function createGame(readlineInterface: readline.promises.Interface)
 	// Add Other Related Data
 	//
 
-	await addGameCompanies(readlineInterface, game);
-
-	await addGameEngines(readlineInterface, game);
-
 	await addGamePlatforms(readlineInterface, game);
 
 	await addGameInstallations(readlineInterface, game);
@@ -443,214 +330,6 @@ async function createGame(readlineInterface: readline.promises.Interface)
 			});
 
 		console.log(chalk.green("Added %s to %s! (Series Game #%d)"), game.name, series.name, seriesGame.id);
-	}
-}
-
-async function addGameCompanies(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
-{
-	loop: while (true)
-	{
-		const gameCompanies = await prismaClient.gameCompany.findMany(
-			{
-				where:
-				{
-					game_id: game.id,
-				},
-				include:
-				{
-					company: true,
-				},
-			});
-
-		console.group("Game companies for " + game.name + " (Game ID: " + game.id + "):");
-
-		for (const gameCompany of gameCompanies)
-		{
-			console.log("%s (ID: %d) (Type: %s) (Notes: %s) (Company ID: %d)", 
-				gameCompany.company.name,
-				gameCompany.id,
-				gameCompany.type,
-				gameCompany.notes, 
-				gameCompany.company.id);
-		}
-
-		console.groupEnd();
-
-		const OptionSchema = z.enum([ "createNew", "addExisting", "done" ]);
-
-		type Option = z.infer<typeof OptionSchema>;
-
-		const option = await CliLib.prompt(readlineInterface,
-			{
-				text: "Add a company to this " + game.name + " (Game ID: " + game.id + ")",
-				options:
-				[
-					{
-						value: "createNew" satisfies Option,
-						description: "Create a new company",
-					},
-					{
-						value: "addExisting" satisfies Option,
-						description: "Use an existing company",
-					},
-					{
-						value: "done" satisfies Option,
-						description: "Finish adding companies",
-					},
-				],
-				validateAndTransform: async (input) => OptionSchema.parse(input),
-			});
-
-		let company: Prisma.CompanyGetPayload<null>;
-
-		switch (option)
-		{
-			case "createNew":
-			{
-				company = await CompanyCliLib.create(readlineInterface);
-
-				break;
-			}
-
-			case "addExisting":
-			{
-				const companies = await CompanyCliLib.search(readlineInterface);
-
-				if (companies.length == 0)
-				{
-					console.log("No companies found. Please try again or create a new company.");
-
-					continue loop;
-				}
-				else if (companies.length == 1)
-				{
-					company = companies[0]!;
-				}
-				else
-				{
-					company = await CompanyCliLib.choose(readlineInterface, companies);
-				}
-
-				break;
-			}
-
-			case "done":
-			{		
-				break loop;
-			}
-		}
-
-		const gameCompany = await GameCompanyCliLib.create(readlineInterface,
-			{
-				game,
-				company,
-			});
-	
-		console.log(chalk.green("Added %s as a %s for %s! (Game Company #%s)"), company.name, gameCompany.type, game.name, gameCompany.id);
-	}
-}
-
-async function addGameEngines(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
-{
-	loop: while (true)
-	{
-		const gameEngines = await prismaClient.gameEngine.findMany(
-			{
-				where:
-				{
-					game_id: game.id,
-				},
-				include:
-				{
-					engine: true,
-				},
-			});
-
-		console.group("Game engines for " + game.name + " (Game ID: " + game.id + "):");
-
-		for (const gameEngine of gameEngines)
-		{
-			console.log("%s (ID: %d) (Notes: %s) (Engine ID: %d)", 
-				gameEngine.engine.name, 
-				gameEngine.id, 
-				gameEngine.notes, 
-				gameEngine.engine.id);
-		}
-
-		console.groupEnd();
-
-		const OptionSchema = z.enum([ "createNew", "addExisting", "done" ]);
-
-		type Option = z.infer<typeof OptionSchema>;
-
-		const option = await CliLib.prompt(readlineInterface,
-			{
-				text: "Add an engine to this game",
-				options:
-				[
-					{
-						value: "createNew" satisfies Option,
-						description: "Create a new engine",
-					},
-					{
-						value: "addExisting" satisfies Option,
-						description: "Use an existing engine",
-					},
-					{
-						value: "done" satisfies Option,
-						description: "Finish adding engines",
-					},
-				],
-				validateAndTransform: async (input) => OptionSchema.parse(input),
-			});
-
-		let engine: Prisma.EngineGetPayload<null>;
-
-		switch (option)
-		{
-			case "createNew":
-			{
-				engine = await EngineCliLib.create(readlineInterface);
-
-				break;
-			}
-
-			case "addExisting":
-			{
-				const engines = await EngineCliLib.search(readlineInterface);
-
-				if (engines.length == 0)
-				{
-					console.log("No engines found. Please try again or create a new engine.");
-
-					continue loop;
-				}
-				else if (engines.length == 1)
-				{
-					engine = engines[0]!;
-				}
-				else
-				{
-					engine = await EngineCliLib.choose(readlineInterface, engines);
-				}
-
-
-				break;
-			}
-
-			case "done":
-			{		
-				break loop;
-			}
-		}
-
-		const gameEngine = await GameEngineCliLib.create(readlineInterface,
-			{
-				game,
-				engine,
-			});
-	
-		console.log("Added %s as an engine for %s! (Game Engine #%s)", engine.name, game.name, gameEngine.id);
 	}
 }
 
@@ -983,18 +662,6 @@ async function addGamePlaySessions(readlineInterface: readline.promises.Interfac
 }
 
 //
-// Genre Actions
-//
-
-// TODO: createGenre
-
-//
-// Mode Actions
-//
-
-// TODO: createMode
-
-//
 // Platform Actions
 //
 
@@ -1078,98 +745,6 @@ async function addSeriesGames(readlineInterface: readline.promises.Interface, se
 }
 
 //
-// Steam Actions
-//
-
-async function downloadGameImagesFromSteam(readlineInterface: readline.promises.Interface, game: Prisma.GameGetPayload<null>)
-{
-	const numberOfImagesDownloadedFromSteam = await GameCliLib.downloadImagesFromSteam(readlineInterface, game);
-
-	console.log(chalk.green("%d images downloaded from Steam!"), numberOfImagesDownloadedFromSteam);
-}
-
-async function pullMissingDescriptionsFromSteam(readlineInterface: readline.promises.Interface)
-{
-	const games = await prismaClient.game.findMany(
-		{
-			where:
-			{
-				description: null,
-
-				steamAppId: { not: null },
-			},
-		});
-
-	for (const [ gameIndex, game ] of games.entries())
-	{
-		//
-		// Clear Console
-		//
-
-		console.clear();
-
-		console.log("%d left...", games.length - gameIndex);
-
-		//
-		// Fetch Steam App Details
-		//
-
-		const steamAppDetails = await SteamThirdPartyLib.fetchAppDetails(game.steamAppId!);
-
-		if (steamAppDetails == null)
-		{
-			console.log(chalk.red("Failed to fetch Steam app details for %s!"), game.name);
-
-			continue;
-		}
-
-		//
-		// Log Description
-		//
-
-		const lines = await steamAppDetails.short_description.split("\n");
-
-		console.group("%s description:", game.name);
-
-		for (const line of lines)
-		{
-			console.log(line);
-		}
-
-		console.groupEnd();
-
-		//
-		// Prompt to Use Description
-		//
-
-		console.log("");
-
-		const description = await CliLib.prompt(readlineInterface,
-			{
-				text: "Description:",
-				defaultValue: steamAppDetails.short_description.trim(),
-				validateAndTransform: async (input) => z.string().nonempty().parse(input),
-			});
-
-		//
-		// Update Game
-		//
-
-		await prismaClient.game.update(
-			{
-				where:
-				{
-					id: game.id,
-				},
-				data:
-				{
-					description,
-				},
-			});
-	}
-}
-
-//
 // Actions Record
 //
 
@@ -1181,48 +756,10 @@ type Action =
 
 const actions: Record<string, Action> =
 {
-	audit:
-	{
-		description: "Audit your game library for weird or missing data",
-		execute: audit,
-	},
-
-	createCompany:
-	{
-		description: "Add a new company to your library",
-		execute: createCompany,
-	},
-
-	createEngine:
-	{
-		description: "Add a new engine to your library",
-		execute: createEngine,
-	},
-
 	createGame:
 	{
 		description: "Add a new game to your library",
 		execute: createGame,
-	},
-	addGameCompanies:
-	{
-		description: "Add companies to an existing game",
-		execute: async (readlineInterface) =>
-		{
-			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
-
-			await addGameCompanies(readlineInterface, game);
-		},
-	},
-	addGameEngines:
-	{
-		description: "Add engine to an existing game",
-		execute: async (readlineInterface) =>
-		{
-			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
-
-			await addGameEngines(readlineInterface, game);
-		},
 	},
 	addGameInstallations:
 	{
@@ -1285,22 +822,6 @@ const actions: Record<string, Action> =
 
 			await addSeriesGames(readlineInterface, series);
 		},
-	},
-
-	downloadGameImagesFromSteam:
-	{
-		description: "Download images for a game from Steam",
-		execute: async (readlineInterface) =>
-		{
-			const game = await GameCliLib.searchAndChooseOne(readlineInterface);
-
-			await downloadGameImagesFromSteam(readlineInterface, game);
-		},
-	},
-	pullMissingDescriptionsFromSteam:
-	{
-		description: "Pull missing descriptions from Steam",
-		execute: pullMissingDescriptionsFromSteam,
 	},
 };
 
