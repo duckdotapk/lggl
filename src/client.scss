@@ -21,6 +21,7 @@
 
 @use "components/layout/AutomaticColumnLayout.scss";
 @use "components/layout/ColumnLayout.scss";
+@use "components/layout/ListLayout.scss";
 
 @use "components/toolbar/Toolbar.scss";
 
@@ -52,6 +53,7 @@
 
 @include AutomaticColumnLayout.AutomaticColumnLayout();
 @include ColumnLayout.ColumnLayout();
+@include ListLayout.ListLayout();
 
 @include Toolbar.Toolbar();
 
