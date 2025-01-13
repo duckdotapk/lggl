@@ -6,8 +6,7 @@ import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
-import { TabControl } from "../../components/input/TabControl.js";
-
+import { DownloadGameImagesForm } from "../../components/form/DownloadGameImagesForm.js";
 import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/UpsertGameForm.js";
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
 import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../components/form/UpsertGameEngineForm.js";
@@ -45,48 +44,49 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				Header(1, "Edit " + options.game.name),
 
+				Header(2, "Game"),
+
 				UpsertGameForm(options.game),
 
-				TabControl(
+				Header(2, "Game companies"),
+
+				options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
+					{
+						companies: options.companies, 
+						game: options.game,
+						gameCompany,
+					}))),
+	
+				Block(UpsertGameCompanyForm(
+					{
+						companies: options.companies,
+						game: options.game,
+						gameCompany: null,
+					})),
+
+				Header(2, "Game engines"),
+
+				options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
+					{
+						engines: options.engines,
+						game: options.game,
+						gameEngine,
+					}))),
+	
+				Block(UpsertGameEngineForm(
+					{
+						engines: options.engines,
+						game: options.game,
+						gameEngine: null,
+					})),
+
+				Header(2, "Utilities"),
+
+				Block(
 					[
-						{
-							title: "Companies",
-							content:
-							[				
-								options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
-									{
-										companies: options.companies, 
-										game: options.game,
-										gameCompany,
-									}))),
-					
-								Block(UpsertGameCompanyForm(
-									{
-										companies: options.companies,
-										game: options.game,
-										gameCompany: null,
-									})),
-							],
-						},
-						{
-							title: "Engines",
-							content:
-							[
-								options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
-									{
-										engines: options.engines,
-										game: options.game,
-										gameEngine,
-									}))),
-					
-								Block(UpsertGameEngineForm(
-									{
-										engines: options.engines,
-										game: options.game,
-										gameEngine: null,
-									})),
-							],
-						}
+						Header(3, "Download images"),
+
+						DownloadGameImagesForm(options.game),
 					]),
 			]),
 	};

@@ -2,6 +2,7 @@
 // Imports
 //
 
+import { initialiseDownloadGameImagesForms } from "./components/form/DownloadGameImagesForm.client.js";
 import { initialiseUpsertCompanyForms } from "./components/form/UpsertCompanyForm.client.js";
 import { initialiseUpsertEngineForms } from "./components/form/UpsertEngineForm.client.js";
 import { initialiseUpsertGameForms } from "./components/form/UpsertGameForm.client.js";
@@ -21,6 +22,7 @@ import { initialiseGameLists } from "./components/GameList.client.js";
 // Client
 //
 
+initialiseDownloadGameImagesForms();
 initialiseUpsertCompanyForms();
 initialiseUpsertEngineForms();
 initialiseUpsertGameForms();
