@@ -2,7 +2,11 @@
 // Imports
 //
 
-import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { Prisma } from "@prisma/client";
+
+import { GroupManager } from "../../classes/GroupManager.js";
+
+import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 
@@ -12,7 +16,7 @@ import { SiteOptions } from "../../components/Site.js";
 
 export type ViewOptions =
 {
-	groups: ListLayoutOptions["groups"];
+	groupManager: GroupManager<Prisma.EngineGetPayload<null>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -23,7 +27,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		content: ListLayout(
 			{
 				toolbar: null,
-				groups: options.groups,
+				groupManager: options.groupManager,
 				createHref: "/engines/create",
 				content: null,
 			}),

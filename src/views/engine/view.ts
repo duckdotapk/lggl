@@ -4,14 +4,15 @@
 
 import { Prisma } from "@prisma/client";
 
+import { GroupManager } from "../../classes/GroupManager.js";
+
 import { Anchor } from "../../components/basic/Anchor.js";
 import { Block } from "../../components/basic/Block.js";
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { Button } from "../../components/input/Button.js";
 
-import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -22,32 +23,26 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
-	groups: ListLayoutOptions["groups"];
+	groupManager: GroupManager<Prisma.EngineGetPayload<null>>;
 	engine: Prisma.EngineGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
-	const pageTitle = options.engine.shortName ?? options.engine.name;
+	const engineName = options.engine.shortName ?? options.engine.name;
 
 	return {
 		currentPage: "engines",
-		pageTitle,
+		pageTitle: engineName + " | Engines",
 		content: ListLayout(
 			{
 				toolbar: null,
-				groups: options.groups,
+				groupManager: options.groupManager,
 				createHref: "/engines/create",
 				content: Wrapper("45rem",
-					[
-						Breadcrumbs(
-							[
-								{ href: "/engines", text: "Engines" },
-								{ href: "/engines/view/" + options.engine.id, text: options.engine.shortName ?? options.engine.name },
-							]),
-		
-						Header(1, pageTitle),
+					[		
+						Header(1, engineName),
 		
 						Button(
 							{

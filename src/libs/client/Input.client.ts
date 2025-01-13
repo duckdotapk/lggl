@@ -191,7 +191,7 @@ export function enableInputs(form: HTMLFormElement)
 type InitialiseFormOptions<T extends { success: boolean }> =
 {
 	form: HTMLFormElement;
-	submitter: HTMLButtonElement | HTMLFormElement;
+	submitter: HTMLButtonElement | HTMLFormElement | HTMLInputElement | HTMLSelectElement;
 	requireConfirmation: boolean;
 	onSubmit: () => Promise<T>;
 	onSuccess: (successResponse: Extract<T, { success: true }>) => Promise<void>;
@@ -199,7 +199,22 @@ type InitialiseFormOptions<T extends { success: boolean }> =
 
 export function initialiseForm<T extends { success: boolean }>(options: InitialiseFormOptions<T>)
 {
-	options.submitter.addEventListener(options.submitter instanceof HTMLButtonElement ? "click" : "submit",
+	let eventName: string;
+
+	if (options.submitter instanceof HTMLButtonElement)
+	{
+		eventName = "click";
+	}
+	else if (options.submitter instanceof HTMLFormElement)
+	{
+		eventName = "submit";
+	}
+	else
+	{
+		eventName = "change";
+	}
+
+	options.submitter.addEventListener(eventName,
 		async (event) =>
 		{
 			event.preventDefault();

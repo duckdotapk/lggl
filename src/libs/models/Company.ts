@@ -5,76 +5,52 @@
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { GroupManager } from "../../classes/GroupManager.js";
 
-import * as SettingSchemaLib from "../schemas/Setting.js";
+import * as SettingModelLib from "../models/Setting.js";
 
 //
 // Create/Find/Update/Delete Functions
 //
 
-export type FindGroupsMode = "name";
-
 export type FindGroupsOptions =
 {
-	mode: SettingSchemaLib.CompanyGroupMode;
+	settings: SettingModelLib.Settings;
 	selectedCompany: Prisma.CompanyGetPayload<null> | null;
 };
 
 export async function findGroups(transactionClient: Prisma.TransactionClient, options: FindGroupsOptions)
 {
-	const companies = await transactionClient.company.findMany(
+	const companies = await transactionClient.company.findMany();
+
+	const groupManager = new GroupManager<typeof companies[0]>(
+		(company) =>
 		{
-			orderBy:
-			[
-				{ name: "asc" },
-			],
+			return {
+				selected: company.id == options.selectedCompany?.id,
+				href: "/companies/view/" + company.id,
+				iconName: "fa-solid fa-building",
+				name: company.name,
+				info: "Last updated " + DateTime.fromJSDate(company.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
+			};
 		});
 
-	const groupsMap = new Map<string, ListLayoutOptions["groups"][0]>();
-
-	switch (options.mode)
+	switch (options.settings.companyGroupMode)
 	{
 		case "name":
 		{
-			for (const company of companies)
+			const sortedCompanies = companies.toSorted((a, b) => a.name.localeCompare(b.name));
+
+			for (const company of sortedCompanies)
 			{
-				const charCode = company.name.toUpperCase().charCodeAt(0);
-		
-				let groupName: string;
-		
-				if (charCode >= 48 && charCode <= 57)
-				{
-					groupName = "#";
-				}
-				else if (charCode >= 65 && charCode <= 90)
-				{
-					groupName = company.name[0]!.toUpperCase();
-				}
-				else
-				{
-					groupName = "?";
-				}
-		
-				const companyGroup = groupsMap.get(groupName) ?? { name: groupName, items: [] };
-				
-				companyGroup.items.push(
-					{
-						selected: company.id == options.selectedCompany?.id,
-						href: "/companies/view/" + company.id,
-						iconName: "fa-solid fa-building",
-						name: company.name,
-						info: "Last updated " + DateTime.fromJSDate(company.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
-					});
-		
-				groupsMap.set(groupName, companyGroup);
+				const groupName = GroupManager.getNameGroupName(company.name);
+
+				groupManager.addItemToGroup(groupName, company);
 			}
 
 			break;
 		}
 	}
 
-	const groups = Array.from(groupsMap.values());
-
-	return groups;
+	return groupManager;
 }

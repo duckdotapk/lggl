@@ -4,13 +4,15 @@
 
 import { Prisma } from "@prisma/client";
 
+import { GroupManager } from "../../classes/GroupManager.js";
+
 import { Anchor } from "../../components/basic/Anchor.js";
 import { Block } from "../../components/basic/Block.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { Button } from "../../components/input/Button.js";
 
-import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -21,7 +23,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
-	groups: ListLayoutOptions["groups"];
+	groupManager: GroupManager<Prisma.CompanyGetPayload<null>>;
 	company: Prisma.CompanyGetPayload<null>;
 	gamesDeveloped: Prisma.GameGetPayload<null>[];
 	gamesPublished: Prisma.GameGetPayload<null>[];
@@ -29,19 +31,17 @@ type ViewOptions =
 
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
-	const pageTitle = options.company.name;
-
 	return {
 		currentPage: "companies",
-		pageTitle,
+		pageTitle: options.company.name + " | Companies",
 		content: ListLayout(
 			{
 				toolbar: null,
-				groups: options.groups,
+				groupManager: options.groupManager,
 				createHref: "/companies/create",
 				content: Wrapper("45rem",
 					[
-						Header(1, pageTitle),
+						Header(1, options.company.name),
 
 						Button(
 							{

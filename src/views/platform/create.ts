@@ -2,11 +2,15 @@
 // Imports
 //
 
+import { Prisma } from "@prisma/client";
+
+import { GroupManager } from "../../classes/GroupManager.js";
+
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertPlatformForm } from "../../components/form/UpsertPlatformForm.js";
 
-import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -17,8 +21,8 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 export type ViewOptions =
 {
-	groups: ListLayoutOptions["groups"];
-}
+	groupManager: GroupManager<Prisma.PlatformGetPayload<null>>;
+};
 
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
@@ -28,7 +32,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		content: ListLayout(
 			{
 				toolbar: null,
-				groups: options.groups,
+				groupManager: options.groupManager,
 				createHref: "/platforms/create",
 				content: Wrapper("45rem",
 					[

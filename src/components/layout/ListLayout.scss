@@ -16,6 +16,12 @@
 		gap: 0.25rem;
 		align-items: center;
 
+		// HACK: this is specifically for when the list is games
+		&[data-is-installed="false"]
+		{
+			opacity: 0.5;
+		}
+
 		&:hover,
 		&.selected
 		{

@@ -4,11 +4,13 @@
 
 import { Prisma } from "@prisma/client";
 
+import { GroupManager } from "../../classes/GroupManager.js";
+
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertEngineForm } from "../../components/form/UpsertEngineForm.js";
 
-import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -19,25 +21,25 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
-	groups: ListLayoutOptions["groups"];
+	groupManager: GroupManager<Prisma.EngineGetPayload<null>>;
 	engine: Prisma.EngineGetPayload<null>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
 {
-	const pageTitle = "Edit " + (options.engine.shortName ?? options.engine.name);
+	const engineName = options.engine.shortName ?? options.engine.name;
 
 	return {
 		currentPage: "engines",
-		pageTitle,
+		pageTitle: "Edit " + engineName + " | Engines",
 		content: ListLayout(
 			{
 				toolbar: null,
-				groups: options.groups,
+				groupManager: options.groupManager,
 				createHref: "/engines/create",
 				content: Wrapper("45rem",
 					[		
-						Header(1, pageTitle),
+						Header(1, engineName),
 		
 						UpsertEngineForm(options.engine),
 					]),

@@ -5,9 +5,9 @@
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
-import { ListLayoutOptions } from "../../components/layout/ListLayout.js";
+import { GroupManager } from "../../classes/GroupManager.js";
 
-import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
+import * as SettingModelLib from "../models/Setting.js";
 
 //
 // Create/Find/Update/Delete Functions
@@ -15,64 +15,42 @@ import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
 
 export type FindGroupsOptions =
 {
-	mode: SettingSchemaLib.EngineGroupMode;
+	settings: SettingModelLib.Settings;
 	selectedEngine: Prisma.EngineGetPayload<null> | null;
 };
 
 export async function findGroups(transactionClient: Prisma.TransactionClient, options: FindGroupsOptions)
 {
-	const engines = await transactionClient.engine.findMany(
+	const engines = await transactionClient.engine.findMany();
+
+	const groupManager = new GroupManager<typeof engines[0]>(
+		(engine) =>
 		{
-			orderBy:
-			[
-				{ name: "asc" },
-			],
+			return {
+				selected: engine.id == options.selectedEngine?.id,
+				href: "/engines/view/" + engine.id,
+				iconName: "fa-solid fa-engine",
+				name: engine.name,
+				info: "Last updated " + DateTime.fromJSDate(engine.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
+			};
 		});
 
-	const groupsMap = new Map<string, ListLayoutOptions["groups"][0]>();
-
-	switch (options.mode)
+	switch (options.settings.engineGroupMode)
 	{
 		case "name":
 		{
-			for (const engine of engines)
+			const sortedEngines = engines.toSorted((a, b) => a.name.localeCompare(b.name));
+
+			for (const engine of sortedEngines)
 			{
-				const charCode = engine.name.toUpperCase().charCodeAt(0);
+				const groupName = GroupManager.getNameGroupName(engine.name);
 		
-				let groupName: string;
-		
-				if (charCode >= 48 && charCode <= 57)
-				{
-					groupName = "#";
-				}
-				else if (charCode >= 65 && charCode <= 90)
-				{
-					groupName = engine.name[0]!.toUpperCase();
-				}
-				else
-				{
-					groupName = "?";
-				}
-		
-				const engineGroup = groupsMap.get(groupName) ?? { name: groupName, items: [] };
-				
-				engineGroup.items.push(
-					{
-						selected: engine.id == options.selectedEngine?.id,
-						href: "/engines/view/" + engine.id,
-						iconName: "fa-solid fa-engine",
-						name: engine.name,
-						info: "Last updated " + DateTime.fromJSDate(engine.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
-					});
-		
-				groupsMap.set(groupName, engineGroup);
+				groupManager.addItemToGroup(groupName, engine);
 			}
 
 			break;
 		}
 	}
 
-	const groups = Array.from(groupsMap.values());
-
-	return groups;
+	return groupManager;
 }

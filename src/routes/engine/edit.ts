@@ -49,15 +49,15 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			return;
 		}
 
-		const groups = await EngineModelLib.findGroups(prismaClient,
+		const groupManager = await EngineModelLib.findGroups(prismaClient,
 			{
-				mode: "name",
+				settings: context.settings,
 				selectedEngine: engine,
 			});
 
 		context.renderComponent(view(
 			{
-				groups,
+				groupManager,
 				engine,
 			}));
 	},

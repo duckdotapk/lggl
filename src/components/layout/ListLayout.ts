@@ -5,6 +5,8 @@
 import { Child, DE } from "@donutteam/document-builder";
 import * as Utilities from "@donutteam/utilities";
 
+import { GroupManager } from "../../classes/GroupManager.js";
+
 import { Muted } from "../basic/Muted.js";
 
 import { Button } from "../input/Button.js";
@@ -15,16 +17,16 @@ import { staticMiddleware } from "../../instances/server.js";
 // Locals
 //
 
-type GroupItemOptions =
+export type ListLayoutGroupItemOptions =
 {
 	selected: boolean;
 	href: string;
 	iconName: string;
 	name: string;
-	info: string;
+	info: Child;
 };
 
-function GroupItem(options: GroupItemOptions)
+function GroupItem(options: ListLayoutGroupItemOptions)
 {
 	let className = "component-list-layout-group-item";
 
@@ -66,10 +68,10 @@ function GroupItem(options: GroupItemOptions)
 		]);
 }
 
-type ListLayoutGroupOptions =
+export type ListLayoutGroupOptions =
 {
 	name: string;
-	items: GroupItemOptions[];
+	items: ListLayoutGroupItemOptions[];
 };
 
 function Group(options: ListLayoutGroupOptions)
@@ -101,7 +103,7 @@ function Group(options: ListLayoutGroupOptions)
 export type ListLayoutOptions =
 {
 	toolbar: Child;
-	groups: ListLayoutGroupOptions[];
+	groupManager: GroupManager<any>;
 	createHref: string;
 	content: Child;
 };
@@ -114,7 +116,7 @@ export function ListLayout(options: ListLayoutOptions)
 
 			new DE("aside", "list",
 				[
-					options.groups.map((group) => Group(group)),
+					options.groupManager.getGroups().map((group) => Group(group)),
 				]),
 
 			new DE("div", "create",
