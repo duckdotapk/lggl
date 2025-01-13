@@ -7,6 +7,8 @@ import * as Fritter from "@donutteam/fritter";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
+import * as EngineModelLib from "../../libs/models/Engine.js";
+
 import { view } from "../../views/engine/_main.js";
 
 //
@@ -21,17 +23,15 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/engines",
 	handler: async (context) =>
 	{
-		const engines = await prismaClient.engine.findMany(
-			{
-				orderBy:
-				[
-					{ name: "asc" },
-				],
+		const groups = await EngineModelLib.findGroups(prismaClient,
+			{ 
+				mode: "name",
+				selectedEngine: null,
 			});
 
 		context.renderComponent(view(
 			{
-				engines,
+				groups,
 			}));
 	},
 };

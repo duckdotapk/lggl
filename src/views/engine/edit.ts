@@ -4,10 +4,11 @@
 
 import { Prisma } from "@prisma/client";
 
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertEngineForm } from "../../components/form/UpsertEngineForm.js";
+
+import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -18,6 +19,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
+	groups: ListLayoutOptions["groups"];
 	engine: Prisma.EngineGetPayload<null>;
 };
 
@@ -28,18 +30,17 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "engines",
 		pageTitle,
-		content: Wrapper("45rem",
-			[
-				Breadcrumbs(
-					[
-						{ href: "/engines", text: "Engines" },
-						{ href: "/engines/view/" + options.engine.id, text: options.engine.shortName ?? options.engine.name },
-						{ href: "/engines/edit/" + options.engine.id, text: "Edit" },
+		content: ListLayout(
+			{
+				toolbar: null,
+				groups: options.groups,
+				createHref: "/engines/create",
+				content: Wrapper("45rem",
+					[		
+						Header(1, pageTitle),
+		
+						UpsertEngineForm(options.engine),
 					]),
-
-				Header(1, pageTitle),
-
-				UpsertEngineForm(options.engine),
-			]),
+			}),
 	};
 }

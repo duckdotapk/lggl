@@ -2,10 +2,10 @@
 // Imports
 //
 
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertEngineForm } from "../../components/form/UpsertEngineForm.js";
+import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -14,22 +14,27 @@ import { Wrapper } from "../../components/Wrapper.js";
 // View
 //
 
-export function view(): Partial<SiteOptions>
+export type ViewOptions =
+{
+	groups: ListLayoutOptions["groups"];
+};
+
+export function view(options: ViewOptions): Partial<SiteOptions>
 {
 	return {
 		currentPage: "engines",
 		pageTitle: "Create engine",
-		content: Wrapper("45rem",
-			[
-				Breadcrumbs(
+		content: ListLayout(
+			{
+				toolbar: null,
+				groups: options.groups,
+				createHref: "/engines/create",
+				content: Wrapper("45rem",
 					[
-						{ href: "/engines", text: "Engines" },
-						{ href: "/engines/create", text: "Create" },
+						Header(1, "Create engine"),
+		
+						UpsertEngineForm(null),
 					]),
-
-				Header(1, "Create engine"),
-
-				UpsertEngineForm(null),
-			]),
+			}),
 	};
 }
