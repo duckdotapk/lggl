@@ -7,6 +7,8 @@ import * as Fritter from "@donutteam/fritter";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
+import * as GameModelLib from "../../libs/models/Game.js";
+
 import { view } from "../../views/game/edit.js";
 
 //
@@ -46,6 +48,12 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		{
 			return;
 		}
+
+		const groupManager = await GameModelLib.findGroups(prismaClient,
+			{
+				settings: context.settings,
+				selectedGame: game,
+			});
 
 		const companies = await prismaClient.company.findMany(
 			{
@@ -143,6 +151,8 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		context.renderComponent(view(
 			{
+				settings: context.settings,
+				groupManager,
 				companies,
 				engines,
 				game,

@@ -2,9 +2,14 @@
 // Imports
 //
 
-import { GameGroupManager } from "../../classes/GameGroupManager.js";
+import { Prisma } from "@prisma/client";
 
-import { Library } from "../../components/Library.js";
+import { GroupManager } from "../../classes/GroupManager.js";
+
+import { ListLayout } from "../../components/layout/ListLayout.js";
+
+import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolbar.js";
+
 import { SiteOptions } from "../../components/Site.js";
 
 import * as SettingModelLib from "../../libs/models/Setting.js";
@@ -16,7 +21,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	gameGroupManager: GameGroupManager;
+	groupManager: GroupManager<Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -24,11 +29,12 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "games",
 		pageTitle: "Games",
-		content: Library(
+		content: ListLayout(
 			{
-				settings: options.settings,
-				gameGroupManager: options.gameGroupManager,
-				selectedGame: null,
+				toolbar: GameSettingsToolbar(options.settings),
+				groupManager: options.groupManager,
+				createHref: "/games/create",
+				content: null,
 			}),
 	};
 }

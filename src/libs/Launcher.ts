@@ -6,19 +6,12 @@ import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 import { z } from "zod";
 
-import { LastPlayedGameGroupManager } from "../classes/LastPlayedGameGroupManager.js";
-import { NameGameGroupManager } from "../classes/NameGameGroupManager.js";
-import { PlayTimeGameGroupManager } from "../classes/PlayTimeGameGroupManager.js";
-import { SeriesGameGroupManager } from "../classes/SeriesGameGroupManager.js";
-
 import { LGGL_CURRENT_PLATFORM_ID } from "../env/LGGL_CURRENT_PLATFORM_ID.js";
 import { LGGL_LAUNCH_CHECK_INTERVAL } from "../env/LGGL_LAUNCH_CHECK_INTERVAL.js";
 import { LGGL_LAUNCH_INITIAL_CHECK_DELAY } from "../env/LGGL_LAUNCH_INITIAL_CHECK_DELAY.js";
 import { LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS } from "../env/LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS.js";
 
 import { prismaClient } from "../instances/prismaClient.js";
-
-import * as SettingModelLib from "./models/Setting.js";
 
 import * as GameSchemaLib from "./schemas/Game.js";
 
@@ -27,53 +20,6 @@ import * as SystemLib from "./System.js";
 //
 // Utility Functions
 //
-
-export async function fetchGameGroupManager(settings: SettingModelLib.Settings)
-{
-	let games = await prismaClient.game.findMany(
-		{
-			include:
-			{
-				seriesGames:
-				{
-					include:
-					{
-						series: true,
-					},
-				},
-			},
-		});
-
-	if (!settings.showVisibleGames)
-	{
-		games = games.filter((game) => game.isHidden || game.isNsfw);
-	}
-
-	if (!settings.showHiddenGames)
-	{
-		games = games.filter((game) => !game.isHidden);
-	}
-
-	if (!settings.showNsfwGames)
-	{
-		games = games.filter((game) => !game.isNsfw);
-	}
-
-	switch (settings.gameGroupMode)
-	{
-		case "lastPlayed":
-			return new LastPlayedGameGroupManager(settings, games);
-
-		case "name":
-			return new NameGameGroupManager(settings, games);
-
-		case "playTime":
-			return new PlayTimeGameGroupManager(settings, games);
-
-		case "series":
-			return new SeriesGameGroupManager(settings, games);
-	}
-}
 
 export type LaunchGameResult =
 {

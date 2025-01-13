@@ -10,7 +10,7 @@ import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../../env/LGGL_GAME_PLAY_SE
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as LauncherLib from "../../libs/Launcher.js";
+import * as GameModelLib from "../../libs/models/Game.js";
 
 import { view } from "../../views/game/view.js";
 
@@ -32,18 +32,18 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/games/view/:gameId",
 	handler: async (context) =>
 	{
-		const selectedGameId = parseInt(context.routeParameters.gameId);
+		const gameId = parseInt(context.routeParameters.gameId);
 
-		if (isNaN(selectedGameId))
+		if (isNaN(gameId))
 		{
 			return;
 		}
 
-		const selectedGame = await prismaClient.game.findFirst(
+		const game = await prismaClient.game.findFirst(
 			{
 				where:
 				{
-					id: selectedGameId,
+					id: gameId,
 				},
 				include:
 				{
@@ -55,6 +55,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						},
 						orderBy:
 						[
+							{ notes: { sort: "asc", nulls: "first" } },
 							{ company: { name: "asc" } },
 						],
 					},
@@ -93,18 +94,22 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				},
 			});
 
-		if (selectedGame == null)
+		if (game == null)
 		{
 			return;
 		}
 
-		const gameGroupManager = await LauncherLib.fetchGameGroupManager(context.settings);
+		const groupManager = await GameModelLib.findGroups(prismaClient,
+			{
+				settings: context.settings,
+				selectedGame: game,
+			});
 
 		context.renderComponent(view(
 			{
 				settings: context.settings,
-				gameGroupManager,
-				selectedGame, 
+				groupManager,
+				game, 
 			}));
 	},
 };

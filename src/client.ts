@@ -20,10 +20,9 @@ import { initialiseTabControls } from "./components/input/TabControl.client.js";
 
 import { initialiseListLayouts } from "./components/layout/ListLayout.client.js";
 
-import { initialiseFilterOptionsToolbars } from "./components/toolbar/FilterSettingsToolbar.client.js";
+import { initialiseGameSettingsToolbars } from "./components/toolbar/GameSettingsToolbar.client.js";
 
 import { initialiseGameDetails } from "./components/GameDetails.client.js";
-import { initialiseGameLists } from "./components/GameList.client.js";
 
 //
 // Client
@@ -47,7 +46,6 @@ initialiseTabControls();
 
 initialiseListLayouts();
 
-initialiseFilterOptionsToolbars();
+initialiseGameSettingsToolbars();
 
 initialiseGameDetails();
-initialiseGameLists();

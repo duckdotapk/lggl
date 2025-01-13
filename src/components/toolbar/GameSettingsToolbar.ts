@@ -15,9 +15,9 @@ import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
 // Components
 //
 
-export function FilterSettingsToolbar(settings: SettingModelLib.Settings)
+export function GameSettingsToolbar(settings: SettingModelLib.Settings)
 {
-	return Toolbar("component-filter-settings-toolbar", null,
+	return Toolbar("component-game-settings-toolbar", null,
 		[
 			Control(
 				{

@@ -4,6 +4,8 @@
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
 
+import * as InputClientLib from "../../libs/client/Input.client.js";
+
 import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
 
 import { updateSettings } from "../../routes/api/setting/update.schemas.js";
@@ -26,10 +28,12 @@ async function initialise(toolbar: HTMLFormElement)
 
 	toolbar.addEventListener("submit", (event) => event.preventDefault());
 
-	gameGroupModeSelect.addEventListener("change",
-		async () =>
+	InputClientLib.initialiseForm(
 		{
-			await updateSettings(
+			form: toolbar,
+			submitter: gameGroupModeSelect,
+			requireConfirmation: false,
+			onSubmit: async () => await updateSettings(
 				{
 					settingUpdates:
 					[
@@ -38,16 +42,16 @@ async function initialise(toolbar: HTMLFormElement)
 							value: gameGroupModeSelect.value as SettingSchemaLib.GameGroupMode,
 						},
 					],
-				});
-
-			// TODO: somehow make this not require a reload
-			window.location.reload();
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 
-	showFavoritesGroupCheckbox.addEventListener("change",
-		async () =>
+	InputClientLib.initialiseForm(
 		{
-			const _ = await updateSettings(
+			form: toolbar,
+			submitter: showFavoritesGroupCheckbox,
+			requireConfirmation: false,
+			onSubmit: async () => await updateSettings(
 				{
 					settingUpdates:
 					[
@@ -56,18 +60,16 @@ async function initialise(toolbar: HTMLFormElement)
 							value: showFavoritesGroupCheckbox.checked,
 						},
 					],
-				});
-
-			console.log(_);
-
-			// TODO: somehow make this not require a reload
-			window.location.reload();
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 
-	showVisibleGamesCheckbox.addEventListener("change",
-		async () =>
+	InputClientLib.initialiseForm(
 		{
-			await updateSettings(
+			form: toolbar,
+			submitter: showVisibleGamesCheckbox,
+			requireConfirmation: false,
+			onSubmit: async () => await updateSettings(
 				{
 					settingUpdates:
 					[
@@ -76,16 +78,16 @@ async function initialise(toolbar: HTMLFormElement)
 							value: showVisibleGamesCheckbox.checked,
 						},
 					],
-				});
-
-			// TODO: somehow make this not require a reload
-			window.location.reload();
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 
-	showHiddenGamesCheckbox.addEventListener("change",
-		async () =>
+	InputClientLib.initialiseForm(
 		{
-			await updateSettings(
+			form: toolbar,
+			submitter: showHiddenGamesCheckbox,
+			requireConfirmation: false,
+			onSubmit: async () => await updateSettings(
 				{
 					settingUpdates:
 					[
@@ -94,16 +96,16 @@ async function initialise(toolbar: HTMLFormElement)
 							value: showHiddenGamesCheckbox.checked,
 						},
 					],
-				});
-
-			// TODO: somehow make this not require a reload
-			window.location.reload();
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 
-	showNsfwGamesCheckbox.addEventListener("change",
-		async () =>
+	InputClientLib.initialiseForm(
 		{
-			await updateSettings(
+			form: toolbar,
+			submitter: showNsfwGamesCheckbox,
+			requireConfirmation: false,
+			onSubmit: async () => await updateSettings(
 				{
 					settingUpdates:
 					[
@@ -112,10 +114,8 @@ async function initialise(toolbar: HTMLFormElement)
 							value: showNsfwGamesCheckbox.checked,
 						},
 					],
-				});
-
-			// TODO: somehow make this not require a reload
-			window.location.reload();
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 }
 
@@ -123,11 +123,11 @@ async function initialise(toolbar: HTMLFormElement)
 // Components
 //
 
-export async function initialiseFilterOptionsToolbars()
+export async function initialiseGameSettingsToolbars()
 {
-	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-filter-settings-toolbar:not(.initialised)");
+	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-game-settings-toolbar:not(.initialised)");
 
-	console.log("[FilterOptionsToolbar]", toolbars);
+	console.log("[GameSettingsToolbar]", toolbars);
 
 	for (const toolbar of toolbars)
 	{
@@ -139,7 +139,7 @@ export async function initialiseFilterOptionsToolbars()
 		}
 		catch (error)
 		{
-			console.error("[FilterOptionsToolbar] Error initialising:", toolbar, error);
+			console.error("[GameSettingsToolbar] Error initialising:", toolbar, error);
 		}
 	}
 }

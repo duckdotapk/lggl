@@ -4,9 +4,10 @@
 
 import * as Fritter from "@donutteam/fritter";
 
+import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as LauncherLib from "../../libs/Launcher.js";
+import * as GameModelLib from "../../libs/models/Game.js";
 
 import { view } from "../../views/game/_main.js";
 
@@ -22,12 +23,16 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/games",
 	handler: async (context) =>
 	{
-		const gameGroupManager = await LauncherLib.fetchGameGroupManager(context.settings);
+		const groupManager = await GameModelLib.findGroups(prismaClient,
+			{
+				settings: context.settings,
+				selectedGame: null,
+			});
 
 		context.renderComponent(view(
 			{
 				settings: context.settings,
-				gameGroupManager: gameGroupManager,
+				groupManager,
 			}));
 	},
 };

@@ -2,6 +2,10 @@
 // Imports
 //
 
+import { Prisma } from "@prisma/client";
+
+import { GroupManager } from "../../classes/GroupManager.js";
+
 import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
@@ -17,9 +21,14 @@ import { UpsertGamePlayActionForm, UpsertGamePlayActionFormOptions } from "../..
 
 import { TabControl } from "../../components/input/TabControl.js";
 
+import { ListLayout } from "../../components/layout/ListLayout.js";
+
+import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolbar.js";
+
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
+import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
 // View
@@ -27,6 +36,8 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 export type ViewOptions =
 {
+	settings: SettingModelLib.Settings;
+	groupManager: GroupManager<Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>>;
 	companies: UpsertGameCompanyFormOptions["companies"];
 	engines: UpsertGameEngineFormOptions["engines"];
 	game: NonNullable<UpsertGameFormGame>;
@@ -43,132 +54,138 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "games",
 		pageTitle: "Edit " + options.game.name,
-		content: Wrapper("45rem",
-			[
-				Breadcrumbs(
+		content: ListLayout(
+			{
+				toolbar: GameSettingsToolbar(options.settings),
+				groupManager: options.groupManager,
+				createHref: "/games/create",
+				content:Wrapper("45rem",
 					[
-						{ href: "/games", text: "Games" },
-						{ href: "/games/view/" + options.game.id, text: options.game.name },
-						{ href: "/games/edit/" + options.game.id, text: "Edit" },
-					]),
-
-				Header(1, "Edit " + options.game.name),
-
-				UpsertGameForm(options.game),
-
-				TabControl(
-					[
-						{
-							title: "Companies",
-							content:
+						Breadcrumbs(
 							[
-								options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
-									{
-										companies: options.companies, 
-										game: options.game,
-										gameCompany,
-									}))),
-					
-								Block(UpsertGameCompanyForm(
-									{
-										companies: options.companies,
-										game: options.game,
-										gameCompany: null,
-									})),
-							],
-						},
-						{
-							title: "Engines",
-							content:
+								{ href: "/games", text: "Games" },
+								{ href: "/games/view/" + options.game.id, text: options.game.name },
+								{ href: "/games/edit/" + options.game.id, text: "Edit" },
+							]),
+		
+						Header(1, "Edit " + options.game.name),
+		
+						UpsertGameForm(options.game),
+		
+						TabControl(
 							[
-								options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
-									{
-										engines: options.engines,
-										game: options.game,
-										gameEngine,
-									}))),
-					
-								Block(UpsertGameEngineForm(
-									{
-										engines: options.engines,
-										game: options.game,
-										gameEngine: null,
-									})),
-							],
-						},
-						{
-							title: "Installations",
-							content:
-							[
-								options.gameInstallations.map((gameInstallation) => Block(UpsertGameInstallationForm(
-									{
-										game: options.game,
-										gameInstallation,
-									}))),
-				
-								Block(UpsertGameInstallationForm(
-									{
-										game: options.game,
-										gameInstallation: null,
-									})),
-							],
-						},
-						{
-							title: "Platforms",
-							content:
-							[
-								options.gamePlatforms.map((gamePlatform) => Block(UpsertGamePlatformForm(
-									{
-										platforms: options.platforms,
-										game: options.game,
-										gamePlatform,
-									}))),
-				
-								Block(UpsertGamePlatformForm(
-									{
-										platforms: options.platforms,
-										game: options.game,
-										gamePlatform: null,
-									})),
-							],
-						},
-						{
-							title: "Play actions",
-							content:
-							[
-								options.gamePlayActions.map((gamePlayAction) => Block(UpsertGamePlayActionForm(
-									{
-										game: options.game, 
-										gamePlayAction,
-									}))),
-				
-								Block(UpsertGamePlayActionForm(
-									{
-										game: options.game,
-										gamePlayAction: null,
-									})),
-							],
-						},
-						{
-							title: "Utilities",
-							content:
-							[
-								Block(
+								{
+									title: "Companies",
+									content:
 									[
-										Header(3, "Download images from Steam"),
-				
-										DownloadGameImagesForm(options.game),
-									]),
-				
-								Block(
+										options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
+											{
+												companies: options.companies, 
+												game: options.game,
+												gameCompany,
+											}))),
+							
+										Block(UpsertGameCompanyForm(
+											{
+												companies: options.companies,
+												game: options.game,
+												gameCompany: null,
+											})),
+									],
+								},
+								{
+									title: "Engines",
+									content:
 									[
-										Header(3, "Sync historical play time from Steam"),
-				
-										SyncGameHistoricalPlayTimeForm(options.game),
-									]),
-							],
-						},
+										options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
+											{
+												engines: options.engines,
+												game: options.game,
+												gameEngine,
+											}))),
+							
+										Block(UpsertGameEngineForm(
+											{
+												engines: options.engines,
+												game: options.game,
+												gameEngine: null,
+											})),
+									],
+								},
+								{
+									title: "Installations",
+									content:
+									[
+										options.gameInstallations.map((gameInstallation) => Block(UpsertGameInstallationForm(
+											{
+												game: options.game,
+												gameInstallation,
+											}))),
+						
+										Block(UpsertGameInstallationForm(
+											{
+												game: options.game,
+												gameInstallation: null,
+											})),
+									],
+								},
+								{
+									title: "Platforms",
+									content:
+									[
+										options.gamePlatforms.map((gamePlatform) => Block(UpsertGamePlatformForm(
+											{
+												platforms: options.platforms,
+												game: options.game,
+												gamePlatform,
+											}))),
+						
+										Block(UpsertGamePlatformForm(
+											{
+												platforms: options.platforms,
+												game: options.game,
+												gamePlatform: null,
+											})),
+									],
+								},
+								{
+									title: "Play actions",
+									content:
+									[
+										options.gamePlayActions.map((gamePlayAction) => Block(UpsertGamePlayActionForm(
+											{
+												game: options.game, 
+												gamePlayAction,
+											}))),
+						
+										Block(UpsertGamePlayActionForm(
+											{
+												game: options.game,
+												gamePlayAction: null,
+											})),
+									],
+								},
+								{
+									title: "Utilities",
+									content:
+									[
+										Block(
+											[
+												Header(3, "Download images from Steam"),
+						
+												DownloadGameImagesForm(options.game),
+											]),
+						
+										Block(
+											[
+												Header(3, "Sync historical play time from Steam"),
+						
+												SyncGameHistoricalPlayTimeForm(options.game),
+											]),
+									],
+								},
+							]),
 					]),
-			]),
+			}),
 	};
 }

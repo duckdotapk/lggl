@@ -26,8 +26,6 @@
 @use "components/toolbar/Toolbar.scss";
 
 @use "components/GameDetails.scss";
-@use "components/GameList.scss";
-@use "components/Library.scss";
 @use "components/Sidebar.scss";
 @use "components/Site.scss";
 @use "components/Wrapper.scss";
@@ -58,8 +56,6 @@
 @include Toolbar.Toolbar();
 
 @include GameDetails.GameDetails();
-@include GameList.GameList();
-@include Library.Library();
 @include Sidebar.Sidebar();
 @include Site.Site();
 @include Wrapper.Wrapper();
