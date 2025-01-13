@@ -11,8 +11,6 @@ import { Header } from "../../components/basic/Header.js";
 
 import { Button } from "../../components/input/Button.js";
 
-import { AutomaticColumns } from "../../components/layout/AutomaticColumns.js";
-
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
