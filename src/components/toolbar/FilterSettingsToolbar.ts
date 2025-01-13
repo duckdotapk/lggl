@@ -22,15 +22,15 @@ export function FilterSettingsToolbar(settings: SettingModelLib.Settings)
 			Control(
 				{
 					type: "select",
-					name: "groupMode",
-					value: settings.groupMode,
+					name: "gameGroupMode",
+					value: settings.gameGroupMode,
 					required: true,
 					options:
 					[
-						{ value: "name" satisfies SettingSchemaLib.GroupMode, label: "Group by Name" },
-						{ value: "lastPlayed" satisfies SettingSchemaLib.GroupMode, label: "Group by Last played" },
-						{ value: "series" satisfies SettingSchemaLib.GroupMode, label: "Group by Series" },
-						{ value: "playTime" satisfies SettingSchemaLib.GroupMode, label: "Group by Play time" },
+						{ value: "name" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Name" },
+						{ value: "lastPlayed" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Last played" },
+						{ value: "series" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Series" },
+						{ value: "playTime" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Play time" },
 					],
 				}),
 

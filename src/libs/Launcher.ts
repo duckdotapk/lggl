@@ -59,7 +59,7 @@ export async function fetchGameGroupManager(settings: SettingModelLib.Settings)
 		games = games.filter((game) => !game.isNsfw);
 	}
 
-	switch (settings.groupMode)
+	switch (settings.gameGroupMode)
 	{
 		case "lastPlayed":
 			return new LastPlayedGameGroupManager(settings, games);

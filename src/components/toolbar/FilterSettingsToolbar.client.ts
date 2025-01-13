@@ -14,7 +14,7 @@ import { updateSettings } from "../../routes/api/setting/update.schemas.js";
 
 async function initialise(toolbar: HTMLFormElement)
 {
-	const groupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="groupMode"]`);
+	const gameGroupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="gameGroupMode"]`);
 
 	const showFavoritesGroupCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showFavoritesGroup"]`);
 
@@ -26,7 +26,7 @@ async function initialise(toolbar: HTMLFormElement)
 
 	toolbar.addEventListener("submit", (event) => event.preventDefault());
 
-	groupModeSelect.addEventListener("change",
+	gameGroupModeSelect.addEventListener("change",
 		async () =>
 		{
 			await updateSettings(
@@ -34,8 +34,8 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "groupMode",
-							value: groupModeSelect.value as SettingSchemaLib.GroupMode,
+							name: "gameGroupMode",
+							value: gameGroupModeSelect.value as SettingSchemaLib.GameGroupMode,
 						},
 					],
 				});

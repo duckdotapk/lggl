@@ -12,15 +12,17 @@ import * as SettingSchemaLib from "../schemas/Setting.js";
 
 export class Settings
 {
-	groupMode: SettingSchemaLib.GroupMode = "lastPlayed";
-
+	gameGroupMode: SettingSchemaLib.GameGroupMode = "lastPlayed";
 	showFavoritesGroup: SettingSchemaLib.ShowFavoritesGroup = true;
-
 	showVisibleGames: SettingSchemaLib.ShowVisibleGames = true;
-
 	showHiddenGames: SettingSchemaLib.ShowHiddenGames = false;
-
 	showNsfwGames: SettingSchemaLib.ShowNsfwGames = false;
+
+	companyGroupMode: SettingSchemaLib.CompanyGroupMode = "name";
+
+	engineGroupMode: SettingSchemaLib.EngineGroupMode = "name";
+
+	platformGroupMode: SettingSchemaLib.PlatformGroupMode = "name";
 
 	constructor(settings: Prisma.SettingGetPayload<null>[])
 	{
@@ -28,13 +30,13 @@ export class Settings
 		{
 			switch (setting.name)
 			{
-				case "groupMode":
+				case "gameGroupMode":
 				{
-					const valueParseResult = SettingSchemaLib.GroupModeSchema.safeParse(setting.value);
+					const valueParseResult = SettingSchemaLib.GameGroupModeSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
-						this.groupMode = valueParseResult.data;
+						this.gameGroupMode = valueParseResult.data;
 					}
 
 					break;
@@ -83,6 +85,42 @@ export class Settings
 					if (valueParseResult.success)
 					{
 						this.showNsfwGames = valueParseResult.data;
+					}
+
+					break;
+				}
+
+				case "companyGroupMode":
+				{
+					const valueParseResult = SettingSchemaLib.CompanyGroupModeSchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.companyGroupMode = valueParseResult.data;
+					}
+
+					break;
+				}
+
+				case "engineGroupMode":
+				{
+					const valueParseResult = SettingSchemaLib.EngineGroupModeSchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.engineGroupMode = valueParseResult.data;
+					}
+
+					break;
+				}
+
+				case "platformGroupMode":
+				{
+					const valueParseResult = SettingSchemaLib.PlatformGroupModeSchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.platformGroupMode = valueParseResult.data;
 					}
 
 					break;

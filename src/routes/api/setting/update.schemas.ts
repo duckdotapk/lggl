@@ -17,8 +17,8 @@ export const RequestBodySchema = z.object(
 			[
 				z.object(
 					{
-						name: z.literal("groupMode"),
-						value: SettingSchemaLib.GroupModeSchema,
+						name: z.literal("gameGroupMode"),
+						value: SettingSchemaLib.GameGroupModeSchema,
 					}),
 
 				z.object(
@@ -43,6 +43,24 @@ export const RequestBodySchema = z.object(
 					{
 						name: z.literal("showNsfwGames"),
 						value: SettingSchemaLib.ShowNsfwGamesSchema,
+					}),
+
+				z.object(
+					{
+						name: z.literal("companyGroupMode"),
+						value: SettingSchemaLib.CompanyGroupModeSchema,
+					}),
+
+				z.object(
+					{
+						name: z.literal("engineGroupMode"),
+						value: SettingSchemaLib.EngineGroupModeSchema,
+					}),
+
+				z.object(
+					{
+						name: z.literal("platformGroupMode"),
+						value: SettingSchemaLib.PlatformGroupModeSchema,
 					}),
 			])),
 	});
