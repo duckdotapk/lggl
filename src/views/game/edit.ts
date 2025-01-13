@@ -11,6 +11,7 @@ import { SyncGameHistoricalPlayTimeForm } from "../../components/form/SyncGameHi
 import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/UpsertGameForm.js";
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
 import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../components/form/UpsertGameEngineForm.js";
+import { UpsertGameInstallationForm, UpsertGameInstallationFormOptions } from "../../components/form/UpsertGameInstallationForm.js";
 import { UpsertGamePlayActionForm, UpsertGamePlayActionFormOptions } from "../../components/form/UpsertGamePlayActionForm.js";
 
 import { SiteOptions } from "../../components/Site.js";
@@ -28,6 +29,7 @@ export type ViewOptions =
 	game: NonNullable<UpsertGameFormGame>;
 	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
 	gameEngines: NonNullable<UpsertGameEngineFormOptions["gameEngine"]>[];
+	gameInstallations: NonNullable<UpsertGameInstallationFormOptions["gameInstallation"]>[];
 	gamePlayActions: NonNullable<UpsertGamePlayActionFormOptions["gamePlayAction"]>[];
 };
 
@@ -81,6 +83,20 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						engines: options.engines,
 						game: options.game,
 						gameEngine: null,
+					})),
+
+				Header(2, "Game installations"),
+
+				options.gameInstallations.map((gameInstallation) => Block(UpsertGameInstallationForm(
+					{
+						game: options.game,
+						gameInstallation,
+					}))),
+
+				Block(UpsertGameInstallationForm(
+					{
+						game: options.game,
+						gameInstallation: null,
 					})),
 
 				Header(2, "Game play actions"),

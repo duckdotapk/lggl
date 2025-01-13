@@ -96,6 +96,18 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
+		const gameInstallations = await prismaClient.gameInstallation.findMany(
+			{
+				where:
+				{
+					game_id: game.id,
+				},
+				orderBy:
+				[
+					{ path: "asc" },
+				],
+			});
+
 		const gamePlayActions = await prismaClient.gamePlayAction.findMany(
 			{
 				where:
@@ -116,6 +128,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				game,
 				gameCompanies,
 				gameEngines,
+				gameInstallations,
 				gamePlayActions,
 			}));
 	},
