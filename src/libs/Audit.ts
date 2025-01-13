@@ -19,13 +19,15 @@ import * as GameCompanySchemaLib from "./schemas/GameCompany.js";
 export class Problem
 {
 	description: string;
+	isStrictModeOnly: boolean;
 	isAutoFixable: boolean;
 	wasAutomaticallyFixed: boolean;
 
-	constructor(description: string, isFixable: boolean)
+	constructor(description: string, isStrictModeOnly: boolean, isAutoFixable: boolean)
 	{
 		this.description = description;
-		this.isAutoFixable = isFixable;
+		this.isStrictModeOnly = isStrictModeOnly;
+		this.isAutoFixable = isAutoFixable;
 		this.wasAutomaticallyFixed = false;
 	}
 }
@@ -42,9 +44,9 @@ export class ProblemList
 		this.problems = [];
 	}
 
-	addProblem(description: string, isFixable: boolean)
+	addProblem(description: string, isStrictModeOnly: boolean, isFixable: boolean)
 	{
-		const problem = new Problem(description, isFixable);
+		const problem = new Problem(description, isStrictModeOnly, isFixable);
 
 		this.problems.push(problem);
 
@@ -72,7 +74,7 @@ export type AuditGameGame = Prisma.GameGetPayload<
 		},
 	}>;
 
-export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): Promise<ProblemList>
+export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFixProblems: boolean): Promise<ProblemList>
 {
 	//
 	// Create Problem List
@@ -87,20 +89,29 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	// General data
 	if (game.releaseDate == null && !game.isUnreleased)
 	{
-		problemList.addProblem("releaseDate is null", false);
+		problemList.addProblem("releaseDate is null but game is not marked as unreleased", false, false);
+	}
+	else if (game.releaseDate != null && game.isUnreleased)
+	{
+		problemList.addProblem("releaseDate is set but game is marked as unreleased", false, false);
 	}
 
 	if (game.description == null)
 	{
-		problemList.addProblem("description is null", false);
+		problemList.addProblem("description is null", false, false);
+	}
+
+	if (game.progressionType == null)
+	{
+		problemList.addProblem("progressionType is null", false, false);
 	}
 
 	// Image flags
 	const imagePaths = GameModelLib.getImagePaths(game);
 
-	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner!))
+	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner))
 	{
-		const problem = problemList.addProblem("hasBannerImage is true but banner image does not exist on disk", true);
+		const problem = problemList.addProblem("hasBannerImage is true but banner image does not exist on disk", false, true);
 
 		if (autoFixProblems)
 		{
@@ -120,9 +131,9 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		}
 	}
 
-	if (game.hasCoverImage && !fs.existsSync(imagePaths.cover!))
+	if (game.hasCoverImage && !fs.existsSync(imagePaths.cover))
 	{
-		const problem = problemList.addProblem("hasCoverImage is true but cover image does not exist on disk", true);
+		const problem = problemList.addProblem("hasCoverImage is true but cover image does not exist on disk", false, true);
 
 		if (autoFixProblems)
 		{
@@ -142,9 +153,9 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		}
 	}
 
-	if (game.hasIconImage && !fs.existsSync(imagePaths.icon!))
+	if (game.hasIconImage && !fs.existsSync(imagePaths.icon))
 	{
-		const problem = problemList.addProblem("hasIconImage is true but icon image does not exist on disk", true);
+		const problem = problemList.addProblem("hasIconImage is true but icon image does not exist on disk", false, true);
 
 		if (autoFixProblems)
 		{
@@ -164,9 +175,9 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 		}
 	}
 
-	if (game.hasLogoImage && !fs.existsSync(imagePaths.logo!))
+	if (game.hasLogoImage && !fs.existsSync(imagePaths.logo))
 	{
-		const problem = problemList.addProblem("hasLogoImage is true but logo image does not exist on disk", true);
+		const problem = problemList.addProblem("hasLogoImage is true but logo image does not exist on disk", false, true);
 
 		if (autoFixProblems)
 		{
@@ -190,24 +201,19 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	// TODO
 
 	// Play data
-	if (game.progressionType == null)
-	{
-		problemList.addProblem("progressionType is null", false);
-	}
-
 	if (game.completionStatus == null && game.progressionType != "NONE")
 	{
-		problemList.addProblem("completionStatus is null", false);
+		problemList.addProblem("completionStatus is null", false, false);
 	}
 	
 	if (game.completionStatus == "TODO" && game.playCount > 0)
 	{
-		problemList.addProblem("completionStatus is TODO but playCount is greater than 0", false);
+		problemList.addProblem("completionStatus is TODO but playCount is greater than 0", false, false);
 	}
 
 	if (game.completionStatus == "TODO" && game.playTimeTotalSeconds > 0)
 	{
-		const problem = problemList.addProblem("completionStatus is TODO but playTimeTotalSeconds is greater than 0", true);
+		const problem = problemList.addProblem("completionStatus is TODO but playTimeTotalSeconds is greater than 0", false, true);
 
 		if (autoFixProblems)
 		{
@@ -228,12 +234,32 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	}
 
 	// Supported features
-	// TODO
+	if (game.achievementSupport == null)
+	{
+		problemList.addProblem("achievementSupport is null", false, false);
+	}
+
+	if (game.controllerSupport == null)
+	{
+		problemList.addProblem("controllerSupport is null", false, false);
+	}
+
+	// Note: It's tricky to determine what I consider a game's mod support to be,
+	//	so I readded the concept of "strict mode" to check it only sometimes.
+	if (strictMode && game.modSupport == null)
+	{
+		problemList.addProblem("modSupport is null", true, false);
+	}
+
+	if (game.virtualRealitySupport == null)
+	{
+		problemList.addProblem("virtualRealitySupport is null", false, false);
+	}
 
 	// Steam data
 	if (game.steamAppId != null && game.steamAppName == null)
 	{
-		problemList.addProblem("steamAppId is set but steamAppName is null", false);
+		problemList.addProblem("steamAppId is set but steamAppName is null", false, false);
 	}
 
 	//
@@ -244,14 +270,14 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 
 	if (gameDevelopers.length == 0)
 	{
-		problemList.addProblem("no gameCompanies with DEVELOPER type", false);
+		problemList.addProblem("no gameCompanies with DEVELOPER type", false, false);
 	}
 
 	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);
 
 	if (gamePublishers.length == 0)
 	{
-		problemList.addProblem("no gameCompanies with PUBLISHER type", false);
+		problemList.addProblem("no gameCompanies with PUBLISHER type", false, false);
 	}
 
 	//
@@ -268,12 +294,12 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 
 	if (gameEngines.length == 0 && !game.isUnknownEngine)
 	{
-		problemList.addProblem("game is not marked as having an unknown engine but has no gameEngines", false);
+		problemList.addProblem("game is not marked as having an unknown engine but has no gameEngines", false, false);
 	}
 
 	if (gameEngines.length > 0 && game.isUnknownEngine)
 	{
-		problemList.addProblem("game is marked as having an unknown engine but has gameEngines", false);
+		problemList.addProblem("game is marked as having an unknown engine but has gameEngines", false, false);
 	}
 
 	//
@@ -284,7 +310,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	{
 		if (!fs.existsSync(gameInstallation.path))
 		{
-			const problem = problemList.addProblem("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path, true);
+			const problem = problemList.addProblem("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path, false, true);
 
 			if (autoFixProblems)
 			{
@@ -312,7 +338,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 
 	if (game.isInstalled && gameInstallations.length == 0)
 	{
-		const problem = problemList.addProblem("isInstalled is true but game has no gameInstallations", true);
+		const problem = problemList.addProblem("isInstalled is true but game has no gameInstallations", false, true);
 
 		if (autoFixProblems)
 		{
@@ -334,7 +360,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 
 	if (!game.isInstalled && gameInstallations.length > 0)
 	{
-		const problem = problemList.addProblem("isInstalled is false but game has gameInstallations", true);
+		const problem = problemList.addProblem("isInstalled is false but game has gameInstallations", false, true);
 
 		if (autoFixProblems)
 		{
@@ -355,21 +381,12 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	}
 
 	//
-	// Check Game Modes
-	//
-
-	// if (game.gameModes.length == 0)
-	// {
-	// 	problemList.addProblem("no gameModes", false);
-	// }
-
-	//
 	// Check Game Platforms
 	//
 
 	if (game.gamePlatforms.length == 0)
 	{
-		problemList.addProblem("no gamePlatforms", false);
+		problemList.addProblem("no gamePlatforms", false, false);
 	}
 
 	//
@@ -378,12 +395,12 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 
 	if (game.isInstalled && game.gamePlayActions.length == 0)
 	{
-		problemList.addProblem("game is marked as installed but has no gamePlayActions", false);
+		problemList.addProblem("game is marked as installed but has no gamePlayActions", false, false);
 	}
 
 	if (!game.isInstalled && game.gamePlayActions.length > 0)
 	{
-		problemList.addProblem("game is not marked installed but has gamePlayActions", false);
+		problemList.addProblem("game is not marked installed but has gamePlayActions", false, false);
 	}
 
 	//
@@ -401,7 +418,7 @@ export async function auditGame(game: AuditGameGame, autoFixProblems: boolean): 
 	{
 		const difference = game.playTimeTotalSeconds - playTimeTotalSeconds;
 
-		problemList.addProblem("game play time is " + game.playTimeTotalSeconds + " but sum of all sessions is " + playTimeTotalSeconds + " (difference: " + difference + ")", true);
+		problemList.addProblem("game play time is " + game.playTimeTotalSeconds + " but sum of all sessions is " + playTimeTotalSeconds + " (difference: " + difference + ")", false, true);
 	}
 
 	//

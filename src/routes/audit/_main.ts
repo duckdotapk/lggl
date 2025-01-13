@@ -23,6 +23,8 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/audit",
 	handler: async (context) =>
 	{
+		const isStrictMode = context.fritterRequest.getSearchParams().get("strictMode") == "true";
+
 		const games = await prismaClient.game.findMany(
 			{
 				include:
@@ -47,7 +49,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		for (const game of games)
 		{
-			const problemList = await AuditLib.auditGame(game, false);
+			const problemList = await AuditLib.auditGame(game, isStrictMode, false);
 
 			if (problemList.problems.length == 0)
 			{
@@ -59,6 +61,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		context.renderComponent(view(
 			{
+				isStrictMode,
 				problemLists,
 			}));
 	},

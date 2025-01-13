@@ -12,6 +12,7 @@ import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
 import * as AuditLib from "../../libs/Audit.js";
+import { Button } from "../../components/input/Button.js";
 
 //
 // View
@@ -19,6 +20,7 @@ import * as AuditLib from "../../libs/Audit.js";
 
 export type ViewOptions =
 {
+	isStrictMode: boolean;
 	problemLists: AuditLib.ProblemList[];
 };
 
@@ -32,6 +34,20 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		content: Wrapper("40rem",
 			[
 				Header(1, "Audit"),
+
+				options.isStrictMode
+					? Button(
+						{
+							style: "secondary",
+							href: "?strictMode=false",
+							text: "Disable Strict mode",
+						})
+					: Button(
+						{
+							style: "secondary",
+							href: "?strictMode=true",
+							text: "Enable Strict mode",
+						}),
 
 				Paragraph(
 					[
@@ -68,7 +84,19 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 										: null,
 								]),
 
-							new DE("ul", null, problemList.problems.map((problem) => new DE("li", null, problem.description))),
+							new DE("ul", null, problemList.problems.map((problem) =>
+								{
+									let textComponents = [];
+
+									if (problem.isStrictModeOnly)
+									{
+										textComponents.push(new DE("strong", null, "Strict Mode: "));
+									}
+
+									textComponents.push(problem.description);
+
+									return new DE("li", null, textComponents.join(""));
+								})),
 						];
 					}),
 			]),
