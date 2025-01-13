@@ -4,10 +4,11 @@
 
 import { Prisma } from "@prisma/client";
 
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertCompanyForm } from "../../components/form/UpsertCompanyForm.js";
+
+import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -18,6 +19,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
+	groups: ListLayoutOptions["groups"];
 	company: Prisma.CompanyGetPayload<null>;
 };
 
@@ -28,18 +30,17 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "companies",
 		pageTitle,
-		content: Wrapper("45rem",
-			[
-				Breadcrumbs(
+		content: ListLayout(
+			{
+				toolbar: null,
+				groups: options.groups,
+				createHref: "/companies/create",
+				content: Wrapper("45rem",
 					[
-						{ href: "/companies", text: "Companies" },
-						{ href: "/companies/view/" + options.company.id, text: options.company.name },
-						{ href: "/companies/edit/" + options.company.id, text: "Edit" },
+						Header(1, pageTitle),
+		
+						UpsertCompanyForm(options.company),
 					]),
-
-				Header(1, pageTitle),
-
-				UpsertCompanyForm(options.company),
-			]),
+			}),
 	};
 }

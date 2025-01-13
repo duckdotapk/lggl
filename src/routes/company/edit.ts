@@ -7,6 +7,8 @@ import * as Fritter from "@donutteam/fritter";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
+import * as CompanyModelLib from "../../libs/models/Company.js";
+
 import { view } from "../../views/company/edit.js";
 
 //
@@ -47,8 +49,15 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			return;
 		}
 
+		const groups = await CompanyModelLib.findGroups(prismaClient,
+			{ 
+				mode: "name",
+				selectedCompany: company,
+			});
+
 		context.renderComponent(view(
 			{
+				groups,
 				company,
 			}));
 	},
