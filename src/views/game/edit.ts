@@ -14,6 +14,8 @@ import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../compone
 import { UpsertGameInstallationForm, UpsertGameInstallationFormOptions } from "../../components/form/UpsertGameInstallationForm.js";
 import { UpsertGamePlayActionForm, UpsertGamePlayActionFormOptions } from "../../components/form/UpsertGamePlayActionForm.js";
 
+import { TabControl } from "../../components/input/TabControl.js";
+
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
@@ -49,84 +51,101 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 
 				Header(1, "Edit " + options.game.name),
 
-				Header(2, "Game"),
-
 				UpsertGameForm(options.game),
 
-				Header(2, "Game companies"),
-
-				options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
-					{
-						companies: options.companies, 
-						game: options.game,
-						gameCompany,
-					}))),
-	
-				Block(UpsertGameCompanyForm(
-					{
-						companies: options.companies,
-						game: options.game,
-						gameCompany: null,
-					})),
-
-				Header(2, "Game engines"),
-
-				options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
-					{
-						engines: options.engines,
-						game: options.game,
-						gameEngine,
-					}))),
-	
-				Block(UpsertGameEngineForm(
-					{
-						engines: options.engines,
-						game: options.game,
-						gameEngine: null,
-					})),
-
-				Header(2, "Game installations"),
-
-				options.gameInstallations.map((gameInstallation) => Block(UpsertGameInstallationForm(
-					{
-						game: options.game,
-						gameInstallation,
-					}))),
-
-				Block(UpsertGameInstallationForm(
-					{
-						game: options.game,
-						gameInstallation: null,
-					})),
-
-				Header(2, "Game play actions"),
-
-				options.gamePlayActions.map((gamePlayAction) => Block(UpsertGamePlayActionForm(
-					{
-						game: options.game, 
-						gamePlayAction,
-					}))),
-
-				Block(UpsertGamePlayActionForm(
-					{
-						game: options.game,
-						gamePlayAction: null,
-					})),
-
-				Header(2, "Utilities"),
-
-				Block(
+				TabControl(
 					[
-						Header(3, "Download images from Steam"),
-
-						DownloadGameImagesForm(options.game),
-					]),
-
-				Block(
-					[
-						Header(3, "Sync historical play time from Steam"),
-
-						SyncGameHistoricalPlayTimeForm(options.game),
+						{
+							title: "Companies",
+							content:
+							[
+								options.gameCompanies.map((gameCompany) => Block(UpsertGameCompanyForm(
+									{
+										companies: options.companies, 
+										game: options.game,
+										gameCompany,
+									}))),
+					
+								Block(UpsertGameCompanyForm(
+									{
+										companies: options.companies,
+										game: options.game,
+										gameCompany: null,
+									})),
+							],
+						},
+						{
+							title: "Engines",
+							content:
+							[
+								options.gameEngines.map((gameEngine) => Block(UpsertGameEngineForm(
+									{
+										engines: options.engines,
+										game: options.game,
+										gameEngine,
+									}))),
+					
+								Block(UpsertGameEngineForm(
+									{
+										engines: options.engines,
+										game: options.game,
+										gameEngine: null,
+									})),
+							],
+						},
+						{
+							title: "Installations",
+							content:
+							[
+								options.gameInstallations.map((gameInstallation) => Block(UpsertGameInstallationForm(
+									{
+										game: options.game,
+										gameInstallation,
+									}))),
+				
+								Block(UpsertGameInstallationForm(
+									{
+										game: options.game,
+										gameInstallation: null,
+									})),
+							],
+						},
+						{
+							title: "Play actions",
+							content:
+							[
+								options.gamePlayActions.map((gamePlayAction) => Block(UpsertGamePlayActionForm(
+									{
+										game: options.game, 
+										gamePlayAction,
+									}))),
+				
+								Block(UpsertGamePlayActionForm(
+									{
+										game: options.game,
+										gamePlayAction: null,
+									})),
+							],
+						},
+						{
+							title: "Utilities",
+							content:
+							[
+								Block(
+									[
+										Header(3, "Download images from Steam"),
+				
+										DownloadGameImagesForm(options.game),
+									]),
+				
+								Block(
+									[
+										Header(3, "Sync historical play time from Steam"),
+				
+										SyncGameHistoricalPlayTimeForm(options.game),
+									]),
+							],
+						},
 					]),
 			]),
 	};

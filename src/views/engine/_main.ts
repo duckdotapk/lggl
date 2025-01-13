@@ -9,11 +9,10 @@ import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
-import { AutomaticColumns } from "../../components/layout/AutomaticColumns.js";
+import { Button } from "../../components/input/Button.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
-import { Button } from "../../components/input/Button.js";
 
 //
 // View
@@ -43,11 +42,11 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						href: "/engines/create",
 						style: "success",
 						iconName: "fa-solid fa-plus",
-						text: "Create engine",
+						text: "Create",
 					}),
 
 
-				AutomaticColumns("14rem", options.engines.map((engine) => Block(Anchor(engine.shortName ?? engine.name, "/engines/view/" + engine.id))))
+				options.engines.map((engine) => Block(Anchor(engine.shortName ?? engine.name, "/engines/view/" + engine.id))),
 			]),
 	};
 }
