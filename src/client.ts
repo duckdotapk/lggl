@@ -21,6 +21,7 @@ import { initialiseTabControls } from "./components/input/TabControl.client.js";
 import { initialiseListLayouts } from "./components/layout/ListLayout.client.js";
 
 import { initialiseCompanySettingsToolbars } from "./components/toolbar/CompanySettingsToolbar.client.js";
+import { initialiseEngineSettingsToolbars } from "./components/toolbar/EngineSettingsToolbar.client.js";
 import { initialiseGameSettingsToolbars } from "./components/toolbar/GameSettingsToolbar.client.js";
 
 import { initialiseGameDetails } from "./components/GameDetails.client.js";
@@ -48,6 +49,7 @@ initialiseTabControls();
 initialiseListLayouts();
 
 initialiseCompanySettingsToolbars();
+initialiseEngineSettingsToolbars();
 initialiseGameSettingsToolbars();
 
 initialiseGameDetails();
