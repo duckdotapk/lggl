@@ -20,41 +20,19 @@ async function initialise(form: HTMLFormElement)
 	const updateFirstPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="updateFirstPlayedDate"]`);
 	const updateLastPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="updateLastPlayedDate"]`);
 
-	form.addEventListener("submit",
-		async (event) =>
+	InputClientLib.initialiseForm(
 		{
-			event.preventDefault();
-
-			try
-			{
-				InputClientLib.disableInputs(form);
-
-				const response = await syncHistoricalPlayTime(gameId,
-					{
-						name: "steam",
-						steamAppId: InputClientLib.getNumberValue(steamAppIdInput),
-						updateFirstPlayedDate: InputClientLib.getBooleanValue(updateFirstPlayedDateInput),
-						updateLastPlayedDate: InputClientLib.getBooleanValue(updateLastPlayedDateInput),
-					});
-
-				// TODO: show notifications on success/failure
-
-				if (!response.success)
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await syncHistoricalPlayTime(gameId,
 				{
-					return console.error("[SyncGameHistoricalPlayTimeForm] Error syncing play time:", response.errors);
-				}
-
-				window.location.reload();
-			}
-			catch (error)
-			{
-				console.error("[SyncGameHistoricalPlayTimeForm] Error syncing play time:", error);
-			}
-			finally
-			{
-
-				InputClientLib.enableInputs(form);
-			}
+					name: "steam",
+					steamAppId: InputClientLib.getNumberValue(steamAppIdInput),
+					updateFirstPlayedDate: InputClientLib.getBooleanValue(updateFirstPlayedDateInput),
+					updateLastPlayedDate: InputClientLib.getBooleanValue(updateLastPlayedDateInput),
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 }
 

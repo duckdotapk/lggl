@@ -28,120 +28,55 @@ async function initialise(form: HTMLFormElement)
 	const argumentsJsonTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="argumentsJson"]`);
 	const isArchivedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isArchived"]`);
 
-	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-
 	if (gamePlayActionId == null)
 	{
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await createGamePlayAction(
-						{
-							game_id: gameId,
-
-							name: InputClientLib.getStringValue(nameInput),
-							type: InputClientLib.getEnumValue(typeSelect, GamePlayActionSchemaLib.TypeSchema),
-							path: InputClientLib.getStringValue(pathInput),
-							trackingPath: InputClientLib.getStringValue(trackingPathInput),
-							argumentsJson: InputClientLib.getStringValue(argumentsJsonTextArea),
-							isArchived: InputClientLib.getBooleanValue(isArchivedInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await createGamePlayAction(
 					{
-						return console.error("[UpsertGamePlayActionForm] Error creating GamePlayAction:", response.errors);
-					}
+						game_id: gameId,
 
-					// TODO: don't reload the page here
-					window.location.reload();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGamePlayActionForm] Error creating GamePlayAction:", error);
-				}
-				finally
-				{
-	
-					InputClientLib.enableInputs(form);
-				}
+						name: InputClientLib.getStringValue(nameInput),
+						type: InputClientLib.getEnumValue(typeSelect, GamePlayActionSchemaLib.TypeSchema),
+						path: InputClientLib.getStringValue(pathInput),
+						trackingPath: InputClientLib.getStringValue(trackingPathInput),
+						argumentsJson: InputClientLib.getStringValue(argumentsJsonTextArea),
+						isArchived: InputClientLib.getBooleanValue(isArchivedInput),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 	else
 	{
-		deleteButton?.addEventListener("click",
-			async () =>
+		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+
+		InputClientLib.initialiseForm(
 			{
-				try
-				{
-					InputClientLib.disableInputs(form);
-				
-					// TODO: prompt for confirmation
-	
-					const response = await deleteGamePlayAction(gamePlayActionId);
-	
-					// TODO: show notifications on success/failure
-	
-					if (!response.success)
-					{
-						return console.error("[UpsertGamePlayActionForm] Error deleting GamePlayAction:", response.errors);
-					}
-	
-					form.remove();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGamePlayActionForm] Error deleting GamePlayAction:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+				form,
+				submitter: deleteButton,
+				requireConfirmation: true,
+				onSubmit: async () => await deleteGamePlayAction(gamePlayActionId),
+				onSuccess: async () => window.location.reload(),
 			});
 
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await updateGamePlayAction(gamePlayActionId,
-						{
-							name: InputClientLib.getChangedStringValue(nameInput),
-							type: InputClientLib.getChangedEnumValue(typeSelect, GamePlayActionSchemaLib.TypeSchema),
-							path: InputClientLib.getChangedStringValue(pathInput),
-							trackingPath: InputClientLib.getChangedStringValue(trackingPathInput),
-							argumentsJson: InputClientLib.getChangedStringValue(argumentsJsonTextArea),
-							isArchived: InputClientLib.getChangedBooleanValue(isArchivedInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await updateGamePlayAction(gamePlayActionId,
 					{
-						return console.error("[UpsertGamePlayActionForm] Error updating GamePlayAction:", response.errors);
-					}
-
-					InputClientLib.clearDirtyInputs(form);
-				}
-				catch (error)
-				{
-					console.error("[UpsertGamePlayActionForm] Error updating GamePlayAction:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+						name: InputClientLib.getChangedStringValue(nameInput),
+						type: InputClientLib.getChangedEnumValue(typeSelect, GamePlayActionSchemaLib.TypeSchema),
+						path: InputClientLib.getChangedStringValue(pathInput),
+						trackingPath: InputClientLib.getChangedStringValue(trackingPathInput),
+						argumentsJson: InputClientLib.getChangedStringValue(argumentsJsonTextArea),
+						isArchived: InputClientLib.getChangedBooleanValue(isArchivedInput),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 }

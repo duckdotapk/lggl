@@ -21,109 +21,44 @@ async function initialise(form: HTMLFormElement)
 
 	const pathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
 
-	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-
 	if (gameInstallationId == null)
 	{
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await createGameInstallation(
-						{
-							game_id: gameId,
-							path: InputClientLib.getStringValue(pathInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await createGameInstallation(
 					{
-						return console.error("[UpsertGameInstallationForm] Error creating GameInstallation:", response.errors);
-					}
-
-					// TODO: don't reload the page here
-					window.location.reload();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGameInstallationForm] Error creating GameInstallation:", error);
-				}
-				finally
-				{
-	
-					InputClientLib.enableInputs(form);
-				}
+						game_id: gameId,
+						path: InputClientLib.getStringValue(pathInput),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 	else
 	{
-		deleteButton?.addEventListener("click",
-			async () =>
+		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+
+		InputClientLib.initialiseForm(
 			{
-				try
-				{
-					InputClientLib.disableInputs(form);
-				
-					// TODO: prompt for confirmation
-	
-					const response = await deleteGameInstallation(gameInstallationId);
-	
-					// TODO: show notifications on success/failure
-	
-					if (!response.success)
-					{
-						return console.error("[UpsertGameInstallationForm] Error deleting GameInstallation:", response.errors);
-					}
-	
-					form.remove();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGameInstallationForm] Error deleting GameInstallation:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+				form,
+				submitter: deleteButton,
+				requireConfirmation: true,
+				onSubmit: async () => await deleteGameInstallation(gameInstallationId),
+				onSuccess: async () => window.location.reload(),
 			});
 
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await updateGameInstallation(gameInstallationId,
-						{
-							path: InputClientLib.getChangedStringValue(pathInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await updateGameInstallation(gameInstallationId,
 					{
-						return console.error("[UpsertGameInstallationForm] Error updating GameInstallation:", response.errors);
-					}
-
-					InputClientLib.clearDirtyInputs(form);
-				}
-				catch (error)
-				{
-					console.error("[UpsertGameInstallationForm] Error updating GameInstallation:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+						path: InputClientLib.getChangedStringValue(pathInput),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 }

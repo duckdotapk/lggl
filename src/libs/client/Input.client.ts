@@ -187,3 +187,47 @@ export function enableInputs(form: HTMLFormElement)
 		input.disabled = false;
 	}
 }
+
+type InitialiseFormOptions<T extends { success: boolean }> =
+{
+	form: HTMLFormElement;
+	submitter: HTMLButtonElement | HTMLFormElement;
+	requireConfirmation: boolean;
+	onSubmit: () => Promise<T>;
+	onSuccess: (successResponse: Extract<T, { success: true }>) => Promise<void>;
+};
+
+export function initialiseForm<T extends { success: boolean }>(options: InitialiseFormOptions<T>)
+{
+	options.submitter.addEventListener(options.submitter instanceof HTMLButtonElement ? "click" : "submit",
+		async (event) =>
+		{
+			event.preventDefault();
+
+			try
+			{
+				disableInputs(options.form);
+
+				// TODO: require confirmation
+
+				const response = await options.onSubmit();
+
+				if (!response.success)
+				{
+					// TODO: show error(s)
+					console.error("[FormClientLib] Error submitting form:", response);
+
+					enableInputs(options.form);
+
+					return;
+				}
+
+				// HACK: I hate that this cast is seemingly necessary
+				await options.onSuccess(response as Extract<T, { success: true }>);
+			}
+			catch (error)
+			{
+				console.error("[FormClientLib] Error submitting form:", error);
+			}
+		});
+}

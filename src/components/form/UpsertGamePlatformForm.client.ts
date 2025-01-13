@@ -21,109 +21,44 @@ async function initialise(form: HTMLFormElement)
 
 	const platformIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="platform_id"]`);
 
-	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-
 	if (gamePlatformId == null)
 	{
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await createGamePlatform(
-						{
-							game_id: gameId,
-							platform_id: InputClientLib.getNumberValue(platformIdSelect),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await createGamePlatform(
 					{
-						return console.error("[UpsertGamePlatformForm] Error creating GamePlatform:", response.errors);
-					}
-
-					// TODO: don't reload the page here
-					window.location.reload();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGamePlatformForm] Error creating GamePlatform:", error);
-				}
-				finally
-				{
-	
-					InputClientLib.enableInputs(form);
-				}
+						game_id: gameId,
+						platform_id: InputClientLib.getNumberValue(platformIdSelect),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 	else
 	{
-		deleteButton?.addEventListener("click",
-			async () =>
+		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+
+		InputClientLib.initialiseForm(
 			{
-				try
-				{
-					InputClientLib.disableInputs(form);
-				
-					// TODO: prompt for confirmation
-	
-					const response = await deleteGamePlatform(gamePlatformId);
-	
-					// TODO: show notifications on success/failure
-	
-					if (!response.success)
-					{
-						return console.error("[UpsertGamePlatformForm] Error deleting GamePlatform:", response.errors);
-					}
-	
-					form.remove();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGamePlatformForm] Error deleting GamePlatform:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+				form,
+				submitter: deleteButton,
+				requireConfirmation: true,
+				onSubmit: async () => await deleteGamePlatform(gamePlatformId),
+				onSuccess: async () => window.location.reload(),
 			});
 
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await updateGamePlatform(gamePlatformId,
-						{
-							platform_id: InputClientLib.getChangedNumberValue(platformIdSelect),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await updateGamePlatform(gamePlatformId,
 					{
-						return console.error("[UpsertGamePlatformForm] Error updating GamePlatform:", response.errors);
-					}
-
-					InputClientLib.clearDirtyInputs(form);
-				}
-				catch (error)
-				{
-					console.error("[UpsertGamePlatformForm] Error updating GamePlatform:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+						platform_id: InputClientLib.getChangedNumberValue(platformIdSelect),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 }

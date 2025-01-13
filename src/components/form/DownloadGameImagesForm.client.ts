@@ -18,39 +18,17 @@ async function initialise(form: HTMLFormElement)
 
 	const steamAppIdInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="steamAppId"]`);
 
-	form.addEventListener("submit",
-		async (event) =>
+	InputClientLib.initialiseForm(
 		{
-			event.preventDefault();
-
-			try
-			{
-				InputClientLib.disableInputs(form);
-
-				const response = await downloadImages(gameId,
-					{
-						name: "steam",
-						steamAppId: InputClientLib.getNumberValue(steamAppIdInput),
-					});
-
-				// TODO: show notifications on success/failure
-
-				if (!response.success)
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await downloadImages(gameId,
 				{
-					return console.error("[DownloadGameImagesForm] Error downloading images:", response.errors);
-				}
-
-				window.location.reload();
-			}
-			catch (error)
-			{
-				console.error("[DownloadGameImagesForm] Error downloading images:", error);
-			}
-			finally
-			{
-
-				InputClientLib.enableInputs(form);
-			}
+					name: "steam",
+					steamAppId: InputClientLib.getNumberValue(steamAppIdInput),
+				}),
+			onSuccess: async () => window.location.reload(),
 		});
 }
 

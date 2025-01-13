@@ -25,113 +25,48 @@ async function initialise(form: HTMLFormElement)
 	const typeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
 	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
-	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-
 	if (gameCompanyId == null)
 	{
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await createGameCompany(
-						{
-							game_id: gameId,
-							company_id: InputClientLib.getNumberValue(companyIdSelect),
-							type: InputClientLib.getEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
-							notes: InputClientLib.getStringValueNullable(notesInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () =>await createGameCompany(
 					{
-						return console.error("[UpsertGameCompanyForm] Error creating GameCompany:", response.errors);
-					}
-
-					// TODO: don't reload the page here
-					window.location.reload();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGameCompanyForm] Error creating GameCompany:", error);
-				}
-				finally
-				{
-	
-					InputClientLib.enableInputs(form);
-				}
+						game_id: gameId,
+						company_id: InputClientLib.getNumberValue(companyIdSelect),
+						type: InputClientLib.getEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
+						notes: InputClientLib.getStringValueNullable(notesInput),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 	else
 	{
-		deleteButton?.addEventListener("click",
-			async () =>
+		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+
+		InputClientLib.initialiseForm(
 			{
-				try
-				{
-					InputClientLib.disableInputs(form);
-				
-					// TODO: prompt for confirmation
-	
-					const response = await deleteGameCompany(gameCompanyId);
-	
-					// TODO: show notifications on success/failure
-	
-					if (!response.success)
-					{
-						return console.error("[UpsertGameCompanyForm] Error deleting GameCompany:", response.errors);
-					}
-	
-					form.remove();
-				}
-				catch (error)
-				{
-					console.error("[UpsertGameCompanyForm] Error deleting GameCompany:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+				form,
+				submitter: deleteButton,
+				requireConfirmation: true,
+				onSubmit: async () => await deleteGameCompany(gameCompanyId),
+				onSuccess: async () => window.location.reload(),
 			});
 
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await updateGameCompany(gameCompanyId,
-						{
-							company_id: InputClientLib.getChangedNumberValue(companyIdSelect),
-							type: InputClientLib.getChangedEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
-							notes: InputClientLib.getChangedStringValueNullable(notesInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await updateGameCompany(gameCompanyId,
 					{
-						return console.error("[UpsertGameCompanyForm] Error updating GameCompany:", response.errors);
-					}
-
-					InputClientLib.clearDirtyInputs(form);
-				}
-				catch (error)
-				{
-					console.error("[UpsertGameCompanyForm] Error updating GameCompany:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+						company_id: InputClientLib.getChangedNumberValue(companyIdSelect),
+						type: InputClientLib.getChangedEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
+						notes: InputClientLib.getChangedStringValueNullable(notesInput),
+					}),
+				onSuccess: async () => window.location.reload(),
 			});
 	}
 }

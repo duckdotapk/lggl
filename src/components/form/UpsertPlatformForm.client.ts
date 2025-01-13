@@ -21,109 +21,45 @@ async function initialise(form: HTMLFormElement)
 	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
 	const iconNameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="iconName"]`);
 
-	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-
 	if (platformId == null)
 	{
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await createPlatform(
-						{
-							name: InputClientLib.getStringValue(nameInput),
-							iconName: InputClientLib.getStringValue(iconNameInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await createPlatform(
 					{
-						return console.error("[UpsertPlatformForm] Error creating Platform:", response.errors);
-					}
-
-					window.location.href = "/platforms/view/" + response.platform.id;
-				}
-				catch (error)
-				{
-					console.error("[UpsertPlatformForm] Error creating Platform:", error);
-				}
-				finally
-				{
-	
-					InputClientLib.enableInputs(form);
-				}
+						name: InputClientLib.getStringValue(nameInput),
+						iconName: InputClientLib.getStringValue(iconNameInput),
+					}),
+				onSuccess: async (response) => { window.location.href = "/platforms/view/" + response.platform.id; },
 			});
 	}
 	else
 	{
-		deleteButton?.addEventListener("click",
-			async () =>
+		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+
+		InputClientLib.initialiseForm(
 			{
-				try
-				{
-					InputClientLib.disableInputs(form);
-				
-					// TODO: prompt for confirmation
-	
-					const response = await deletePlatform(platformId);
-	
-					// TODO: show notifications on success/failure
-	
-					if (!response.success)
-					{
-						return console.error("[UpsertPlatformForm] Error deleting Platform:", response.errors);
-					}
-	
-					window.location.href = "/platforms";
-				}
-				catch (error)
-				{
-					console.error("[UpsertPlatformForm] Error deleting Platform:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+				form,
+				submitter: deleteButton,
+				requireConfirmation: true,
+				onSubmit: async () => await deletePlatform(platformId),
+				onSuccess: async () => { window.location.href = "/platforms"; },
 			});
 
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await updatePlatform(platformId,
-						{
-							name: InputClientLib.getChangedStringValue(nameInput),
-							iconName: InputClientLib.getChangedStringValue(iconNameInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await updatePlatform(platformId,
 					{
-						return console.error("[UpsertPlatformForm] Error updating Platform:", response.errors);
-					}
-
-					InputClientLib.clearDirtyInputs(form);
-				}
-				catch (error)
-				{
-					console.error("[UpsertPlatformForm] Error updating Platform:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+						name: InputClientLib.getChangedStringValue(nameInput),
+						iconName: InputClientLib.getChangedStringValue(iconNameInput),
+					}),
+				onSuccess: async () => { window.location.href = "/platforms/view/" + platformId; },
 			});
 	}
 }

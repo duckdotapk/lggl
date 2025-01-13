@@ -20,107 +20,43 @@ async function initialise(form: HTMLFormElement)
 
 	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
 
-	const deleteButton = BrowserUtilities.ElementClientLib.getElement<HTMLButtonElement>(form, `[data-action="delete"]`);
-
 	if (companyId == null)
 	{
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await createCompany(
-						{
-							name: InputClientLib.getStringValue(nameInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () => await createCompany(
 					{
-						return console.error("[UpsertCompanyForm] Error creating Company:", response.errors);
-					}
-
-					window.location.href = "/companies/view/" + response.company.id;
-				}
-				catch (error)
-				{
-					console.error("[UpsertCompanyForm] Error creating Company:", error);
-				}
-				finally
-				{
-	
-					InputClientLib.enableInputs(form);
-				}
+						name: InputClientLib.getStringValue(nameInput),
+					}),
+				onSuccess: async (response) => { window.location.href = "/companies/view/" + response.company.id },
 			});
 	}
 	else
 	{
-		deleteButton?.addEventListener("click",
-			async () =>
+		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+
+		InputClientLib.initialiseForm(
 			{
-				try
-				{
-					InputClientLib.disableInputs(form);
-				
-					// TODO: prompt for confirmation
-	
-					const response = await deleteCompany(companyId);
-	
-					// TODO: show notifications on success/failure
-	
-					if (!response.success)
-					{
-						return console.error("[UpserCompanyForm] Error deleting Company:", response.errors);
-					}
-	
-					window.location.href = "/companies";
-				}
-				catch (error)
-				{
-					console.error("[UpsertCompanyForm] Error deleting Company:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+				form,
+				submitter: deleteButton,
+				requireConfirmation: true,
+				onSubmit: async () => await deleteCompany(companyId),
+				onSuccess: async () => { window.location.href = "/companies" },
 			});
 
-		form.addEventListener("submit",
-			async (event) =>
+		InputClientLib.initialiseForm(
 			{
-				event.preventDefault();
-
-				try
-				{
-					InputClientLib.disableInputs(form);
-
-					const response = await updateCompany(companyId,
-						{
-							name: InputClientLib.getChangedStringValue(nameInput),
-						});
-
-					// TODO: show notifications on success/failure
-
-					if (!response.success)
+				form,
+				submitter: form,
+				requireConfirmation: false,
+				onSubmit: async () =>  await updateCompany(companyId,
 					{
-						return console.error("[UpsertCompanyForm] Error updating Company:", response.errors);
-					}
-
-					InputClientLib.clearDirtyInputs(form);
-				}
-				catch (error)
-				{
-					console.error("[UpsertCompanyForm] Error updating Company:", error);
-				}
-				finally
-				{
-					InputClientLib.enableInputs(form);
-				}
+						name: InputClientLib.getChangedStringValue(nameInput),
+					}),
+				onSuccess: async () => { window.location.href = "/companies/view/" + companyId },
 			});
 	}
 }
