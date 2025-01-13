@@ -4,10 +4,11 @@
 
 import { Prisma } from "@prisma/client";
 
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertPlatformForm } from "../../components/form/UpsertPlatformForm.js";
+
+import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -18,6 +19,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 type ViewOptions =
 {
+	groups: ListLayoutOptions["groups"];
 	platform: Prisma.PlatformGetPayload<null>;
 };
 
@@ -28,18 +30,17 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "platforms",
 		pageTitle,
-		content: Wrapper("45rem",
-			[
-				Breadcrumbs(
+		content: ListLayout(
+			{
+				toolbar: null,
+				groups: options.groups,
+				createHref: "/platforms/create",
+				content: Wrapper("45rem",
 					[
-						{ href: "/platforms", text: "Platforms" },
-						{ href: "/platforms/view/" + options.platform.id, text: options.platform.name },
-						{ href: "/platforms/edit/" + options.platform.id, text: "Edit" },
+						Header(1, pageTitle),
+		
+						UpsertPlatformForm(options.platform),
 					]),
-
-				Header(1, pageTitle),
-
-				UpsertPlatformForm(options.platform),
-			]),
+			}),
 	};
 }

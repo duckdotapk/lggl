@@ -2,10 +2,11 @@
 // Imports
 //
 
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertPlatformForm } from "../../components/form/UpsertPlatformForm.js";
+
+import { ListLayout, ListLayoutOptions } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
@@ -14,22 +15,27 @@ import { Wrapper } from "../../components/Wrapper.js";
 // View
 //
 
-export function view(): Partial<SiteOptions>
+export type ViewOptions =
+{
+	groups: ListLayoutOptions["groups"];
+}
+
+export function view(options: ViewOptions): Partial<SiteOptions>
 {
 	return {
 		currentPage: "platforms",
 		pageTitle: "Create platform",
-		content: Wrapper("45rem",
-			[
-				Breadcrumbs(
+		content: ListLayout(
+			{
+				toolbar: null,
+				groups: options.groups,
+				createHref: "/platforms/create",
+				content: Wrapper("45rem",
 					[
-						{ href: "/platforms", text: "Platforms" },
-						{ href: "/platforms/create", text: "Create" },
+						Header(1, "Create platform"),
+		
+						UpsertPlatformForm(null),
 					]),
-
-				Header(1, "Create platform"),
-
-				UpsertPlatformForm(null),
-			]),
+			}),
 	};
 }
