@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 
 import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
+import { Label } from "../input/Label.js";
 
 //
 // Component
@@ -24,6 +25,8 @@ export function DownloadGameImagesForm(game: DownloadGameImagesFormGame)
 			"data-game-id": game.id,
 		},
 		[
+			Label("steamAppId", "Steam app ID"),
+
 			Control(
 				{
 					type: "number",

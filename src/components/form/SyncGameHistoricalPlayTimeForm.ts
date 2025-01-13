@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client";
 import { Button } from "../input/Button.js";
 import { Checkbox } from "../input/Checkbox.js";
 import { Control } from "../input/Control.js";
+import { Label } from "../input/Label.js";
 
 //
 // Component
@@ -25,6 +26,8 @@ export function SyncGameHistoricalPlayTimeForm(game: SyncGameHistoricalPlayTimeF
 			"data-game-id": game.id,
 		},
 		[
+			Label("steamAppId", "Steam app ID"),
+
 			Control(
 				{
 					type: "number",
