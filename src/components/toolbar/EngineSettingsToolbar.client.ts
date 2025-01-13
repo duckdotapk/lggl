@@ -47,8 +47,6 @@ export async function initialiseEngineSettingsToolbars()
 {
 	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-engine-settings-toolbar:not(.initialised)");
 
-	console.log("[EngineSettingsToolbar]", toolbars);
-
 	for (const toolbar of toolbars)
 	{
 		try

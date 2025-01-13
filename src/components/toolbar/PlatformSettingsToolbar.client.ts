@@ -47,8 +47,6 @@ export async function initialisePlatformSettingsToolbars()
 {
 	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-platform-settings-toolbar:not(.initialised)");
 
-	console.log("[PlatformSettingsToolbar]", toolbars);
-
 	for (const toolbar of toolbars)
 	{
 		try

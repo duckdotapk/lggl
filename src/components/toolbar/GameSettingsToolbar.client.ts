@@ -127,8 +127,6 @@ export async function initialiseGameSettingsToolbars()
 {
 	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-game-settings-toolbar:not(.initialised)");
 
-	console.log("[GameSettingsToolbar]", toolbars);
-
 	for (const toolbar of toolbars)
 	{
 		try

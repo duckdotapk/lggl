@@ -47,8 +47,6 @@ export async function initialiseCompanySettingsToolbars()
 {
 	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-company-settings-toolbar:not(.initialised)");
 
-	console.log("[CompanySettingsToolbar]", toolbars);
-
 	for (const toolbar of toolbars)
 	{
 		try
