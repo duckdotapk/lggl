@@ -11,7 +11,7 @@ import { LGGL_DATA_DIRECTORY } from "../env/LGGL_DATA_DIRECTORY.js";
 // Utility Functions
 //
 
-export async function downloadUrl(url: string, pathComponents: string[])
+export async function downloadUrl(url: string, dataPathComponents: string[])
 {
 	const response = await fetch(url);
 
@@ -24,7 +24,7 @@ export async function downloadUrl(url: string, pathComponents: string[])
 
 	const responseBuffer = Buffer.from(await responseBlob.arrayBuffer());
 
-	const responsePath = path.join(LGGL_DATA_DIRECTORY, ...pathComponents);
+	const responsePath = path.join(LGGL_DATA_DIRECTORY, ...dataPathComponents);
 
 	await fs.promises.mkdir(path.dirname(responsePath), 
 		{ 
