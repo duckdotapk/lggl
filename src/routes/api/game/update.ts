@@ -68,6 +68,11 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.notes = requestBody.updateData.notes;
 			}
 
+			if (requestBody.updateData.progressionType !== undefined)
+			{
+				gameUpdateData.progressionType = requestBody.updateData.progressionType;
+			}
+
 			if (requestBody.updateData.hasBannerImage !== undefined)
 			{
 				gameUpdateData.hasBannerImage = requestBody.updateData.hasBannerImage;
