@@ -52,7 +52,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						return [
 							Header(2,
 								[
-									Anchor(problemList.game.name, "/?selectedGameId=" + problemList.game.id),
+									Anchor(problemList.game.name, "/games/view/" + problemList.game.id),
 									" ",
 									Anchor(new DE("span", "fa-solid fa-pen-to-square"), "/games/edit/" + problemList.game.id, "_blank"),
 
