@@ -30,6 +30,7 @@ async function initialise(dialog: HTMLDialogElement)
 
 				if (!response.success)
 				{
+					// TODO: show notification
 					console.error("[ChooseGamePlayActionDialog] Failed to launch game:", response.errors);
 				}
 			});
@@ -51,11 +52,13 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 			if (!findGamePlayActionsResponse.success)
 			{
+				// TODO: show notification
 				return console.error("[ChooseGamePlayActionDialog] Failed to find game play actions:", findGamePlayActionsResponse.errors);
 			}
 
 			if (findGamePlayActionsResponse.gamePlayActions.length == 0)
 			{
+				// TODO: show notification
 				return console.error("[ChooseGamePlayActionDialog] No game play actions found for game:", gameId);
 			}
 
@@ -65,6 +68,7 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 				if (!launchGameResponse.success)
 				{
+					// TODO: show notification
 					return console.error("[ChooseGamePlayActionDialog] Failed to launch game:", launchGameResponse.errors);
 				}
 
