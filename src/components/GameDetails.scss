@@ -97,6 +97,11 @@
 				word-wrap: break-word;
 				overflow-wrap: break-word;
 				white-space: normal;
+
+				> .null
+				{
+					color: #dc2626; // Tailwind Red 600
+				}
 			}
 		}
 	}

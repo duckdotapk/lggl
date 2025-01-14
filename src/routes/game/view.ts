@@ -72,6 +72,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						],
 					},
 					gameLinks: true,
+					gamePlatforms:
+					{
+						include:
+						{
+							platform: true,
+						},
+					},
 					gamePlayActions: true,
 					gamePlaySessions:
 					{
