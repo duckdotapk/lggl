@@ -13,7 +13,6 @@ import { HumanDateTime } from "./basic/HumanDateTime.js";
 import { Paragraph } from "./basic/Paragraph.js";
 
 import { Button } from "./input/Button.js";
-import { Checkbox } from "./input/Checkbox.js";
 
 import { AutomaticColumnLayout } from "./layout/AutomaticColumnLayout.js";
 
@@ -131,11 +130,11 @@ function PlayActionButtonGroup(game: GameDetailsGame)
 		]);
 }
 
-function Section(headerText: string, children: Child)
+function Section(headerLevel: 1 | 2 | 3 | 4 | 5 | 6, headerText: string, children: Child)
 {
 	return new DE("section", "component-game-details-section",
 		[
-			Header(3, headerText),
+			Header(headerLevel, headerText),
 
 			children,
 		]);
@@ -275,273 +274,279 @@ export function GameDetails(game: GameDetailsGame)
 
 			PlayActionButtonGroup(game),
 
-			// TODO: this is getting a little bloated and arbitrarily sorted, probably restructure this at some point
-			AutomaticColumnLayout("380px",
+			new DE("div", "data", AutomaticColumnLayout("50rem",
 				[
-					Section("Play data",
+					Section(2, "Your play data",
 						[
-							DataTable(
+							AutomaticColumnLayout("25rem",
 								[
-									game.completionStatus != null
-										? {
-											label: "Completion status",
-											value: GameModelLib.getCompletionStatusName(game),
-										}
-										: null,
-
-									{
-										label: "Total time played",
-										value: game.playTimeTotalSeconds > 0
-											? new DE("span",
-												{
-													title: Utilities.NumberLib.format(game.playTimeTotalSeconds) + " seconds",
-												},
+									Section(3, "Play data",
+										[
+											DataTable(
 												[
-													shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
-												])
-											: "No playtime recorded",
-									},
-									{
-										label: "Date last played",
-										value: game.lastPlayedDate != null
-											? new DE("span",
-												{
-													title: DateTime.fromJSDate(game.lastPlayedDate).toLocaleString(DateTime.DATE_MED),
-												},
-												[
-													HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)),
-												])
-											: "Never played",
-									},
+													game.completionStatus != null
+														? {
+															label: "Completion status",
+															value: GameModelLib.getCompletionStatusName(game),
+														}
+														: null,
+				
+													{
+														label: "Total time played",
+														value: game.playTimeTotalSeconds > 0
+															? new DE("span",
+																{
+																	title: Utilities.NumberLib.format(game.playTimeTotalSeconds) + " seconds",
+																},
+																[
+																	shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
+																])
+															: "No playtime recorded",
+													},
+													{
+														label: "Date last played",
+														value: game.lastPlayedDate != null
+															? new DE("span",
+																{
+																	title: DateTime.fromJSDate(game.lastPlayedDate).toLocaleString(DateTime.DATE_MED),
+																},
+																[
+																	HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)),
+																])
+															: "Never played",
+													},
+				
+													game.firstCompletedDate != null
+														? buildDateDataTableRow(game.firstCompletedDate, game.firstCompletedDateApproximated, "completed")
+														: null,
+													
+													game.firstPlayedDate != null
+														? buildDateDataTableRow(game.firstPlayedDate, game.firstPlayedDateApproximated, "played")
+														: null,
+												]), 
+										]),
+				
+									Section(3, "Recent play sessions",
+										[
+											game.gamePlaySessions.length > 0
+												? DataTable(game.gamePlaySessions.map(
+													(gamePlaySession) =>
+													{
+														let title = "Played for " + Utilities.NumberLib.format(gamePlaySession.playTimeSeconds) + " seconds on " + gamePlaySession.platform.name;
+				
+														if (gamePlaySession.notes != null)
+														{
+															title += "\n\n" + gamePlaySession.notes;
+														}
+				
+														if (LGGL_DEVELOPER_MODE)
+														{
+															title += "\n\nGamePlaySession #" + gamePlaySession.id;
+														}
+				
+														return {
+															label: !gamePlaySession.isHistorical
+																? HumanDateTime(DateTime.fromJSDate(gamePlaySession.startDate))
+																: "Historical",
+															value: new DE("span",
+																{
+																	title,
+																},
+																[
+																	new DE("span", gamePlaySession.platform.iconName + " fa-fw"),
+																	" ",
+																	shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000),
+																]),
+														};
+													}))
+												: Paragraph(LGGL_GAME_PLAY_SESSION_HISTORY_DAYS != -1
+													? "No play sessions in the last " + LGGL_GAME_PLAY_SESSION_HISTORY_DAYS + " days."
+													: "No play sessions recorded."),
 
-									game.firstCompletedDate != null
-										? buildDateDataTableRow(game.firstCompletedDate, game.firstCompletedDateApproximated, "completed")
+											Button(
+												{
+													style: "secondary",
+													href: "/gamePlaySessions/list/" + game.id,
+													iconName: "fa-solid fa-list",
+													text: "View play session history",
+												}),
+										]),
+
+									game.notes != null
+										? Section(3, "Notes",
+											[
+												// TODO: render as markdown instead
+												game.notes.split("\n").map((line) => Paragraph(line)),
+											])
 										: null,
-									
-									game.firstPlayedDate != null
-										? buildDateDataTableRow(game.firstPlayedDate, game.firstPlayedDateApproximated, "played")
-										: null,
-								]), 
+								]),
 						]),
 
-					Section("Recent play sessions",
+					Section(2, "About this game",
 						[
-							game.gamePlaySessions.length > 0
-								? DataTable(game.gamePlaySessions.map(
-									(gamePlaySession) =>
-									{
-										let title = "Played for " + Utilities.NumberLib.format(gamePlaySession.playTimeSeconds) + " seconds on " + gamePlaySession.platform.name;
-
-										if (gamePlaySession.notes != null)
-										{
-											title += "\n\n" + gamePlaySession.notes;
-										}
-
-										if (LGGL_DEVELOPER_MODE)
-										{
-											title += "\n\nGamePlaySession #" + gamePlaySession.id;
-										}
-
-										return {
-											label: !gamePlaySession.isHistorical
-												? HumanDateTime(DateTime.fromJSDate(gamePlaySession.startDate))
-												: "Historical",
-											value: new DE("span",
-												{
-													title,
-												},
+							AutomaticColumnLayout("25rem",
+								[
+									Section(3, "General information",
+										[
+											DataTable(
 												[
-													new DE("span", gamePlaySession.platform.iconName + " fa-fw"),
-													" ",
-													shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000),
+													{
+														label: "Name",
+														value: game.name,
+													},
+													{
+														label: "Release date",
+														value: game.releaseDate != null
+															? HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED)
+															: "Unreleased",
+													},
+													{
+														label: gameDevelopers.length > 1
+															? "Developers"
+															: "Developer",
+														value: gameDevelopers.length > 0
+															? gameDevelopers.map(
+																(gameDeveloper) =>
+																{
+																	let text = gameDeveloper.company.name;
+
+																	if (gameDeveloper.notes != null)
+																	{
+																		text += "*";
+																	}
+
+																	return Paragraph(new DE("span", { title: gameDeveloper.notes }, text));
+																})
+															: "-",
+													},
+													{
+														label: gamePublishers.length > 1
+															? "Publishers"
+															: "Publisher",
+														value: gamePublishers.length > 0
+															? gamePublishers.map(
+																(gamePublisher) =>
+																{
+																	let text = gamePublisher.company.name;
+
+																	if (gamePublisher.notes != null)
+																	{
+																		text += "*";
+																	}
+
+																	return Paragraph(new DE("span", { title: gamePublisher.notes }, text));
+																})
+															: "-",
+													},
+													{
+														label: game.gameEngines.length > 1
+															? "Engines"
+															: "Engine",
+														value: game.gameEngines.length > 0
+															? game.gameEngines.map(
+																(gameEngine) =>
+																{
+																	let text = gameEngine.engine.shortName ?? gameEngine.engine.name;
+
+																	if (gameEngine.version != null)
+																	{
+																		text += " " + gameEngine.version;
+																	}
+
+																	if (gameEngine.notes != null)
+																	{
+																		text += "*";
+																	}
+
+																	let tooltip = gameEngine.engine.name;
+
+																	if (gameEngine.notes != null)
+																	{
+																		tooltip += "\n\n" + gameEngine.notes;
+																	}
+
+																	return Paragraph(new DE("span", { title: tooltip }, text));
+																})
+															: (game.isUnknownEngine ? "Unknown" : "-"),
+													}
 												]),
-										};
-									}))
-								: Paragraph(LGGL_GAME_PLAY_SESSION_HISTORY_DAYS != -1
-									? "No play sessions in the last " + LGGL_GAME_PLAY_SESSION_HISTORY_DAYS + " days."
-									: "No play sessions recorded."),
-						]),
+										]),
 
-					Section("Info",
-						[
-							DataTable(
-								[
-									{
-										label: "Name",
-										value: game.name,
-									},
-									{
-										label: "Release date",
-										value: game.releaseDate != null
-											? HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED)
-											: "Unreleased",
-									},
-									{
-										label: gameDevelopers.length > 1
-											? "Developers"
-											: "Developer",
-										value: gameDevelopers.length > 0
-											? gameDevelopers.map(
-												(gameDeveloper) =>
-												{
-													let text = gameDeveloper.company.name;
+									Section(3, "Description",
+										[
+											game.description != null
+												? game.description.split("\n").map((line) => Paragraph(line))
+												: Paragraph("No description available."),
+										]),
 
-													if (gameDeveloper.notes != null)
+									Section(3, "Features",
+										[
+											DataTable(
+												[
 													{
-														text += "*";
-													}
-
-													return Paragraph(new DE("span", { title: gameDeveloper.notes }, text));
-												})
-											: "-",
-									},
-									{
-										label: gamePublishers.length > 1
-											? "Publishers"
-											: "Publisher",
-										value: gamePublishers.length > 0
-											? gamePublishers.map(
-												(gamePublisher) =>
-												{
-													let text = gamePublisher.company.name;
-
-													if (gamePublisher.notes != null)
+														label: "Progression type",
+														value: GameModelLib.getProgressionTypeName(game),
+													},
 													{
-														text += "*";
-													}
-
-													return Paragraph(new DE("span", { title: gamePublisher.notes }, text));
-												})
-											: "-",
-									},
-									{
-										label: game.gameEngines.length > 1
-											? "Engines"
-											: "Engine",
-										value: game.gameEngines.length > 0
-											? game.gameEngines.map(
-												(gameEngine) =>
-												{
-													let text = gameEngine.engine.shortName ?? gameEngine.engine.name;
-
-													if (gameEngine.version != null)
+														label: "Achievement support",
+														value: GameModelLib.getAchievementSupportName(game),
+													},
 													{
-														text += " " + gameEngine.version;
-													}
-
-													if (gameEngine.notes != null)
+														label: "Controller support",
+														value: GameModelLib.getControllerSupportName(game),
+													},
 													{
-														text += "*";
-													}
-
-													let tooltip = gameEngine.engine.name;
-
-													if (gameEngine.notes != null)
+														label: "Mod support",
+														value: GameModelLib.getModSupportName(game),
+													},
 													{
-														tooltip += "\n\n" + gameEngine.notes;
-													}
+														label: "VR support",
+														value: GameModelLib.getVirtualRealitySupportName(game),
+													},
+												]),
+										]),
 
-													return Paragraph(new DE("span", { title: tooltip }, text));
-												})
-											: "-",
-									}
+									links.length > 0
+										? Section(3, "Links", links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))))
+										: null,
+				
+									game.steamAppId != null
+										? Section(3, "Steam app",
+											[
+												DataTable(
+													[
+														{
+															label: "Steam app ID",
+															value: game.steamAppId,
+														},
+														{
+															label: "Steam app name",
+															value: game.steamAppName,
+														}
+													]),
+											])
+										: null,
+				
+									Section(3, "Library",
+										[
+											DataTable(
+												[
+													{
+														label: "ID",
+														value: game.id,
+													},
+													{
+														label: "Created",
+														value: HumanDateTime(DateTime.fromJSDate(game.createdDate), DateTime.DATE_MED),
+													},
+													{
+														label: "Last updated",
+														value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate), DateTime.DATE_MED),
+													},
+												])
+										]),
 								]),
 						]),
-
-					Section("Description",
-						[
-							game.description != null
-								? game.description.split("\n").map((line) => Paragraph(line))
-								: Paragraph("No description available."),
-						]),
-
-					Section("Features",
-						[
-							DataTable(
-								[
-									{
-										label: "Progression type",
-										value: GameModelLib.getProgressionTypeName(game),
-									},
-									{
-										label: "Achievement support",
-										value: GameModelLib.getAchievementSupportName(game),
-									},
-									{
-										label: "Controller support",
-										value: GameModelLib.getControllerSupportName(game),
-									},
-									{
-										label: "Mod support",
-										value: GameModelLib.getModSupportName(game),
-									},
-									{
-										label: "VR support",
-										value: GameModelLib.getVirtualRealitySupportName(game),
-									},
-								]),
-						]),
-
-					Section("Flags",
-						[
-							Paragraph(Checkbox("isEarlyAccess", "Is Early Access", game.isEarlyAccess)),
-
-							Paragraph(Checkbox("isFavorite", "Is Favorite", game.isFavorite)),
-
-							Paragraph(Checkbox("isHidden", "Is Hidden", game.isHidden)),
-
-							Paragraph(Checkbox("isNsfw", "Is NSFW", game.isNsfw)),
-							
-							Paragraph(Checkbox("isShelved", "Is Shelved", game.isShelved)),
-						]),
-
-					links.length > 0
-						? Section("Links", links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))))
-						: null,
-
-					game.notes != null
-						? Section("Notes",
-							[
-								// TODO: render as markdown instead
-								game.notes.split("\n").map((line) => Paragraph(line)),
-							])
-						: null,
-
-					game.steamAppId != null
-						? Section("Steam app",
-							[
-								DataTable(
-									[
-										{
-											label: "Steam app ID",
-											value: game.steamAppId,
-										},
-										{
-											label: "Steam app name",
-											value: game.steamAppName,
-										}
-									]),
-							])
-						: null,
-
-					Section("Library",
-						[
-							DataTable(
-								[
-									{
-										label: "ID",
-										value: game.id,
-									},
-									{
-										label: "Created",
-										value: HumanDateTime(DateTime.fromJSDate(game.createdDate), DateTime.DATE_MED),
-									},
-									{
-										label: "Last updated",
-										value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate), DateTime.DATE_MED),
-									},
-								])
-						]),
-				]),
+				])),
 		]);
 }
