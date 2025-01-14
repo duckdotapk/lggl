@@ -1,0 +1,18 @@
+//
+// Component
+//
+
+@mixin Dialog()
+{
+	.component-dialog
+	{
+		background-color: #1f2937; // Tailwind Gray 800
+		border: 1px solid #374151;
+		color: #f3f4f6; // Tailwind Gray 100
+
+		&::backdrop
+		{
+			background-color: rgba(0, 0, 0, 0.5);
+		}
+	}
+}

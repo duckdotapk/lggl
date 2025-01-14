@@ -13,6 +13,8 @@
 @use "components/basic/Muted.scss";
 @use "components/basic/Paragraph.scss";
 
+@use "components/dialogs/Dialog.scss";
+
 @use "components/input/Button.scss";
 @use "components/input/Checkbox.scss";
 @use "components/input/Control.scss";
@@ -43,6 +45,8 @@
 @include Header.Header();
 @include Muted.Muted();
 @include Paragraph.Paragraph();
+
+@include Dialog.Dialog();
 
 @include Button.Button();
 @include Checkbox.Checkbox();
