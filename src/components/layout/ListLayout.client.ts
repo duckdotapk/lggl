@@ -10,7 +10,7 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 async function initialise(element: HTMLElement)
 {
-	let allGroupsCollapsed = false;
+	let allGroupsCollapsed = true;
 
 	const listLayoutGroups = element.querySelectorAll<HTMLDetailsElement>(".component-list-layout-group");
 	const selectedListLayoutGroupItem = BrowserUtilities.ElementClientLib.getElement<HTMLAnchorElement>(element, ".component-list-layout-group-item.selected");

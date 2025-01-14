@@ -81,7 +81,7 @@ function Group(options: ListLayoutGroupOptions)
 	return new DE("details",
 		{
 			class: "component-list-layout-group",
-			open: true,
+			open: false,
 
 			"data-name": options.name,
 		},
@@ -131,8 +131,8 @@ export function ListLayout(options: ListLayoutOptions)
 							{
 								"data-action": "toggleGroups",
 							},
-							iconName: "fa-solid fa-chevron-up",
-							text: "Collapse all groups",
+							iconName: "fa-solid fa-chevron-down",
+							text: "Expand all groups",
 						}),
 
 					Button(
