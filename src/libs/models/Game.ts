@@ -30,6 +30,14 @@ const progressionTypeNames: Record<GameSchemaLib.ProgressionType, string> =
 	"CAMPAIGN": "Campaign",
 };
 
+const completionStatusIconNames: Record<GameSchemaLib.CompletionStatus, string> =
+{
+	"TODO": "fa-solid fa-circle-dashed",
+	"IN_PROGRESS": "fa-solid fa-circle-half",
+	"COMPLETE": "fa-solid fa-circle",
+	"ONE_HUNDRED_PERCENT": "fa-solid fa-check-circle",
+};
+
 const completionStatusNames: Record<GameSchemaLib.CompletionStatus, string> =
 {
 	"TODO": "To Do",
@@ -364,6 +372,25 @@ export function getImagePaths(game: Prisma.GameGetPayload<null>)
 		icon: path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "icon.jpg"),
 		logo: path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "logo.png"),
 	}
+}
+
+export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameSchemaLib.CompletionStatus)
+{
+	if (typeof gameOrCompletionStatus == "string")
+	{
+		return completionStatusIconNames[gameOrCompletionStatus];
+	}
+
+	if (gameOrCompletionStatus.completionStatus == null)
+	{
+		return "fa-solid fa-circle";
+	}
+
+	const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(gameOrCompletionStatus.completionStatus);
+
+	return completionStatusParseResult.success
+		? completionStatusIconNames[completionStatusParseResult.data]
+		: "fa-solid fa-question";
 }
 
 export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameSchemaLib.CompletionStatus)
