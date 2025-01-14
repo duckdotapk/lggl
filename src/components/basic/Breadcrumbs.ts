@@ -12,6 +12,7 @@ type ItemOptions =
 {
 	href: string;
 	text: string;
+	pjaxSelector?: string;
 };
 
 function Item(options: ItemOptions)
@@ -20,6 +21,8 @@ function Item(options: ItemOptions)
 		{
 			class: "component-breadcrumbs-item",
 			href: options.href,
+
+			"data-pjax-selector": options.pjaxSelector,
 		},
 		[
 			new DE("span", "text", options.text),
