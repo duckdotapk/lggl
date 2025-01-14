@@ -2,7 +2,8 @@
 // Imports
 //
 
-import { initialiseOpenChooseGamePlayActionDialogButtons } from "./components/dialogs/ChooseGamePlayActionDialog.client.js";
+import { initialiseChooseGamePlayActionDialogs, initialiseOpenChooseGamePlayActionDialogButtons } from "./components/dialogs/ChooseGamePlayActionDialog.client.js";
+import { initialiseGameNotesDialogs, initialiseOpenGameNotesDialogButtons } from "./components/dialogs/GameNotesDialog.client.js";
 
 import { initialiseDownloadGameImagesForms } from "./components/form/DownloadGameImagesForm.client.js";
 import { initialiseSyncGameHistoricalSteamPlayTimeForm } from "./components/form/SyncGameHistoricalPlayTimeForm.client.js";
@@ -41,7 +42,10 @@ async function initialiseComponents()
 	// Initialise Components
 	//
 
+	initialiseChooseGamePlayActionDialogs();
 	initialiseOpenChooseGamePlayActionDialogButtons();
+	initialiseGameNotesDialogs();
+	initialiseOpenGameNotesDialogButtons();
 
 	initialiseDownloadGameImagesForms();
 	initialiseSyncGameHistoricalSteamPlayTimeForm();
@@ -77,4 +81,6 @@ async function initialiseComponents()
 
 initialiseComponents();
 
-PjaxClientLib.initialise(() => initialiseComponents());
+document.addEventListener("lggl:reinitialise", () => initialiseComponents());
+
+PjaxClientLib.initialise();

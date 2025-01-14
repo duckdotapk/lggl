@@ -135,6 +135,19 @@ function ActionToolbar(game: GameDetailsGame)
 							iconName: "fa-solid fa-list",
 							text: "Play sessions",
 						}),
+
+					Button(
+						{
+							style: "warning",
+							type: "button",
+							extraAttributes:
+							{
+								"data-open-game-notes-dialog": "true",
+								"data-game-id": game.id,
+							},
+							iconName: "fa-solid fa-sticky-note",
+							text: "Notes",
+						}),
 				]),
 		]);
 }

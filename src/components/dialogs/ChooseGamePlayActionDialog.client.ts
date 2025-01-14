@@ -79,7 +79,7 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 			dialogContainer.appendChild(dialog);
 
-			await initialise(dialog);
+			document.dispatchEvent(new CustomEvent("lggl:reinitialise"));
 
 			dialog.showModal();
 		});
@@ -88,6 +88,25 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 //
 // Component
 //
+
+export async function initialiseChooseGamePlayActionDialogs()
+{
+	const dialogs = document.querySelectorAll<HTMLDialogElement>(`.component-choose-game-play-action-dialog:not(.initialised)`);
+
+	for (const dialog of dialogs)
+	{
+		try
+		{
+			await initialise(dialog);
+
+			dialog.classList.add("initialised");
+		}
+		catch (error)
+		{
+			console.error("[ChooseGamePlayActionDialog] Failed to initialise dialog:", dialog, error);
+		}
+	}
+}
 
 export async function initialiseOpenChooseGamePlayActionDialogButtons()
 {

@@ -138,7 +138,7 @@ function load(href: string, action: "push" | "pop" | "replace", selector: string
 
 			upgradeAnchors();
 
-			document.dispatchEvent(new CustomEvent("lggl:pjaxLoad"));
+			document.dispatchEvent(new CustomEvent("lggl:reinitialise"));
 		});
 
 	xhr.send();
@@ -197,11 +197,9 @@ function upgradeAnchors()
 	}
 }
 
-export function initialise(onLoad: () => void)
+export function initialise()
 {
 	upgradeAnchors();
-
-	document.addEventListener("lggl:pjaxLoad", onLoad);
 
 	window.addEventListener("popstate",
 		() =>
