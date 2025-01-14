@@ -39,7 +39,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				toolbar: CompanySettingsToolbar(options.settings),
 				groupManager: options.groupManager,
 				createHref: "/companies/create",
-				content: Wrapper("45rem",
+				content: Wrapper(
 					[
 						Header(1, "Create company"),
 

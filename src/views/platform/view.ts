@@ -45,7 +45,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				toolbar: PlatformSettingsToolbar(options.settings),
 				groupManager: options.groupManager,
 				createHref: "/platforms/create",
-				content: Wrapper("45rem",
+				content: Wrapper(
 					[		
 						Header(1, pageTitle),
 		

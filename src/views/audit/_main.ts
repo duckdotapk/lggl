@@ -31,7 +31,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 	return {
 		currentPage: "audit",
 		pageTitle: "Audit (" + totalProblems + " problem" + (totalProblems == 1 ? "" : "s") + ")",
-		content: Wrapper("40rem",
+		content: Wrapper(
 			[
 				Header(1, "Audit"),
 

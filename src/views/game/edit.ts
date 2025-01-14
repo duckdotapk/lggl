@@ -58,7 +58,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				toolbar: GameSettingsToolbar(options.settings),
 				groupManager: options.groupManager,
 				createHref: "/games/create",
-				content: Wrapper("45rem",
+				content: Wrapper(
 					[		
 						Header(1, "Edit " + options.game.name),
 		
