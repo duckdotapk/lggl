@@ -45,6 +45,8 @@ const logRequestMiddleware = Fritter.LogRequestMiddleware.create();
 
 const bodyParserMiddleware = Fritter.BodyParserMiddleware.create();
 
+const currentPageNumberMiddleware = Fritter.CurrentPageNumberMiddleware.create();
+
 const settingsMiddleware = SettingsMiddleware.create();
 
 const renderComponentMiddleware = RenderComponentMiddleware.create<SiteOptions, ServerFritterContext>(
@@ -74,6 +76,8 @@ server.use(logRequestMiddleware.execute);
 
 server.use(bodyParserMiddleware.execute);
 
+server.use(currentPageNumberMiddleware.execute);
+
 server.use(settingsMiddleware.execute);
 
 server.use(renderComponentMiddleware.execute);
@@ -85,6 +89,7 @@ export type ServerFritterContext =
 	Fritter.StaticMiddleware.MiddlewareFritterContext &
 	Fritter.LogRequestMiddleware.MiddlewareFritterContext &
 	Fritter.BodyParserMiddleware.MiddlewareFritterContext &
+	Fritter.CurrentPageNumberMiddleware.MiddlewareFritterContext &
 	SettingsMiddleware.MiddlewareFritterContext &
 	RenderComponentMiddleware.MiddlewareFritterContext<SiteOptions> &
 	Fritter.RouterMiddleware.MiddlewareFritterContext;
