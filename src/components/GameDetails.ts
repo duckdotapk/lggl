@@ -3,7 +3,6 @@
 //
 
 import { Child, DE } from "@donutteam/document-builder";
-import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -17,8 +16,7 @@ import { Button } from "./input/Button.js";
 
 import { ColumnLayout } from "./layout/ColumnLayout.js";
 
-import { LGGL_DEVELOPER_MODE } from "../env/LGGL_DEVELOPER_MODE.js";
-import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
+import { DataList } from "./DataList.js";
 
 import { shortEnglishHumanizer } from "../instances/humanizer.js";
 import { staticMiddleware } from "../instances/server.js";
@@ -63,72 +61,81 @@ function Banner(game: GameDetailsGame)
 		]);
 }
 
-function PlayActionButtonGroup(game: GameDetailsGame)
+function ActionToolbar(game: GameDetailsGame)
 {
-	let children: Child[] = [];
-
-	if (!game.isInstalled)
-	{
-		children.push(Button(
-			{
-				style: "secondary",
-				type: "button",
-				extraAttributes:
-				{
-					disabled: true,
-				},
-				text: "Not installed",
-			}));
-	}
-	else if (game.gamePlayActions.length == 0)
-	{
-		children.push(Button(
-			{
-				style: "secondary",
-				type: "button",
-				extraAttributes:
-				{
-					disabled: true,
-				},
-				text: "No play actions available",
-			}));
-	}
-	else
-	{
-		for (const gamePlayAction of game.gamePlayActions)
-		{
-			children.push(Button(
-				{
-					style: "success",
-					type: "button",
-					extraAttributes:
-					{
-						"data-game-play-action-id": gamePlayAction.id,
-					},
-					iconName: "fa-solid fa-play",
-					text: gamePlayAction.name,
-				}));
-		}
-	}
-
-	children.push(Button(
-		{
-			style: "secondary",
-			href: "/games/edit/" + game.id,
-			extraAttributes:
-			{
-				"data-pjax-selector": "main",
-			},
-			iconName: "fa-solid fa-pen-to-square",
-			text: "Edit",
-		}));
-
-	return new DE("div",
-		{
-			class: "component-game-details-play-action-button-group",
-		},
+	return new DE("div", "component-game-details-action-bar",
 		[
-			children,
+			new DE("div", "buttons",
+				[
+					Button(
+						{
+							style: "success",
+							type: "button",
+							extraAttributes:
+							{
+								"data-open-choose-game-play-action-dialog": "true",
+								"data-game-id": game.id,
+							},
+							iconName: "fa-solid fa-play",
+							text: "Play",
+						}),
+				]),
+
+			new DE("div", "data-list", DataList(
+				[
+					game.lastPlayedDate != null
+						? {
+							iconName: "fa-solid fa-calendar",
+							name: "Last played",
+							value: game.lastPlayedDate != null
+								? HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED)
+								: "Never",
+						}
+						: null,
+
+					game.playTimeTotalSeconds > 0
+						? {
+							iconName: "fa-solid fa-timer",
+							name: "Play time",
+							value: shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
+						}
+						: null,
+
+					game.progressionType != "NONE" satisfies GameSchemaLib.ProgressionType && game.completionStatus != null
+						? {
+							iconName: GameModelLib.getCompletionStatusIconName(game),
+							name: "Completion status",
+							value: GameModelLib.getCompletionStatusName(game),
+						}
+						: null,
+				])),
+
+			new DE("div", "buttons",
+				[
+					Button(
+						{
+							style: "secondary",
+							href: "/games/edit/" + game.id,
+							extraAttributes:
+							{
+								"data-pjax-selector": "main",
+							},
+							iconName: "fa-solid fa-pen-to-square",
+							text: "Edit",
+						}),
+
+					Button(
+						{
+							style: "secondary",
+							href: "/gamePlaySessions/list/" + game.id,
+							extraAttributes:
+							{
+								"data-pjax-selector": "main",
+							},
+							iconName: "fa-solid fa-list",
+							text: "Play sessions",
+						}),
+				]),
 		]);
 }
 
@@ -415,179 +422,6 @@ function buildLinksSection(game: GameDetailsGame)
 
 	return Section(3, "Links", links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))));
 }
- 
-function buildNotesSection(game: GameDetailsGame)
-{
-	if (game.notes == null)
-	{
-		return null;
-	}
-
-	// TODO: render notes as markdown
-	return Section(3, "Notes", game.notes.split("\n").map((line) => Paragraph(line)));
-}
-
-function buildPlayTimeAndCompletionSection(game: GameDetailsGame)
-{
-	const dataTableRows: DataTableRow[] = [];
-
-	if (game.playTimeTotalSeconds > 0)
-	{
-		dataTableRows.push(
-			{
-				label: "Total time played",
-				value: new DE("span",
-					{
-						title: Utilities.NumberLib.format(game.playTimeTotalSeconds) + " seconds",
-					},
-					[
-						shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
-					]),
-			});
-	}
-
-	if (game.firstPlayedDate != null)
-	{
-		if (DateTime.fromJSDate(game.firstPlayedDate).toSeconds() == 0)
-		{
-			dataTableRows.push(
-				{
-					label: "Year first played",
-					value: "Unknown",
-				});
-		}
-		else if (game.firstPlayedDateApproximated)
-		{
-			dataTableRows.push(
-				{
-					label: "Year first played",
-					value: DateTime.fromJSDate(game.firstPlayedDate).year.toString(),
-				});
-		}
-		else
-		{
-			dataTableRows.push(
-				{
-					label: "Date first played",
-					value: HumanDateTime(DateTime.fromJSDate(game.firstPlayedDate), DateTime.DATE_MED),
-				});
-		}
-	}
-
-	if (game.firstCompletedDate != null)
-	{
-		if (DateTime.fromJSDate(game.firstCompletedDate).toSeconds() == 0)
-		{
-			dataTableRows.push(
-				{
-					label: "Year first completed",
-					value: "Unknown",
-				});
-		}
-		else if (game.firstCompletedDateApproximated)
-		{
-			dataTableRows.push(
-				{
-					label: "Year first completed",
-					value: DateTime.fromJSDate(game.firstCompletedDate).year.toString(),
-				});
-		}
-		else
-		{
-			dataTableRows.push(
-				{
-					label: "Date first completed",
-					value: HumanDateTime(DateTime.fromJSDate(game.firstCompletedDate), DateTime.DATE_MED),
-				});
-		}
-	}
-
-	if (game.progressionType != "NONE" satisfies GameSchemaLib.ProgressionType)
-	{
-		dataTableRows.push(
-			{
-				label: "Completion status",
-				value: game.completionStatus != null
-					? GameModelLib.getCompletionStatusName(game)
-					: null,
-			});
-	}
-
-	if (game.lastPlayedDate != null)
-	{
-		dataTableRows.push(
-			{
-				label: "Date last played",
-				value: new DE("span",
-					{
-						title: DateTime.fromJSDate(game.lastPlayedDate).toLocaleString(DateTime.DATE_MED),
-					},
-					[
-						HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)),
-					]),
-			});
-	}
-
-	return Section(3, "Play time & completion", DataTable(dataTableRows));
-}
-
-function buildRecentPlaySessionsSection(game: GameDetailsGame)
-{
-	let recentPlaySessionsDataTable: Child;
-
-	if (game.gamePlaySessions.length > 0)
-	{
-		recentPlaySessionsDataTable = DataTable(game.gamePlaySessions.map(
-			(gamePlaySession) =>
-			{
-				let title = "Played for " + Utilities.NumberLib.format(gamePlaySession.playTimeSeconds) + " seconds on " + gamePlaySession.platform.name;
-
-				if (gamePlaySession.notes != null)
-				{
-					title += "\n\n" + gamePlaySession.notes;
-				}
-
-				if (LGGL_DEVELOPER_MODE)
-				{
-					title += "\n\nGamePlaySession #" + gamePlaySession.id;
-				}
-
-				return {
-					label: !gamePlaySession.isHistorical
-						? HumanDateTime(DateTime.fromJSDate(gamePlaySession.startDate))
-						: "Historical",
-					value: new DE("span",
-						{
-							title,
-						},
-						[
-							new DE("span", gamePlaySession.platform.iconName + " fa-fw"),
-							" ",
-							shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000),
-						]),
-				};
-			}));
-	}
-	else
-	{
-		recentPlaySessionsDataTable = LGGL_GAME_PLAY_SESSION_HISTORY_DAYS != -1
-			? Paragraph("No play sessions in the last " + LGGL_GAME_PLAY_SESSION_HISTORY_DAYS + " days.")
-			: Paragraph("No play sessions recorded.")
-	}
-
-	return Section(3, "Recent play sessions",
-		[
-			recentPlaySessionsDataTable,
-
-			Button(
-				{
-					style: "secondary",
-					href: "/gamePlaySessions/list/" + game.id,
-					iconName: "fa-solid fa-list",
-					text: "View play session history",
-				}),
-		]);
-}
 
 function buildSteamAppSection(game: GameDetailsGame)
 {
@@ -639,14 +473,6 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					platform: true;
 				};
 			};
-			gamePlayActions: true;
-			gamePlaySessions:
-			{
-				include:
-				{
-					platform: true;
-				};
-			};
 		};
 	}>;
 
@@ -662,26 +488,16 @@ export function GameDetails(game: GameDetailsGame)
 		[
 			Banner(game),
 
-			PlayActionButtonGroup(game),
+			ActionToolbar(game),
 
-			new DE("div", "data",
+			new DE("div", "data", ColumnLayout(3,
 				[
-					Section(2, "Your play data", ColumnLayout(3,
-						[
-							buildPlayTimeAndCompletionSection(game),
-							buildRecentPlaySessionsSection(game),
-							buildNotesSection(game),
-						])),
-
-					Section(2, "About this game", ColumnLayout(3,
-						[
-							buildGeneralSection(game),
-							buildDescriptionSection(game),
-							buildFeaturesSection(game),
-							buildLinksSection(game),
-							buildSteamAppSection(game),
-							buildLibrarySection(game),
-						])),
-				]),
+					buildGeneralSection(game),
+					buildDescriptionSection(game),
+					buildFeaturesSection(game),
+					buildLinksSection(game),
+					buildSteamAppSection(game),
+					buildLibrarySection(game),
+				])),
 		]);
 }

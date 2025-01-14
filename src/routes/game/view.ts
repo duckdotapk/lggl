@@ -3,9 +3,6 @@
 //
 
 import * as Fritter from "@donutteam/fritter";
-import { DateTime } from "luxon";
-
-import { LGGL_GAME_PLAY_SESSION_HISTORY_DAYS } from "../../env/LGGL_GAME_PLAY_SESSION_HISTORY_DAYS.js";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
@@ -78,25 +75,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						{
 							platform: true,
 						},
-					},
-					gamePlayActions: true,
-					gamePlaySessions:
-					{
-						where:
-						{
-							startDate: LGGL_GAME_PLAY_SESSION_HISTORY_DAYS != -1
-								? { gte: DateTime.now().minus({ days: LGGL_GAME_PLAY_SESSION_HISTORY_DAYS }).toJSDate() }
-								: undefined,
-						},
-						include:
-						{
-							platform: true,
-						},
-						orderBy:
-						{
-							startDate: "desc",
-						},
-						take: 5,
 					},
 				},
 			});

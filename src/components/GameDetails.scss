@@ -8,6 +8,8 @@
 	{
 		display: grid;
 		grid-template-areas: "stack";
+		
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
 
 		height: 20rem;
 
@@ -51,21 +53,27 @@
 		}
 	}
 
-	.component-game-details-play-action-button-group
+	.component-game-details-action-bar
 	{
-		display: flex;
-		gap: 0.75rem;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 1.25rem;
+
+		border-bottom: 1px solid #374151; // Tailwind Gray 700
 
 		padding: 0.75rem;
 
-		border-top: 1px solid #374151; // Tailwind Gray 700
-		border-bottom: 1px solid #374151; // Tailwind Gray 700
-
-		> *
+		> .buttons
 		{
-			margin: 0 !important;
+			display: flex;
+			gap: 0.75rem;
 
-			width: auto;
+			> *
+			{
+				margin: 0 !important;
+				min-width: fit-content;
+			}
 		}
 	}
 

@@ -2,6 +2,8 @@
 // Imports
 //
 
+import { initialiseOpenChooseGamePlayActionDialogButtons } from "./components/dialogs/ChooseGamePlayActionDialog.client.js";
+
 import { initialiseDownloadGameImagesForms } from "./components/form/DownloadGameImagesForm.client.js";
 import { initialiseSyncGameHistoricalSteamPlayTimeForm } from "./components/form/SyncGameHistoricalPlayTimeForm.client.js";
 import { initialiseUpsertCompanyForms } from "./components/form/UpsertCompanyForm.client.js";
@@ -25,7 +27,6 @@ import { initialiseEngineSettingsToolbars } from "./components/toolbar/EngineSet
 import { initialiseGameSettingsToolbars } from "./components/toolbar/GameSettingsToolbar.client.js";
 import { initialisePlatformSettingsToolbars } from "./components/toolbar/PlatformSettingsToolbar.client.js";
 
-import { initialiseGameDetails } from "./components/GameDetails.client.js";
 import { updateSidebars } from "./components/Sidebar.client.js";
 
 import * as PjaxClientLib from "./libs/client/Pjax.client.js";
@@ -39,6 +40,8 @@ async function initialiseComponents()
 	//
 	// Initialise Components
 	//
+
+	initialiseOpenChooseGamePlayActionDialogButtons();
 
 	initialiseDownloadGameImagesForms();
 	initialiseSyncGameHistoricalSteamPlayTimeForm();
@@ -62,8 +65,6 @@ async function initialiseComponents()
 	initialiseEngineSettingsToolbars();
 	initialiseGameSettingsToolbars();
 	initialisePlatformSettingsToolbars();
-	
-	initialiseGameDetails();
 
 	//
 	// Update Components
