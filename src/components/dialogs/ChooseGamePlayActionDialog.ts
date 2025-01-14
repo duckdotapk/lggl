@@ -23,12 +23,9 @@ export type ChooseGamePlayActionDialogGamePlayActions = Prisma.GamePlayActionGet
 		};
 	}>[];
 
-export function ChooseGamePlayActionDialog(game_id: number, gamePlayActions: ChooseGamePlayActionDialogGamePlayActions)
+export function ChooseGamePlayActionDialog(gamePlayActions: ChooseGamePlayActionDialogGamePlayActions)
 {
-	return Dialog("component-choose-game-play-action-dialog",
-		{
-			"data-game-id": game_id,
-		},
+	return Dialog("component-choose-game-play-action-dialog", null,
 		[
 			Header(2, "Choose play action"),
 

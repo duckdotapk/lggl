@@ -15,7 +15,8 @@ import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
 import { staticMiddleware } from "../../instances/server.js";
 
-import * as SettingModelLib from "../models/Setting.js";
+import * as GamePlaySessionModelLib from "./GamePlaySession.js";
+import * as SettingModelLib from "./Setting.js";
 
 import * as GameSchemaLib from "../schemas/Game.js";
 
@@ -505,4 +506,9 @@ export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma
 	return virtualRealitySupportParseResult.success
 		? virtualRealitySupportNames[virtualRealitySupportParseResult.data]
 		: "Invalid: " + gameOrVirtualRealitySupport.virtualRealitySupport;
+}
+
+export function hasActiveSession(game: Prisma.GameGetPayload<null>)
+{
+	return GamePlaySessionModelLib.gamesWithActiveSessions.has(game.id);
 }

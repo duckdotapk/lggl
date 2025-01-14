@@ -12,7 +12,6 @@ import { z } from "zod";
 export const RequestBodySchema = z.object(
 	{
 		id: z.number().int().min(1),
-		gamePlayAction_id: z.number().int().min(1),
 	});
 
 export const ResponseBodySchema = z.union(
@@ -36,13 +35,13 @@ export type ResponseBody = z.infer<typeof ResponseBodySchema>;
 
 export const method = "POST";
 
-export const path = "/api/games/launch";
+export const path = "/api/gamePlayActions/execute";
 
 //
 // Utility Functions
 //
 
-export function launchGame(id: number, gamePlayAction_id: number)
+export function executeGamePlayAction(id: number)
 {
 	return FritterApiUtilities.request(method, path,
 		{
@@ -50,8 +49,7 @@ export function launchGame(id: number, gamePlayAction_id: number)
 			responseBodySchema: ResponseBodySchema,
 			requestBody:
 			{
-				id: id,
-				gamePlayAction_id,
+				id,
 			},
 		});
 }

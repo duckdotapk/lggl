@@ -7,9 +7,10 @@ import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as LauncherLib from "../../../libs/Launcher.js";
+import * as GameModelLib from "../../../libs/models/Game.js";
+import * as GamePlayActionModelLib from "../../../libs/models/GamePlayAction.js";
 
-import * as Schemas from "./launch.schemas.js";
+import * as Schemas from "./execute.schemas.js";
 
 //
 // Route
@@ -26,34 +27,15 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 		responseBodySchema: Schemas.ResponseBodySchema,
 		handler: async (requestBody) =>
 		{
-			//
-			// Find Game
-			//
-
-			const game = await prismaClient.game.findUnique(
+			const gamePlayAction = await prismaClient.gamePlayAction.findUnique(
 				{
 					where:
 					{
 						id: requestBody.id,
 					},
-				});
-
-			if (game == null)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
-
-			//
-			// Find Game Play Action
-			//
-
-			const gamePlayAction = await prismaClient.gamePlayAction.findUnique(
-				{
-					where:
+					include:
 					{
-						id: requestBody.gamePlayAction_id,
-
-						game_id: game.id,
+						game: true,
 					},
 				});
 
@@ -62,20 +44,17 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game play action not found." });
 			}
 
-			//
-			// Launch Game
-			//
+			if (GameModelLib.hasActiveSession(gamePlayAction.game))
+			{
+				throw new FritterApiUtilities.APIError({ code: "GAME_HAS_ACTIVE_SESSION", message: "Game has an active session." });
+			}
 
-			const launchGameResult = await LauncherLib.launchGame(game, gamePlayAction);
+			const launchGameResult = await GamePlayActionModelLib.execute(gamePlayAction);
 
 			if (!launchGameResult.success)
 			{
 				throw new FritterApiUtilities.APIError({ code: "LAUNCH_FAILED", message: launchGameResult.message });
 			}
-
-			//
-			// Return
-			//
 
 			return {
 				success: true,

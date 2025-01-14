@@ -6,8 +6,7 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import { ChooseGamePlayActionDialog } from "./ChooseGamePlayActionDialog.js";
 
-import { launchGame } from "../../routes/api/game/launch.schemas.js";
-
+import { executeGamePlayAction } from "../../routes/api/gamePlayAction/execute.schemas.js";
 import { findGamePlayActions } from "../../routes/api/gamePlayAction/findAll.schemas.js";
 
 //
@@ -16,8 +15,6 @@ import { findGamePlayActions } from "../../routes/api/gamePlayAction/findAll.sch
 
 async function initialise(dialog: HTMLDialogElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(dialog, "gameId");
-
 	const buttons = dialog.querySelectorAll<HTMLButtonElement>(".component-button");
 
 	for (const button of buttons)
@@ -29,7 +26,7 @@ async function initialise(dialog: HTMLDialogElement)
 			{
 				dialog.close();
 
-				const response = await launchGame(gameId, gamePlayActionId);
+				const response = await executeGamePlayAction(gamePlayActionId);
 
 				if (!response.success)
 				{
@@ -64,7 +61,7 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 			if (findGamePlayActionsResponse.gamePlayActions.length == 1)
 			{
-				const launchGameResponse = await launchGame(gameId, findGamePlayActionsResponse.gamePlayActions[0]!.id);
+				const launchGameResponse = await executeGamePlayAction(findGamePlayActionsResponse.gamePlayActions[0]!.id);
 
 				if (!launchGameResponse.success)
 				{
@@ -74,7 +71,7 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 				return;
 			}
 
-			const dialog = ChooseGamePlayActionDialog(gameId, findGamePlayActionsResponse.gamePlayActions).renderToHTMLElement<HTMLDialogElement>();
+			const dialog = ChooseGamePlayActionDialog(findGamePlayActionsResponse.gamePlayActions).renderToHTMLElement<HTMLDialogElement>();
 
 			dialogContainer.appendChild(dialog);
 
