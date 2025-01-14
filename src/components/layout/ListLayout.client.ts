@@ -1,10 +1,35 @@
 //
+// Imports
+//
+
+import * as BrowserUtilities from "@donutteam/browser-utilities";
+
+//
 // Locals
 //
 
 async function initialise(element: HTMLElement)
 {
-	const selectedListLayoutGroupItem = element.querySelector<HTMLAnchorElement>(".component-list-layout-group-item.selected");
+	let allGroupsCollapsed = false;
+
+	const listLayoutGroups = element.querySelectorAll<HTMLDetailsElement>(".component-list-layout-group");
+	const selectedListLayoutGroupItem = BrowserUtilities.ElementClientLib.getElement<HTMLAnchorElement>(element, ".component-list-layout-group-item.selected");
+	const toggleGroupsButton = BrowserUtilities.ElementClientLib.getElementOrThrow(element, `[data-action="toggleGroups"]`);
+	const toggleGroupsButtonIcon = BrowserUtilities.ElementClientLib.getElementOrThrow(toggleGroupsButton, ".icon");
+	const toggleGroupsButtonText = BrowserUtilities.ElementClientLib.getElementOrThrow(toggleGroupsButton, ".text");
+
+	const setGroupsCollapsed = (collapsed: boolean) =>
+	{
+		for (const listLayoutGroup of listLayoutGroups)
+		{
+			listLayoutGroup.open = !collapsed;
+		}
+
+		allGroupsCollapsed = collapsed;
+
+		toggleGroupsButtonIcon.className = collapsed ? "icon fa-solid fa-chevron-down" : "icon fa-solid fa-chevron-up";
+		toggleGroupsButtonText.textContent = collapsed ? "Expand all groups" : "Collapse all groups";
+	}
 
 	if (selectedListLayoutGroupItem != null)
 	{
@@ -17,6 +42,8 @@ async function initialise(element: HTMLElement)
 	
 		selectedListLayoutGroupItem.scrollIntoView({ block: "nearest" });
 	}
+
+	toggleGroupsButton.addEventListener("click", () => setGroupsCollapsed(!allGroupsCollapsed));
 }
 
 //

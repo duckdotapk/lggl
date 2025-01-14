@@ -89,7 +89,7 @@
 		grid-template-areas:
 			"toolbar 	toolbar"
 			"list 		content"
-			"create 	content";
+			"buttons 	content";
 		grid-template-columns: 20rem 1fr;
 		grid-template-rows: auto 1fr auto;
 
@@ -113,11 +113,13 @@
 			overflow-y: scroll;
 		}
 
-		> .create
+		> .buttons
 		{
-			grid-area: create;
+			grid-area: buttons;
 
 			border-top: 1px solid #374151;
+
+			padding: 0.5rem;
 		}
 
 		> .content

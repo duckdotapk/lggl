@@ -121,8 +121,20 @@ export function ListLayout(options: ListLayoutOptions)
 					options.groupManager.getGroups().map((group) => Group(group)),
 				]),
 
-			new DE("div", "create",
+			new DE("div", "buttons",
 				[
+					Button(
+						{
+							style: "secondary",
+							type: "button",
+							extraAttributes:
+							{
+								"data-action": "toggleGroups",
+							},
+							iconName: "fa-solid fa-chevron-up",
+							text: "Collapse all groups",
+						}),
+
 					Button(
 						{
 							style: "success",
