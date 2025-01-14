@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
+import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertCompanyForm } from "../../components/form/UpsertCompanyForm.js";
@@ -42,6 +43,25 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				createHref: "/companies/create",
 				content: Wrapper(
 					[
+						Breadcrumbs(
+							[
+								{
+									href: "/companies",
+									text: "Companies",
+									pjaxSelector: "main",
+								},
+								{
+									href: "/companies/view/" + options.company.id,
+									text: options.company.name,
+									pjaxSelector: "main",
+								},
+								{
+									href: "/companies/edit/" + options.company.id,
+									text: "Edit",
+									pjaxSelector: "main",
+								},
+							]),
+
 						Header(1, "Edit " + options.company.name),
 		
 						UpsertCompanyForm(options.company),

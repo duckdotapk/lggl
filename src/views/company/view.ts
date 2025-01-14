@@ -8,6 +8,7 @@ import { GroupManager } from "../../classes/GroupManager.js";
 
 import { Anchor } from "../../components/basic/Anchor.js";
 import { Block } from "../../components/basic/Block.js";
+import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { Button } from "../../components/input/Button.js";
@@ -46,6 +47,20 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				createHref: "/companies/create",
 				content: Wrapper(
 					[
+						Breadcrumbs(
+							[
+								{
+									href: "/companies",
+									text: "Companies",
+									pjaxSelector: "main",
+								},
+								{
+									href: "/companies/view/" + options.company.id,
+									text: options.company.name,
+									pjaxSelector: "main",
+								},
+							]),
+
 						Header(1, options.company.name),
 
 						Button(

@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { GroupManager } from "../../classes/GroupManager.js";
 
 import { Block } from "../../components/basic/Block.js";
+import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { DownloadGameImagesForm } from "../../components/form/DownloadGameImagesForm.js";
@@ -60,7 +61,26 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				createHref: "/games/create",
 				content: Wrapper(
 					[		
-						Header(1, "Edit " + options.game.name),
+						Breadcrumbs(
+							[
+								{
+									href: "/games", 
+									text: "Games", 
+									pjaxSelector: "main",
+								},
+								{
+									href: "/games/view/" + options.game.id, 
+									text: options.game.name, 
+									pjaxSelector: "main",
+								},
+								{
+									href: "/games/edit/" + options.game.id, 
+									text: "Edit",
+									pjaxSelector: "main",
+								},
+							]),
+
+						Header(1, "Edit Game"),
 		
 						UpsertGameForm(options.game),
 		

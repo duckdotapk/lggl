@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
+import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertEngineForm } from "../../components/form/UpsertEngineForm.js";
@@ -44,6 +45,25 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				createHref: "/engines/create",
 				content: Wrapper(
 					[		
+						Breadcrumbs(
+							[
+								{
+									href: "/engines",
+									text: "Engines",
+									pjaxSelector: "main",
+								},
+								{
+									href: "/engines/view/" + options.engine.id,
+									text: engineName,
+									pjaxSelector: "main",
+								},
+								{
+									href: "/engines/edit/" + options.engine.id,
+									text: "Edit",
+									pjaxSelector: "main",
+								},
+							]),
+
 						Header(1, engineName),
 		
 						UpsertEngineForm(options.engine),

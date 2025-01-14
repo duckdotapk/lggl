@@ -5,26 +5,28 @@
 import { DE } from "@donutteam/document-builder";
 import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
+import { DateTime } from "luxon";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
 import { Block } from "../../components/basic/Block.js";
+import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 import { Paragraph } from "../../components/basic/Paragraph.js";
 
+import { Label } from "../../components/input/Label.js";
+
 import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolbar.js";
 
+import { ColumnLayout } from "../../components/layout/ColumnLayout.js";
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as SettingModelLib from "../../libs/models/Setting.js";
-import { DateTime } from "luxon";
 import { shortEnglishHumanizer } from "../../instances/humanizer.js";
-import { Label } from "../../components/input/Label.js";
-import { ColumnLayout } from "../../components/layout/ColumnLayout.js";
-import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
+
+import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
 // View
@@ -53,9 +55,21 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 					[
 						Breadcrumbs(
 							[
-								{ href: "/games", text: "Games" },
-								{ href: "/games/view/" + options.game.id, text: options.game.name },
-								{ href: "/gamePlaySessions/list/" + options.game.id, text: "Play sessions" },
+								{ 
+									href: "/games",
+									text: "Games", 
+									pjaxSelector: "main",
+								},
+								{ 
+									href: "/games/view/" + options.game.id, 
+									text: options.game.name,
+									pjaxSelector: "main",
+								},
+								{ 
+									href: "/gamePlaySessions/list/" + options.game.id, 
+									text: "Play sessions",
+									pjaxSelector: "main",
+								},
 							]),
 
 						Header(1,
