@@ -73,6 +73,8 @@ export function Site(options: SiteOptions)
 							new DE("div", "sidebar", Sidebar(options.currentPage)),
 
 							new DE("div", "content", content),
+
+							new DE("div", "dialog-container"),
 						]),
 				]),
 		]);
