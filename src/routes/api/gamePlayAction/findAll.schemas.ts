@@ -40,7 +40,7 @@ export type ResponseBody = z.infer<typeof ResponseBodySchema>;
 // Constants
 //
 
-export const method = "POST";
+export const method = "GET";
 
 export const path = "/api/gamePlayActions/findAll";
 
