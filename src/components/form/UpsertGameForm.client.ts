@@ -31,6 +31,8 @@ async function initialise(form: HTMLFormElement)
 	const hasCoverImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasCoverImage"]`);
 	const hasIconImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasIconImage"]`);
 	const hasLogoImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasLogoImage"]`);
+	const logoImageAlignmentSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageAlignment"]`);
+	const logoImageJustificationSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageJustification"]`);
 
 	const isEarlyAccessInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isEarlyAccess"]`);
 	const isFavoriteInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFavorite"]`);
@@ -80,6 +82,8 @@ async function initialise(form: HTMLFormElement)
 						hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
 						hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
 						hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
+						logoImageAlignment: InputClientLib.getEnumValueNullable(logoImageAlignmentSelect, GameSchemaLib.LogoImageAlignmentSchema),
+						logoImageJustification: InputClientLib.getEnumValueNullable(logoImageJustificationSelect, GameSchemaLib.LogoImageJustificationSchema),
 
 						isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
 						isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
@@ -142,6 +146,8 @@ async function initialise(form: HTMLFormElement)
 						hasCoverImage: InputClientLib.getChangedBooleanValue(hasCoverImageInput),
 						hasIconImage: InputClientLib.getChangedBooleanValue(hasIconImageInput),
 						hasLogoImage: InputClientLib.getChangedBooleanValue(hasLogoImageInput),
+						logoImageAlignment: InputClientLib.getChangedEnumValueNullable(logoImageAlignmentSelect, GameSchemaLib.LogoImageAlignmentSchema),
+						logoImageJustification: InputClientLib.getChangedEnumValueNullable(logoImageJustificationSelect, GameSchemaLib.LogoImageJustificationSchema),
 
 						isEarlyAccess: InputClientLib.getChangedBooleanValue(isEarlyAccessInput),
 						isFavorite: InputClientLib.getChangedBooleanValue(isFavoriteInput),

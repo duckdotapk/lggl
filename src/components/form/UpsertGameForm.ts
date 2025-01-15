@@ -39,7 +39,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 			TabControl(
 				[
 					{
-						title: "General data",
+						title: "General",
 						content: Block(
 							[
 								ColumnLayout(2,
@@ -127,7 +127,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 							]),
 					},
 					{
-						title: "Image flags",
+						title: "Images",
 						content: Block(
 							[
 								Checkbox("hasBannerImage", "Has banner image", game?.hasBannerImage ?? false),
@@ -137,10 +137,34 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 								Checkbox("hasIconImage", "Has icon image", game?.hasIconImage ?? false),
 					
 								Checkbox("hasLogoImage", "Has logo image", game?.hasLogoImage ?? false),
+
+								Label("logoImageAlignment", "Logo image alignment"),
+
+								Control(
+									{
+										type: "select",
+										name: "logoImageAlignment",
+										required: false,
+										value: game?.logoImageAlignment ?? null,
+										showEmptyOption: true,
+										options: GameSchemaLib.LogoImageAlignmentSchema.options.map((option) => ({ value: option, label: GameModelLib.getLogoImageAlignmentName(option) })),
+									}),
+
+								Label("logoImageJustification", "Logo image justification"),
+
+								Control(
+									{
+										type: "select",
+										name: "logoImageJustification",
+										required: false,
+										value: game?.logoImageJustification ?? null,
+										showEmptyOption: true,
+										options: GameSchemaLib.LogoImageJustificationSchema.options.map((option) => ({ value: option, label: GameModelLib.getLogoImageJustificationName(option) })),
+									}),
 							]),
 					},
 					{
-						title: "Other flags",
+						title: "Flags",
 						content: Block(
 							[
 								Checkbox("isEarlyAccess", "Is early access", game?.isEarlyAccess ?? false),
@@ -238,7 +262,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 							]),
 					},
 					{
-						title: "Supported features",
+						title: "Features",
 						content: Block(
 							[
 								Label("achievementSupport", "Achievement support"),
@@ -291,7 +315,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 							]),
 					},
 					{
-						title: "Steam data",
+						title: "Steam app",
 						content: Block(
 							[
 								Label("steamAppId", "Steam app ID"),

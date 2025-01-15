@@ -31,6 +31,19 @@ const progressionTypeNames: Record<GameSchemaLib.ProgressionType, string> =
 	"CAMPAIGN": "Campaign",
 };
 
+const logoImageAlignmentNames: Record<GameSchemaLib.LogoImageAlignment, string> =
+{
+	"start": "Top",
+	"center": "Center",
+	"end": "Bottom",
+};
+
+const logoImageJustificationNames: Record<GameSchemaLib.LogoImageJustification, string> =
+{
+	"start": "Left",
+	"center": "Center",
+};
+
 const completionStatusIconNames: Record<GameSchemaLib.CompletionStatus, string> =
 {
 	"TODO": "fa-solid fa-circle-dashed",
@@ -375,6 +388,63 @@ export function getImagePaths(game: Prisma.GameGetPayload<null>)
 	}
 }
 
+export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayload<null> | GameSchemaLib.ProgressionType)
+{
+	if (typeof gameOrProgressionType == "string")
+	{
+		return progressionTypeNames[gameOrProgressionType];
+	}
+
+	if (gameOrProgressionType.progressionType == null)
+	{
+		return "-";
+	}
+
+	const progressionTypeParseResult = GameSchemaLib.ProgressionTypeSchema.safeParse(gameOrProgressionType.progressionType);
+
+	return progressionTypeParseResult.success
+		? progressionTypeNames[progressionTypeParseResult.data]
+		: "Invalid: " + gameOrProgressionType.progressionType;
+}
+
+export function getLogoImageAlignmentName(gameOrLogoImageAlignment: Prisma.GameGetPayload<null> | GameSchemaLib.LogoImageAlignment)
+{
+	if (typeof gameOrLogoImageAlignment == "string")
+	{
+		return logoImageAlignmentNames[gameOrLogoImageAlignment];
+	}
+
+	if (gameOrLogoImageAlignment.logoImageAlignment == null)
+	{
+		return "-";
+	}
+
+	const logoImageAlignmentParseResult = GameSchemaLib.LogoImageAlignmentSchema.safeParse(gameOrLogoImageAlignment.logoImageAlignment);
+
+	return logoImageAlignmentParseResult.success
+		? logoImageAlignmentNames[logoImageAlignmentParseResult.data]
+		: "Invalid: " + gameOrLogoImageAlignment.logoImageAlignment;
+}
+
+export function getLogoImageJustificationName(gameOrLogoImageJustification: Prisma.GameGetPayload<null> | GameSchemaLib.LogoImageJustification)
+{
+	if (typeof gameOrLogoImageJustification == "string")
+	{
+		return logoImageJustificationNames[gameOrLogoImageJustification];
+	}
+
+	if (gameOrLogoImageJustification.logoImageJustification == null)
+	{
+		return "-";
+	}
+
+	const logoImageJustificationParseResult = GameSchemaLib.LogoImageJustificationSchema.safeParse(gameOrLogoImageJustification.logoImageJustification);
+
+	return logoImageJustificationParseResult.success
+		? logoImageJustificationNames[logoImageJustificationParseResult.data]
+		: "Invalid: " + gameOrLogoImageJustification.logoImageJustification;
+}
+
 export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameSchemaLib.CompletionStatus)
 {
 	if (typeof gameOrCompletionStatus == "string")
@@ -411,25 +481,6 @@ export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPa
 	return completionStatusParseResult.success
 		? completionStatusNames[completionStatusParseResult.data]
 		: "Invalid: " + gameOrCompletionStatus.completionStatus;
-}
-
-export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayload<null> | GameSchemaLib.ProgressionType)
-{
-	if (typeof gameOrProgressionType == "string")
-	{
-		return progressionTypeNames[gameOrProgressionType];
-	}
-
-	if (gameOrProgressionType.progressionType == null)
-	{
-		return "-";
-	}
-
-	const progressionTypeParseResult = GameSchemaLib.ProgressionTypeSchema.safeParse(gameOrProgressionType.progressionType);
-
-	return progressionTypeParseResult.success
-		? progressionTypeNames[progressionTypeParseResult.data]
-		: "Invalid: " + gameOrProgressionType.progressionType;
 }
 
 export function getAchievementSupportName(gameOrAchievementSupport: Prisma.GameGetPayload<null> | GameSchemaLib.AchievementSupport)

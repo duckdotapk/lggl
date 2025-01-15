@@ -24,6 +24,8 @@ export const RequestBodySchema = z.object(
 		hasCoverImage: z.boolean(),
 		hasIconImage: z.boolean(),
 		hasLogoImage: z.boolean(),
+		logoImageAlignment: GameSchemaLib.LogoImageAlignmentSchema.nullable(),
+		logoImageJustification: GameSchemaLib.LogoImageJustificationSchema.nullable(),
 
 		isEarlyAccess: z.boolean(),
 		isFavorite: z.boolean(),

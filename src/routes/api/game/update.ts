@@ -93,6 +93,16 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.hasLogoImage = requestBody.updateData.hasLogoImage;
 			}
 
+			if (requestBody.updateData.logoImageAlignment !== undefined)
+			{
+				gameUpdateData.logoImageAlignment = requestBody.updateData.logoImageAlignment;
+			}
+
+			if (requestBody.updateData.logoImageJustification !== undefined)
+			{
+				gameUpdateData.logoImageJustification = requestBody.updateData.logoImageJustification;
+			}
+
 			if (requestBody.updateData.isEarlyAccess !== undefined)
 			{
 				gameUpdateData.isEarlyAccess = requestBody.updateData.isEarlyAccess;

@@ -15,6 +15,19 @@ export const ProgressionTypeSchema = z.enum(
 		"CAMPAIGN",
 	]);
 
+export const LogoImageAlignmentSchema = z.enum(
+	[
+		"start",
+		"center",
+		"end",
+	]);
+
+export const LogoImageJustificationSchema = z.enum(
+	[
+		"start",
+		"center",
+	]);
+
 export const CompletionStatusSchema = z.enum(
 	[
 		"TODO",
@@ -56,6 +69,10 @@ export const VirtualRealitySupportSchema = z.enum(
 //
 
 export type ProgressionType = z.infer<typeof ProgressionTypeSchema>;
+
+export type LogoImageAlignment = z.infer<typeof LogoImageAlignmentSchema>;
+
+export type LogoImageJustification = z.infer<typeof LogoImageJustificationSchema>;
 
 export type CompletionStatus = z.infer<typeof CompletionStatusSchema>;
 

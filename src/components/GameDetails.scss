@@ -33,7 +33,8 @@
 		{
 			grid-area: stack;
 
-			align-self: end;
+			align-self: var(--logo-image-alignment);
+			justify-self: var(--logo-image-justification);
 
 			padding: 2rem;
 

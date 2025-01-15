@@ -42,6 +42,8 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						hasCoverImage: requestBody.hasCoverImage,
 						hasIconImage: requestBody.hasIconImage,
 						hasLogoImage: requestBody.hasLogoImage,
+						logoImageAlignment: requestBody.logoImageAlignment,
+						logoImageJustification: requestBody.logoImageJustification,
 
 						isEarlyAccess: requestBody.isEarlyAccess,
 						isFavorite: requestBody.isFavorite,

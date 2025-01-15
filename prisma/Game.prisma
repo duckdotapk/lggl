@@ -3,7 +3,7 @@ model Game {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
-    // General data
+    // General
     name            String    @unique
     sortName        String
     releaseDate     DateTime?
@@ -11,13 +11,15 @@ model Game {
     notes           String?
     progressionType String?
 
-    // Image flags
-    hasBannerImage Boolean @default(false)
-    hasCoverImage  Boolean @default(false)
-    hasIconImage   Boolean @default(false)
-    hasLogoImage   Boolean @default(false)
+    // Images
+    hasBannerImage         Boolean @default(false)
+    hasCoverImage          Boolean @default(false)
+    hasIconImage           Boolean @default(false)
+    hasLogoImage           Boolean @default(false)
+    logoImageAlignment     String?
+    logoImageJustification String?
 
-    // Other flags
+    // Flags
     isEarlyAccess   Boolean @default(false)
     isFavorite      Boolean @default(false)
     isHidden        Boolean @default(false)
@@ -37,13 +39,13 @@ model Game {
     playCount                      Int       @default(0)
     playTimeTotalSeconds           Int       @default(0)
 
-    // Supported features
+    // Features
     achievementSupport    String?
     controllerSupport     String?
     modSupport            String?
     virtualRealitySupport String?
 
-    // Steam data
+    // Steam app
     steamAppId   Int?
     steamAppName String?
 

@@ -34,6 +34,12 @@ function Banner(game: GameDetailsGame)
 {
 	const imageUrls = GameModelLib.getImageUrls(game);
 
+	let logoImageStyleComponents =
+	[
+		"--logo-image-alignment: " + (game.logoImageAlignment ?? "end"),
+		"--logo-image-justification: " + (game.logoImageJustification ?? "start"),
+	];
+
 	return new DE("header",
 		{
 			class: "component-game-details-banner",
@@ -53,6 +59,7 @@ function Banner(game: GameDetailsGame)
 				? new DE("img",
 					{
 						class: "logo",
+						style: logoImageStyleComponents.join("; "),
 
 						src: staticMiddleware.getCacheBustedPath(imageUrls.logo),
 						alt: game.name + " logo",
