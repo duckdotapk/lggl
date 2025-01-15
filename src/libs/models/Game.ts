@@ -19,6 +19,7 @@ import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
 import * as GameSchemaLib from "../schemas/Game.js";
+import { shortEnglishHumanizer } from "../../instances/humanizer.js";
 
 //
 // Constants
@@ -129,148 +130,237 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 		games = games.filter((game) => !game.isNsfw);
 	}
 
-	const groupManager = new GroupManager<typeof games[0]>(
-		(game) =>
-		{
-			return {
-				selected: game.id == options.selectedGame?.id,
-				href: "/games/view/" + game.id,
-				iconName: game.hasIconImage
-					? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
-					: "fa-solid fa-gamepad-modern",
-				name: game.name,
-				info: game.lastPlayedDate != null
-					? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
-					: [],
-			};
-		});
-
 	switch (options.settings.gameGroupMode)
 	{
 		case "lastPlayed":
 		{
-			const sortedGames = games.toSorted((a, b) => (b.lastPlayedDate ?? new Date(0)).getTime() - (a.lastPlayedDate ?? new Date(0)).getTime());
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: [],
+						};
+					},
+				});
 
 			if (options.settings.showFavoritesGroup)
 			{
-				groupManager.addItemsToGroup("Favorites", sortedGames.filter((game) => game.isFavorite));
+				groupManager.addGroup("Favorites");
 			}
 
-			const playedSortedGames = sortedGames.filter((game) => game.lastPlayedDate != null);
+			const playedGames = games
+				.filter((game) => game.lastPlayedDate != null)
+				.toSorted((a, b) => b.lastPlayedDate!.getTime() - a.lastPlayedDate!.getTime());
 
-			for (const game of playedSortedGames)
+			for (const game of playedGames)
 			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
 				groupManager.addItemToGroup(DateTime.fromJSDate(game.lastPlayedDate!).year.toString(), game);
 			}
 
-			const unplayedSortedGames = sortedGames
+			const unplayedGames = games
 				.filter((game) => game.lastPlayedDate == null)
 				.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
 
-			groupManager.addItemsToGroup("Unplayed", unplayedSortedGames);
+			for (const game of unplayedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
 
-			break;
+				groupManager.addItemToGroup("Unplayed", game);
+			}
+
+			return groupManager;
 		}
 
 		case "name":
 		{
-			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: [],
+						};
+					},
+				});
 
 			if (options.settings.showFavoritesGroup)
 			{
-				groupManager.addItemsToGroup("Favorites", sortedGames.filter((game) => game.isFavorite));
+				groupManager.addGroup("Favorites");
 			}
+
+			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
 
 			for (const game of sortedGames)
 			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
 				const groupName = GroupManager.getNameGroupName(game.sortName);
 
 				groupManager.addItemToGroup(groupName, game);
 			}
 
-			break;
+			return groupManager;
 		}
 
 		case "playTime":
 		{
-			const sortedGames = games.toSorted((a, b) => b.playTimeTotalSeconds - a.playTimeTotalSeconds);
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.playTimeTotalSeconds > 0
+								? [ "Played ", shortEnglishHumanizer(game.playTimeTotalSeconds * 1000) ]
+								: null,
+						};
+					},
+				});
 
 			if (options.settings.showFavoritesGroup)
 			{
-				groupManager.addItemsToGroup("Favorites", sortedGames.filter((game) => game.isFavorite));
+				groupManager.addGroup("Favorites");
 			}
 
-			const playedSortedGames = sortedGames.filter((game) => game.playTimeTotalSeconds > 0);
+			const sortedGames = games.toSorted(
+				(a, b) =>
+				{
+					if (a.playTimeTotalSeconds > b.playTimeTotalSeconds)
+					{
+						return -1;
+					}
 
-			for (const playedGame of playedSortedGames)
+					if (a.playTimeTotalSeconds < b.playTimeTotalSeconds)
+					{
+						return 1;
+					}
+
+					return a.sortName.localeCompare(b.sortName);
+				});
+
+			for (const game of sortedGames)
 			{
-				const playTimeTotalHours = Math.floor(playedGame.playTimeTotalSeconds / 3600);
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				const playTimeTotalHours = game.playTimeTotalSeconds / 3600;
 
 				if (playTimeTotalHours >= 1000)
 				{
-					groupManager.addItemToGroup("Over 1000 hours", playedGame);
+					groupManager.addItemToGroup("Over 1000 hours", game);
 				}
 				else if (playTimeTotalHours >= 750)
 				{
-					groupManager.addItemToGroup("Over 750 hours", playedGame);
+					groupManager.addItemToGroup("Over 750 hours", game);
 				}
 				else if (playTimeTotalHours >= 500)
 				{
-					groupManager.addItemToGroup("Over 500 hours", playedGame);
+					groupManager.addItemToGroup("Over 500 hours", game);
 				}
 				else if (playTimeTotalHours >= 250)
 				{
-					groupManager.addItemToGroup("Over 250 hours", playedGame);
+					groupManager.addItemToGroup("Over 250 hours", game);
 				}
 				else if (playTimeTotalHours >= 100)
 				{
-					groupManager.addItemToGroup("Over 100 hours", playedGame);
+					groupManager.addItemToGroup("Over 100 hours", game);
 				}
 				else if (playTimeTotalHours >= 50)
 				{
-					groupManager.addItemToGroup("Over 50 hours", playedGame);
+					groupManager.addItemToGroup("Over 50 hours", game);
 				}
 				else if (playTimeTotalHours >= 10)
 				{
-					groupManager.addItemToGroup("Over 10 hours", playedGame);
+					groupManager.addItemToGroup("Over 10 hours", game);
 				}
 				else if (playTimeTotalHours >= 5)
 				{
-					groupManager.addItemToGroup("Over 5 hours", playedGame);
+					groupManager.addItemToGroup("Over 5 hours", game);
 				}
 				else if (playTimeTotalHours >= 4)
 				{
-					groupManager.addItemToGroup("Over 4 hours", playedGame);
+					groupManager.addItemToGroup("Over 4 hours", game);
 				}
 				else if (playTimeTotalHours >= 3)
 				{
-					groupManager.addItemToGroup("Over 3 hours", playedGame);
+					groupManager.addItemToGroup("Over 3 hours", game);
 				}
 				else if (playTimeTotalHours >= 2)
 				{
-					groupManager.addItemToGroup("Over 2 hours", playedGame);
+					groupManager.addItemToGroup("Over 2 hours", game);
 				}
 				else if (playTimeTotalHours >= 1)
 				{
-					groupManager.addItemToGroup("Over 1 hour", playedGame);
+					groupManager.addItemToGroup("Over 1 hour", game);
+				}
+				else if (playTimeTotalHours > 0)
+				{
+					groupManager.addItemToGroup("Under 1 hour", game);
 				}
 				else
 				{
-					groupManager.addItemToGroup("Under 1 hour", playedGame);
+					groupManager.addItemToGroup("Unplayed", game);
 				}
 			}
 
-			const unplayedSortedGames = sortedGames
-				.filter((game) => game.playTimeTotalSeconds == 0)
-				.sort((a, b) => a.sortName.localeCompare(b.sortName));
-	
-			groupManager.addItemsToGroup("No play time", unplayedSortedGames);
-
-			break;
+			return groupManager;
 		}
 
 		case "series":
 		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: [],
+						};
+					},
+				});
+
 			const seriesWithGamesBySeriesName: Map<string, 
 				{ 
 					series: Prisma.SeriesGetPayload<null>, 
@@ -357,11 +447,9 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 				groupManager.addItemsToGroup("-", gamesWithoutSeries);
 			}
 
-			break;
+			return groupManager;
 		}
 	}
-
-	return groupManager;
 }
 
 //

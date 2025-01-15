@@ -8,6 +8,17 @@ import { ListLayoutGroupItemOptions, ListLayoutGroupOptions } from "../component
 // Class
 //
 
+export type GroupManagerGroup<Model> =
+{
+	name: string;
+	models: Model[];
+};
+
+export type GroupManagerOptions<Model> =
+{
+	mapGroupModel: (model: Model, group: GroupManagerGroup<Model>) => ListLayoutGroupItemOptions;
+};
+
 export class GroupManager<Model>
 {
 	// TODO: maybe this should be... somewhere else, idk where
@@ -29,26 +40,32 @@ export class GroupManager<Model>
 		}
 	}
 
-	modelToGroupItem: (model: Model) => ListLayoutGroupItemOptions;
+	options: GroupManagerOptions<Model>;
 
-	groups: Map<string, ListLayoutGroupOptions> = new Map();
+	groupsByName: Map<string, GroupManagerGroup<Model>> = new Map();
 
-	constructor(modelToGroupItem: (data: Model) => ListLayoutGroupItemOptions)
+	constructor(options: GroupManagerOptions<Model>)
 	{
-		this.modelToGroupItem = modelToGroupItem;
+		this.options = options;
+	}
+
+	addGroup(groupName: string)
+	{
+		if (this.groupsByName.has(groupName))
+		{
+			return;
+		}
+
+		this.groupsByName.set(groupName, { name: groupName, models: [] });
 	}
 
 	addItemToGroup(groupName: string, model: Model)
 	{
-		const group = this.groups.get(groupName) ??
-		{
-			name: groupName,
-			items: [],
-		};
+		const group = this.groupsByName.get(groupName) ?? { name: groupName, models: [] };
 
-		group.items.push(this.modelToGroupItem(model));
+		group.models.push(model);
 
-		this.groups.set(groupName, group);
+		this.groupsByName.set(groupName, group);
 	}
 
 	addItemsToGroup(groupName: string, models: Model[])
@@ -59,8 +76,16 @@ export class GroupManager<Model>
 		}
 	}
 
-	getGroups()
+	getListLayoutGroups(): ListLayoutGroupOptions[]
 	{
-		return Array.from(this.groups.values());
+		return Array.from(this.groupsByName.values())
+			.map((group) =>
+			{
+				return {
+					name: group.name,
+					items: group.models.map((model) => this.options.mapGroupModel(model, group)),
+				};
+			})
+			.filter((group) => group.items.length > 0);
 	}
 }

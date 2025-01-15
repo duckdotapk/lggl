@@ -24,15 +24,17 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 	const platforms = await transactionClient.platform.findMany();
 
 	const groupManager = new GroupManager<typeof platforms[0]>(
-		(platform) =>
 		{
-			return {
-				selected: platform.id == options.selectedPlatform?.id,
-				href: "/platforms/view/" + platform.id,
-				iconName: platform.iconName,
-				name: platform.name,
-				info: "Last updated " + DateTime.fromJSDate(platform.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
-			};
+			mapGroupModel: (platform) =>
+			{
+				return {
+					selected: platform.id == options.selectedPlatform?.id,
+					href: "/platforms/view/" + platform.id,
+					iconName: platform.iconName,
+					name: platform.name,
+					info: "Last updated " + DateTime.fromJSDate(platform.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
+				};
+			},
 		});
 
 	switch (options.settings.platformGroupMode)

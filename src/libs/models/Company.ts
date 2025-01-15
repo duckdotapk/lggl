@@ -24,15 +24,17 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 	const companies = await transactionClient.company.findMany();
 
 	const groupManager = new GroupManager<typeof companies[0]>(
-		(company) =>
 		{
-			return {
-				selected: company.id == options.selectedCompany?.id,
-				href: "/companies/view/" + company.id,
-				iconName: "fa-solid fa-building",
-				name: company.name,
-				info: "Last updated " + DateTime.fromJSDate(company.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
-			};
+			mapGroupModel: (company) =>
+			{
+				return {
+					selected: company.id == options.selectedCompany?.id,
+					href: "/companies/view/" + company.id,
+					iconName: "fa-solid fa-building",
+					name: company.name,
+					info: "Last updated " + DateTime.fromJSDate(company.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
+				};
+			},
 		});
 
 	switch (options.settings.companyGroupMode)

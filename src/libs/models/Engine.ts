@@ -24,15 +24,17 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 	const engines = await transactionClient.engine.findMany();
 
 	const groupManager = new GroupManager<typeof engines[0]>(
-		(engine) =>
 		{
-			return {
-				selected: engine.id == options.selectedEngine?.id,
-				href: "/engines/view/" + engine.id,
-				iconName: "fa-solid fa-engine",
-				name: engine.name,
-				info: "Last updated " + DateTime.fromJSDate(engine.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
-			};
+			mapGroupModel: (engine) =>
+			{
+				return {
+					selected: engine.id == options.selectedEngine?.id,
+					href: "/engines/view/" + engine.id,
+					iconName: "fa-solid fa-engine",
+					name: engine.name,
+					info: "Last updated " + DateTime.fromJSDate(engine.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
+				};
+			},
 		});
 
 	switch (options.settings.engineGroupMode)

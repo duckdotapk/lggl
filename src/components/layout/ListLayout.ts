@@ -118,7 +118,7 @@ export function ListLayout(options: ListLayoutOptions)
 
 			new DE("aside", "list",
 				[
-					options.groupManager.getGroups().map((group) => Group(group)),
+					options.groupManager.getListLayoutGroups().map((group) => Group(group)),
 				]),
 
 			new DE("div", "buttons",
