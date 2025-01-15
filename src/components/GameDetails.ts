@@ -503,7 +503,7 @@ export function GameDetails(game: GameDetailsGame)
 
 			ActionToolbar(game),
 
-			new DE("div", "data", AutomaticColumnLayout("20rem",
+			new DE("div", "data", AutomaticColumnLayout("25rem",
 				[
 					buildGeneralSection(game),
 					buildDescriptionSection(game),
