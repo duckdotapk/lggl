@@ -421,51 +421,51 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 
 				if (playTimeTotalHours >= 1000)
 				{
-					groupManager.addItemToGroup("Over 1000 hours", game);
+					groupManager.addItemToGroup("1000+ hours", game);
 				}
 				else if (playTimeTotalHours >= 750)
 				{
-					groupManager.addItemToGroup("Over 750 hours", game);
+					groupManager.addItemToGroup("750 to 1000 hours", game);
 				}
 				else if (playTimeTotalHours >= 500)
 				{
-					groupManager.addItemToGroup("Over 500 hours", game);
+					groupManager.addItemToGroup("500 to 750 hours", game);
 				}
 				else if (playTimeTotalHours >= 250)
 				{
-					groupManager.addItemToGroup("Over 250 hours", game);
+					groupManager.addItemToGroup("250 to 500 hours", game);
 				}
 				else if (playTimeTotalHours >= 100)
 				{
-					groupManager.addItemToGroup("Over 100 hours", game);
+					groupManager.addItemToGroup("100 to 250 hours", game);
 				}
 				else if (playTimeTotalHours >= 50)
 				{
-					groupManager.addItemToGroup("Over 50 hours", game);
+					groupManager.addItemToGroup("50 to 100 hours", game);
 				}
 				else if (playTimeTotalHours >= 10)
 				{
-					groupManager.addItemToGroup("Over 10 hours", game);
+					groupManager.addItemToGroup("10 to 50 hours", game);
 				}
 				else if (playTimeTotalHours >= 5)
 				{
-					groupManager.addItemToGroup("Over 5 hours", game);
+					groupManager.addItemToGroup("5 to 10 hours", game);
 				}
 				else if (playTimeTotalHours >= 4)
 				{
-					groupManager.addItemToGroup("Over 4 hours", game);
+					groupManager.addItemToGroup("4 to 5 hours", game);
 				}
 				else if (playTimeTotalHours >= 3)
 				{
-					groupManager.addItemToGroup("Over 3 hours", game);
+					groupManager.addItemToGroup("3 to 4 hours", game);
 				}
 				else if (playTimeTotalHours >= 2)
 				{
-					groupManager.addItemToGroup("Over 2 hours", game);
+					groupManager.addItemToGroup("2 to 3 hours", game);
 				}
 				else if (playTimeTotalHours >= 1)
 				{
-					groupManager.addItemToGroup("Over 1 hour", game);
+					groupManager.addItemToGroup("1 to 2 hours", game);
 				}
 				else if (playTimeTotalHours > 0)
 				{
