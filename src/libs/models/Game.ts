@@ -130,7 +130,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			},
 		});
 
-	if (!options.settings.showVisibleGames)
+	if (!options.settings.showRegularGames)
 	{
 		games = games.filter((game) => game.isHidden || game.isNsfw);
 	}

@@ -35,7 +35,7 @@ export function GameSettingsToolbar(settings: SettingModelLib.Settings)
 
 			Checkbox("showFavoritesGroup", "Show favorites group", settings.showFavoritesGroup),
 
-			Checkbox("showVisibleGames", "Show visible games", settings.showVisibleGames),
+			Checkbox("showRegularGames", "Show regular games", settings.showRegularGames),
 
 			Checkbox("showHiddenGames", "Show hidden games", settings.showHiddenGames),
 

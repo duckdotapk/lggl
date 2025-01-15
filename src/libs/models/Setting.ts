@@ -14,7 +14,7 @@ export class Settings
 {
 	gameGroupMode: SettingSchemaLib.GameGroupMode = "lastPlayed";
 	showFavoritesGroup: SettingSchemaLib.ShowFavoritesGroup = true;
-	showVisibleGames: SettingSchemaLib.ShowVisibleGames = true;
+	showRegularGames: SettingSchemaLib.ShowRegularGames = true;
 	showHiddenGames: SettingSchemaLib.ShowHiddenGames = false;
 	showNsfwGames: SettingSchemaLib.ShowNsfwGames = false;
 
@@ -54,13 +54,13 @@ export class Settings
 					break;
 				}
 
-				case "showVisibleGames":
+				case "showRegularGames":
 				{
-					const valueParseResult = SettingSchemaLib.ShowVisibleGamesSchema.safeParse(setting.value);
+					const valueParseResult = SettingSchemaLib.ShowRegularGamesSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
-						this.showVisibleGames = valueParseResult.data;
+						this.showRegularGames = valueParseResult.data;
 					}
 
 					break;

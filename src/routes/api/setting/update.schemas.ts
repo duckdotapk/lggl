@@ -29,8 +29,8 @@ export const RequestBodySchema = z.object(
 
 				z.object(
 					{
-						name: z.literal("showVisibleGames"),
-						value: SettingSchemaLib.ShowVisibleGamesSchema,
+						name: z.literal("showRegularGames"),
+						value: SettingSchemaLib.ShowRegularGamesSchema,
 					}),
 
 				z.object(

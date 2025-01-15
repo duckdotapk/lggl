@@ -21,7 +21,7 @@ async function initialise(toolbar: HTMLFormElement)
 
 	const showFavoritesGroupCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showFavoritesGroup"]`);
 
-	const showVisibleGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showVisibleGames"]`);
+	const showRegularGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showRegularGames"]`);
 
 	const showHiddenGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showHiddenGames"]`);
 
@@ -68,15 +68,15 @@ async function initialise(toolbar: HTMLFormElement)
 	InputClientLib.initialiseForm(
 		{
 			form: toolbar,
-			submitter: showVisibleGamesCheckbox,
+			submitter: showRegularGamesCheckbox,
 			requireConfirmation: false,
 			onSubmit: async () => await updateSettings(
 				{
 					settingUpdates:
 					[
 						{
-							name: "showVisibleGames",
-							value: showVisibleGamesCheckbox.checked,
+							name: "showRegularGames",
+							value: showRegularGamesCheckbox.checked,
 						},
 					],
 				}),

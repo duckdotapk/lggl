@@ -17,15 +17,15 @@ const BooleanSchema = z.union(
 
 export const GameGroupModeSchema = z.enum([ "developer", "engine", "name", "lastPlayed", "playTime", "publisher", "series" ]);
 export const ShowFavoritesGroupSchema = BooleanSchema;
-export const ShowVisibleGamesSchema = BooleanSchema;
+export const ShowRegularGamesSchema = BooleanSchema;
 export const ShowHiddenGamesSchema = BooleanSchema;
 export const ShowNsfwGamesSchema = BooleanSchema;
 
-export const CompanyGroupModeSchema = z.enum([ "name" ]);
+export const CompanyGroupModeSchema = z.enum([ "name", "numberOfGamesDeveloped", "numberOfGamesPublished" ]);
 
-export const EngineGroupModeSchema = z.enum([ "name" ]);
+export const EngineGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
 
-export const PlatformGroupModeSchema = z.enum([ "name" ]);
+export const PlatformGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
 
 //
 // Types
@@ -33,7 +33,7 @@ export const PlatformGroupModeSchema = z.enum([ "name" ]);
 
 export type GameGroupMode = z.infer<typeof GameGroupModeSchema>;
 export type ShowFavoritesGroup = z.infer<typeof ShowFavoritesGroupSchema>;
-export type ShowVisibleGames = z.infer<typeof ShowVisibleGamesSchema>;
+export type ShowRegularGames = z.infer<typeof ShowRegularGamesSchema>;
 export type ShowHiddenGames = z.infer<typeof ShowHiddenGamesSchema>;
 export type ShowNsfwGames = z.infer<typeof ShowNsfwGamesSchema>;
 
