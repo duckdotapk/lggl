@@ -86,7 +86,7 @@ export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFi
 	// Check Game
 	//
 
-	// General data
+	// General
 	if (game.releaseDate == null && !game.isUnreleased)
 	{
 		problemList.addProblem("releaseDate is null but game is not marked as unreleased", false, false);
@@ -106,7 +106,7 @@ export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFi
 		problemList.addProblem("progressionType is null", false, false);
 	}
 
-	// Image flags
+	// Images
 	const imagePaths = GameModelLib.getImagePaths(game);
 
 	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner))
@@ -175,30 +175,40 @@ export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFi
 		}
 	}
 
-	if (game.hasLogoImage && !fs.existsSync(imagePaths.logo))
+	if (game.hasLogoImage)
 	{
-		const problem = problemList.addProblem("hasLogoImage is true but logo image does not exist on disk", false, true);
-
-		if (autoFixProblems)
+		if (!fs.existsSync(imagePaths.logo))
 		{
-			await prismaClient.game.update(
-				{
-					where:
-					{
-						id: game.id,
-					},
-					data:
-					{
-						hasLogoImage: false,
-					},
-				});
+			const problem = problemList.addProblem("hasLogoImage is true but logo image does not exist on disk", false, true);
 
-			problem.wasAutomaticallyFixed = true;
+			if (autoFixProblems)
+			{
+				await prismaClient.game.update(
+					{
+						where:
+						{
+							id: game.id,
+						},
+						data:
+						{
+							hasLogoImage: false,
+						},
+					});
+
+				problem.wasAutomaticallyFixed = true;
+			}
+		}
+
+		if (game.logoImageAlignment == null)
+		{
+			problemList.addProblem("hasLogoImage is true but logoImageAlignment is null", false, false);
+		}
+
+		if (game.logoImageJustification == null)
+		{
+			problemList.addProblem("hasLogoImage is true but logoImageJustification is null", false, false);
 		}
 	}
-
-	// Other flags
-	// TODO
 
 	// Play data
 	if (game.completionStatus == null && game.progressionType != "NONE")
@@ -233,7 +243,12 @@ export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFi
 		}
 	}
 
-	// Supported features
+	if (game.playCount == 0 && game.playTimeTotalSeconds > 0)
+	{
+		problemList.addProblem("playCount is 0 but playTimeTotalSeconds is greater than 0", false, false);
+	}
+
+	// Features
 	if (game.achievementSupport == null)
 	{
 		problemList.addProblem("achievementSupport is null", false, false);
@@ -256,7 +271,7 @@ export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFi
 		problemList.addProblem("virtualRealitySupport is null", false, false);
 	}
 
-	// Steam data
+	// Steam app
 	if (game.steamAppId != null && game.steamAppName == null)
 	{
 		problemList.addProblem("steamAppId is set but steamAppName is null", false, false);
