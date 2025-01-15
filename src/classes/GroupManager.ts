@@ -12,10 +12,12 @@ export type GroupManagerGroup<Model> =
 {
 	name: string;
 	models: Model[];
+	sortOrder: number;
 };
 
 export type GroupManagerOptions<Model> =
 {
+	sortGroups?: (a: GroupManagerGroup<Model>, b: GroupManagerGroup<Model>) => number;
 	mapGroupModel: (model: Model, group: GroupManagerGroup<Model>) => ListLayoutGroupItemOptions;
 };
 
@@ -40,28 +42,32 @@ export class GroupManager<Model>
 		}
 	}
 
-	options: GroupManagerOptions<Model>;
+	options: Required<GroupManagerOptions<Model>>;
 
 	groupsByName: Map<string, GroupManagerGroup<Model>> = new Map();
 
 	constructor(options: GroupManagerOptions<Model>)
 	{
-		this.options = options;
+		this.options =
+		{
+			sortGroups: options.sortGroups ?? ((a, b) => a.sortOrder - b.sortOrder),
+			mapGroupModel: options.mapGroupModel,
+		};
 	}
 
-	addGroup(groupName: string)
+	addGroup(groupName: string, sortOrder = 0)
 	{
 		if (this.groupsByName.has(groupName))
 		{
 			return;
 		}
 
-		this.groupsByName.set(groupName, { name: groupName, models: [] });
+		this.groupsByName.set(groupName, { name: groupName, models: [], sortOrder });
 	}
 
 	addItemToGroup(groupName: string, model: Model)
 	{
-		const group = this.groupsByName.get(groupName) ?? { name: groupName, models: [] };
+		const group = this.groupsByName.get(groupName) ?? { name: groupName, models: [], sortOrder: 0 };
 
 		group.models.push(model);
 
@@ -79,6 +85,7 @@ export class GroupManager<Model>
 	getListLayoutGroups(): ListLayoutGroupOptions[]
 	{
 		return Array.from(this.groupsByName.values())
+			.sort(this.options.sortGroups)
 			.map((group) =>
 			{
 				return {

@@ -131,6 +131,21 @@ export class Settings
 }
 
 //
+// Constants
+//
+
+const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
+{
+	developer: "Developer",
+	engine: "Engine",
+	lastPlayed: "Last played",
+	name: "Name",
+	playTime: "Play time",
+	publisher: "Publisher",
+	series: "Series",
+};
+
+//
 // Create/Find/Update/Delete Functions
 //
 
@@ -139,4 +154,9 @@ export async function getSettings(transactionClient: Prisma.TransactionClient)
 	const settings = await transactionClient.setting.findMany();
 
 	return new Settings(settings);
+}
+
+export function getGameGroupModeName(gameGroupMode: SettingSchemaLib.GameGroupMode)
+{
+	return gameGroupModeNames[gameGroupMode];
 }

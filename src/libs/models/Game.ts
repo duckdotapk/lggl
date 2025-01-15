@@ -13,13 +13,14 @@ import { HumanDateTime } from "../../components/basic/HumanDateTime.js";
 
 import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
+import { shortEnglishHumanizer } from "../../instances/humanizer.js";
 import { staticMiddleware } from "../../instances/server.js";
 
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
 import * as GameSchemaLib from "../schemas/Game.js";
-import { shortEnglishHumanizer } from "../../instances/humanizer.js";
+import * as GameCompanySchemaLib from "../schemas/GameCompany.js";
 
 //
 // Constants
@@ -105,6 +106,20 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 		{
 			include:
 			{
+				gameCompanies:
+				{
+					include:
+					{
+						company: true,
+					},
+				},
+				gameEngines:
+				{
+					include:
+					{
+						engine: true,
+					},
+				},
 				seriesGames:
 				{
 					include:
@@ -132,6 +147,130 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 
 	switch (options.settings.gameGroupMode)
 	{
+		case "developer":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					sortGroups: (a, b) =>
+					{
+						if (b.sortOrder != a.sortOrder)
+						{
+							return b.sortOrder - a.sortOrder;
+						}
+
+						return a.name.localeCompare(b.name);
+					},
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: null,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites", 1);
+			}
+
+			groupManager.addGroup("-", -1);
+
+			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of sortedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type);				
+
+				if (gameDevelopers.length > 0)
+				{
+					for (const gameDeveloper of gameDevelopers)
+					{
+						groupManager.addItemToGroup(gameDeveloper.company.name, game);
+					}
+				}
+				else
+				{
+					groupManager.addItemToGroup("-", game);
+				}
+			}
+
+			return groupManager;
+		}
+
+		case "engine":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					sortGroups: (a, b) =>
+					{
+						if (b.sortOrder != a.sortOrder)
+						{
+							return b.sortOrder - a.sortOrder;
+						}
+
+						return a.name.localeCompare(b.name);
+					},
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: null,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites", 1);
+			}
+
+			groupManager.addGroup("-", -1);
+
+			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of sortedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				if (game.gameEngines.length > 0)
+				{
+					for (const gameEngine of game.gameEngines)
+					{
+						groupManager.addItemToGroup(gameEngine.engine.name, game);
+					}
+				}
+				else
+				{
+					groupManager.addItemToGroup("-", game);
+				}
+			}
+
+			return groupManager;
+		}
+
 		case "lastPlayed":
 		{
 			const groupManager = new GroupManager<typeof games[0]>(
@@ -147,7 +286,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 							name: game.name,
 							info: game.lastPlayedDate != null
 								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
-								: [],
+								: null,
 						};
 					},
 				});
@@ -203,7 +342,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 							name: game.name,
 							info: game.lastPlayedDate != null
 								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
-								: [],
+								: null,
 						};
 					},
 				});
@@ -341,6 +480,69 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			return groupManager;
 		}
 
+		case "publisher":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					sortGroups: (a, b) =>
+					{
+						if (b.sortOrder != a.sortOrder)
+						{
+							return b.sortOrder - a.sortOrder;
+						}
+
+						return a.name.localeCompare(b.name);
+					},
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: null,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites", 1);
+			}
+
+			groupManager.addGroup("-", -1);
+
+			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of sortedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);				
+
+				if (gamePublishers.length > 0)
+				{
+					for (const gamePublisher of gamePublishers)
+					{
+						groupManager.addItemToGroup(gamePublisher.company.name, game);
+					}
+				}
+				else
+				{
+					groupManager.addItemToGroup("-", game);
+				}
+			}
+
+			return groupManager;
+		}
+
 		case "series":
 		{
 			const groupManager = new GroupManager<typeof games[0]>(
@@ -356,7 +558,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 							name: game.name,
 							info: game.lastPlayedDate != null
 								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
-								: [],
+								: null,
 						};
 					},
 				});

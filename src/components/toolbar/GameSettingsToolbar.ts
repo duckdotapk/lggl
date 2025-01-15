@@ -26,13 +26,11 @@ export function GameSettingsToolbar(settings: SettingModelLib.Settings)
 					value: settings.gameGroupMode,
 					required: true,
 					showEmptyOption: false,
-					options:
-					[
-						{ value: "name" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Name" },
-						{ value: "lastPlayed" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Last played" },
-						{ value: "series" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Series" },
-						{ value: "playTime" satisfies SettingSchemaLib.GameGroupMode, label: "Group by Play time" },
-					],
+					options: SettingSchemaLib.GameGroupModeSchema.options.map(gameGroupMode => 
+						({ 
+							value: gameGroupMode, 
+							label: "Group by " + SettingModelLib.getGameGroupModeName(gameGroupMode),
+						})),
 				}),
 
 			Checkbox("showFavoritesGroup", "Show favorites group", settings.showFavoritesGroup),
