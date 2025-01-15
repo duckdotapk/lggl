@@ -96,7 +96,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 									[
 										Header(2, "Play session #" + gamePlaySession.id),
 
-										ColumnLayout(3,
+										ColumnLayout(4,
 											[
 												new DE("div", null,
 													[
@@ -129,6 +129,14 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 														Paragraph(shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000)),
 													]),
 											]),
+
+										gamePlaySession.notes != null
+											? [
+												Label(null, "Notes"),
+
+												gamePlaySession.notes.split("\n").map((line) => Paragraph(line)),
+											]
+											: null,
 									]);
 							}),
 					]),
