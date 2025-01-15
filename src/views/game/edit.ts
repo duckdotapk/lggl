@@ -2,10 +2,6 @@
 // Imports
 //
 
-import { Prisma } from "@prisma/client";
-
-import { GroupManager } from "../../classes/GroupManager.js";
-
 import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
@@ -28,6 +24,7 @@ import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolba
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
+import * as GameModelLib from "../../libs/models/Game.js";
 import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
@@ -37,7 +34,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: GroupManager<Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>>;
+	groupManager: Awaited<ReturnType<typeof GameModelLib.findGroups>>;
 	companies: UpsertGameCompanyFormOptions["companies"];
 	engines: UpsertGameEngineFormOptions["engines"];
 	game: NonNullable<UpsertGameFormGame>;
