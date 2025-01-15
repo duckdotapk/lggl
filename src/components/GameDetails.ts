@@ -14,7 +14,7 @@ import { Paragraph } from "./basic/Paragraph.js";
 
 import { Button } from "./input/Button.js";
 
-import { ColumnLayout } from "./layout/ColumnLayout.js";
+import { AutomaticColumnLayout } from "./layout/AutomaticColumnLayout.js";
 
 import { DataList } from "./DataList.js";
 
@@ -503,7 +503,7 @@ export function GameDetails(game: GameDetailsGame)
 
 			ActionToolbar(game),
 
-			new DE("div", "data", ColumnLayout(3,
+			new DE("div", "data", AutomaticColumnLayout("20rem",
 				[
 					buildGeneralSection(game),
 					buildDescriptionSection(game),
