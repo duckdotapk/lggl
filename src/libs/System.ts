@@ -44,24 +44,29 @@ export async function startProcess(path: string, additionalArguments: string[])
 export async function getRunningProcesses()
 {
 	let command: string;
+	let execOptions: child_process.ExecOptions;
 
 	switch (process.platform)
 	{
 		case "win32":
 			command = "wmic process get ExecutablePath";
+			execOptions =
+			{
+				windowsHide: true,
+			};
 
 			break;
 
 		// TODO: make this work on macOS
 		// TODO: make this work on Linux
 		default:
-			throw new Error("Unsupported platform: " + process.platform);
+			throw new Error("Unsupported platform: " + process.platform); 
 	}
 
 	return new Promise<string[]>( 
 		(resolve, reject) => 
 		{
-			child_process.exec(command, 
+			child_process.exec(command, execOptions,
 				(error, stdout) => 
 				{
 					if (error) 
