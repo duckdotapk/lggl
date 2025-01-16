@@ -2,6 +2,8 @@
 // Imports
 //
 
+import { DateTime } from "luxon";
+
 import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
@@ -15,12 +17,15 @@ import { UpsertGameInstallationForm, UpsertGameInstallationFormOptions } from ".
 import { UpsertGamePlatformForm, UpsertGamePlatformFormOptions } from "../../components/form/UpsertGamePlatformForm.js";
 import { UpsertGamePlayActionForm, UpsertGamePlayActionFormOptions } from "../../components/form/UpsertGamePlayActionForm.js";
 
+import { HumanDateTime } from "../../components/basic/HumanDateTime.js";
+
 import { TabControl } from "../../components/input/TabControl.js";
 
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolbar.js";
 
+import { DataList } from "../../components/DataList.js";
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
@@ -78,6 +83,25 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 							]),
 
 						Header(1, "Edit Game"),
+
+						DataList(
+							[
+								{
+									iconName: "fa-solid fa-fingerprint",
+									name: "ID",
+									value: options.game.id,
+								},
+								{
+									iconName: "fa-solid fa-calendar",
+									name: "Created",
+									value: HumanDateTime(DateTime.fromJSDate(options.game.createdDate)),
+								},
+								{
+									iconName: "fa-solid fa-calendar",
+									name: "Last updated",
+									value: HumanDateTime(DateTime.fromJSDate(options.game.lastUpdatedDate)),
+								}
+							]),
 		
 						UpsertGameForm(options.game),
 		
