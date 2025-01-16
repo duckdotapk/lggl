@@ -49,7 +49,7 @@ function Separator()
 // Component
 //
 
-export type SidebarPage = "games" | "companies" | "engines" | "platforms" | "audit" | null;
+export type SidebarPage = "games" | "companies" | "engines" | "platforms" | "audit" | "stats" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -105,6 +105,15 @@ export function Sidebar(currentPage: SidebarPage)
 					currentPage,
 					href: "/audit",
 					iconName: "fa-solid fa-clipboard-list",
+					text: "Audit",
+				}),
+
+			Item(
+				{
+					page: "stats",
+					currentPage,
+					href: "/stats",
+					iconName: "fa-solid fa-stars",
 					text: "Audit",
 				}),
 
