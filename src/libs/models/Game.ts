@@ -147,6 +147,105 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 
 	switch (options.settings.gameGroupMode)
 	{
+		case "completionStatus":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info: game.lastPlayedDate != null
+								? ([ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ])
+								: null,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites");
+			}
+
+			groupManager.addGroup("100%");
+
+			groupManager.addGroup("Complete");
+
+			groupManager.addGroup("In Progress");
+
+			groupManager.addGroup("To Do");
+
+			groupManager.addGroup("Shelved");
+
+			groupManager.addGroup("-");
+			
+			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of sortedGames)
+			{
+				if (game.completionStatus == null)
+				{
+					groupManager.addItemToGroup("-", game);
+
+					continue;
+				}
+
+				if (game.isShelved)
+				{
+					groupManager.addItemToGroup("Shelved", game);
+
+					continue;
+				}
+
+				const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(game.completionStatus);
+
+				if (!completionStatusParseResult.success)
+				{
+					groupManager.addItemToGroup("-", game);
+
+					continue;
+				}
+
+				switch (completionStatusParseResult.data)
+				{
+					case "ONE_HUNDRED_PERCENT":
+					{
+						groupManager.addItemToGroup("100%", game);
+
+						break;
+					}
+
+					case "COMPLETE":
+					{
+						groupManager.addItemToGroup("Complete", game);
+
+						break;
+					}
+
+					case "IN_PROGRESS":
+					{
+						groupManager.addItemToGroup("In Progress", game);
+
+						break;
+					}
+
+					case "TODO":
+					{
+						groupManager.addItemToGroup("To Do", game);
+
+						break;
+					}
+				}
+			}
+
+			return groupManager;
+		}
+
 		case "developer":
 		{
 			const groupManager = new GroupManager<typeof games[0]>(
