@@ -37,11 +37,11 @@ export const RequestBodySchema = z.object(
 		isUnreleased: z.boolean(),
 
 		completionStatus: GameSchemaLib.CompletionStatusSchema.nullable(),
-		firstPlayedDate: z.string().datetime().nullable(),
+		firstPlayedDate: z.string().nullable(),
 		firstPlayedDateApproximated: z.boolean(),
-		firstCompletedDate: z.string().datetime().nullable(),
+		firstCompletedDate: z.string().nullable(),
 		firstCompletedDateApproximated: z.boolean(),
-		lastPlayedDate: z.string().datetime().nullable(),
+		lastPlayedDate: z.string().nullable(),
 		playCount: z.number(),
 		playTimeTotalSeconds: z.number(),
 
