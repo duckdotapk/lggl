@@ -1,0 +1,62 @@
+//
+// Imports
+//
+
+@use "./_Globals.scss";
+
+//
+// Component
+//
+
+@mixin GameHeader()
+{
+	.component-game-header
+	{
+		display: grid;
+		grid-template-areas: "stack";
+		
+		border-bottom: 1px solid Globals.$borderColor;
+
+		height: 20rem;
+
+		position: relative;
+
+		overflow: hidden;
+
+		> .image
+		{
+			grid-area: stack;
+
+			width: 100%;
+			height: 100%;
+
+			object-fit: cover;
+
+			align-self: center;
+		}
+
+		> .logo
+		{
+			grid-area: stack;
+
+			align-self: var(--game-header-logo-alignment);
+			justify-self: var(--game-header-logo-justification);
+
+			padding: 2rem;
+
+			max-width: 30rem;
+			max-height: 100%;
+		}
+
+		> .name
+		{
+			grid-area: stack;
+
+			align-self: end;
+
+			padding: 0.75rem;
+
+			font-size: 3rem;
+		}
+	}
+}

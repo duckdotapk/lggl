@@ -19,7 +19,6 @@ import { AutomaticColumnLayout } from "./layout/AutomaticColumnLayout.js";
 import { DataList } from "./DataList.js";
 
 import { shortEnglishHumanizer } from "../instances/humanizer.js";
-import { staticMiddleware } from "../instances/server.js";
 
 import * as GameModelLib from "../libs/models/Game.js";
 
@@ -29,44 +28,6 @@ import * as GameCompanySchemaLib from "../libs/schemas/GameCompany.js";
 //
 // Locals
 //
-
-function Banner(game: GameDetailsGame)
-{
-	const imageUrls = GameModelLib.getImageUrls(game);
-
-	let logoImageStyleComponents =
-	[
-		"--logo-image-alignment: " + (game.logoImageAlignment ?? "end"),
-		"--logo-image-justification: " + (game.logoImageJustification ?? "start"),
-	];
-
-	return new DE("header",
-		{
-			class: "component-game-details-banner",
-		},
-		[
-			game.hasBannerImage
-				? new DE("img",
-					{
-						class: "image",
-			
-						src: staticMiddleware.getCacheBustedPath(imageUrls.banner),
-						alt: game.name + " banner",
-					})
-				: null,
-
-			game.hasLogoImage
-				? new DE("img",
-					{
-						class: "logo",
-						style: logoImageStyleComponents.join("; "),
-
-						src: staticMiddleware.getCacheBustedPath(imageUrls.logo),
-						alt: game.name + " logo",
-					})
-				: new DE("div", "name", game.name),
-		]);
-}
 
 function ActionToolbar(game: GameDetailsGame)
 {
@@ -510,7 +471,6 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 
 export function GameDetails(game: GameDetailsGame)
 {
-
 	return new DE("div", 
 		{
 			class: "component-game-details",
@@ -518,8 +478,6 @@ export function GameDetails(game: GameDetailsGame)
 			"data-game-id": game.id,
 		},
 		[
-			Banner(game),
-
 			ActionToolbar(game),
 
 			new DE("div", "data", AutomaticColumnLayout("25rem",

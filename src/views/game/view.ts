@@ -7,6 +7,7 @@ import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolba
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { GameDetails, GameDetailsGame } from "../../components/GameDetails.js";
+import { GameHeader } from "../../components/GameHeader.js";
 import { SiteOptions } from "../../components/Site.js";
 
 import * as GameModelLib from "../../libs/models/Game.js";
@@ -33,7 +34,12 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				toolbar: GameSettingsToolbar(options.settings),
 				groupManager: options.groupManager,
 				createHref: "/games/create",
-				content: GameDetails(options.game),
+				content:
+				[
+					GameHeader(options.game),
+
+					GameDetails(options.game),
+				],
 			}),
 	};
 }

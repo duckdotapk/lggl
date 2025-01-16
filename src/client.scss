@@ -29,6 +29,7 @@
 
 @use "components/DataList.scss";
 @use "components/GameDetails.scss";
+@use "components/GameHeader.scss";
 @use "components/Sidebar.scss";
 @use "components/Site.scss";
 @use "components/Wrapper.scss";
@@ -62,6 +63,7 @@
 
 @include DataList.DataList();
 @include GameDetails.GameDetails();
+@include GameHeader.GameHeader();
 @include Sidebar.Sidebar();
 @include Site.Site();
 @include Wrapper.Wrapper();
