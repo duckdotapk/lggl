@@ -6,6 +6,8 @@ import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolba
 
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
+import { GameActionToolbar } from "../../components/toolbar/GameActionToolbar.js";
+
 import { GameDetails, GameDetailsGame } from "../../components/GameDetails.js";
 import { GameHeader } from "../../components/GameHeader.js";
 import { SiteOptions } from "../../components/Site.js";
@@ -37,7 +39,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 				content:
 				[
 					GameHeader(options.game),
-
+					GameActionToolbar(options.game),
 					GameDetails(options.game),
 				],
 			}),

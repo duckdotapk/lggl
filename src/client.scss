@@ -25,6 +25,7 @@
 @use "components/layout/ColumnLayout.scss";
 @use "components/layout/ListLayout.scss";
 
+@use "components/toolbar/GameActionToolbar.scss";
 @use "components/toolbar/Toolbar.scss";
 
 @use "components/DataList.scss";
@@ -59,6 +60,7 @@
 @include ColumnLayout.ColumnLayout();
 @include ListLayout.ListLayout();
 
+@include GameActionToolbar.GameActionToolbar();
 @include Toolbar.Toolbar();
 
 @include DataList.DataList();

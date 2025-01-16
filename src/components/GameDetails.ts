@@ -2,372 +2,70 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { DE } from "@donutteam/document-builder";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { Anchor } from "./basic/Anchor.js";
+import { Block } from "./basic/Block.js";
 import { Header } from "./basic/Header.js";
 import { HumanDateTime } from "./basic/HumanDateTime.js";
-import { Muted } from "./basic/Muted.js";
 import { Paragraph } from "./basic/Paragraph.js";
-
-import { Button } from "./input/Button.js";
-
-import { AutomaticColumnLayout } from "./layout/AutomaticColumnLayout.js";
 
 import { DataList } from "./DataList.js";
 
-import { shortEnglishHumanizer } from "../instances/humanizer.js";
-
 import * as GameModelLib from "../libs/models/Game.js";
 
-import * as GameSchemaLib from "../libs/schemas/Game.js";
 import * as GameCompanySchemaLib from "../libs/schemas/GameCompany.js";
 
 //
 // Locals
 //
 
-function ActionToolbar(game: GameDetailsGame)
+function MissingData()
 {
-	return new DE("div", "component-game-details-action-bar",
-		[
-			new DE("div", "buttons",
-				[
-					!game.isInstalled
-						? Button(
-							{
-								style: "secondary",
-								type: "button",
-								extraAttributes:
-								{
-									disabled: true,
-								},
-								iconName: "fa-solid fa-ban",
-								text: "Not installed",
-							})
-						: Button(
-							{
-								style: "success",
-								type: "button",
-								extraAttributes:
-								{
-									"data-open-choose-game-play-action-dialog": "true",
-									"data-game-id": game.id,
-								},
-								iconName: "fa-solid fa-play",
-								text: "Play",
-							}),
-				]),
-
-			new DE("div", "data-list", DataList(
-				[
-					game.lastPlayedDate != null
-						? {
-							iconName: "fa-solid fa-calendar",
-							name: "Last played",
-							value: game.lastPlayedDate != null
-								? HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED)
-								: "Never",
-						}
-						: null,
-
-					game.playTimeTotalSeconds > 0
-						? {
-							iconName: "fa-solid fa-timer",
-							name: "Play time",
-							value: shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
-						}
-						: null,
-
-					game.progressionType != "NONE" satisfies GameSchemaLib.ProgressionType && game.completionStatus != null
-						? {
-							iconName: GameModelLib.getCompletionStatusIconName(game),
-							name: "Completion status",
-							value: GameModelLib.getCompletionStatusName(game),
-						}
-						: null,
-				])),
-
-			new DE("div", "buttons",
-				[
-					Button(
-						{
-							style: "secondary",
-							href: "/games/edit/" + game.id,
-							extraAttributes:
-							{
-								"data-pjax-selector": "main",
-							},
-							iconName: "fa-solid fa-pen-to-square",
-							text: "Edit",
-						}),
-
-					Button(
-						{
-							style: "secondary",
-							href: "/gamePlaySessions/list/" + game.id,
-							extraAttributes:
-							{
-								"data-pjax-selector": "main",
-							},
-							iconName: "fa-solid fa-list",
-							text: "Play sessions",
-						}),
-
-					Button(
-						{
-							style: "warning",
-							type: "button",
-							extraAttributes:
-							{
-								"data-open-game-notes-dialog": "true",
-								"data-game-id": game.id,
-							},
-							iconName: "fa-solid fa-sticky-note",
-							text: "Notes",
-						}),
-				]),
-		]);
+	return new DE("div", "component-game-details-missing-data", "null");
 }
 
-function Section(headerLevel: 1 | 2 | 3 | 4 | 5 | 6, headerText: string, children: Child)
-{
-	return new DE("section", "component-game-details-section",
-		[
-			Header(headerLevel, headerText),
+//
+// Component
+//
 
-			children,
-		]);
-}
-
-type DataTableRow =
-{
-	label: Child;
-	value: Child;
-};
-
-function DataTable(rows: (DataTableRow | null)[])
-{
-	return new DE("table", "component-game-details-data-table",
-		[
-			rows
-				.filter((row) => row != null)	
-				.map((row) => new DE("tr", null,
-				[
-					new DE("td", "label", row.label),
-
-					new DE("td", "value", row.value ?? new DE("div", "null", "null")),
-				])),
-		]);
-}
-
-function buildDescriptionSection(game: GameDetailsGame)
-{
-	if (game.description == null)
+export type GameDetailsGame = Prisma.GameGetPayload<
 	{
-		return null;
-	}
-
-	// TODO: render description as markdown
-	return Section(3, "Description", game.description.split("\n").map((line) => Paragraph(line)));
-}
-
-function buildFeaturesSection(game: GameDetailsGame)
-{
-	return Section(3, "Features", DataTable(
-		[
-			{
-				label: "Progression type",
-				value: game.progressionType != null
-					? GameModelLib.getProgressionTypeName(game)
-					: null,
-			},
-			{
-				label: "Achievement support",
-				value: game.achievementSupport != null
-					? GameModelLib.getAchievementSupportName(game)
-					: null,
-			},
-			{
-				label: "Controller support",
-				value: game.controllerSupport != null
-					? GameModelLib.getControllerSupportName(game)
-					: null,
-			},
-			{
-				label: "Mod support",
-				value: game.modSupport != null
-					? GameModelLib.getModSupportName(game)
-					: null,
-			},
-			{
-				label: "VR support",
-				value: game.virtualRealitySupport != null
-					? GameModelLib.getVirtualRealitySupportName(game)
-					: null,
-			},
-		]));
-}
-
-function buildGeneralSection(game: GameDetailsGame)
-{
-	const dataTableRows: DataTableRow[] = [];
-
-	dataTableRows.push(
+		include:
 		{
-			label: "Name",
-			value: game.name,
-		});
+			gameCompanies:
+			{
+				include:
+				{
+					company: true;
+				};
+			};
+			gameEngines:
+			{
+				include:
+				{
+					engine: true;
+				};
+			};
+			gameLinks: true;
+			gamePlatforms:
+			{
+				include:
+				{
+					platform: true;
+				};
+			};
+		};
+	}>;
 
-	if (game.isUnreleased)
-	{
-		dataTableRows.push(
-			{
-				label: "Release date",
-				value: "Unreleased",
-			});
-	}
-	else if (game.releaseDate != null)
-	{
-		dataTableRows.push(
-			{
-				label: "Release date",
-				value: HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED),
-			});
-	}
-	else
-	{
-		dataTableRows.push(
-			{
-				label: "Release date",
-				value: null,
-			});
-	}
-
+export function GameDetails(game: GameDetailsGame)
+{
 	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type);
-
-	if (gameDevelopers.length > 0)
-	{
-		dataTableRows.push(
-			{
-				label: gameDevelopers.length > 1 ? "Developers" : "Developer",
-				value: gameDevelopers.map((gameDeveloper) => Paragraph(
-					[
-						gameDeveloper.company.name,
-						gameDeveloper.notes != null ? [ " ", Muted("(" + gameDeveloper.notes + ")") ] : null,
-					])),
-			});
-	}
-	else
-	{
-		dataTableRows.push(
-			{
-				label: "Developer",
-				value: null,
-			});
-	}
 
 	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);
 
-	if (gamePublishers.length > 0)
-	{
-		dataTableRows.push(
-			{
-				label: gamePublishers.length > 1 ? "Publishers" : "Publisher",
-				value: gamePublishers.map((gamePublisher) => Paragraph(
-					[
-						gamePublisher.company.name,
-						gamePublisher.notes != null ? [ " ", Muted("(" + gamePublisher.notes + ")") ] : null,
-					])),
-			});
-	}
-	else
-	{
-		dataTableRows.push(
-			{
-				label: "Publisher",
-				value: null,
-			});
-	}
-
-	if (game.gamePlatforms.length > 0)
-	{
-		dataTableRows.push(
-			{
-				label: game.gamePlatforms.length > 1 ? "Platforms" : "Platform",
-				value: game.gamePlatforms.map((gamePlatform) => Paragraph(
-					[
-						new DE("span", gamePlatform.platform.iconName + " fa-fw"),
-						" ",
-						gamePlatform.platform.name,
-					])),
-			});
-	}
-	else
-	{
-		dataTableRows.push(
-			{
-				label: "Platform",
-				value: null,
-			});
-	}
-
-	if (game.isUnknownEngine)
-	{
-		dataTableRows.push(
-			{
-				label: "Engine",
-				value: "Unknown",
-			});
-	}
-	else if (game.gameEngines.length > 0)
-	{
-		dataTableRows.push(
-			{
-				label: game.gameEngines.length > 1 ? "Engines" : "Engine",
-				value: game.gameEngines.map((gameEngine) => Paragraph(
-					[
-						gameEngine.engine.shortName ?? gameEngine.engine.name,
-						gameEngine.version != null ? [ " ", gameEngine.version ] : null,
-						gameEngine.notes != null ? [ " ", Muted("(" + gameEngine.notes + ")") ] : null,
-					])),
-			});
-	}
-	else
-	{
-		dataTableRows.push(
-			{
-				label: "Engine",
-				value: null,
-			});
-	}
-
-	return Section(3, "General", DataTable(dataTableRows));
-}
-
-function buildLibrarySection(game: GameDetailsGame)
-{
-	return Section(3, "Library", DataTable(
-		[
-			{
-				label: "ID",
-				value: game.id,
-			},
-			{
-				label: "Created",
-				value: HumanDateTime(DateTime.fromJSDate(game.createdDate), DateTime.DATE_MED),
-			},
-			{
-				label: "Last updated",
-				value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate), DateTime.DATE_MED),
-			},
-		]));
-}
-
-function buildLinksSection(game: GameDetailsGame)
-{
 	const links: { title: string; url: string }[] = [];
 
 	if (game.steamAppId != null)
@@ -408,86 +106,257 @@ function buildLinksSection(game: GameDetailsGame)
 			});
 	}
 
-	if (links.length == 0)
-	{
-		return null;
-	}
-
-	return Section(3, "Links", links.map((link) => Paragraph(Anchor(link.title, link.url, "_blank"))));
-}
-
-function buildSteamAppSection(game: GameDetailsGame)
-{
-	if (game.steamAppId == null)
-	{
-		return null;
-	}
-
-	return Section(3, "Steam app", DataTable(
+	return new DE("div", "component-game-details", new DE("div", "wrapper",
 		[
-			{
-				label: "Steam app ID",
-				value: game.steamAppId,
-			},
-			{
-				label: "Steam app name",
-				value: game.steamAppName,
-			}
-		]));
-}
+			// Notes
+			game.notes != null
+				? Block(
+					[
+						Header(3,
+							[
+								new DE("span", "fa-solid fa-sticky-note"),
+								" Notes",
+							]),
 
-//
-// Component
-//
+						game.notes.split("\n").map((line) => Paragraph(line)),
+					])
+				: null,
 
-export type GameDetailsGame = Prisma.GameGetPayload<
-	{
-		include:
-		{
-			gameCompanies:
-			{
-				include:
-				{
-					company: true;
-				};
-			};
-			gameEngines:
-			{
-				include:
-				{
-					engine: true;
-				};
-			};
-			gameLinks: true;
-			gamePlatforms:
-			{
-				include:
-				{
-					platform: true;
-				};
-			};
-		};
-	}>;
-
-export function GameDetails(game: GameDetailsGame)
-{
-	return new DE("div", 
-		{
-			class: "component-game-details",
-			
-			"data-game-id": game.id,
-		},
-		[
-			ActionToolbar(game),
-
-			new DE("div", "data", AutomaticColumnLayout("25rem",
+			// Description
+			Block(
 				[
-					buildGeneralSection(game),
-					buildDescriptionSection(game),
-					buildFeaturesSection(game),
-					buildLinksSection(game),
-					buildSteamAppSection(game),
-					buildLibrarySection(game),
-				])),
-		]);
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-info-circle"),
+							" Description",
+						]),
+
+					game.description != null
+						? game.description.split("\n").map((line) => Paragraph(line))
+						: MissingData(),
+				]),
+
+			// Release date
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-calendar"),
+							" Release date",
+						]),
+
+					game.isUnreleased 
+						? Paragraph("Unreleased")
+						: null,
+
+					game.releaseDate != null
+						? Paragraph(HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED))
+						: null,
+
+					game.releaseDate == null
+						? MissingData()
+						: null,
+				]),
+
+			// Developers
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-code"),
+							" ",
+							gameDevelopers.length > 1 ? "Developers" : "Developer",
+						]),
+
+					gameDevelopers.length > 0
+						? DataList(gameDevelopers.map((gameDeveloper) =>
+							({
+								name: Anchor(gameDeveloper.company.name, "/companies/view/" + gameDeveloper.company.id),
+								value: gameDeveloper.notes,
+							})))
+						: MissingData(),
+				]),
+
+			// Publishers
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-building"),
+							" ",
+							gamePublishers.length > 1 ? "Publishers" : "Publisher",
+						]),
+
+					gamePublishers.length > 0
+						? DataList(gamePublishers.map((gamePublisher) =>
+							({
+								name: Anchor(gamePublisher.company.name, "/companies/view/" + gamePublisher.company.id),
+								value: gamePublisher.notes,
+							})))
+						: MissingData(),
+				]),
+
+			// Platforms
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-layer-group"),
+							" ",
+							game.gamePlatforms.length > 1 ? "Platforms" : "Platform",
+						]),
+
+					game.gamePlatforms.length > 0
+						? DataList(game.gamePlatforms.map((gamePlatform) =>
+							({
+								iconName: gamePlatform.platform.iconName,
+								name: Anchor(gamePlatform.platform.name, "/platforms/view/" + gamePlatform.platform.id),
+								value: null,
+							})))
+						: MissingData(),
+				]),
+
+			// Engines
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-engine"),
+							" ",
+							game.gameEngines.length > 1 ? "Engines" : "Engine",
+						]),
+
+					game.gameEngines.length > 0
+						? DataList(game.gameEngines.map((gameEngine) =>
+							({
+								name: Anchor(
+									[
+										gameEngine.engine.shortName ?? gameEngine.engine.name,
+										gameEngine.version != null ? [ " ", gameEngine.version ] : null,
+									],
+									"/engines/view/" + gameEngine.engine.id),
+								value: gameEngine.notes,
+							})))
+						: (game.isUnknownEngine ? "Unknown" : MissingData()),
+				]),
+
+			// Features
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-tools"),
+							" Features",
+						]),
+
+					DataList(
+						[
+							{
+								name: "Progression type",
+								value: game.progressionType != null
+									? GameModelLib.getProgressionTypeName(game)
+									: MissingData(),
+							},
+							{
+								name: "Achievement support",
+								value: game.achievementSupport != null
+									? GameModelLib.getAchievementSupportName(game)
+									: MissingData(),
+							},
+							{
+								name: "Controller support",
+								value: game.controllerSupport != null
+									? GameModelLib.getControllerSupportName(game)
+									: MissingData(),
+							},
+							{
+								name: "Mod support",
+								value: game.modSupport != null
+									? GameModelLib.getModSupportName(game)
+									: MissingData(),
+							},
+							{
+								name: "VR support",
+								value: game.virtualRealitySupport != null
+									? GameModelLib.getVirtualRealitySupportName(game)
+									: MissingData(),
+							},
+						]),
+				]),
+
+			// Links
+			links.length > 0
+				? Block(
+					[
+						Header(3,
+							[
+								new DE("span", "fa-solid fa-link"),
+								" ",
+								links.length > 1 ? "Links" : "Link",
+							]),
+
+						DataList(links.map(
+							(link) =>
+							({
+								name: Anchor(link.title, link.url, "_blank"), 
+								value: null 
+							}))),
+					])
+				: null,
+
+			// Steam app
+			game.steamAppId != null
+				? Block(
+					[
+						Header(3,
+							[
+								new DE("span", "fa-brands fa-steam"),
+								" Steam app",
+							]),
+
+						DataList(
+							[
+								{
+									iconName: "fa-solid fa-fingerprint",
+									name: "ID",
+									value: game.steamAppId,
+								},
+								{
+									iconName: "fa-solid fa-text",
+									name: "Name",
+									value: game.steamAppName ?? MissingData(),
+								},
+							]),
+					])
+				: null,
+
+			// Game
+			Block(
+				[
+					Header(3,
+						[
+							new DE("span", "fa-solid fa-gamepad-modern"),
+							" Game",
+						]),
+			
+					DataList(
+						[
+							{
+								iconName: "fa-solid fa-fingerprint",
+								name: "ID",
+								value: game.id,
+							},
+							{
+								iconName: "fa-solid fa-calendar",
+								name: "Created",
+								value: HumanDateTime(DateTime.fromJSDate(game.createdDate)),
+							},
+							{
+								iconName: "fa-solid fa-rotate",
+								name: "Last updated",
+								value: HumanDateTime(DateTime.fromJSDate(game.lastUpdatedDate)),
+							}
+						]),
+				]),
+		]));
 }

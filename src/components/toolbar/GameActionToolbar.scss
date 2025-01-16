@@ -1,0 +1,36 @@
+//
+// Imports
+//
+
+@use "../_Globals.scss";
+
+//
+// Component
+//
+
+@mixin GameActionToolbar()
+{
+	.component-game-action-toolbar
+	{
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 1.25rem;
+	
+		border-bottom: 1px solid Globals.$borderColor;
+	
+		padding: 0.75rem;
+	
+		> .buttons
+		{
+			display: flex;
+			gap: 0.75rem;
+	
+			> *
+			{
+				margin: 0 !important;
+				min-width: fit-content;
+			}
+		}
+	}
+}
