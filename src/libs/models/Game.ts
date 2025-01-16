@@ -873,9 +873,14 @@ export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameG
 		return completionStatusIconNames[gameOrCompletionStatus];
 	}
 
+	if (gameOrCompletionStatus.isShelved)
+	{
+		return "fa-solid fa-circle-pause";
+	}
+
 	if (gameOrCompletionStatus.completionStatus == null)
 	{
-		return "fa-solid fa-circle";
+		return "fa-solid fa-question";
 	}
 
 	const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(gameOrCompletionStatus.completionStatus);
@@ -890,6 +895,11 @@ export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPa
 	if (typeof gameOrCompletionStatus == "string")
 	{
 		return completionStatusNames[gameOrCompletionStatus];
+	}
+
+	if (gameOrCompletionStatus.isShelved)
+	{
+		return "Shelved";
 	}
 
 	if (gameOrCompletionStatus.completionStatus == null)
