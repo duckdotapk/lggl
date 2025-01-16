@@ -66,6 +66,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						[
 							{ engine: { name: "asc" } },
 							{ version: "asc" },
+							{ notes: { sort: "asc", nulls: "first" } },
 						],
 					},
 					gameLinks: true,
@@ -75,6 +76,10 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 						{
 							platform: true,
 						},
+						orderBy:
+						[
+							{ platform: { name: "asc" } },
+						],
 					},
 				},
 			});
