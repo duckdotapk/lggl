@@ -74,18 +74,30 @@ function ActionToolbar(game: GameDetailsGame)
 		[
 			new DE("div", "buttons",
 				[
-					Button(
-						{
-							style: "success",
-							type: "button",
-							extraAttributes:
+					!game.isInstalled
+						? Button(
 							{
-								"data-open-choose-game-play-action-dialog": "true",
-								"data-game-id": game.id,
-							},
-							iconName: "fa-solid fa-play",
-							text: "Play",
-						}),
+								style: "secondary",
+								type: "button",
+								extraAttributes:
+								{
+									disabled: true,
+								},
+								iconName: "fa-solid fa-ban",
+								text: "Not installed",
+							})
+						: Button(
+							{
+								style: "success",
+								type: "button",
+								extraAttributes:
+								{
+									"data-open-choose-game-play-action-dialog": "true",
+									"data-game-id": game.id,
+								},
+								iconName: "fa-solid fa-play",
+								text: "Play",
+							}),
 				]),
 
 			new DE("div", "data-list", DataList(

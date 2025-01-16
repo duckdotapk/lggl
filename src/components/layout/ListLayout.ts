@@ -2,7 +2,7 @@
 // Component
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE, ElementAttributes } from "@donutteam/document-builder";
 import * as Utilities from "@donutteam/utilities";
 
 import { GroupManager } from "../../classes/GroupManager.js";
@@ -21,6 +21,7 @@ export type ListLayoutGroupItemOptions =
 {
 	selected: boolean;
 	href: string;
+	extraAtrributes?: ElementAttributes;
 	iconName: string;
 	name: string;
 	info: Child;
@@ -44,6 +45,8 @@ function GroupItem(options: ListLayoutGroupItemOptions)
 			"data-normalized-name": options.name.toLowerCase().replace(/[^a-z0-9]/g, " "),
 
 			"data-pjax-selector": ".component-list-layout .content",
+
+			...options.extraAtrributes,
 		},
 		[
 			new DE("div", "icon-wrapper",

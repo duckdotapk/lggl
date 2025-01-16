@@ -156,6 +156,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -264,6 +268,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -327,6 +335,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -379,6 +391,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -435,6 +451,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -477,6 +497,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -597,6 +621,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
@@ -651,6 +679,10 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
 							iconName: game.hasIconImage
 								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
 								: "fa-solid fa-gamepad-modern",
