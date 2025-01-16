@@ -4,18 +4,37 @@
 
 import { Child, DE } from "@donutteam/document-builder";
 
+
 //
-// Component
+// Locals
 //
 
-export type DataListItem =
+type ItemOptions =
 {
 	iconName?: string;
 	name: Child;
 	value: Child;
 };
 
-export function DataList(items: (DataListItem | null)[])
+function Item(options: ItemOptions)
+{
+	return new DE("div", "component-data-list-item",
+		[
+			options.iconName != null
+				? new DE("div", "icon", new DE("span", options.iconName))
+				: null,
+
+			new DE("div", "name", options.name),
+
+			new DE("div", "value", options.value),
+		]);
+}
+
+//
+// Component
+//
+
+export function DataList(items: (ItemOptions | null)[])
 {
 	const nonNullItems = items.filter(item => item != null);
 
@@ -24,14 +43,5 @@ export function DataList(items: (DataListItem | null)[])
 		return null;
 	}
 
-	return new DE("div", "component-data-list", nonNullItems.map((item) => new DE("div", "item",
-		[
-			item.iconName != null
-				? new DE("div", "icon", new DE("span", item.iconName))
-				: null,
-
-			new DE("div", "name", item.name),
-
-			new DE("div", "value", item.value),
-		])));
+	return new DE("div", "component-data-list", nonNullItems.map((item) => Item(item)));
 }
