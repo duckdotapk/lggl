@@ -24,9 +24,12 @@ function Item(options: ItemOptions)
 				? new DE("div", "icon", new DE("span", options.iconName))
 				: null,
 
-			new DE("div", "name", options.name),
-
-			new DE("div", "value", options.value),
+			new DE("div", "text",
+				[
+					new DE("div", "name", options.name),
+		
+					options.value != null ? new DE("div", "value", options.value) : null,
+				]),
 		]);
 }
 
