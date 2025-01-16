@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "../_Globals.scss";
+
+//
 // Component
 //
 
@@ -6,9 +12,9 @@
 {
 	.component-dialog
 	{
-		background-color: #1f2937; // Tailwind Gray 800
-		border: 1px solid #374151;
-		color: #f3f4f6; // Tailwind Gray 100
+		background-color: Globals.$themeColorPrimary;
+		border: 1px solid Globals.$borderColor;
+		color: Globals.$textColor;
 
 		width: 100%;
 		max-width: 30rem;

@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "./_Globals.scss";
+
+//
 // Component
 //
 
@@ -13,8 +19,8 @@
 		grid-template-columns: auto 1fr;
 		grid-template-rows: 1fr;
 		
-		background-color: #1f2937; // Tailwind Gray 800
-		color: #f3f4f6; // Tailwind Gray 100
+		background-color: Globals.$themeColorPrimary;
+		color: Globals.$textColor;
 		font-family: Arial, Helvetica, "sans-serif";
 
 		> .sidebar

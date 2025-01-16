@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "../_Globals.scss";
+
+//
 // Component
 //
 
@@ -25,8 +31,7 @@
 		&:hover,
 		&.selected
 		{
-			background-color: #030712;
-			color: #f3f4f6;
+			background-color: Globals.$themeColorSecondary;
 			cursor: pointer;
 		}
 

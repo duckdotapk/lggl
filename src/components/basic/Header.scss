@@ -12,7 +12,7 @@
 {
 	.component-header
 	{
-		border-bottom: 1px solid #374151; // Tailwind Gray 700
+		border-bottom: 1px solid Globals.$borderColor;
 
 		margin: 0.5rem 0 0.5rem 0;
 

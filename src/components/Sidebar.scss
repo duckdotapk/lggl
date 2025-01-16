@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "./_Globals.scss";
+
+//
 // Component
 //
 
@@ -24,18 +30,18 @@
 		&:hover,
 		&.selected
 		{
-			border-left-color: #f3f4f6; // Tailwind Gray 100
+			border-left-color: Globals.$textColor;
 		}
 	}
 
 	.component-sidebar-separator
 	{
-		border-bottom: 1px solid #374151; // Tailwind Gray 700
+		border-bottom: 1px solid Globals.$borderColor;
 	}
 
 	.component-sidebar
 	{
-		border-right: 1px solid #374151; // Tailwind Gray 700
+		border-right: 1px solid Globals.$borderColor;
 
 		height: 100%;
 	}

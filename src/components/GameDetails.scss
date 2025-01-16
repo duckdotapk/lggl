@@ -1,4 +1,10 @@
 //
+// Imports
+//
+
+@use "./_Globals.scss";
+
+//
 // Component
 //
 
@@ -9,7 +15,7 @@
 		display: grid;
 		grid-template-areas: "stack";
 		
-		border-bottom: 1px solid #374151; // Tailwind Gray 700
+		border-bottom: 1px solid Globals.$borderColor;
 
 		height: 20rem;
 
@@ -61,7 +67,7 @@
 		align-items: center;
 		gap: 1.25rem;
 
-		border-bottom: 1px solid #374151; // Tailwind Gray 700
+		border-bottom: 1px solid Globals.$borderColor;
 
 		padding: 0.75rem;
 
