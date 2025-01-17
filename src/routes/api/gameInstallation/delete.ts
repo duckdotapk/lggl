@@ -37,16 +37,12 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT FOUND", message: "GameInstallation not found." });
 			}
 
-			await prismaClient.$transaction(
-				async (transactionClient) =>
+			await prismaClient.gameInstallation.delete(
 				{
-					await transactionClient.gameInstallation.delete(
-						{
-							where:
-							{
-								id: requestBody.id,
-							},
-						});
+					where:
+					{
+						id: requestBody.id,
+					},
 				});
 
 			return {
