@@ -34,7 +34,7 @@ export type ControlOptions =
 		options: { value: string | number, label: string }[];
 	} |
 	{
-		type: "text";
+		type: "text" | "url";
 		value?: string | null;
 		placeholder: string;
 	} |
@@ -113,11 +113,12 @@ export function Control(options: ControlOptions)
 		}
 
 		case "text":
+		case "url":
 		{
 			return new DE("input",
 				{
 					class: "component-control",
-					type: "text",
+					type: options.type,
 					name: options.name,
 					required: options.required,
 					value: options.value,

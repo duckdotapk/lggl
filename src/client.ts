@@ -13,6 +13,7 @@ import { initialiseUpsertGameForms } from "./components/form/UpsertGameForm.clie
 import { initialiseUpsertGameCompanyForms } from "./components/form/UpsertGameCompanyForm.client.js";
 import { initialiseUpsertGameEngineForms } from "./components/form/UpsertGameEngineForm.client.js";
 import { initialiseUpsertGameInstallationForms } from "./components/form/UpsertGameInstallationForm.client.js";
+import { initialiseUpsertGameLinkForms } from "./components/form/UpsertGameLinkForm.client.js";
 import { initialiseUpsertGamePlatformForms } from "./components/form/UpsertGamePlatformForm.client.js";
 import { initialiseUpsertGamePlayActionForms } from "./components/form/UpsertGamePlayActionForm.client.js";
 import { initialiseUpsertPlatformForms } from "./components/form/UpsertPlatformForm.client.js";
@@ -55,6 +56,7 @@ async function initialiseComponents()
 	initialiseUpsertGameCompanyForms();
 	initialiseUpsertGameEngineForms();
 	initialiseUpsertGameInstallationForms();
+	initialiseUpsertGameLinkForms();
 	initialiseUpsertGamePlatformForms();
 	initialiseUpsertGamePlayActionForms();
 	initialiseUpsertPlatformForms();

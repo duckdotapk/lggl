@@ -12,6 +12,7 @@ import { UpsertGameForm, UpsertGameFormGame } from "../../components/form/Upsert
 import { UpsertGameCompanyForm, UpsertGameCompanyFormOptions } from "../../components/form/UpsertGameCompanyForm.js";
 import { UpsertGameEngineForm, UpsertGameEngineFormOptions } from "../../components/form/UpsertGameEngineForm.js";
 import { UpsertGameInstallationForm, UpsertGameInstallationFormOptions } from "../../components/form/UpsertGameInstallationForm.js";
+import { UpsertGameLinkForm, UpsertGameLinkFormOptions } from "../../components/form/UpsertGameLinkForm.js";
 import { UpsertGamePlatformForm, UpsertGamePlatformFormOptions } from "../../components/form/UpsertGamePlatformForm.js";
 import { UpsertGamePlayActionForm, UpsertGamePlayActionFormOptions } from "../../components/form/UpsertGamePlayActionForm.js";
 
@@ -41,6 +42,7 @@ export type ViewOptions =
 	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
 	gameEngines: NonNullable<UpsertGameEngineFormOptions["gameEngine"]>[];
 	gameInstallations: NonNullable<UpsertGameInstallationFormOptions["gameInstallation"]>[];
+	gameLinks: NonNullable<UpsertGameLinkFormOptions["gameLink"]>[];
 	gamePlatforms: NonNullable<UpsertGamePlatformFormOptions["gamePlatform"]>[];
 	gamePlayActions: NonNullable<UpsertGamePlayActionFormOptions["gamePlayAction"]>[];
 	platforms: UpsertGamePlatformFormOptions["platforms"];
@@ -135,6 +137,23 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 											{
 												game: options.game,
 												gameInstallation: null,
+											})),
+									],
+								},
+								{
+									title: "Links",
+									content:
+									[
+										options.gameLinks.map((gameLink) => Block(UpsertGameLinkForm(
+											{
+												game: options.game,
+												gameLink,
+											}))),
+						
+										Block(UpsertGameLinkForm(
+											{
+												game: options.game,
+												gameLink: null,
 											})),
 									],
 								},
