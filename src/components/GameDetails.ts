@@ -237,7 +237,13 @@ export function GameDetails(game: GameDetailsGame)
 									"/engines/view/" + gameEngine.engine.id),
 								value: gameEngine.notes,
 							})))
-						: (game.isUnknownEngine ? "Unknown" : MissingData()),
+						: DataList(
+							[
+								{
+									name: game.isUnknownEngine ? "Unknown" : MissingData(),
+									value: null,
+								},
+							]),
 				]),
 
 			// Features
