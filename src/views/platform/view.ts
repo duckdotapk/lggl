@@ -4,8 +4,6 @@
 
 import { Prisma } from "@prisma/client";
 
-import { GroupManager } from "../../classes/GroupManager.js";
-
 import { Anchor } from "../../components/basic/Anchor.js";
 import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
@@ -20,6 +18,7 @@ import { PlatformSettingsToolbar } from "../../components/toolbar/PlatformSettin
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
+import * as PlatformModelLib from "../../libs/models/Platform.js";
 import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
@@ -29,7 +28,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: GroupManager<Prisma.PlatformGetPayload<null>>;
+	groupManager: Awaited<ReturnType<typeof PlatformModelLib.findGroups>>;
 	platform: Prisma.PlatformGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 };

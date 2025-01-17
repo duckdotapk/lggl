@@ -25,10 +25,12 @@ export function CompanySettingsToolbar(settings: SettingModelLib.Settings)
 					value: settings.companyGroupMode,
 					required: true,
 					showEmptyOption: false,
-					options:
-					[
-						{ value: "name" satisfies SettingSchemaLib.CompanyGroupMode, label: "Group by Name" },
-					],
+					options: SettingSchemaLib.CompanyGroupModeSchema.options.map(
+						(companyGroupMode) => 
+						({ 
+							value: companyGroupMode, 
+							label: "Group by " + SettingModelLib.getCompanyGroupModeName(companyGroupMode),
+						})),
 				}),
 		]);
 }

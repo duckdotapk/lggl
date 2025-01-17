@@ -146,6 +146,25 @@ const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 	series: "Series",
 };
 
+const companyGroupModeNames: Record<SettingSchemaLib.CompanyGroupMode, string> =
+{
+	name: "Name",
+	numberOfGamesDeveloped: "Number of games developed",
+	numberOfGamesPublished: "Number of games published",
+};
+
+const engineGroupModeNames: Record<SettingSchemaLib.EngineGroupMode, string> =
+{
+	name: "Name",
+	numberOfGames: "Number of games",
+};
+
+const platformGroupModeNames: Record<SettingSchemaLib.PlatformGroupMode, string> =
+{
+	name: "Name",
+	numberOfGames: "Number of games",
+};
+
 //
 // Create/Find/Update/Delete Functions
 //
@@ -160,4 +179,19 @@ export async function getSettings(transactionClient: Prisma.TransactionClient)
 export function getGameGroupModeName(gameGroupMode: SettingSchemaLib.GameGroupMode)
 {
 	return gameGroupModeNames[gameGroupMode];
+}
+
+export function getCompanyGroupModeName(companyGroupMode: SettingSchemaLib.CompanyGroupMode)
+{
+	return companyGroupModeNames[companyGroupMode];
+}
+
+export function getEngineGroupModeName(engineGroupMode: SettingSchemaLib.EngineGroupMode)
+{
+	return engineGroupModeNames[engineGroupMode];
+}
+
+export function getPlatformGroupModeName(platformGroupMode: SettingSchemaLib.PlatformGroupMode)
+{
+	return platformGroupModeNames[platformGroupMode];
 }

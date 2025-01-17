@@ -2,16 +2,13 @@
 // Imports
 //
 
-import { Prisma } from "@prisma/client";
-
-import { GroupManager } from "../../classes/GroupManager.js";
-
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { EngineSettingsToolbar } from "../../components/toolbar/EngineSettingsToolbar.js";
 
 import { SiteOptions } from "../../components/Site.js";
 
+import * as EngineModelLib from "../../libs/models/Engine.js";
 import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
@@ -21,7 +18,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: GroupManager<Prisma.EngineGetPayload<null>>;
+	groupManager: Awaited<ReturnType<typeof EngineModelLib.findGroups>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>

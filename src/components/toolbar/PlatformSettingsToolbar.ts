@@ -25,10 +25,12 @@ export function PlatformSettingsToolbar(settings: SettingModelLib.Settings)
 					value: settings.platformGroupMode,
 					required: true,
 					showEmptyOption: false,
-					options:
-					[
-						{ value: "name" satisfies SettingSchemaLib.PlatformGroupMode, label: "Group by Name" },
-					],
+					options: SettingSchemaLib.PlatformGroupModeSchema.options.map(
+						(platformGroupMode) => 
+						({ 
+							value: platformGroupMode, 
+							label: "Group by " + SettingModelLib.getPlatformGroupModeName(platformGroupMode),
+						})),
 				}),
 		]);
 }

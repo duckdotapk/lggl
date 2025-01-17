@@ -2,12 +2,8 @@
 // Imports
 //
 
-import { Prisma } from "@prisma/client";
-
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
-
-import { GroupManager } from "../../classes/GroupManager.js";
 
 import { UpsertCompanyForm } from "../../components/form/UpsertCompanyForm.js";
 
@@ -18,6 +14,7 @@ import { CompanySettingsToolbar } from "../../components/toolbar/CompanySettings
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
+import * as CompanyModelLib from "../../libs/models/Company.js";
 import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
@@ -27,7 +24,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: GroupManager<Prisma.CompanyGetPayload<null>>;
+	groupManager: Awaited<ReturnType<typeof CompanyModelLib.findGroups>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>

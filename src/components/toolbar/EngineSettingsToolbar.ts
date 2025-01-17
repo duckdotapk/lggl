@@ -25,10 +25,12 @@ export function EngineSettingsToolbar(settings: SettingModelLib.Settings)
 					value: settings.engineGroupMode,
 					required: true,
 					showEmptyOption: false,
-					options:
-					[
-						{ value: "name" satisfies SettingSchemaLib.EngineGroupMode, label: "Group by Name" },
-					],
+					options: SettingSchemaLib.EngineGroupModeSchema.options.map(
+						(engineGroupMode) => 
+						({ 
+							value: engineGroupMode, 
+							label: "Group by " + SettingModelLib.getEngineGroupModeName(engineGroupMode),
+						})),
 				}),
 		]);
 }

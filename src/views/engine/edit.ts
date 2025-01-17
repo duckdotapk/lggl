@@ -4,8 +4,6 @@
 
 import { Prisma } from "@prisma/client";
 
-import { GroupManager } from "../../classes/GroupManager.js";
-
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
@@ -18,6 +16,7 @@ import { EngineSettingsToolbar } from "../../components/toolbar/EngineSettingsTo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
+import * as EngineModelLib from "../../libs/models/Engine.js";
 import * as SettingModelLib from "../../libs/models/Setting.js";
 
 //
@@ -27,7 +26,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: GroupManager<Prisma.EngineGetPayload<null>>;
+	groupManager: Awaited<ReturnType<typeof EngineModelLib.findGroups>>;
 	engine: Prisma.EngineGetPayload<null>;
 };
 

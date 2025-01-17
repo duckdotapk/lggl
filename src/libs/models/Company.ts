@@ -9,6 +9,8 @@ import { GroupManager } from "../../classes/GroupManager.js";
 
 import * as SettingModelLib from "../models/Setting.js";
 
+import * as GameCompanySchemaLib from "../schemas/GameCompany.js";
+
 //
 // Create/Find/Update/Delete Functions
 //
@@ -21,7 +23,13 @@ export type FindGroupsOptions =
 
 export async function findGroups(transactionClient: Prisma.TransactionClient, options: FindGroupsOptions)
 {
-	const companies = await transactionClient.company.findMany();
+	const companies = await transactionClient.company.findMany(
+		{
+			include:
+			{
+				gameCompanies: true,
+			},
+		});
 
 	const groupManager = new GroupManager<typeof companies[0]>(
 		{
@@ -48,6 +56,66 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 				const groupName = GroupManager.getNameGroupName(company.name);
 
 				groupManager.addItemToGroup(groupName, company);
+			}
+
+			break;
+		}
+
+		case "numberOfGamesDeveloped":
+		{
+			const sortedCompanyWrappers = companies
+				.map((company) => 
+				{
+					return {
+						company, 
+						numberOfGamesDeveloped: company.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type).length,
+					};
+				})
+				.toSorted((a, b) =>
+				{
+					if (a.numberOfGamesDeveloped != b.numberOfGamesDeveloped)
+					{
+						return b.numberOfGamesDeveloped - a.numberOfGamesDeveloped;
+					}
+
+					return a.company.name.localeCompare(b.company.name);
+				});
+
+			for (const companyWrapper of sortedCompanyWrappers)
+			{
+				const groupName = companyWrapper.numberOfGamesDeveloped + " games developed";
+
+				groupManager.addItemToGroup(groupName, companyWrapper.company);
+			}
+
+			break;
+		}
+
+		case "numberOfGamesPublished":
+		{
+			const sortedCompanyWrappers = companies
+				.map((company) => 
+				{
+					return {
+						company, 
+						numberOfGamesPublished: company.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type).length,
+					};
+				})
+				.toSorted((a, b) =>
+				{
+					if (a.numberOfGamesPublished != b.numberOfGamesPublished)
+					{
+						return b.numberOfGamesPublished - a.numberOfGamesPublished;
+					}
+
+					return a.company.name.localeCompare(b.company.name);
+				});
+
+			for (const companyWrapper of sortedCompanyWrappers)
+			{
+				const groupName = companyWrapper.numberOfGamesPublished + " games published";
+
+				groupManager.addItemToGroup(groupName, companyWrapper.company);
 			}
 
 			break;

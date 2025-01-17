@@ -21,7 +21,13 @@ export type FindGroupsOptions =
 
 export async function findGroups(transactionClient: Prisma.TransactionClient, options: FindGroupsOptions)
 {
-	const engines = await transactionClient.engine.findMany();
+	const engines = await transactionClient.engine.findMany(
+		{
+			include:
+			{
+				gameEngines: true,
+			},
+		});
 
 	const groupManager = new GroupManager<typeof engines[0]>(
 		{
@@ -47,6 +53,20 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			{
 				const groupName = GroupManager.getNameGroupName(engine.name);
 		
+				groupManager.addItemToGroup(groupName, engine);
+			}
+
+			break;
+		}
+
+		case "numberOfGames":
+		{
+			const sortedEngines = engines.toSorted((a, b) => b.gameEngines.length - a.gameEngines.length);
+
+			for (const engine of sortedEngines)
+			{
+				const groupName = engine.gameEngines.length + " game" + (engine.gameEngines.length == 1 ? "" : "s");
+
 				groupManager.addItemToGroup(groupName, engine);
 			}
 
