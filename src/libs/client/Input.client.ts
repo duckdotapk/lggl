@@ -3,7 +3,6 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
-import { ZodTypeAny } from "zod";
 
 //
 // Utility Functions
@@ -44,14 +43,14 @@ export function getNumberValueNullable(input: HTMLInputElement)
 	return input.value.trim() != "" ? Number(input.value) : null;
 }
 
-export function getEnumValue<T extends ZodTypeAny>(input: HTMLSelectElement, schema: T)
+export function getEnumValue<T>(input: HTMLSelectElement)
 {
-	return schema.parse(input.value);
+	return input.value as T;
 }
 
-export function getEnumValueNullable<T extends ZodTypeAny>(input: HTMLSelectElement, schema: T)
+export function getEnumValueNullable<T>(input: HTMLSelectElement)
 {
-	return input.value.trim() != "" ? schema.parse(input.value.trim()) : null;
+	return input.value != "" ? input.value as T : null;
 }
 
 export function getStringValue(input: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)
@@ -104,19 +103,19 @@ export function getChangedDateTimeValueNullable(input: HTMLInputElement)
 	return input.value.trim() != "" ? input.value.trim() : null;
 }
 
-export function getChangedEnumValue<T extends ZodTypeAny>(input: HTMLSelectElement, schema: T)
+export function getChangedEnumValue<T>(input: HTMLSelectElement)
 {
-	return isInputDirty(input) ? schema.parse(input.value.trim()) : undefined;
+	return isInputDirty(input) ? input.value as T : undefined;
 }
 
-export function getChangedEnumValueNullable<T extends ZodTypeAny>(input: HTMLSelectElement, schema: T)
+export function getChangedEnumValueNullable<T>(input: HTMLSelectElement)
 {
 	if (!isInputDirty(input))
 	{
 		return undefined;
 	}
 
-	return input.value.trim() != "" ? schema.parse(input.value.trim()) : null;
+	return input.value.trim() != "" ? input.value as T : null;
 }
 
 export function getChangedNumberValue(input: HTMLInputElement | HTMLSelectElement)

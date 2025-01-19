@@ -3,7 +3,7 @@
 //
 
 import { DE } from "@donutteam/document-builder";
-import { Prisma } from "@prisma/client";
+import { $Enums, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { Block } from "../basic/Block.js";
@@ -17,8 +17,6 @@ import { TabControl } from "../input/TabControl.js";
 import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 import * as GameModelLib from "../../libs/models/Game.js";
-
-import * as GameSchemaLib from "../../libs/schemas/Game.js";
 
 //
 // Component
@@ -98,7 +96,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 														required: false,
 														value: game?.progressionType ?? null,
 														showEmptyOption: true,
-														options: GameSchemaLib.ProgressionTypeSchema.options.map((option) => ({ value: option, label: GameModelLib.getProgressionTypeName(option) }))
+														options: Object.values($Enums.GameProgressionType).map((option) => ({ value: option, label: GameModelLib.getProgressionTypeName(option) })),
 													}),
 											]),
 									]),
@@ -147,7 +145,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.logoImageAlignment ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.LogoImageAlignmentSchema.options.map((option) => ({ value: option, label: GameModelLib.getLogoImageAlignmentName(option) })),
+										options: Object.values($Enums.GameLogoImageAlignment).map((option) => ({ value: option, label: GameModelLib.getLogoImageAlignmentName(option) })),
 									}),
 
 								Label("logoImageJustification", "Logo image justification"),
@@ -159,7 +157,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.logoImageJustification ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.LogoImageJustificationSchema.options.map((option) => ({ value: option, label: GameModelLib.getLogoImageJustificationName(option) })),
+										options: Object.values($Enums.GameLogoImageJustification).map((option) => ({ value: option, label: GameModelLib.getLogoImageJustificationName(option) })),
 									}),
 							]),
 					},
@@ -197,7 +195,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.completionStatus ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.CompletionStatusSchema.options.map((option) => ({ value: option, label: GameModelLib.getCompletionStatusName(option) }))
+										options: Object.values($Enums.GameCompletionStatus).map((option) => ({ value: option, label: GameModelLib.getCompletionStatusName(option) })),
 									}),
 					
 								Label("firstPlayedDate", "First played date"),
@@ -274,7 +272,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.achievementSupport ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.AchievementSupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getAchievementSupportName(option) }))
+										options: Object.values($Enums.GameAchievementSupport).map((option) => ({ value: option, label: GameModelLib.getAchievementSupportName(option) })),
 									}),
 					
 								Label("controllerSupport", "Controller support"),
@@ -286,7 +284,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.controllerSupport ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.ControllerSupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getControllerSupportName(option) }))
+										options: Object.values($Enums.GameControllerSupport).map((option) => ({ value: option, label: GameModelLib.getControllerSupportName(option) })),
 									}),
 					
 								Label("modSupport", "Mod support"),
@@ -298,7 +296,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.modSupport ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.ModSupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getModSupportName(option) }))
+										options: Object.values($Enums.GameModSupport).map((option) => ({ value: option, label: GameModelLib.getModSupportName(option) })),
 									}),
 					
 								Label("virtualRealitySupport", "Virtual reality support"),
@@ -310,7 +308,7 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										required: false,
 										value: game?.virtualRealitySupport ?? null,
 										showEmptyOption: true,
-										options: GameSchemaLib.VirtualRealitySupportSchema.options.map((option) => ({ value: option, label: GameModelLib.getVirtualRealitySupportName(option) }))
+										options: Object.values($Enums.GameVirtualRealitySupport).map((option) => ({ value: option, label: GameModelLib.getVirtualRealitySupportName(option) })),
 									}),
 							]),
 					},

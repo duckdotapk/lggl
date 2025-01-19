@@ -3,11 +3,10 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { GameCompanyType } from "@prisma/client";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
 import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
-
-import * as GameCompanySchemaLib from "../../libs/schemas/GameCompany.js";
 
 import { createGameCompany } from "../../routes/api/gameCompany/create.schemas.js";
 import { deleteGameCompany } from "../../routes/api/gameCompany/delete.schemas.js";
@@ -37,7 +36,7 @@ async function initialise(form: HTMLFormElement)
 					{
 						game_id: gameId,
 						company_id: InputClientLib.getNumberValue(companyIdSelect),
-						type: InputClientLib.getEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
+						type: InputClientLib.getEnumValue<GameCompanyType>(typeSelect),
 						notes: InputClientLib.getStringValueNullable(notesInput),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),
@@ -64,7 +63,7 @@ async function initialise(form: HTMLFormElement)
 				onSubmit: async () => await updateGameCompany(gameCompanyId,
 					{
 						company_id: InputClientLib.getChangedNumberValue(companyIdSelect),
-						type: InputClientLib.getChangedEnumValue(typeSelect, GameCompanySchemaLib.TypeSchema),
+						type: InputClientLib.getChangedEnumValue<GameCompanyType>(typeSelect),
 						notes: InputClientLib.getChangedStringValueNullable(notesInput),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),

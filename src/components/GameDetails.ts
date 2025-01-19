@@ -16,8 +16,6 @@ import { DataList } from "./DataList.js";
 
 import * as GameModelLib from "../libs/models/Game.js";
 
-import * as GameCompanySchemaLib from "../libs/schemas/GameCompany.js";
-
 //
 // Locals
 //
@@ -62,9 +60,9 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 
 export function GameDetails(game: GameDetailsGame)
 {
-	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type);
+	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER");
 
-	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);
+	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER");
 
 	const links: { title: string; url: string }[] = [];
 

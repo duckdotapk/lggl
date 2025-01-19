@@ -3,7 +3,7 @@
 //
 
 import { DE } from "@donutteam/document-builder";
-import { Prisma } from "@prisma/client";
+import { $Enums, Prisma } from "@prisma/client";
 
 import { Button } from "../input/Button.js";
 import { Control } from "../input/Control.js";
@@ -12,8 +12,6 @@ import { Label } from "../input/Label.js";
 import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 import * as GameCompanyModelLib from "../../libs/models/GameCompany.js";
-
-import * as GameCompanySchemaLib from "../../libs/schemas/GameCompany.js";
 
 //
 // Component
@@ -65,7 +63,7 @@ export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
 									required: true,
 									value: options.gameCompany?.type,
 									showEmptyOption: true,
-									options: GameCompanySchemaLib.TypeSchema.options.map((type) => ({ value: type, label: GameCompanyModelLib.getTypeName(type) }))
+									options: Object.values($Enums.GameCompanyType).map((type) => ({ value: type, label: GameCompanyModelLib.getTypeName(type) })),
 								}),
 						]),
 

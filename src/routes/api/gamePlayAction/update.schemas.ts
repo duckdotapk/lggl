@@ -3,9 +3,8 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { GamePlayActionType } from "@prisma/client";
 import { z } from "zod";
-
-import * as GamePlayActionSchemaLib from "../../../libs/schemas/GamePlayAction.js";
 
 //
 // Schemas
@@ -18,10 +17,10 @@ export const RequestBodySchema = z.object(
 		updateData: z.object(
 			{
 				name: z.string(),
-				type: GamePlayActionSchemaLib.TypeSchema,
+				type: z.custom<GamePlayActionType>(),
 				path: z.string(),
 				trackingPath: z.string(),
-				argumentsJson: z.string(),
+				argumentsJson: z.array(z.string()),
 				isArchived: z.boolean(),
 			}).partial(),
 	});

@@ -3,11 +3,10 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { GamePlayActionType } from "@prisma/client";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
 import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
-
-import * as GamePlayActionSchemaLib from "../../libs/schemas/GamePlayAction.js";
 
 import { createGamePlayAction } from "../../routes/api/gamePlayAction/create.schemas.js";
 import { deleteGamePlayAction } from "../../routes/api/gamePlayAction/delete.schemas.js";
@@ -41,10 +40,10 @@ async function initialise(form: HTMLFormElement)
 						game_id: gameId,
 
 						name: InputClientLib.getStringValue(nameInput),
-						type: InputClientLib.getEnumValue(typeSelect, GamePlayActionSchemaLib.TypeSchema),
+						type: InputClientLib.getEnumValue<GamePlayActionType>(typeSelect),
 						path: InputClientLib.getStringValue(pathInput),
 						trackingPath: InputClientLib.getStringValue(trackingPathInput),
-						argumentsJson: InputClientLib.getStringValue(argumentsJsonTextArea),
+						argumentsJson: JSON.parse(InputClientLib.getStringValue(argumentsJsonTextArea)),
 						isArchived: InputClientLib.getBooleanValue(isArchivedInput),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),
@@ -71,10 +70,12 @@ async function initialise(form: HTMLFormElement)
 				onSubmit: async () => await updateGamePlayAction(gamePlayActionId,
 					{
 						name: InputClientLib.getChangedStringValue(nameInput),
-						type: InputClientLib.getChangedEnumValue(typeSelect, GamePlayActionSchemaLib.TypeSchema),
+						type: InputClientLib.getChangedEnumValue<GamePlayActionType>(typeSelect),
 						path: InputClientLib.getChangedStringValue(pathInput),
 						trackingPath: InputClientLib.getChangedStringValue(trackingPathInput),
-						argumentsJson: InputClientLib.getChangedStringValue(argumentsJsonTextArea),
+						argumentsJson: InputClientLib.isInputDirty(argumentsJsonTextArea)
+							? JSON.parse(InputClientLib.getStringValue(argumentsJsonTextArea))
+							: undefined,
 						isArchived: InputClientLib.getChangedBooleanValue(isArchivedInput),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),

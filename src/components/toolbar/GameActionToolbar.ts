@@ -16,8 +16,6 @@ import { shortEnglishHumanizer } from "../../instances/humanizer.js";
 
 import * as GameModelLib from "../../libs/models/Game.js";
 
-import * as GameSchemaLib from "../../libs/schemas/Game.js";
-
 //
 // Component
 //
@@ -76,7 +74,7 @@ export function GameActionToolbar(game: GameActionToolbarGame)
 						}
 						: null,
 
-					game.progressionType != "NONE" satisfies GameSchemaLib.ProgressionType && game.completionStatus != null
+					game.progressionType != "NONE" && game.completionStatus != null
 						? {
 							iconName: GameModelLib.getCompletionStatusIconName(game),
 							name: "Completion status",

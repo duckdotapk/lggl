@@ -3,7 +3,7 @@
 //
 
 import { DE } from "@donutteam/document-builder";
-import { Prisma } from "@prisma/client";
+import { $Enums, Prisma } from "@prisma/client";
 
 import { Button } from "../input/Button.js";
 import { Checkbox } from "../input/Checkbox.js";
@@ -13,8 +13,6 @@ import { Label } from "../input/Label.js";
 import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 import * as GamePlayActionModelLib from "../../libs/models/GamePlayAction.js";
-
-import * as GamePlayActionSchemaLib from "../../libs/schemas/GamePlayAction.js";
 
 //
 // Component
@@ -64,7 +62,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 									required: true,
 									value: options.gamePlayAction?.type,
 									showEmptyOption: true,
-									options: GamePlayActionSchemaLib.TypeSchema.options.map((option) => ({ value: option, label: GamePlayActionModelLib.getTypeName(option) }))
+									options: Object.values($Enums.GamePlayActionType).map((option) => ({ value: option, label: GamePlayActionModelLib.getTypeName(option) })),
 								}),
 						]),
 				]),
@@ -98,7 +96,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 					type: "textarea",
 					name: "argumentsJson",
 					required: true,
-					value: options.gamePlayAction?.argumentsJson ?? "[]",
+					value: JSON.stringify(options.gamePlayAction?.argumentsJson),
 					placeholder: "Arguments (as JSON string array)",
 				}),
 

@@ -4,7 +4,7 @@
 
 import path from "node:path";
 
-import { Prisma } from "@prisma/client";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { GroupManager } from "../../classes/GroupManager.js";
@@ -19,34 +19,31 @@ import { staticMiddleware } from "../../instances/server.js";
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
-import * as GameSchemaLib from "../schemas/Game.js";
-import * as GameCompanySchemaLib from "../schemas/GameCompany.js";
-
 //
 // Constants
 //
 
-const progressionTypeNames: Record<GameSchemaLib.ProgressionType, string> =
+const progressionTypeNames: Record<GameProgressionType, string> =
 {
 	"NONE": "None",
 	"NON_CAMPAIGN": "Non-Campaign",
 	"CAMPAIGN": "Campaign",
 };
 
-const logoImageAlignmentNames: Record<GameSchemaLib.LogoImageAlignment, string> =
+const logoImageAlignmentNames: Record<GameLogoImageAlignment, string> =
 {
-	"start": "Top",
-	"center": "Center",
-	"end": "Bottom",
+	"START": "Top",
+	"CENTER": "Center",
+	"END": "Bottom",
 };
 
-const logoImageJustificationNames: Record<GameSchemaLib.LogoImageJustification, string> =
+const logoImageJustificationNames: Record<GameLogoImageJustification, string> =
 {
-	"start": "Left",
-	"center": "Center",
+	"START": "Left",
+	"CENTER": "Center",
 };
 
-const completionStatusIconNames: Record<GameSchemaLib.CompletionStatus, string> =
+const completionStatusIconNames: Record<GameCompletionStatus, string> =
 {
 	"TODO": "fa-solid fa-circle-dashed",
 	"IN_PROGRESS": "fa-solid fa-circle-half",
@@ -54,7 +51,7 @@ const completionStatusIconNames: Record<GameSchemaLib.CompletionStatus, string> 
 	"ONE_HUNDRED_PERCENT": "fa-solid fa-check-circle",
 };
 
-const completionStatusNames: Record<GameSchemaLib.CompletionStatus, string> =
+const completionStatusNames: Record<GameCompletionStatus, string> =
 {
 	"TODO": "To Do",
 	"IN_PROGRESS": "In Progress",
@@ -62,28 +59,28 @@ const completionStatusNames: Record<GameSchemaLib.CompletionStatus, string> =
 	"ONE_HUNDRED_PERCENT": "100%",
 };
 
-const achievementSupportNames: Record<GameSchemaLib.AchievementSupport, string> =
+const achievementSupportNames: Record<GameAchievementSupport, string> =
 {
 	"NONE": "None",
 	"INGAME": "In-Game",
 	"LAUNCHER": "Launcher",
 };
 
-const controllerSupportNames: Record<GameSchemaLib.ControllerSupport, string> =
+const controllerSupportNames: Record<GameControllerSupport, string> =
 {
 	"NONE": "None",
 	"SUPPORTED": "Supported",
 	"REQUIRED": "Required",
 };
 
-const modSupportNames: Record<GameSchemaLib.ModSupport, string> =
+const modSupportNames: Record<GameModSupport, string> =
 {
 	"NONE": "None",
 	"UNOFFICIAL": "Unofficial",
 	"OFFICIAL": "Official",
 };
 
-const virtualRealitySupportNames: Record<GameSchemaLib.VirtualRealitySupport, string> =
+const virtualRealitySupportNames: Record<GameVirtualRealitySupport, string> =
 {
 	"NONE": "None",
 	"SUPPORTED": "Supported",
@@ -192,13 +189,6 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 
 			for (const game of sortedGames)
 			{
-				if (game.completionStatus == null)
-				{
-					groupManager.addItemToGroup("-", game);
-
-					continue;
-				}
-
 				if (game.isShelved)
 				{
 					groupManager.addItemToGroup("Shelved", game);
@@ -206,16 +196,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 					continue;
 				}
 
-				const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(game.completionStatus);
-
-				if (!completionStatusParseResult.success)
-				{
-					groupManager.addItemToGroup("-", game);
-
-					continue;
-				}
-
-				switch (completionStatusParseResult.data)
+				switch (game.completionStatus)
 				{
 					case "ONE_HUNDRED_PERCENT":
 					{
@@ -241,6 +222,13 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 					case "TODO":
 					{
 						groupManager.addItemToGroup("To Do", game);
+
+						break;
+					}
+					
+					case null:
+					{
+						groupManager.addItemToGroup("-", game);
 
 						break;
 					}
@@ -299,7 +287,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 					groupManager.addItemToGroup("Favorites", game);
 				}
 
-				const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type);				
+				const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER");				
 
 				if (gameDevelopers.length > 0)
 				{
@@ -652,7 +640,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 					groupManager.addItemToGroup("Favorites", game);
 				}
 
-				const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);				
+				const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER");				
 
 				if (gamePublishers.length > 0)
 				{
@@ -809,185 +797,124 @@ export function getImagePaths(game: Prisma.GameGetPayload<null>)
 	}
 }
 
-export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayload<null> | GameSchemaLib.ProgressionType)
+export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayload<null> | GameProgressionType)
 {
 	if (typeof gameOrProgressionType == "string")
 	{
 		return progressionTypeNames[gameOrProgressionType];
 	}
 
-	if (gameOrProgressionType.progressionType == null)
-	{
-		return "-";
-	}
-
-	const progressionTypeParseResult = GameSchemaLib.ProgressionTypeSchema.safeParse(gameOrProgressionType.progressionType);
-
-	return progressionTypeParseResult.success
-		? progressionTypeNames[progressionTypeParseResult.data]
-		: "Invalid: " + gameOrProgressionType.progressionType;
+	return gameOrProgressionType.progressionType != null
+		? progressionTypeNames[gameOrProgressionType.progressionType]
+		: "-";
 }
 
-export function getLogoImageAlignmentName(gameOrLogoImageAlignment: Prisma.GameGetPayload<null> | GameSchemaLib.LogoImageAlignment)
+export function getLogoImageAlignmentName(gameOrLogoImageAlignment: Prisma.GameGetPayload<null> | GameLogoImageAlignment)
 {
 	if (typeof gameOrLogoImageAlignment == "string")
 	{
 		return logoImageAlignmentNames[gameOrLogoImageAlignment];
 	}
 
-	if (gameOrLogoImageAlignment.logoImageAlignment == null)
-	{
-		return "-";
-	}
-
-	const logoImageAlignmentParseResult = GameSchemaLib.LogoImageAlignmentSchema.safeParse(gameOrLogoImageAlignment.logoImageAlignment);
-
-	return logoImageAlignmentParseResult.success
-		? logoImageAlignmentNames[logoImageAlignmentParseResult.data]
-		: "Invalid: " + gameOrLogoImageAlignment.logoImageAlignment;
+	return gameOrLogoImageAlignment.logoImageAlignment != null
+		? logoImageAlignmentNames[gameOrLogoImageAlignment.logoImageAlignment]
+		: "-";
 }
 
-export function getLogoImageJustificationName(gameOrLogoImageJustification: Prisma.GameGetPayload<null> | GameSchemaLib.LogoImageJustification)
+export function getLogoImageJustificationName(gameOrLogoImageJustification: Prisma.GameGetPayload<null> | GameLogoImageJustification)
 {
 	if (typeof gameOrLogoImageJustification == "string")
 	{
 		return logoImageJustificationNames[gameOrLogoImageJustification];
 	}
 
-	if (gameOrLogoImageJustification.logoImageJustification == null)
-	{
-		return "-";
-	}
-
-	const logoImageJustificationParseResult = GameSchemaLib.LogoImageJustificationSchema.safeParse(gameOrLogoImageJustification.logoImageJustification);
-
-	return logoImageJustificationParseResult.success
-		? logoImageJustificationNames[logoImageJustificationParseResult.data]
-		: "Invalid: " + gameOrLogoImageJustification.logoImageJustification;
+	return gameOrLogoImageJustification.logoImageJustification != null
+		? logoImageJustificationNames[gameOrLogoImageJustification.logoImageJustification]
+		: "-";
 }
 
-export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameSchemaLib.CompletionStatus)
+export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameCompletionStatus)
 {
 	if (typeof gameOrCompletionStatus == "string")
 	{
 		return completionStatusIconNames[gameOrCompletionStatus];
 	}
 
+	// HACK: this is not *really* a GameCompletionStatus
 	if (gameOrCompletionStatus.isShelved)
 	{
 		return "fa-solid fa-circle-pause";
 	}
 
-	if (gameOrCompletionStatus.completionStatus == null)
-	{
-		return "fa-solid fa-question";
-	}
-
-	const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(gameOrCompletionStatus.completionStatus);
-
-	return completionStatusParseResult.success
-		? completionStatusIconNames[completionStatusParseResult.data]
+	return gameOrCompletionStatus.completionStatus != null
+		? completionStatusIconNames[gameOrCompletionStatus.completionStatus]
 		: "fa-solid fa-question";
 }
 
-export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameSchemaLib.CompletionStatus)
+export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameCompletionStatus)
 {
 	if (typeof gameOrCompletionStatus == "string")
 	{
 		return completionStatusNames[gameOrCompletionStatus];
 	}
 
+	// HACK: this is not *really* a GameCompletionStatus
 	if (gameOrCompletionStatus.isShelved)
 	{
 		return "Shelved";
 	}
 
-	if (gameOrCompletionStatus.completionStatus == null)
-	{
-		return "-";
-	}
-
-	const completionStatusParseResult = GameSchemaLib.CompletionStatusSchema.safeParse(gameOrCompletionStatus.completionStatus);
-
-	return completionStatusParseResult.success
-		? completionStatusNames[completionStatusParseResult.data]
-		: "Invalid: " + gameOrCompletionStatus.completionStatus;
+	return gameOrCompletionStatus.completionStatus != null
+		? completionStatusNames[gameOrCompletionStatus.completionStatus]
+		: "-";
 }
 
-export function getAchievementSupportName(gameOrAchievementSupport: Prisma.GameGetPayload<null> | GameSchemaLib.AchievementSupport)
+export function getAchievementSupportName(gameOrAchievementSupport: Prisma.GameGetPayload<null> | GameAchievementSupport)
 {
 	if (typeof gameOrAchievementSupport == "string")
 	{
 		return achievementSupportNames[gameOrAchievementSupport];
 	}
 
-	if (gameOrAchievementSupport.achievementSupport == null)
-	{
-		return "-";
-	}
-
-	const achievementSupportParseResult = GameSchemaLib.AchievementSupportSchema.safeParse(gameOrAchievementSupport.achievementSupport);
-
-	return achievementSupportParseResult.success
-		? achievementSupportNames[achievementSupportParseResult.data]
-		: "Invalid: " + gameOrAchievementSupport.achievementSupport;
+	return gameOrAchievementSupport.achievementSupport != null
+		? achievementSupportNames[gameOrAchievementSupport.achievementSupport]
+		: "-";
 }
 
-export function getControllerSupportName(gameOrControllerSupport: Prisma.GameGetPayload<null> | GameSchemaLib.ControllerSupport)
+export function getControllerSupportName(gameOrControllerSupport: Prisma.GameGetPayload<null> | GameControllerSupport)
 {
 	if (typeof gameOrControllerSupport == "string")
 	{
 		return controllerSupportNames[gameOrControllerSupport];
 	}
 
-	if (gameOrControllerSupport.controllerSupport == null)
-	{
-		return "-";
-	}
-
-	const controllerSupportParseResult = GameSchemaLib.ControllerSupportSchema.safeParse(gameOrControllerSupport.controllerSupport);
-
-	return controllerSupportParseResult.success
-		? controllerSupportNames[controllerSupportParseResult.data]
-		: "Invalid: " + gameOrControllerSupport.controllerSupport;
+	return gameOrControllerSupport.controllerSupport != null
+		? controllerSupportNames[gameOrControllerSupport.controllerSupport]
+		: "-";
 }
 
-export function getModSupportName(gameOrModSupport: Prisma.GameGetPayload<null> | GameSchemaLib.ModSupport)
+export function getModSupportName(gameOrModSupport: Prisma.GameGetPayload<null> | GameModSupport)
 {
 	if (typeof gameOrModSupport == "string")
 	{
 		return modSupportNames[gameOrModSupport];
 	}
 
-	if (gameOrModSupport.modSupport == null)
-	{
-		return "-";
-	}
-
-	const modSupportParseResult = GameSchemaLib.ModSupportSchema.safeParse(gameOrModSupport.modSupport);
-
-	return modSupportParseResult.success
-		? modSupportNames[modSupportParseResult.data]
-		: "Invalid: " + gameOrModSupport.modSupport;
+	return gameOrModSupport.modSupport != null
+		? modSupportNames[gameOrModSupport.modSupport]
+		: "-";
 }
 
-export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma.GameGetPayload<null> | GameSchemaLib.VirtualRealitySupport)
+export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma.GameGetPayload<null> | GameVirtualRealitySupport)
 {
 	if (typeof gameOrVirtualRealitySupport == "string")
 	{
 		return virtualRealitySupportNames[gameOrVirtualRealitySupport];
 	}
 
-	if (gameOrVirtualRealitySupport.virtualRealitySupport == null)
-	{
-		return "-";
-	}
-
-	const virtualRealitySupportParseResult = GameSchemaLib.VirtualRealitySupportSchema.safeParse(gameOrVirtualRealitySupport.virtualRealitySupport);
-
-	return virtualRealitySupportParseResult.success
-		? virtualRealitySupportNames[virtualRealitySupportParseResult.data]
-		: "Invalid: " + gameOrVirtualRealitySupport.virtualRealitySupport;
+	return gameOrVirtualRealitySupport.virtualRealitySupport != null
+		? virtualRealitySupportNames[gameOrVirtualRealitySupport.virtualRealitySupport]
+		: "-";
 }
 
 export function hasActiveSession(game: Prisma.GameGetPayload<null>)

@@ -9,8 +9,6 @@ import { ServerFritterContext } from "../../instances/server.js";
 
 import * as CompanyModelLib from "../../libs/models/Company.js";
 
-import * as GameCompanySchemaLib from "../../libs/schemas/GameCompany.js";
-
 import { view } from "../../views/company/view.js";
 
 //
@@ -65,7 +63,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					{
 						some:
 						{
-							type: "DEVELOPER" satisfies GameCompanySchemaLib.Type,
+							type: "DEVELOPER",
 
 							company_id: companyId,
 						},
@@ -85,7 +83,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					{
 						some:
 						{
-							type: "PUBLISHER" satisfies GameCompanySchemaLib.Type,
+							type: "PUBLISHER",
 
 							company_id: companyId,
 						},

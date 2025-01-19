@@ -3,6 +3,7 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { GamePlayActionType } from "@prisma/client";
 import { z } from "zod";
 
 //
@@ -12,10 +13,10 @@ import { z } from "zod";
 export const RequestBodySchema = z.object(
 	{
 		name: z.string(),
-		type: z.string(),
+		type: z.custom<GamePlayActionType>(),
 		path: z.string(),
 		trackingPath: z.string(),
-		argumentsJson: z.string(),
+		argumentsJson: z.array(z.string()),
 		isArchived: z.boolean(),
 
 		game_id: z.number().int(),

@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Prisma } from "@prisma/client";
+import { GamePlayActionType, Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { LGGL_LAUNCH_CHECK_INTERVAL } from "../../env/LGGL_LAUNCH_CHECK_INTERVAL.js";
@@ -13,16 +13,13 @@ import { prismaClient } from "../../instances/prismaClient.js";
 
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 
-import * as GameSchemaLib from "../schemas/Game.js";
-import * as GamePlayActionSchemaLib from "../schemas/GamePlayAction.js";
-
 import * as SystemLib from "../System.js";
 
 //
 // Constants
 //
 
-const typeNames: Record<GamePlayActionSchemaLib.Type, string> =
+const typeNames: Record<GamePlayActionType, string> =
 {
 	"EXECUTABLE": "Executable",
 	"URL": "URL",
@@ -57,7 +54,7 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<Ex
 
 	console.log("[LauncherLib] Parsing additional arguments for game play action %d...", gamePlayAction.id);
 
-	const additionalArgumentsParseResult = z.array(z.string()).safeParse(JSON.parse(gamePlayAction.argumentsJson));
+	const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
 
 	if (!additionalArgumentsParseResult.success)
 	{
@@ -127,8 +124,8 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<Ex
 	//
 
 	const updateCompletionStatus =
-		gamePlayAction.game.progressionType != "NONE" satisfies GameSchemaLib.ProgressionType && 
-		(gamePlayAction.game.completionStatus == null || gamePlayAction.game.completionStatus == "TODO" satisfies GameSchemaLib.CompletionStatus);
+		gamePlayAction.game.progressionType != "NONE" && 
+		(gamePlayAction.game.completionStatus == null || gamePlayAction.game.completionStatus == "TODO");
 
 	await prismaClient.game.update(
 		{
@@ -138,7 +135,7 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<Ex
 			},
 			data:
 			{
-				completionStatus: updateCompletionStatus ? "IN_PROGRESS" satisfies GameSchemaLib.CompletionStatus : undefined,
+				completionStatus: updateCompletionStatus ? "IN_PROGRESS" : undefined,
 				firstPlayedDate: gamePlayAction.game.firstPlayedDate == null ? gamePlaySession.startDate : undefined,
 				lastPlayedDate: gamePlaySession.startDate,
 				playCount: { increment: 1 },
@@ -158,21 +155,9 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<Ex
 // Utility Functions
 //
 
-export function getTypeName(gamePlayActionOrType: Prisma.GameCompanyGetPayload<null> | GamePlayActionSchemaLib.Type)
+export function getTypeName(gamePlayActionOrType: Prisma.GameCompanyGetPayload<null> | GamePlayActionType)
 {
-	if (typeof gamePlayActionOrType == "string")
-	{
-		return typeNames[gamePlayActionOrType];
-	}
-
-	if (gamePlayActionOrType.type == null)
-	{
-		return "-";
-	}
-
-	const typeParseResult = GamePlayActionSchemaLib.TypeSchema.safeParse(gamePlayActionOrType.type);
-
-	return typeParseResult.success
-		? typeNames[typeParseResult.data]
-		: "Invalid: " + gamePlayActionOrType.type;
+	return typeof gamePlayActionOrType == "string"
+		? typeNames[gamePlayActionOrType]
+		: gamePlayActionOrType.type;
 }

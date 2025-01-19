@@ -3,9 +3,9 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport } from "@prisma/client";
 import { z } from "zod";
 
-import * as GameSchemaLib from "../../../libs/schemas/Game.js";
 
 //
 // Schemas
@@ -18,14 +18,14 @@ export const RequestBodySchema = z.object(
 		releaseDate: z.string().date().nullable(),
 		description: z.string().trim().nullable(),
 		notes: z.string().trim().nullable(),
-		progressionType: GameSchemaLib.ProgressionTypeSchema.nullable(),
+		progressionType: z.custom<GameProgressionType>().nullable(),
 
 		hasBannerImage: z.boolean(),
 		hasCoverImage: z.boolean(),
 		hasIconImage: z.boolean(),
 		hasLogoImage: z.boolean(),
-		logoImageAlignment: GameSchemaLib.LogoImageAlignmentSchema.nullable(),
-		logoImageJustification: GameSchemaLib.LogoImageJustificationSchema.nullable(),
+		logoImageAlignment: z.custom<GameLogoImageAlignment>().nullable(),
+		logoImageJustification: z.custom<GameLogoImageJustification>().nullable(),
 
 		isEarlyAccess: z.boolean(),
 		isFavorite: z.boolean(),
@@ -36,7 +36,7 @@ export const RequestBodySchema = z.object(
 		isUnknownEngine: z.boolean(),
 		isUnreleased: z.boolean(),
 
-		completionStatus: GameSchemaLib.CompletionStatusSchema.nullable(),
+		completionStatus: z.custom<GameCompletionStatus>().nullable(),
 		firstPlayedDate: z.string().nullable(),
 		firstPlayedDateApproximated: z.boolean(),
 		firstCompletedDate: z.string().nullable(),
@@ -45,10 +45,10 @@ export const RequestBodySchema = z.object(
 		playCount: z.number(),
 		playTimeTotalSeconds: z.number(),
 
-		achievementSupport: GameSchemaLib.AchievementSupportSchema.nullable(),
-		controllerSupport: GameSchemaLib.ControllerSupportSchema.nullable(),
-		modSupport: GameSchemaLib.ModSupportSchema.nullable(),
-		virtualRealitySupport: GameSchemaLib.VirtualRealitySupportSchema.nullable(),
+		achievementSupport: z.custom<GameAchievementSupport>().nullable(),
+		controllerSupport: z.custom<GameControllerSupport>().nullable(),
+		modSupport: z.custom<GameModSupport>().nullable(),
+		virtualRealitySupport: z.custom<GameVirtualRealitySupport>().nullable(),
 
 		steamAppId: z.number().nullable(),
 		steamAppName: z.string().nullable(),

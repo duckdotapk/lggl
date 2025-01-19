@@ -1,10 +1,15 @@
+enum GameCompanyType {
+    DEVELOPER
+    PUBLISHER
+}
+
 model GameCompany {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
     notes String?
-    type  String
+    type  GameCompanyType
 
     company_id Int
     game_id    Int

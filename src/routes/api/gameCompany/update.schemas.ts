@@ -3,9 +3,8 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { GameCompanyType } from "@prisma/client";
 import { z } from "zod";
-
-import * as GameCompanySchemaLib from "../../../libs/schemas/GameCompany.js";
 
 //
 // Schemas
@@ -18,7 +17,7 @@ export const RequestBodySchema = z.object(
 		updateData: z.object(
 			{
 				notes: z.string().nullable(),
-				type: GameCompanySchemaLib.TypeSchema,
+				type: z.custom<GameCompanyType>(),
 
 				company_id: z.number().int(),
 			}).partial(),

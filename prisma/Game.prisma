@@ -1,23 +1,71 @@
+enum GameProgressionType {
+    NONE
+    NON_CAMPAIGN
+    CAMPAIGN
+}
+
+enum GameLogoImageAlignment {
+    START
+    CENTER
+    END
+}
+
+enum GameLogoImageJustification {
+    START
+    CENTER
+}
+
+enum GameCompletionStatus {
+    TODO
+    IN_PROGRESS
+    COMPLETE
+    ONE_HUNDRED_PERCENT
+}
+
+enum GameAchievementSupport {
+    NONE
+    INGAME
+    LAUNCHER
+}
+
+enum GameControllerSupport {
+    NONE
+    SUPPORTED
+    REQUIRED
+}
+
+enum GameModSupport {
+    NONE
+    UNOFFICIAL
+    OFFICIAL
+}
+
+enum GameVirtualRealitySupport {
+    NONE
+    SUPPORTED
+    REQUIRED
+}
+
 model Game {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
     // General
-    name            String    @unique
+    name            String               @unique
     sortName        String
     releaseDate     DateTime?
     description     String?
     notes           String?
-    progressionType String?
+    progressionType GameProgressionType?
 
     // Images
-    hasBannerImage         Boolean @default(false)
-    hasCoverImage          Boolean @default(false)
-    hasIconImage           Boolean @default(false)
-    hasLogoImage           Boolean @default(false)
-    logoImageAlignment     String?
-    logoImageJustification String?
+    hasBannerImage         Boolean                     @default(false)
+    hasCoverImage          Boolean                     @default(false)
+    hasIconImage           Boolean                     @default(false)
+    hasLogoImage           Boolean                     @default(false)
+    logoImageAlignment     GameLogoImageAlignment?
+    logoImageJustification GameLogoImageJustification?
 
     // Flags
     isEarlyAccess   Boolean @default(false)
@@ -30,20 +78,20 @@ model Game {
     isUnreleased    Boolean @default(false)
 
     // Play data
-    completionStatus               String?
+    completionStatus               GameCompletionStatus?
     firstPlayedDate                DateTime?
-    firstPlayedDateApproximated    Boolean   @default(false)
+    firstPlayedDateApproximated    Boolean               @default(false)
     firstCompletedDate             DateTime?
-    firstCompletedDateApproximated Boolean   @default(false)
+    firstCompletedDateApproximated Boolean               @default(false)
     lastPlayedDate                 DateTime?
-    playCount                      Int       @default(0)
-    playTimeTotalSeconds           Int       @default(0)
+    playCount                      Int                   @default(0)
+    playTimeTotalSeconds           Int                   @default(0)
 
     // Features
-    achievementSupport    String?
-    controllerSupport     String?
-    modSupport            String?
-    virtualRealitySupport String?
+    achievementSupport    GameAchievementSupport?
+    controllerSupport     GameControllerSupport?
+    modSupport            GameModSupport?
+    virtualRealitySupport GameVirtualRealitySupport?
 
     // Steam app
     steamAppId   Int?

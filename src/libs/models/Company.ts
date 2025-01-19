@@ -9,8 +9,6 @@ import { GroupManager } from "../../classes/GroupManager.js";
 
 import * as SettingModelLib from "../models/Setting.js";
 
-import * as GameCompanySchemaLib from "../schemas/GameCompany.js";
-
 //
 // Create/Find/Update/Delete Functions
 //
@@ -68,7 +66,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 				{
 					return {
 						company, 
-						numberOfGamesDeveloped: company.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type).length,
+						numberOfGamesDeveloped: company.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER").length,
 					};
 				})
 				.toSorted((a, b) =>
@@ -98,7 +96,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 				{
 					return {
 						company, 
-						numberOfGamesPublished: company.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type).length,
+						numberOfGamesPublished: company.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER").length,
 					};
 				})
 				.toSorted((a, b) =>

@@ -3,11 +3,10 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport } from "@prisma/client";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
 import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
-
-import * as GameSchemaLib from "../../libs/schemas/Game.js";
 
 import { createGame } from "../../routes/api/game/create.schemas.js";
 import { updateGame } from "../../routes/api/game/update.schemas.js";
@@ -76,14 +75,14 @@ async function initialise(form: HTMLFormElement)
 						releaseDate: InputClientLib.getDateValueNullable(releaseDateInput),
 						description: InputClientLib.getStringValueNullable(descriptionInput),
 						notes: InputClientLib.getStringValueNullable(notesInput),
-						progressionType: InputClientLib.getEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
+						progressionType: InputClientLib.getEnumValueNullable<GameProgressionType>(progressionTypeSelect),
 
 						hasBannerImage: InputClientLib.getBooleanValue(hasBannerImageInput),
 						hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
 						hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
 						hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
-						logoImageAlignment: InputClientLib.getEnumValueNullable(logoImageAlignmentSelect, GameSchemaLib.LogoImageAlignmentSchema),
-						logoImageJustification: InputClientLib.getEnumValueNullable(logoImageJustificationSelect, GameSchemaLib.LogoImageJustificationSchema),
+						logoImageAlignment: InputClientLib.getEnumValueNullable<GameLogoImageAlignment>(logoImageAlignmentSelect),
+						logoImageJustification: InputClientLib.getEnumValueNullable<GameLogoImageJustification>(logoImageJustificationSelect),
 
 						isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
 						isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
@@ -94,7 +93,7 @@ async function initialise(form: HTMLFormElement)
 						isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
 						isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
 
-						completionStatus: InputClientLib.getEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
+						completionStatus: InputClientLib.getEnumValueNullable<GameCompletionStatus>(completionStatusSelect),
 						firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
 						firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
 						firstCompletedDate: InputClientLib.getDateTimeValueNullable(firstCompletedDateInput),
@@ -103,10 +102,10 @@ async function initialise(form: HTMLFormElement)
 						playCount: InputClientLib.getNumberValue(playCountInput),
 						playTimeTotalSeconds: InputClientLib.getNumberValue(playTimeTotalSecondsInput),
 
-						achievementSupport: InputClientLib.getEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
-						controllerSupport: InputClientLib.getEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
-						modSupport: InputClientLib.getEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
-						virtualRealitySupport: InputClientLib.getEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
+						achievementSupport: InputClientLib.getEnumValueNullable<GameAchievementSupport>(achievementSupportSelect),
+						controllerSupport: InputClientLib.getEnumValueNullable<GameControllerSupport>(controllerSupportSelect),
+						modSupport: InputClientLib.getEnumValueNullable<GameModSupport>(modSupportSelect),
+						virtualRealitySupport: InputClientLib.getEnumValueNullable<GameVirtualRealitySupport>(virtualRealitySupportSelect),
 
 						steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
 						steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
@@ -140,14 +139,14 @@ async function initialise(form: HTMLFormElement)
 						releaseDate: InputClientLib.getChangedDateValueNullable(releaseDateInput),
 						description: InputClientLib.getChangedStringValueNullable(descriptionInput),
 						notes: InputClientLib.getChangedStringValueNullable(notesInput),
-						progressionType: InputClientLib.getChangedEnumValueNullable(progressionTypeSelect, GameSchemaLib.ProgressionTypeSchema),
+						progressionType: InputClientLib.getChangedEnumValueNullable<GameProgressionType>(progressionTypeSelect),
 
 						hasBannerImage: InputClientLib.getChangedBooleanValue(hasBannerImageInput),
 						hasCoverImage: InputClientLib.getChangedBooleanValue(hasCoverImageInput),
 						hasIconImage: InputClientLib.getChangedBooleanValue(hasIconImageInput),
 						hasLogoImage: InputClientLib.getChangedBooleanValue(hasLogoImageInput),
-						logoImageAlignment: InputClientLib.getChangedEnumValueNullable(logoImageAlignmentSelect, GameSchemaLib.LogoImageAlignmentSchema),
-						logoImageJustification: InputClientLib.getChangedEnumValueNullable(logoImageJustificationSelect, GameSchemaLib.LogoImageJustificationSchema),
+						logoImageAlignment: InputClientLib.getChangedEnumValueNullable<GameLogoImageAlignment>(logoImageAlignmentSelect),
+						logoImageJustification: InputClientLib.getChangedEnumValueNullable<GameLogoImageJustification>(logoImageJustificationSelect),
 
 						isEarlyAccess: InputClientLib.getChangedBooleanValue(isEarlyAccessInput),
 						isFavorite: InputClientLib.getChangedBooleanValue(isFavoriteInput),
@@ -158,7 +157,7 @@ async function initialise(form: HTMLFormElement)
 						isUnknownEngine: InputClientLib.getChangedBooleanValue(isUnknownEngineInput),
 						isUnreleased: InputClientLib.getChangedBooleanValue(isUnreleasedInput),
 
-						completionStatus: InputClientLib.getChangedEnumValueNullable(completionStatusSelect, GameSchemaLib.CompletionStatusSchema),
+						completionStatus: InputClientLib.getChangedEnumValueNullable<GameCompletionStatus>(completionStatusSelect),
 						firstPlayedDate: InputClientLib.getChangedDateTimeValueNullable(firstPlayedDateInput),
 						firstPlayedDateApproximated: InputClientLib.getChangedBooleanValue(firstPlayedDateApproximatedInput),
 						firstCompletedDate: InputClientLib.getChangedDateTimeValueNullable(firstCompletedDateInput),
@@ -167,10 +166,10 @@ async function initialise(form: HTMLFormElement)
 						playCount: InputClientLib.getChangedNumberValue(playCountInput),
 						playTimeTotalSeconds: InputClientLib.getChangedNumberValue(playTimeTotalSecondsInput),
 
-						achievementSupport: InputClientLib.getChangedEnumValueNullable(achievementSupportSelect, GameSchemaLib.AchievementSupportSchema),
-						controllerSupport: InputClientLib.getChangedEnumValueNullable(controllerSupportSelect, GameSchemaLib.ControllerSupportSchema),
-						modSupport: InputClientLib.getChangedEnumValueNullable(modSupportSelect, GameSchemaLib.ModSupportSchema),
-						virtualRealitySupport: InputClientLib.getChangedEnumValueNullable(virtualRealitySupportSelect, GameSchemaLib.VirtualRealitySupportSchema),
+						achievementSupport: InputClientLib.getChangedEnumValueNullable<GameAchievementSupport>(achievementSupportSelect),
+						controllerSupport: InputClientLib.getChangedEnumValueNullable<GameControllerSupport>(controllerSupportSelect),
+						modSupport: InputClientLib.getChangedEnumValueNullable<GameModSupport>(modSupportSelect),
+						virtualRealitySupport: InputClientLib.getChangedEnumValueNullable<GameVirtualRealitySupport>(virtualRealitySupportSelect),
 
 						steamAppId: InputClientLib.getChangedNumberValueNullable(steamAppIdInput),
 						steamAppName: InputClientLib.getChangedStringValueNullable(steamAppNameInput),

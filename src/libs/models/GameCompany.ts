@@ -2,15 +2,13 @@
 // Imports
 //
 
-import { Prisma } from "@prisma/client";
-
-import * as GameCompanySchemaLib from "../schemas/GameCompany.js";
+import { GameCompanyType, Prisma } from "@prisma/client";
 
 //
 // Constants
 //
 
-const typeNames: Record<GameCompanySchemaLib.Type, string> =
+const typeNames: Record<GameCompanyType, string> =
 {
 	"DEVELOPER": "Developer",
 	"PUBLISHER": "Publisher",
@@ -20,21 +18,9 @@ const typeNames: Record<GameCompanySchemaLib.Type, string> =
 // Utility Functions
 //
 
-export function getTypeName(gameCompanyOrType: Prisma.GameCompanyGetPayload<null> | GameCompanySchemaLib.Type)
+export function getTypeName(gameCompanyOrType: Prisma.GameCompanyGetPayload<null> | GameCompanyType)
 {
-	if (typeof gameCompanyOrType == "string")
-	{
-		return typeNames[gameCompanyOrType];
-	}
-
-	if (gameCompanyOrType.type == null)
-	{
-		return "-";
-	}
-
-	const typeParseResult = GameCompanySchemaLib.TypeSchema.safeParse(gameCompanyOrType.type);
-
-	return typeParseResult.success
-		? typeNames[typeParseResult.data]
-		: "Invalid: " + gameCompanyOrType.type;
+	return typeof gameCompanyOrType == "string"
+		? typeNames[gameCompanyOrType]
+		: typeNames[gameCompanyOrType.type];
 }

@@ -10,8 +10,6 @@ import { prismaClient } from "../instances/prismaClient.js";
 
 import * as GameModelLib from "./models/Game.js";
 
-import * as GameCompanySchemaLib from "./schemas/GameCompany.js";
-
 //
 // Classes
 //
@@ -281,14 +279,14 @@ export async function auditGame(game: AuditGameGame, strictMode: boolean, autoFi
 	// Check Game Companies
 	//
 
-	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER" satisfies GameCompanySchemaLib.Type);
+	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER");
 
 	if (gameDevelopers.length == 0)
 	{
 		problemList.addProblem("no gameCompanies with DEVELOPER type", false, false);
 	}
 
-	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER" satisfies GameCompanySchemaLib.Type);
+	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER");
 
 	if (gamePublishers.length == 0)
 	{

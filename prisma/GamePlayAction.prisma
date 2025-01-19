@@ -1,14 +1,20 @@
+enum GamePlayActionType {
+    EXECUTABLE
+    URL
+}
+
 model GamePlayAction {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
-    name          String
-    type          String
-    path          String
-    trackingPath  String
-    argumentsJson String  @default("[]")
-    isArchived    Boolean @default(false)
+    name             String
+    type             GamePlayActionType
+    path             String
+    workingDirectory String?
+    trackingPath     String
+    argumentsJson    Json
+    isArchived       Boolean            @default(false)
 
     game_id Int
 

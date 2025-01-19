@@ -62,7 +62,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (requestBody.updateData.argumentsJson !== undefined)
 			{
-				// TODO: validate that this is actually a JSON string array (possibly at the schema level)
 				gamePlayActionUpdateData.argumentsJson = requestBody.updateData.argumentsJson;
 			}
 
