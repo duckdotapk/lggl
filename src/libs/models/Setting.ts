@@ -12,7 +12,7 @@ import * as SettingSchemaLib from "../schemas/Setting.js";
 
 export class Settings
 {
-	gameGroupMode: SettingSchemaLib.GameGroupMode = "lastPlayed";
+	gameGroupMode: SettingSchemaLib.GameGroupMode = "lastPlayedDate";
 	showFavoritesGroup: SettingSchemaLib.ShowFavoritesGroup = true;
 	showRegularGames: SettingSchemaLib.ShowRegularGames = true;
 	showHiddenGames: SettingSchemaLib.ShowHiddenGames = false;
@@ -153,7 +153,7 @@ const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 	completionStatus: "Completion status",
 	developer: "Developer",
 	engine: "Engine",
-	lastPlayed: "Last played",
+	lastPlayedDate: "Last played date",
 	name: "Name",
 	playTime: "Play time",
 	publisher: "Publisher",

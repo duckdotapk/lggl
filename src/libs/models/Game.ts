@@ -370,7 +370,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			return groupManager;
 		}
 
-		case "lastPlayed":
+		case "lastPlayedDate":
 		{
 			const groupManager = new GroupManager<typeof games[0]>(
 				{
