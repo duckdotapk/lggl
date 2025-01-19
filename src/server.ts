@@ -13,6 +13,7 @@ import * as unzipper from "unzipper";
 import { LGGL_DATA_DIRECTORY } from "./env/LGGL_DATA_DIRECTORY.js";
 import { LGGL_PORT } from "./env/LGGL_PORT.js";
 
+import { prismaClient } from "./instances/prismaClient.js";
 import { routerMiddleware, server } from "./instances/server.js";
 
 //
@@ -92,6 +93,55 @@ if (!fs.existsSync(fontAwesomeDirectory))
 
 		console.error(chalk.red("[Server] Failed to download Font Awesome Free, some icons will not work:"), error);
 	}
+}
+
+//
+// Add Unadded Play Sessions
+//
+
+const gamePlaySessions = await prismaClient.gamePlaySession.findMany(
+	{
+		where:
+		{
+			addedToTotal: false,
+		},
+		include:
+		{
+			game: true,
+		},
+	});
+
+for (const gamePlaySession of gamePlaySessions)
+{
+	console.log("[Server] Adding play session %d to play time total for %s...", gamePlaySession.id, gamePlaySession.game.name);
+
+	await prismaClient.$transaction(
+		async (transactionClient) =>
+		{
+			await transactionClient.game.update(
+				{
+					where:
+					{
+						id: gamePlaySession.game_id,
+					},
+					data:
+					{
+						playTimeTotalSeconds: { increment: gamePlaySession.playTimeSeconds },
+					},
+				});
+
+			await transactionClient.gamePlaySession.update(
+				{
+					where:
+					{
+						id: gamePlaySession.id,
+					},
+					data:
+					{
+						addedToTotal: true,
+					},
+				});
+		});
 }
 
 //
