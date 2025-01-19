@@ -17,6 +17,7 @@ import { initialiseUpsertGameLinkForms } from "./components/form/UpsertGameLinkF
 import { initialiseUpsertGamePlatformForms } from "./components/form/UpsertGamePlatformForm.client.js";
 import { initialiseUpsertGamePlayActionForms } from "./components/form/UpsertGamePlayActionForm.client.js";
 import { initialiseUpsertPlatformForms } from "./components/form/UpsertPlatformForm.client.js";
+import { initialiseUpsertSeriesForms } from "./components/form/UpsertSeriesForm.client.js";
 
 import { initialiseCheckboxes } from "./components/input/Checkbox.client.js";
 import { initialiseControls } from "./components/input/Control.client.js";
@@ -28,6 +29,7 @@ import { initialiseCompanySettingsToolbars } from "./components/toolbar/CompanyS
 import { initialiseEngineSettingsToolbars } from "./components/toolbar/EngineSettingsToolbar.client.js";
 import { initialiseGameSettingsToolbars } from "./components/toolbar/GameSettingsToolbar.client.js";
 import { initialisePlatformSettingsToolbars } from "./components/toolbar/PlatformSettingsToolbar.client.js";
+import { initialiseSeriesSettingsToolbars } from "./components/toolbar/SeriesSettingsToolbar.client.js";
 
 import { updateSidebars } from "./components/Sidebar.client.js";
 
@@ -60,6 +62,7 @@ async function initialiseComponents()
 	initialiseUpsertGamePlatformForms();
 	initialiseUpsertGamePlayActionForms();
 	initialiseUpsertPlatformForms();
+	initialiseUpsertSeriesForms();
 	
 	initialiseCheckboxes();
 	initialiseControls();
@@ -71,6 +74,7 @@ async function initialiseComponents()
 	initialiseEngineSettingsToolbars();
 	initialiseGameSettingsToolbars();
 	initialisePlatformSettingsToolbars();
+	initialiseSeriesSettingsToolbars();
 
 	//
 	// Update Components

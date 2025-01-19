@@ -49,7 +49,7 @@ function Separator()
 // Component
 //
 
-export type SidebarPage = "games" | "companies" | "engines" | "platforms" | "audit" | "stats" | null;
+export type SidebarPage = "games" | "companies" | "engines" | "platforms" | "series" | "audit" | "stats" | null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
@@ -95,7 +95,14 @@ export function Sidebar(currentPage: SidebarPage)
 					text: "Platforms",
 				}),
 
-			// TODO: Series item
+			Item(
+				{
+					page: "series",
+					currentPage,
+					href: "/series",
+					iconName: "fa-solid fa-list-timeline",
+					text: "Series",
+				}),
 
 			Separator(),
 

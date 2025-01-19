@@ -27,6 +27,8 @@ export const EngineGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
 
 export const PlatformGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
 
+export const SeriesGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
+
 //
 // Types
 //
@@ -42,3 +44,5 @@ export type CompanyGroupMode = z.infer<typeof CompanyGroupModeSchema>;
 export type EngineGroupMode = z.infer<typeof EngineGroupModeSchema>;
 
 export type PlatformGroupMode = z.infer<typeof PlatformGroupModeSchema>;
+
+export type SeriesGroupMode = z.infer<typeof SeriesGroupModeSchema>;

@@ -62,6 +62,12 @@ export const RequestBodySchema = z.object(
 						name: z.literal("platformGroupMode"),
 						value: SettingSchemaLib.PlatformGroupModeSchema,
 					}),
+
+				z.object(
+					{
+						name: z.literal("seriesGroupMode"),
+						value: SettingSchemaLib.SeriesGroupModeSchema,
+					}),
 			])),
 	});
 

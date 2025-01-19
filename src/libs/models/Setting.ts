@@ -24,6 +24,8 @@ export class Settings
 
 	platformGroupMode: SettingSchemaLib.PlatformGroupMode = "name";
 
+	seriesGroupMode: SettingSchemaLib.SeriesGroupMode = "name";
+
 	constructor(settings: Prisma.SettingGetPayload<null>[])
 	{
 		for (const setting of settings)
@@ -125,6 +127,18 @@ export class Settings
 
 					break;
 				}
+
+				case "seriesGroupMode":
+				{
+					const valueParseResult = SettingSchemaLib.SeriesGroupModeSchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.seriesGroupMode = valueParseResult.data;
+					}
+
+					break
+				}
 			}
 		}
 	}
@@ -165,6 +179,12 @@ const platformGroupModeNames: Record<SettingSchemaLib.PlatformGroupMode, string>
 	numberOfGames: "Number of games",
 };
 
+const seriesGroupModeNames: Record<SettingSchemaLib.SeriesGroupMode, string> =
+{
+	name: "Name",
+	numberOfGames: "Number of games",
+};
+
 //
 // Create/Find/Update/Delete Functions
 //
@@ -194,4 +214,9 @@ export function getEngineGroupModeName(engineGroupMode: SettingSchemaLib.EngineG
 export function getPlatformGroupModeName(platformGroupMode: SettingSchemaLib.PlatformGroupMode)
 {
 	return platformGroupModeNames[platformGroupMode];
+}
+
+export function getSeriesGroupModeName(seriesGroupMode: SettingSchemaLib.SeriesGroupMode)
+{
+	return seriesGroupModeNames[seriesGroupMode];
 }
