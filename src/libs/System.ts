@@ -17,6 +17,8 @@ export async function startProcess(path: string, additionalArguments: string[])
 	{
 		case "win32":
 			command = "cmd";
+
+			// TODO: set working directory, this is currently fucked for EXECUTABLE type game play actions
 			commandArguments = [ "/c", "start", "", path ];
 
 			break;
