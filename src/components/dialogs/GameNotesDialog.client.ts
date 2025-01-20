@@ -7,6 +7,7 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 import { GameNotesDialog } from "./GameNotesDialog.js";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
+import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
 import { findGame } from "../../routes/api/game/findOne.schemas.js";
 import { updateGame } from "../../routes/api/game/update.schemas.js";
@@ -39,6 +40,8 @@ async function initialise(dialog: HTMLDialogElement)
 			}
 
 			dialog.close();
+
+			PjaxClientLib.reloadView();
 		});
 
 	dialog.addEventListener("close", () => dialog.remove());
