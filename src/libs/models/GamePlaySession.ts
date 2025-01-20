@@ -131,25 +131,25 @@ export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ in
 
 	gamesWithActiveSessions.add(gamePlayAction.game.id);
 
-	const interval = setInterval(
-		async () =>
+	const timeoutCallback = async () =>
+	{
+		const isGameProcessRunning = await SystemLib.isProcessRunning(gamePlayAction.trackingPath);
+
+		if (isGameProcessRunning)
 		{
-			const isGameProcessRunning = await SystemLib.isProcessRunning(gamePlayAction.trackingPath);
+			update(gamePlaySession);
 
-			if (isGameProcessRunning)
-			{
-				update(gamePlaySession);
-			}
-			else
-			{
-				gamesWithActiveSessions.delete(gamePlayAction.game.id);
+			setTimeout(timeoutCallback, LGGL_LAUNCH_CHECK_INTERVAL);
+		}
+		else
+		{
+			gamesWithActiveSessions.delete(gamePlayAction.game.id);
 
-				clearInterval(interval);
+			end(gamePlaySession);
+		}
+	}
 
-				end(gamePlaySession);
-			}
-		},
-		LGGL_LAUNCH_CHECK_INTERVAL);
+	setTimeout(timeoutCallback, LGGL_LAUNCH_CHECK_INTERVAL);
 
 	return gamePlaySession;
 }
