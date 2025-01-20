@@ -40,6 +40,11 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			const gamePlatformUpdateData: Prisma.GamePlatformUpdateArgs["data"] = {};
 
+			if (requestBody.updateData.notes !== undefined)
+			{
+				gamePlatformUpdateData.notes = requestBody.updateData.notes;
+			}
+
 			if (requestBody.updateData.platform_id !== undefined)
 			{
 				const platform = await prismaClient.platform.findUnique(

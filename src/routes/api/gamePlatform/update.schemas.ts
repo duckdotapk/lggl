@@ -15,6 +15,8 @@ export const RequestBodySchema = z.object(
 		
 		updateData: z.object(
 			{
+				notes: z.string().nullable(),
+
 				platform_id: z.number().int().min(1),
 			}).partial(),
 	});

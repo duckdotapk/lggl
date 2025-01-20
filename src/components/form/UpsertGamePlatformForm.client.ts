@@ -21,6 +21,7 @@ async function initialise(form: HTMLFormElement)
 	const gamePlatformId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gamePlatformId");
 
 	const platformIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="platform_id"]`);
+	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
 	if (gamePlatformId == null)
 	{
@@ -31,6 +32,8 @@ async function initialise(form: HTMLFormElement)
 				requireConfirmation: false,
 				onSubmit: async () => await createGamePlatform(
 					{
+						notes: InputClientLib.getStringValueNullable(notesInput),
+
 						game_id: gameId,
 						platform_id: InputClientLib.getNumberValue(platformIdSelect),
 					}),
@@ -57,6 +60,8 @@ async function initialise(form: HTMLFormElement)
 				requireConfirmation: false,
 				onSubmit: async () => await updateGamePlatform(gamePlatformId,
 					{
+						notes: InputClientLib.getChangedStringValueNullable(notesInput),
+
 						platform_id: InputClientLib.getChangedNumberValue(platformIdSelect),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),

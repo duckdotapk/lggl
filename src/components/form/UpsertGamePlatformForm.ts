@@ -33,17 +33,37 @@ export function UpsertGamePlatformForm(options: UpsertGamePlatformFormOptions)
 			"data-game-platform-id": options.gamePlatform?.id ?? null,
 		},
 		[
-			Label("platform_id", "Platform"),
+			ColumnLayout(2,
+				[
+					new DE("div", null,
+						[
+							Label("platform_id", "Platform"),
 
-			Control(
-				{
-					type: "select",
-					name: "platform_id",
-					required: true,
-					value: options.gamePlatform?.platform_id,
-					showEmptyOption: true,
-					options: options.platforms.map((platform) => ({ value: platform.id, label: platform.name }))
-				}),
+							Control(
+								{
+									type: "select",
+									name: "platform_id",
+									required: true,
+									value: options.gamePlatform?.platform_id,
+									showEmptyOption: true,
+									options: options.platforms.map((platform) => ({ value: platform.id, label: platform.name }))
+								}),
+						]),
+
+					new DE("div", null,
+						[
+							Label("notes", "Notes"),
+
+							Control(
+								{
+									type: "text",
+									name: "notes",
+									required: false,
+									value: options.gamePlatform?.notes,
+									placeholder: "Notes",
+								}),
+						]),
+				]),
 
 			ColumnLayout(options.gamePlatform != null ? 2 : 1,
 				[

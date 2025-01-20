@@ -11,6 +11,8 @@ import { z } from "zod";
 
 export const RequestBodySchema = z.object(
 	{
+		notes: z.string().nullable(),
+
 		platform_id: z.number().int(),
 		game_id: z.number().int(),
 	});

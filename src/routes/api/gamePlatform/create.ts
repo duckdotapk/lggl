@@ -54,6 +54,8 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				{
 					data:
 					{
+						notes: requestBody.notes,
+
 						platform_id: platform.id,
 						game_id: game.id,
 					},

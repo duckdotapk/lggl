@@ -209,7 +209,7 @@ export function GameDetails(game: GameDetailsGame)
 							({
 								iconName: gamePlatform.platform.iconName,
 								name: Anchor(gamePlatform.platform.name, "/platforms/view/" + gamePlatform.platform.id),
-								value: null,
+								value: gamePlatform.notes,
 							})))
 						: MissingData(),
 				]),

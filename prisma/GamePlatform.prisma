@@ -3,6 +3,8 @@ model GamePlatform {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
+    notes String?
+
     game_id     Int
     platform_id Int
 
