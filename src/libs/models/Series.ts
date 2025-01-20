@@ -16,7 +16,7 @@ import * as SettingModelLib from "../models/Setting.js";
 export type FindGroupsOptions =
 {
 	settings: SettingModelLib.Settings;
-	selectedSeries: Prisma.PlatformGetPayload<null> | null;
+	selectedSeries: Prisma.SeriesGetPayload<null> | null;
 };
 
 export async function findGroups(transactionClient: Prisma.TransactionClient, options: FindGroupsOptions)
@@ -35,7 +35,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			{
 				return {
 					selected: series.id == options.selectedSeries?.id,
-					href: "/platforms/view/" + series.id,
+					href: "/series/view/" + series.id,
 					iconName: "fa-solid fa-list-timeline",
 					name: series.name,
 					info: "Last updated " + DateTime.fromJSDate(series.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
@@ -47,13 +47,13 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 	{
 		case "name":
 		{
-			const sortedPlatforms = series.toSorted((a, b) => a.name.localeCompare(b.name));
+			const sortedSeries = series.toSorted((a, b) => a.name.localeCompare(b.name));
 
-			for (const platform of sortedPlatforms)
+			for (const series of sortedSeries)
 			{
-				const groupName = GroupManager.getNameGroupName(platform.name);
+				const groupName = GroupManager.getNameGroupName(series.name);
 		
-				groupManager.addItemToGroup(groupName, platform);
+				groupManager.addItemToGroup(groupName, series);
 			}
 
 			break;
@@ -61,7 +61,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 
 		case "numberOfGames":
 		{
-			const sortedPlatforms = series.toSorted(
+			const sortedSeries = series.toSorted(
 				(a, b) =>
 				{
 					if (a.seriesGames.length != b.seriesGames.length)
@@ -72,11 +72,11 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 					return a.name.localeCompare(b.name);
 				});
 
-			for (const platform of sortedPlatforms)
+			for (const series of sortedSeries)
 			{
-				const groupName = platform.seriesGames.length + " game" + (platform.seriesGames.length == 1 ? "" : "s");
+				const groupName = series.seriesGames.length + " game" + (series.seriesGames.length == 1 ? "" : "s");
 
-				groupManager.addItemToGroup(groupName, platform);
+				groupManager.addItemToGroup(groupName, series);
 			}
 
 			break;
