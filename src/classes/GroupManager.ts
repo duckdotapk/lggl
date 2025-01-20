@@ -50,7 +50,7 @@ export class GroupManager<Model>
 	{
 		this.options =
 		{
-			sortGroups: options.sortGroups ?? ((a, b) => a.sortOrder - b.sortOrder),
+			sortGroups: options.sortGroups ?? ((a, b) => b.sortOrder - a.sortOrder),
 			mapGroupModel: options.mapGroupModel,
 		};
 	}
