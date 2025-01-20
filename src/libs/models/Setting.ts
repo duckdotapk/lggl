@@ -151,6 +151,7 @@ export class Settings
 const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 {
 	completionStatus: "Completion status",
+	createdDate: "Created date",
 	developer: "Developer",
 	engine: "Engine",
 	lastPlayedDate: "Last played date",

@@ -238,6 +238,81 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			return groupManager;
 		}
 
+		case "createdDate":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info:
+							[ 
+								"Created ", 
+								HumanDateTime(DateTime.fromJSDate(game.createdDate), DateTime.DATE_MED),
+							],
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites");
+			}
+
+			const sortedGames = games.toSorted((a, b) => b.createdDate.getTime() - a.createdDate.getTime());
+
+			for (const game of sortedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				const createdDateTime = DateTime.fromJSDate(game.createdDate);
+
+				if (createdDateTime.hasSame(DateTime.local(), "day"))
+				{
+					groupManager.addItemToGroup("Today", game);
+				}
+				else if (createdDateTime.hasSame(DateTime.local().minus({ days: 1 }), "day"))
+				{
+					groupManager.addItemToGroup("Yesterday", game);
+				}
+				else if (createdDateTime.hasSame(DateTime.local(), "week"))
+				{
+					groupManager.addItemToGroup("This Week", game);
+				}
+				else if (createdDateTime.hasSame(DateTime.local().minus({ weeks: 1 }), "week"))
+				{
+					groupManager.addItemToGroup("Last Week", game);
+				}
+				else if (createdDateTime.hasSame(DateTime.local(), "year"))
+				{
+					const groupName = createdDateTime.monthLong + " " + createdDateTime.year.toString();
+
+					groupManager.addItemToGroup(groupName, game);
+				}
+				else
+				{
+					const groupName = createdDateTime.year.toString();
+
+					groupManager.addItemToGroup(groupName, game);
+				}
+			}
+
+			return groupManager;
+		}
+
 		case "developer":
 		{
 			const groupManager = new GroupManager<typeof games[0]>(
