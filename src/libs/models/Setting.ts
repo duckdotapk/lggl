@@ -161,6 +161,7 @@ const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 	playTime: "Play time",
 	publisher: "Publisher",
 	series: "Series",
+	steamDeckCompatibility: "Steam Deck compatibility",
 };
 
 const companyGroupModeNames: Record<SettingSchemaLib.CompanyGroupMode, string> =

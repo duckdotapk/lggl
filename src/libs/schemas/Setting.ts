@@ -15,7 +15,7 @@ const BooleanSchema = z.union(
 		z.enum([ "true", "false" ]).transform(value => value == "true"),
 	]);
 
-export const GameGroupModeSchema = z.enum([ "completionStatus", "createdDate", "developer", "engine", "firstCompletedDate", "firstPlayedDate", "name", "lastPlayedDate", "playTime", "publisher", "series" ]);
+export const GameGroupModeSchema = z.enum([ "completionStatus", "createdDate", "developer", "engine", "firstCompletedDate", "firstPlayedDate", "name", "lastPlayedDate", "playTime", "publisher", "series", "steamDeckCompatibility" ]);
 export const ShowFavoritesGroupSchema = BooleanSchema;
 export const ShowRegularGamesSchema = BooleanSchema;
 export const ShowHiddenGamesSchema = BooleanSchema;

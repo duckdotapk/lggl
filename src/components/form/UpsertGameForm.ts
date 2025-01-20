@@ -336,6 +336,23 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 										value: game?.steamAppName ?? null,
 										placeholder: "Steam app name",
 									}),
+
+								Label("steamDeckCompatibility", "Steam Deck compatibility"),
+
+								Control(
+									{
+										type: "select",
+										name: "steamDeckCompatibility",
+										required: false,
+										showEmptyOption: true,
+										value: game?.steamDeckCompatibility ?? null,
+										options: Object.values($Enums.GameSteamDeckCompatibility).map(
+											(option) => 
+											({ 
+												value: option, 
+												label: GameModelLib.getSteamDeckCompatibilityName(option),
+											})),
+									}),
 							]),
 					},
 				]),

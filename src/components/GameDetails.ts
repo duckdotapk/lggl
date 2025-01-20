@@ -330,6 +330,13 @@ export function GameDetails(game: GameDetailsGame)
 									name: "Name",
 									value: game.steamAppName ?? MissingData(),
 								},
+								{
+									iconName: GameModelLib.getSteamDeckCompatibilityIconName(game),
+									name: "Steam Deck compatibility",
+									value: game.steamDeckCompatibility != null
+										? GameModelLib.getSteamDeckCompatibilityName(game)
+										: MissingData(),
+								},
 							]),
 					])
 				: null,

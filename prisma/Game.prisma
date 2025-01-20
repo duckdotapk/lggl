@@ -46,6 +46,13 @@ enum GameVirtualRealitySupport {
     REQUIRED
 }
 
+enum GameSteamDeckCompatibility {
+    UNKNOWN
+    UNSUPPORTED
+    PLAYABLE
+    VERIFIED
+}
+
 model Game {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
@@ -94,8 +101,9 @@ model Game {
     virtualRealitySupport GameVirtualRealitySupport?
 
     // Steam app
-    steamAppId   Int?
-    steamAppName String?
+    steamAppId             Int?
+    steamAppName           String?
+    steamDeckCompatibility GameSteamDeckCompatibility?
 
     // Relations
     gameCompanies     GameCompany[]

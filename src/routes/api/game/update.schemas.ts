@@ -3,7 +3,7 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-import { GameProgressionType, GameLogoImageAlignment, GameLogoImageJustification, GameCompletionStatus, GameAchievementSupport, GameControllerSupport, GameModSupport, GameVirtualRealitySupport } from "@prisma/client";
+import { GameProgressionType, GameLogoImageAlignment, GameLogoImageJustification, GameCompletionStatus, GameAchievementSupport, GameControllerSupport, GameModSupport, GameVirtualRealitySupport, GameSteamDeckCompatibility } from "@prisma/client";
 import { z } from "zod";
 
 //
@@ -55,6 +55,7 @@ export const RequestBodySchema = z.object(
 
 				steamAppId: z.number().nullable(),
 				steamAppName: z.string().nullable(),
+				steamDeckCompatibility: z.custom<GameSteamDeckCompatibility>().nullable(),
 			}).partial(),
 	});
 

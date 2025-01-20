@@ -219,6 +219,11 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.steamAppName = requestBody.updateData.steamAppName;
 			}
 
+			if (requestBody.updateData.steamDeckCompatibility !== undefined)
+			{
+				gameUpdateData.steamDeckCompatibility = requestBody.updateData.steamDeckCompatibility;
+			}
+
 			if (Object.keys(gameUpdateData).length == 0)
 			{
 				return {

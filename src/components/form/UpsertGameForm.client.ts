@@ -3,7 +3,7 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport } from "@prisma/client";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameSteamDeckCompatibility, GameVirtualRealitySupport } from "@prisma/client";
 
 import * as InputClientLib from "../../libs/client/Input.client.js";
 import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
@@ -58,6 +58,7 @@ async function initialise(form: HTMLFormElement)
 
 	const steamAppIdInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="steamAppId"]`);
 	const steamAppNameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="steamAppName"]`);
+	const steamDeckCompatibilitySelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="steamDeckCompatibility"]`);
 
 	form.addEventListener("submit", (event) => event.preventDefault());
 
@@ -109,6 +110,7 @@ async function initialise(form: HTMLFormElement)
 
 						steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
 						steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
+						steamDeckCompatibility: InputClientLib.getEnumValueNullable<GameSteamDeckCompatibility>(steamDeckCompatibilitySelect),
 					}),
 				onSuccess: async (response) => PjaxClientLib.changeView("/games/view/" + response.game.id),
 			}
@@ -173,6 +175,7 @@ async function initialise(form: HTMLFormElement)
 
 						steamAppId: InputClientLib.getChangedNumberValueNullable(steamAppIdInput),
 						steamAppName: InputClientLib.getChangedStringValueNullable(steamAppNameInput),
+						steamDeckCompatibility: InputClientLib.getChangedEnumValueNullable<GameSteamDeckCompatibility>(steamDeckCompatibilitySelect),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),
 			});

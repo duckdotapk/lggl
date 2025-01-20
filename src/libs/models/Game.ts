@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Child } from "@donutteam/document-builder";
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
+import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameSteamDeckCompatibility, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 import { z } from "zod";
 
@@ -19,6 +19,7 @@ import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 import { shortEnglishHumanizer } from "../../instances/humanizer.js";
 import { staticMiddleware } from "../../instances/server.js";
 
+import * as GameModelLib from "./Game.js";
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
@@ -90,6 +91,22 @@ const virtualRealitySupportNames: Record<GameVirtualRealitySupport, string> =
 	"NONE": "None",
 	"SUPPORTED": "Supported",
 	"REQUIRED": "Required",
+};
+
+const steamDeckCompatibilityIconNames: Record<GameSteamDeckCompatibility, string> =
+{
+	"UNKNOWN": "fa-solid fa-question-circle",
+	"UNSUPPORTED": "fa-solid fa-times-circle",
+	"PLAYABLE": "fa-solid fa-circle",
+	"VERIFIED": "fa-solid fa-check-circle",
+};
+
+const steamDeckCompatibilityNames: Record<GameSteamDeckCompatibility, string> =
+{
+	"UNKNOWN": "Unknown",
+	"UNSUPPORTED": "Unsupported",
+	"PLAYABLE": "Playable",
+	"VERIFIED": "Verified",
 };
 
 //
@@ -1061,6 +1078,90 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 
 			return groupManager;
 		}
+
+		case "steamDeckCompatibility":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game, group) =>
+					{
+						let info: Child = null;
+
+						if (group.name == "Favorites")
+						{
+							if (game.steamAppId != null)
+							{
+								info = game.steamDeckCompatibility != null 
+									? GameModelLib.getSteamDeckCompatibilityName(game.steamDeckCompatibility)
+									: null;
+							}
+							else
+							{
+								info = "Non-Steam Game";
+							}
+						}
+
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites");
+			}
+
+			groupManager.addGroup(GameModelLib.getSteamDeckCompatibilityName("VERIFIED"));
+
+			groupManager.addGroup(GameModelLib.getSteamDeckCompatibilityName("PLAYABLE"));
+
+			groupManager.addGroup(GameModelLib.getSteamDeckCompatibilityName("UNSUPPORTED"));
+
+			groupManager.addGroup(GameModelLib.getSteamDeckCompatibilityName("UNKNOWN"));
+
+			groupManager.addGroup("Non-Steam games");
+
+			groupManager.addGroup("-");
+
+			const sortedGames = games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of sortedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				if (game.steamAppId == null)
+				{
+					groupManager.addItemToGroup("Non-Steam games", game);
+
+					continue;
+				}
+
+				if (game.steamDeckCompatibility == null)
+				{
+					groupManager.addItemToGroup("-", game);
+
+					continue;
+				}
+
+				groupManager.addItemToGroup(GameModelLib.getSteamDeckCompatibilityName(game.steamDeckCompatibility), game);
+			}
+
+			return groupManager;
+		}
 	}
 }
 
@@ -1201,9 +1302,17 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	}
 
 	// Steam app
-	if (game.steamAppId != null && game.steamAppName == null)
+	if (game.steamAppId != null)
 	{
-		problemList.addProblem("steamAppId is not null but steamAppName is null", false);
+		if (game.steamAppName == null)
+		{
+			problemList.addProblem("steamAppId is not null but steamAppName is null", false);
+		}
+
+		if (game.steamDeckCompatibility == null)
+		{
+			problemList.addProblem("steamAppId is not null but steamDeckCompatibility is null", false);
+		}
 	}
 
 	//
@@ -1483,6 +1592,30 @@ export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma
 
 	return gameOrVirtualRealitySupport.virtualRealitySupport != null
 		? virtualRealitySupportNames[gameOrVirtualRealitySupport.virtualRealitySupport]
+		: "-";
+}
+
+export function getSteamDeckCompatibilityIconName(gameOrSteamDeckCompatibility: Prisma.GameGetPayload<null> | GameSteamDeckCompatibility)
+{
+	if (typeof gameOrSteamDeckCompatibility == "string")
+	{
+		return steamDeckCompatibilityIconNames[gameOrSteamDeckCompatibility];
+	}
+
+	return gameOrSteamDeckCompatibility.steamDeckCompatibility != null
+		? steamDeckCompatibilityIconNames[gameOrSteamDeckCompatibility.steamDeckCompatibility]
+		: "fa-solid fa-question";
+}
+
+export function getSteamDeckCompatibilityName(gameOrSteamDeckCompatibility: Prisma.GameGetPayload<null> | GameSteamDeckCompatibility)
+{
+	if (typeof gameOrSteamDeckCompatibility == "string")
+	{
+		return steamDeckCompatibilityNames[gameOrSteamDeckCompatibility];
+	}
+
+	return gameOrSteamDeckCompatibility.steamDeckCompatibility != null
+		? steamDeckCompatibilityNames[gameOrSteamDeckCompatibility.steamDeckCompatibility]
 		: "-";
 }
 

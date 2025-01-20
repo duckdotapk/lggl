@@ -76,6 +76,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 						steamAppId: requestBody.steamAppId,
 						steamAppName: requestBody.steamAppName,
+						steamDeckCompatibility: requestBody.steamDeckCompatibility,
 					},
 				});
 
