@@ -66,17 +66,37 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 								}),
 						]),
 				]),
+				
+			ColumnLayout(2,
+				[
+					new DE("div", null,
+						[
+							Label("path", "Path"),
 
-			Label("path", "Path"),
+							Control(
+								{
+									type: "text",
+									name: "path",
+									required: true,
+									value: options.gamePlayAction?.path,
+									placeholder: "Path",
+								}),
+						]),
 
-			Control(
-				{
-					type: "text",
-					name: "path",
-					required: true,
-					value: options.gamePlayAction?.path,
-					placeholder: "Path",
-				}),
+					new DE("div", null,
+						[
+							Label("workingDirectory", "Working directory"),
+
+							Control(
+								{
+									type: "text",
+									name: "workingDirectory",
+									required: false,
+									value: options.gamePlayAction?.workingDirectory,
+									placeholder: "Working directory",
+								}),
+						]),
+				]),
 
 			Label("trackingPath", "Tracking path"),
 
@@ -96,7 +116,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 					type: "textarea",
 					name: "argumentsJson",
 					required: true,
-					value: JSON.stringify(options.gamePlayAction?.argumentsJson),
+					value: JSON.stringify(options.gamePlayAction?.argumentsJson ?? "[]"),
 					placeholder: "Arguments (as JSON string array)",
 				}),
 

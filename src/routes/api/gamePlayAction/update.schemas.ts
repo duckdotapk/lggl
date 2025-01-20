@@ -19,6 +19,7 @@ export const RequestBodySchema = z.object(
 				name: z.string(),
 				type: z.custom<GamePlayActionType>(),
 				path: z.string(),
+				workingDirectory: z.string().nullable(),
 				trackingPath: z.string(),
 				argumentsJson: z.array(z.string()),
 				isArchived: z.boolean(),

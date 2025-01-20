@@ -24,6 +24,7 @@ async function initialise(form: HTMLFormElement)
 	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
 	const typeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
 	const pathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
+	const workingDirectoryInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="workingDirectory"]`);
 	const trackingPathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="trackingPath"]`);
 	const argumentsJsonTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="argumentsJson"]`);
 	const isArchivedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isArchived"]`);
@@ -42,6 +43,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getStringValue(nameInput),
 						type: InputClientLib.getEnumValue<GamePlayActionType>(typeSelect),
 						path: InputClientLib.getStringValue(pathInput),
+						workingDirectory: InputClientLib.getStringValueNullable(workingDirectoryInput),
 						trackingPath: InputClientLib.getStringValue(trackingPathInput),
 						argumentsJson: JSON.parse(InputClientLib.getStringValue(argumentsJsonTextArea)),
 						isArchived: InputClientLib.getBooleanValue(isArchivedInput),
@@ -72,6 +74,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getChangedStringValue(nameInput),
 						type: InputClientLib.getChangedEnumValue<GamePlayActionType>(typeSelect),
 						path: InputClientLib.getChangedStringValue(pathInput),
+						workingDirectory: InputClientLib.getChangedStringValueNullable(workingDirectoryInput),
 						trackingPath: InputClientLib.getChangedStringValue(trackingPathInput),
 						argumentsJson: InputClientLib.isInputDirty(argumentsJsonTextArea)
 							? JSON.parse(InputClientLib.getStringValue(argumentsJsonTextArea))

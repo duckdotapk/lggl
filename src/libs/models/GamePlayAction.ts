@@ -49,30 +49,50 @@ export type ExecuteResult =
 export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<ExecuteResult>
 {
 	//
-	// Parse Additional Arguments
-	//
-
-	console.log("[LauncherLib] Parsing additional arguments for game play action %d...", gamePlayAction.id);
-
-	const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
-
-	if (!additionalArgumentsParseResult.success)
-	{
-		return {
-			success: false,
-			message: "Failed to parse additional arguments for game play action " + gamePlayAction.id + ": " + additionalArgumentsParseResult.error.message,
-		};
-	}
-
-	const additionalArguments = additionalArgumentsParseResult.data;
-
-	//
 	// Start Process
 	//
 
 	console.log("[LauncherLib] Starting process for game %d using game play action %d...", gamePlayAction.game.id, gamePlayAction.id);
 
-	await SystemLib.startProcess(gamePlayAction.path, additionalArguments);
+	switch (gamePlayAction.type)
+	{
+		case "EXECUTABLE":
+		{
+			const workingDirectory = gamePlayAction.workingDirectory;
+
+			if (workingDirectory == null)
+			{
+				return {
+					success: false,
+					message: "Working directory is required for EXECUTABLE type GamePlayAction."
+				};
+			}
+
+			const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
+		
+			if (!additionalArgumentsParseResult.success)
+			{
+				return {
+					success: false,
+					message: "Failed to parse additional arguments for EXECUTABLE type GamePlayAction: " + additionalArgumentsParseResult.error.message,
+				};
+			}
+		
+			const additionalArguments = additionalArgumentsParseResult.data;
+
+			await SystemLib.startExecutable(gamePlayAction.path, workingDirectory, additionalArguments);
+
+			break;
+		}
+
+		case "URL":
+		{
+			await SystemLib.startUrl(gamePlayAction.path);
+
+			break;
+		}
+	}
+
 
 	//
 	// Initial Check Delay

@@ -55,6 +55,11 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gamePlayActionUpdateData.path = requestBody.updateData.path;
 			}
 
+			if (requestBody.updateData.workingDirectory !== undefined)
+			{
+				gamePlayActionUpdateData.workingDirectory = requestBody.updateData.workingDirectory;
+			}
+
 			if (requestBody.updateData.trackingPath !== undefined)
 			{
 				gamePlayActionUpdateData.trackingPath = requestBody.updateData.trackingPath;

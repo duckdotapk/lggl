@@ -44,9 +44,8 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						name: requestBody.name,
 						type: requestBody.type,
 						path: requestBody.path,
+						workingDirectory: requestBody.workingDirectory,
 						trackingPath: requestBody.trackingPath,
-
-						// TODO: validate this is a JSON string array before shoving it into the db
 						argumentsJson: requestBody.argumentsJson,
 
 						isArchived: requestBody.isArchived,

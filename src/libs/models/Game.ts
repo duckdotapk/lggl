@@ -8,6 +8,7 @@ import path from "node:path";
 import { Child } from "@donutteam/document-builder";
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
+import { z } from "zod";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
@@ -1282,6 +1283,42 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	if (!game.isInstalled && game.gamePlayActions.length > 0)
 	{
 		problemList.addProblem("isInstalled is false but there are GamePlayAction relations", false);
+	}
+
+	for (const gamePlayAction of game.gamePlayActions)
+	{
+		switch (gamePlayAction.type)
+		{
+			case "EXECUTABLE":
+			{
+				if (gamePlayAction.workingDirectory == null)
+				{
+					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory is null", false);
+				}
+
+				if (gamePlayAction.argumentsJson != null)
+				{
+					const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
+	
+					if (!additionalArgumentsParseResult.success)
+					{
+						problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but additionalArguments is not a string array", false);
+					}
+				}
+
+				break;
+			}
+
+			case "URL":
+			{
+				if (!URL.canParse(gamePlayAction.path))
+				{
+					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
+				}
+
+				break;
+			}
+		}
 	}
 
 	//

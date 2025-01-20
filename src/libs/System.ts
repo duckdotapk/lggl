@@ -4,11 +4,25 @@
 
 import child_process from "node:child_process";
 
+import { z } from "zod";
+
 //
 // Utility Functions
 //
 
-export async function startProcess(path: string, additionalArguments: string[])
+export async function startExecutable(executablePath: string, workingDirectory: string, additionalArguments: string[])
+{
+	const child = child_process.spawn(executablePath, additionalArguments,
+		{
+			cwd: workingDirectory,
+			detached: true,
+			stdio: "ignore",
+		});
+
+	child.unref();
+}
+
+export async function startUrl(url: string)
 {
 	let command: string;
 	let commandArguments: string[];
@@ -17,9 +31,7 @@ export async function startProcess(path: string, additionalArguments: string[])
 	{
 		case "win32":
 			command = "cmd";
-
-			// TODO: set working directory, this is currently fucked for EXECUTABLE type game play actions
-			commandArguments = [ "/c", "start", "", path ];
+			commandArguments = [ "/c", "start", "", url ];
 
 			break;
 
@@ -27,11 +39,6 @@ export async function startProcess(path: string, additionalArguments: string[])
 		// TODO: make this work on Linux
 		default:
 			throw new Error("Unsupported platform: " + process.platform);
-	}
-
-	if (additionalArguments.length > 0)
-	{
-		commandArguments.push(...additionalArguments);
 	}
 
 	const child = child_process.spawn(command, commandArguments,
@@ -51,9 +58,10 @@ export async function getRunningProcesses()
 	switch (process.platform)
 	{
 		case "win32":
-			command = "wmic process get ExecutablePath";
+			command = `powershell -Command "Get-Process | Select-Object -Property Path | ConvertTo-Json"`;
 			execOptions =
 			{
+				maxBuffer: 1024 * 1024 * 1024,
 				windowsHide: true,
 			};
 
@@ -65,22 +73,20 @@ export async function getRunningProcesses()
 			throw new Error("Unsupported platform: " + process.platform); 
 	}
 
-	return new Promise<string[]>( 
-		(resolve, reject) => 
+	return new Promise<string[]>((resolve, reject) => child_process.exec(command, execOptions,
+		(error, stdout) => 
 		{
-			child_process.exec(command, execOptions,
-				(error, stdout) => 
-				{
-					if (error) 
-					{
-						return reject(error);
-					}
+			if (error)
+			{
+				return reject(error);
+			}
 
-					const processes = stdout.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+			const processes = z.array(z.object({ Path: z.string().nullable() })).parse(JSON.parse(stdout));
 
-					resolve(processes);
-				});
-		});
+			const processPaths = processes.filter(process => process.Path != null).map(process => process.Path!);
+
+			resolve(processPaths);
+		}));
 }
 
 export async function isProcessRunning(basePath: string)
