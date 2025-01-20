@@ -7,8 +7,7 @@
 		"build-client-js": "node ./build-client-js.js",
 		"build-client-js:watch": "node ./build-client-js.js --watch",
 		"build-server-js": "npx rimraf ./build && npx tsc",
-		"build-server-js:watch": "npx rimraf ./build && npx tsc --watch",
-		"cli": "node ./build/cli.js"
+		"build-server-js:watch": "npx rimraf ./build && npx tsc --watch"
 	},
 	"dependencies": {
 		"@donutteam/browser-utilities": "^1.1.0",
