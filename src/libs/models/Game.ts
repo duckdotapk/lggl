@@ -410,7 +410,36 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 					groupManager.addItemToGroup("Favorites", game);
 				}
 
-				groupManager.addItemToGroup(DateTime.fromJSDate(game.lastPlayedDate!).year.toString(), game);
+				const lastPlayedDateTime = DateTime.fromJSDate(game.lastPlayedDate!);
+
+				if (lastPlayedDateTime.hasSame(DateTime.local(), "day"))
+				{
+					groupManager.addItemToGroup("Today", game);
+				}
+				else if (lastPlayedDateTime.hasSame(DateTime.local().minus({ days: 1 }), "day"))
+				{
+					groupManager.addItemToGroup("Yesterday", game);
+				}
+				else if (lastPlayedDateTime.hasSame(DateTime.local(), "week"))
+				{
+					groupManager.addItemToGroup("This Week", game);
+				}
+				else if (lastPlayedDateTime.hasSame(DateTime.local().minus({ weeks: 1 }), "week"))
+				{
+					groupManager.addItemToGroup("Last Week", game);
+				}
+				else if (lastPlayedDateTime.hasSame(DateTime.local(), "year"))
+				{
+					const groupName = lastPlayedDateTime.monthLong + " " + lastPlayedDateTime.year.toString();
+
+					groupManager.addItemToGroup(groupName, game);
+				}
+				else
+				{
+					const groupName = lastPlayedDateTime.year.toString();
+
+					groupManager.addItemToGroup(groupName, game);
+				}
 			}
 
 			const unplayedGames = games
