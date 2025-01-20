@@ -32,7 +32,7 @@ async function initialise(form: HTMLFormElement)
 					{
 						name: InputClientLib.getStringValue(nameInput),
 					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/seriess/view/" + response.series.id),
+				onSuccess: async (response) => PjaxClientLib.changeView("/series/view/" + response.series.id),
 			});
 	}
 	else
@@ -45,7 +45,7 @@ async function initialise(form: HTMLFormElement)
 				submitter: deleteButton,
 				requireConfirmation: true,
 				onSubmit: async () => await deleteSeries(seriesId),
-				onSuccess: async () => PjaxClientLib.changeView("/seriess"),
+				onSuccess: async () => PjaxClientLib.changeView("/series"),
 			});
 
 		InputClientLib.initialiseForm(
