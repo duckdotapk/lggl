@@ -55,6 +55,13 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					platform: true;
 				};
 			};
+			seriesGames:
+			{
+				include:
+				{
+					series: true;
+				};
+			};
 		};
 	}>;
 
@@ -193,6 +200,24 @@ export function GameDetails(game: GameDetailsGame)
 							})))
 						: MissingData(),
 				]),
+
+			// Series
+			game.seriesGames.length > 0
+				? Block(
+					[
+						Header(3,
+							[
+								new DE("span", "fa-solid fa-book"),
+								" Series",
+							]),
+
+						DataList(game.seriesGames.map((seriesGame) =>
+							({
+								name: Anchor(seriesGame.series.name, "/series/view/" + seriesGame.series.id),
+								value: null,
+							}))),
+					])
+				: null,
 
 			// Platforms
 			Block(

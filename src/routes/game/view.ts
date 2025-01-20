@@ -81,6 +81,17 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 							{ platform: { name: "asc" } },
 						],
 					},
+					seriesGames:
+					{
+						include:
+						{
+							series: true,
+						},
+						orderBy:
+						[
+							{ series: { name: "asc" } },
+						],
+					},
 				},
 			});
 
