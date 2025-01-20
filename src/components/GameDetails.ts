@@ -147,11 +147,11 @@ export function GameDetails(game: GameDetailsGame)
 						? Paragraph("Unreleased")
 						: null,
 
-					game.releaseDate != null
+					!game.isUnreleased && game.releaseDate != null
 						? Paragraph(HumanDateTime(DateTime.fromJSDate(game.releaseDate), DateTime.DATE_MED))
 						: null,
 
-					game.releaseDate == null
+					!game.isUnreleased && game.releaseDate == null
 						? MissingData()
 						: null,
 				]),
