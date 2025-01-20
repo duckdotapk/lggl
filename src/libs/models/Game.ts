@@ -5,6 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { Child } from "@donutteam/document-builder";
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -443,6 +444,188 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 				{
 					groupManager.addItemToGroup("-", game);
 				}
+			}
+
+			return groupManager;
+		}
+
+		case "firstCompletedDate":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						let info: Child;
+
+						if (game.firstCompletedDate != null && !game.firstCompletedDateApproximated)
+						{
+							info =
+							[
+								"First completed on ",
+								HumanDateTime(DateTime.fromJSDate(game.firstCompletedDate), DateTime.DATE_MED),
+							];
+						}
+						else
+						{
+							info = null;
+						}
+
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites");
+			}
+
+			groupManager.addGroup("Unknown", -1);
+
+			groupManager.addGroup("Not completed", -2);
+
+			const firstCompletedOnKnownDateGames = games
+				.filter((game) => game.firstCompletedDate != null && game.firstCompletedDate.getTime() != 0)
+				.toSorted((a, b) => b.firstCompletedDate!.getTime() - a.firstCompletedDate!.getTime());
+
+			for (const game of firstCompletedOnKnownDateGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				groupManager.addItemToGroup(game.firstCompletedDate!.getFullYear().toString(), game);
+			}
+
+			const firstCompletedOnUnknownDateGames = games
+				.filter((game) => game.firstCompletedDate != null && game.firstCompletedDate.getTime() == 0)
+				.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of firstCompletedOnUnknownDateGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				groupManager.addItemToGroup("Unknown", game);
+			}
+
+			const notCompletedGames = games
+				.filter((game) => game.firstCompletedDate == null)
+				.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of notCompletedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				groupManager.addItemToGroup("Not completed", game);
+			}
+
+			return groupManager;
+		}
+
+		case "firstPlayedDate":
+		{
+			const groupManager = new GroupManager<typeof games[0]>(
+				{
+					mapGroupModel: (game) =>
+					{
+						let info: Child;
+
+						if (game.firstPlayedDate != null && !game.firstPlayedDateApproximated)
+						{
+							info =
+							[
+								"First played on ",
+								HumanDateTime(DateTime.fromJSDate(game.firstPlayedDate), DateTime.DATE_MED),
+							];
+						}
+						else
+						{
+							info = null;
+						}
+
+						return {
+							selected: game.id == options.selectedGame?.id,
+							href: "/games/view/" + game.id,
+							extraAtrributes:
+							{
+								"data-is-installed": game.isInstalled,
+							},
+							iconName: game.hasIconImage
+								? staticMiddleware.getCacheBustedPath("/data/images/games/" + game.id + "/icon.jpg")
+								: "fa-solid fa-gamepad-modern",
+							name: game.name,
+							info,
+						};
+					},
+				});
+
+			if (options.settings.showFavoritesGroup)
+			{
+				groupManager.addGroup("Favorites");
+			}
+
+			groupManager.addGroup("Unknown", -1);
+
+			groupManager.addGroup("Not played", -2);
+
+			const firstPlayedOnKnownDateGames = games
+				.filter((game) => game.firstPlayedDate != null && game.firstPlayedDate.getTime() != 0)
+				.toSorted((a, b) => b.firstPlayedDate!.getTime() - a.firstPlayedDate!.getTime());
+
+			for (const game of firstPlayedOnKnownDateGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				groupManager.addItemToGroup(game.firstPlayedDate!.getFullYear().toString(), game);
+			}
+
+			const firstPlayedOnUnknownDateGames = games
+				.filter((game) => game.firstPlayedDate != null && game.firstPlayedDate.getTime() == 0)
+				.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of firstPlayedOnUnknownDateGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				groupManager.addItemToGroup("Unknown", game);
+			}
+
+			const notPlayedGames = games
+				.filter((game) => game.firstPlayedDate == null)
+				.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
+
+			for (const game of notPlayedGames)
+			{
+				if (options.settings.showFavoritesGroup && game.isFavorite)
+				{
+					groupManager.addItemToGroup("Favorites", game);
+				}
+
+				groupManager.addItemToGroup("Not played", game);
 			}
 
 			return groupManager;
