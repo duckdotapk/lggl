@@ -2,6 +2,7 @@
 // Imports
 //
 
+import fs from "node:fs";
 import path from "node:path";
 
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameVirtualRealitySupport, Prisma } from "@prisma/client";
@@ -18,6 +19,8 @@ import { staticMiddleware } from "../../instances/server.js";
 
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
+
+import * as AuditLib from "../Audit.js";
 
 //
 // Constants
@@ -880,6 +883,248 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 //
 // Utility Functions
 //
+
+export type AuditGame = Prisma.GameGetPayload<
+	{
+		include:
+		{
+			gameCompanies: true;
+			gameEngines: true;
+			gameGenres: true;
+			gameInstallations: true;
+			gameLinks: true;
+			gamePlatforms: true;
+			gamePlayActions: true;
+			gamePlaySessions: true;
+			seriesGames: true;
+		},
+	}>;
+
+export async function audit(game: AuditGame, strictMode: boolean): Promise<AuditLib.ProblemList>
+{
+	//
+	// Create Problem List
+	//
+
+	const problemList = new AuditLib.ProblemList(game.name, "/games/view/" + game.id, "/games/edit/" + game.id);
+
+	//
+	// Check Game
+	//
+
+	// General
+	if (game.releaseDate == null && !game.isUnreleased)
+	{
+		problemList.addProblem("releaseDate is null but is isUnreleased is false", false);
+	}
+
+	if (game.releaseDate != null && game.isUnreleased)
+	{
+		// TODO: check if release date is in the future?
+		problemList.addProblem("releaseDate is not null but isUnreleased is true", false);
+	}
+
+	if (game.description == null)
+	{
+		problemList.addProblem("description is null", false);
+	}
+
+	if (game.progressionType == null)
+	{
+		problemList.addProblem("progressionType is null", false);
+	}
+
+	// Images
+	const imagePaths = getImagePaths(game);
+
+	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner))
+	{
+		problemList.addProblem("hasBannerImage is true but banner image does not exist on disk", false);
+	}
+
+	if (game.hasCoverImage && !fs.existsSync(imagePaths.cover))
+	{
+		problemList.addProblem("hasCoverImage is true but cover image does not exist on disk", false);
+	}
+
+	if (game.hasIconImage && !fs.existsSync(imagePaths.icon))
+	{
+		problemList.addProblem("hasIconImage is true but icon image does not exist on disk", false);
+	}
+
+	if (game.hasLogoImage)
+	{
+		if (!fs.existsSync(imagePaths.logo))
+		{
+			problemList.addProblem("hasLogoImage is true but logo image does not exist on disk", false);
+		}
+
+		if (game.logoImageAlignment == null)
+		{
+			problemList.addProblem("hasLogoImage is true but logoImageAlignment is null", false);
+		}
+
+		if (game.logoImageJustification == null)
+		{
+			problemList.addProblem("hasLogoImage is true but logoImageJustification is null", false);
+		}
+
+		// TODO: check logo image dimensions
+	}
+
+	// Play data
+	if (game.completionStatus == null && game.progressionType != "NONE")
+	{
+		problemList.addProblem("completionStatus is null", false);
+	}
+	
+	if (game.completionStatus == "TODO" && game.playCount > 0)
+	{
+		problemList.addProblem("completionStatus is TODO but playCount is greater than 0", false);
+	}
+
+	if (game.completionStatus == "TODO" && game.playTimeTotalSeconds > 0)
+	{
+		problemList.addProblem("completionStatus is TODO but playTimeTotalSeconds is greater than 0", false);
+	}
+
+	if (game.playCount == 0 && game.playTimeTotalSeconds > 0)
+	{
+		problemList.addProblem("playCount is 0 but playTimeTotalSeconds is greater than 0", false);
+	}
+
+	// Features
+	if (game.achievementSupport == null)
+	{
+		problemList.addProblem("achievementSupport is null", false);
+	}
+
+	if (game.controllerSupport == null)
+	{
+		problemList.addProblem("controllerSupport is null", false);
+	}
+
+	// Note: It's tricky to determine what I consider a game's mod support to be,
+	//	so I readded the concept of "strict mode" to check it only sometimes.
+	if (strictMode && game.modSupport == null)
+	{
+		problemList.addProblem("modSupport is null", true);
+	}
+
+	if (game.virtualRealitySupport == null)
+	{
+		problemList.addProblem("virtualRealitySupport is null", false);
+	}
+
+	// Steam app
+	if (game.steamAppId != null && game.steamAppName == null)
+	{
+		problemList.addProblem("steamAppId is not null but steamAppName is null", false);
+	}
+
+	//
+	// Check Game Companies
+	//
+
+	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER");
+
+	if (gameDevelopers.length == 0)
+	{
+		problemList.addProblem("no GameCompany relations with DEVELOPER type", false);
+	}
+
+	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER");
+
+	if (gamePublishers.length == 0)
+	{
+		problemList.addProblem("no GameCompany relations with PUBLISHER type", false);
+	}
+
+	//
+	// Check Game Engines
+	//
+
+	if (game.isUnknownEngine && game.gameEngines.length > 0)
+	{
+		problemList.addProblem("isUnknownEngine is true but there are GameEngine relations", false);
+	}
+
+	if (!game.isUnknownEngine && game.gameEngines.length == 0)
+	{
+		problemList.addProblem("isUnknownEngine is false but there are no GameEngine relations", false);
+	}
+
+	//
+	// Check Game Installations
+	//
+
+	if (game.isInstalled && game.gameInstallations.length == 0)
+	{
+		problemList.addProblem("isInstalled is true but there are no GameInstallation relations", false);
+	}
+
+	if (!game.isInstalled && game.gameInstallations.length > 0)
+	{
+		problemList.addProblem("isInstalled is false but there are GameInstallation relations", false);
+	}
+
+	for (const gameInstallation of game.gameInstallations)
+	{
+		if (fs.existsSync(gameInstallation.path))
+		{
+			continue;
+		}
+
+		problemList.addProblem("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path, false);
+	}
+
+	//
+	// Check Game Platforms
+	//
+
+	if (game.gamePlatforms.length == 0)
+	{
+		problemList.addProblem("no gamePlatforms", false);
+	}
+
+	//
+	// Check Game Play Actions
+	//
+
+	if (game.isInstalled && game.gamePlayActions.length == 0)
+	{
+		problemList.addProblem("isInstalled is true but there are no GamePlayAction relations", false);
+	}
+
+	if (!game.isInstalled && game.gamePlayActions.length > 0)
+	{
+		problemList.addProblem("isInstalled is false but there are GamePlayAction relations", false);
+	}
+
+	//
+	// Check Game Play Sessions
+	//
+
+	let playTimeTotalSeconds = 0;
+
+	for (const gamePlaySession of game.gamePlaySessions)
+	{
+		playTimeTotalSeconds += gamePlaySession.playTimeSeconds;
+	}
+
+	if (game.playTimeTotalSeconds != playTimeTotalSeconds)
+	{
+		const difference = game.playTimeTotalSeconds - playTimeTotalSeconds;
+
+		problemList.addProblem("playTimeTotalSeconds is " + game.playTimeTotalSeconds + " but sum of GamePlaySession relations is " + playTimeTotalSeconds + " (difference: " + difference + ")", false);
+	}
+
+	//
+	// Return Problem List
+	//
+
+	return problemList;
+}
 
 export function getImageUrls(game: Prisma.GameGetPayload<null>)
 {

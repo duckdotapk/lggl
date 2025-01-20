@@ -7,6 +7,8 @@ import * as Fritter from "@donutteam/fritter";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
+import * as GameModelLib from "../../libs/models/Game.js";
+
 import * as AuditLib from "../../libs/Audit.js";
 
 import { view } from "../../views/audit/_main.js";
@@ -49,7 +51,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 
 		for (const game of games)
 		{
-			const problemList = await AuditLib.auditGame(game, isStrictMode, false);
+			const problemList = await GameModelLib.audit(game, isStrictMode);
 
 			if (problemList.problems.length == 0)
 			{
