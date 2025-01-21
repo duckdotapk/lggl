@@ -7,12 +7,12 @@ import * as Utilities from "@donutteam/utilities";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
+import { Anchor } from "../basic/Anchor.js";
 import { Muted } from "../basic/Muted.js";
 
 import { Button } from "../input/Button.js";
 
 import { staticMiddleware } from "../../instances/server.js";
-import { Anchor } from "../basic/Anchor.js";
 
 //
 // Locals
