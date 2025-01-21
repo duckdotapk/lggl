@@ -8,7 +8,11 @@ import { shortEnglishHumanizer2 } from "../../instances/humanizer.js";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import { view, ViewOptions } from "../../views/stats/_main.js";
+import { view } from "../../views/stats/_main.js";
+
+import * as FileSizeLib from "../../libs/FileSize.js";
+import * as HumanizationLib from "../../libs/Humanization.js";
+import * as StatisticLib from "../../libs/Statistic.js";
 
 //
 // Route
@@ -22,25 +26,83 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/stats",
 	handler: async (context) =>
 	{
-		const games = await prismaClient.game.findMany();
+		//
+		// Find Games
+		//
 
-		const stats: ViewOptions["stats"] = [];
-
-		stats.push(
+		const games = await prismaClient.game.findMany(
 			{
-				name: "Number of games",
-				value: games.length.toString(),
+				include:
+				{
+					gameInstallations: true,
+				},
 			});
 
-		stats.push(
+		//
+		// Create StatCategoryManager
+		//
+
+		const statCategoryManager = new StatisticLib.StatCategoryManager();
+
+		//
+		// Create Game Stats
+		//
+
+		const gamesStatCategory = statCategoryManager.addCategory("Games");
+
+		gamesStatCategory.addStat("Number", games.length.toLocaleString());
+
+		let totalGamePlayTimeSeconds = 0;
+
+		for (const game of games)
+		{
+			totalGamePlayTimeSeconds += game.playTimeTotalSeconds;
+		}
+
+		gamesStatCategory.addStat("Total play time", shortEnglishHumanizer2(totalGamePlayTimeSeconds * 1000));
+
+		//
+		// Create Game Installation Stats
+		//
+
+		const gameInstallationsStatCategory = statCategoryManager.addCategory("Game Installations");
+
+		let numberOfGameInstallations = 0;
+
+		for (const game of games)
+		{
+			numberOfGameInstallations += game.gameInstallations.length;
+		}
+
+		gameInstallationsStatCategory.addStat("Number", numberOfGameInstallations.toLocaleString());
+
+		let totalGameInstallationFileSizeBytes = 0n;
+
+		for (const game of games)
+		{
+			for (const gameInstallation of game.gameInstallations)
 			{
-				name: "Total playtime",
-				value: shortEnglishHumanizer2(games.reduce((total, game) => total + game.playTimeTotalSeconds, 0) * 1000),
-			});
+				const fileSize = FileSizeLib.fromGibiBytes(gameInstallation.fileSizeGibiBytes, gameInstallation.fileSizeBytes);
+
+				totalGameInstallationFileSizeBytes += fileSize;
+			}
+		}
+
+		gameInstallationsStatCategory.addStat("Total file size",
+			[
+				HumanizationLib.formatBytesAsGigabytes(totalGameInstallationFileSizeBytes),
+				" (",
+				HumanizationLib.formatBytesAsGibibytes(totalGameInstallationFileSizeBytes),
+				")",
+			]);
+
+		//
+		// Render View
+		//
 
 		context.renderComponent(view(
 			{
-				stats,
+				statCategoryManager,
 			}));
 	},
 };

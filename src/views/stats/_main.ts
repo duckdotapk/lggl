@@ -2,12 +2,14 @@
 // Imports
 //
 
-import { Child } from "@donutteam/document-builder";
+import { Block } from "../../components/basic/Block.js";
 import { Header } from "../../components/basic/Header.js";
 import { Paragraph } from "../../components/basic/Paragraph.js";
 
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
+
+import * as StatisticLib from "../../libs/Statistic.js";
 
 //
 // View
@@ -15,7 +17,7 @@ import { Wrapper } from "../../components/Wrapper.js";
 
 export type ViewOptions =
 {
-	stats: { name: Child; value: Child }[];
+	statCategoryManager: StatisticLib.StatCategoryManager;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -27,15 +29,17 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 			[
 				Header(1, "Stats"),
 
-				options.stats.map(
-					(stat) =>
-					{
-						return [
-							Header(2, stat.name),
+				options.statCategoryManager.statCategories.map((statCategory) => Block(
+					[
+						Header(2, statCategory.name),
 
-							Paragraph(stat.value),
-						];
-					}),
+						statCategory.stats.map((stat) => Block(
+							[
+								Header(3, stat.name),
+	
+								Paragraph(stat.value),
+							])),
+					])),
 			]),
 	};
 }
