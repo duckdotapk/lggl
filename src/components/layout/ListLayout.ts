@@ -12,6 +12,7 @@ import { Muted } from "../basic/Muted.js";
 import { Button } from "../input/Button.js";
 
 import { staticMiddleware } from "../../instances/server.js";
+import { Anchor } from "../basic/Anchor.js";
 
 //
 // Locals
@@ -101,6 +102,23 @@ function Group(options: ListLayoutGroupOptions)
 		]);
 }
 
+function Logo()
+{
+	return new DE("div", "component-list-layout-logo",
+		[
+			new DE("div", "icon", new DE("span", "fa-solid fa-joystick")),
+
+			new DE("div", "text1", "Loren Goodwin's"),
+
+			new DE("div", "text2", "Game Launcher"),
+
+			new DE("div", "icons",
+				[
+					Anchor(new DE("span", "fa-brands fa-github"), "https://github.com/duckdotapk/lggl", "_blank"),
+				]),
+		]);
+}
+
 //
 // Component
 //
@@ -151,6 +169,6 @@ export function ListLayout(options: ListLayoutOptions)
 						}),
 				]),
 
-			new DE("main", "content", options.content),
+			new DE("main", "content", options.content ?? Logo()),
 		]);
 }
