@@ -35,6 +35,11 @@ $textColor: #f3f4f6; // Tailwind Gray 100
 
 		max-width: 100%;
 	}
+
+	ul
+	{
+		@include Margins();
+	}
 }
 
 @mixin Margins($size: 0.75rem)
