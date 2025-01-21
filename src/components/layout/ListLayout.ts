@@ -21,7 +21,7 @@ export type ListLayoutGroupItemOptions =
 {
 	selected: boolean;
 	href: string;
-	extraAtrributes?: ElementAttributes;
+	extraAttributes?: ElementAttributes;
 	iconName: string;
 	name: string;
 	info: Child;
@@ -46,7 +46,7 @@ function GroupItem(options: ListLayoutGroupItemOptions)
 
 			"data-pjax-selector": ".component-list-layout .content",
 
-			...options.extraAtrributes,
+			...options.extraAttributes,
 		},
 		[
 			new DE("div", "icon-wrapper",

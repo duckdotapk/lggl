@@ -175,7 +175,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -269,7 +269,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -353,7 +353,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -420,7 +420,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -491,7 +491,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -582,7 +582,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -658,7 +658,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -747,7 +747,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -793,7 +793,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -917,7 +917,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -975,7 +975,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
@@ -1104,7 +1104,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 						return {
 							selected: game.id == options.selectedGame?.id,
 							href: "/games/view/" + game.id,
-							extraAtrributes:
+							extraAttributes:
 							{
 								"data-is-installed": game.isInstalled,
 							},
