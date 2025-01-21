@@ -22,10 +22,10 @@ import { ListLayout } from "../../components/layout/ListLayout.js";
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import { shortEnglishHumanizer } from "../../instances/humanizer.js";
-
 import * as GameModelLib from "../../libs/models/Game.js";
 import * as SettingModelLib from "../../libs/models/Setting.js";
+
+import * as HumanizationLib from "../../libs/Humanization.js";
 
 //
 // View
@@ -126,7 +126,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 													[
 														Label(null, "Play time"),
 				
-														Paragraph(shortEnglishHumanizer(gamePlaySession.playTimeSeconds * 1000)),
+														Paragraph(HumanizationLib.formatSeconds(gamePlaySession.playTimeSeconds, false)),
 													]),
 											]),
 

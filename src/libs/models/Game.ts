@@ -16,14 +16,14 @@ import { HumanDateTime } from "../../components/basic/HumanDateTime.js";
 
 import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
-import { shortEnglishHumanizer } from "../../instances/humanizer.js";
 import { staticMiddleware } from "../../instances/server.js";
 
 import * as GameModelLib from "./Game.js";
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
-import * as AuditLib from "../Audit.js";
+import * as AuditLib from "../Audit.js"; 
+import * as HumanizationLib from "../Humanization.js";
 
 //
 // Constants
@@ -802,7 +802,7 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 								: "fa-solid fa-gamepad-modern",
 							name: game.name,
 							info: game.playTimeTotalSeconds > 0
-								? [ "Played ", shortEnglishHumanizer(game.playTimeTotalSeconds * 1000) ]
+								? [ "Played ", HumanizationLib.formatSeconds(game.playTimeTotalSeconds, false) ]
 								: null,
 						};
 					},

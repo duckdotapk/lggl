@@ -4,7 +4,6 @@
 
 import * as Fritter from "@donutteam/fritter";
 
-import { shortEnglishHumanizer2 } from "../../instances/humanizer.js";
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
@@ -59,7 +58,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			totalGamePlayTimeSeconds += game.playTimeTotalSeconds;
 		}
 
-		gamesStatCategory.addStat("Total play time", shortEnglishHumanizer2(totalGamePlayTimeSeconds * 1000));
+		gamesStatCategory.addStat("Total play time",
+			[
+				HumanizationLib.formatSeconds(totalGamePlayTimeSeconds, true),
+				" (",
+				HumanizationLib.formatSeconds(totalGamePlayTimeSeconds, false),
+				")",
+			]);
 
 		//
 		// Create Game Installation Stats

@@ -12,9 +12,9 @@ import { Button } from "../input/Button.js";
 
 import { DataList } from "../DataList.js";
 
-import { shortEnglishHumanizer } from "../../instances/humanizer.js";
-
 import * as GameModelLib from "../../libs/models/Game.js";
+
+import * as HumanizationLib from "../../libs/Humanization.js";
 
 //
 // Component
@@ -70,7 +70,7 @@ export function GameActionToolbar(game: GameActionToolbarGame)
 						? {
 							iconName: "fa-solid fa-timer",
 							name: "Play time",
-							value: shortEnglishHumanizer(game.playTimeTotalSeconds * 1000),
+							value: HumanizationLib.formatSeconds(game.playTimeTotalSeconds, false),
 						}
 						: null,
 
