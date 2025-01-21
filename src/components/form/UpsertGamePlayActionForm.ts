@@ -116,7 +116,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 					type: "textarea",
 					name: "argumentsJson",
 					required: true,
-					value: JSON.stringify(options.gamePlayAction?.argumentsJson ?? "[]"),
+					value: JSON.stringify(options.gamePlayAction?.argumentsJson ?? []),
 					placeholder: "Arguments (as JSON string array)",
 				}),
 
