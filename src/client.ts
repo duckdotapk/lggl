@@ -18,6 +18,7 @@ import { initialiseUpsertGamePlatformForms } from "./components/form/UpsertGameP
 import { initialiseUpsertGamePlayActionForms } from "./components/form/UpsertGamePlayActionForm.client.js";
 import { initialiseUpsertPlatformForms } from "./components/form/UpsertPlatformForm.client.js";
 import { initialiseUpsertSeriesForms } from "./components/form/UpsertSeriesForm.client.js";
+import { initialiseUpsertSeriesGameForms } from "./components/form/UpsertSeriesGameForm.client.js";
 
 import { initialiseCheckboxes } from "./components/input/Checkbox.client.js";
 import { initialiseControls } from "./components/input/Control.client.js";
@@ -63,6 +64,7 @@ async function initialiseComponents()
 	initialiseUpsertGamePlayActionForms();
 	initialiseUpsertPlatformForms();
 	initialiseUpsertSeriesForms();
+	initialiseUpsertSeriesGameForms();
 	
 	initialiseCheckboxes();
 	initialiseControls();

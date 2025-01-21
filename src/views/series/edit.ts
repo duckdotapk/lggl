@@ -4,10 +4,12 @@
 
 import { Prisma } from "@prisma/client";
 
+import { Block } from "../../components/basic/Block.js";
 import { Breadcrumbs } from "../../components/basic/Breadcrumbs.js";
 import { Header } from "../../components/basic/Header.js";
 
 import { UpsertSeriesForm } from "../../components/form/UpsertSeriesForm.js";
+import { UpsertSeriesGameForm } from "../../components/form/UpsertSeriesGameForm.js";
 
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
@@ -28,6 +30,8 @@ type ViewOptions =
 	settings: SettingModelLib.Settings;
 	groupManager: Awaited<ReturnType<typeof SeriesModelLib.findGroups>>;
 	series: Prisma.SeriesGetPayload<null>;
+	games: Prisma.GameGetPayload<null>[];
+	seriesGames: Prisma.SeriesGameGetPayload<null>[];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -66,6 +70,22 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						Header(1, pageTitle),
 		
 						UpsertSeriesForm(options.series),
+
+						Header(2, "Series games"),
+
+						options.seriesGames.map((seriesGame) => Block(UpsertSeriesGameForm(
+							{
+								games: options.games,
+								series: options.series,
+								seriesGame,
+							}))),
+
+						Block(UpsertSeriesGameForm(
+							{
+								games: options.games,
+								series: options.series,
+								seriesGame: null,
+							})),
 					]),
 			}),
 	};
