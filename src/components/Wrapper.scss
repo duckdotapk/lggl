@@ -10,7 +10,7 @@
 
 		display: grid;
 		grid-template-areas: ". content .";
-		grid-template-columns: 1fr 50rem 1fr;
+		grid-template-columns: 1fr minmax(0, 50rem) 1fr;
 
 		> .content
 		{
