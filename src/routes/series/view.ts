@@ -55,23 +55,25 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				selectedSeries: series,
 			});
 
-		const games = await prismaClient.game.findMany(
+		const seriesGames = await prismaClient.seriesGame.findMany(
 			{
 				where:
 				{
-					seriesGames:
-					{
-						some:
-						{
-							series_id: seriesId,
-						},
-					},
+					series_id: seriesId,
+				},
+				include:
+				{
+					game: true,
 				},
 				orderBy:
 				[
-					{ sortName: "asc" },
+					{ number: "asc" },
+					{ game: { releaseDate: { sort: "asc", nulls: "last" } } },
+					{ game: { sortName: "asc" } },
 				],
 			});
+
+		const games = seriesGames.map(seriesGame => seriesGame.game);
 
 		context.renderComponent(view(
 			{
