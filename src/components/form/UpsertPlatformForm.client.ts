@@ -34,7 +34,7 @@ async function initialise(form: HTMLFormElement)
 						name: InputClientLib.getStringValue(nameInput),
 						iconName: InputClientLib.getStringValue(iconNameInput),
 					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/platforms/view/" + response.platform.id),
+				onSuccess: async (response) => PjaxClientLib.changeView("/platforms/edit/" + response.platform.id),
 			});
 	}
 	else

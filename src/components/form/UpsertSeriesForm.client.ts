@@ -32,7 +32,7 @@ async function initialise(form: HTMLFormElement)
 					{
 						name: InputClientLib.getStringValue(nameInput),
 					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/series/view/" + response.series.id),
+				onSuccess: async (response) => PjaxClientLib.changeView("/series/edit/" + response.series.id),
 			});
 	}
 	else

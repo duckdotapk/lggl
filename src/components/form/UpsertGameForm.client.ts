@@ -112,7 +112,7 @@ async function initialise(form: HTMLFormElement)
 						steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
 						steamDeckCompatibility: InputClientLib.getEnumValueNullable<GameSteamDeckCompatibility>(steamDeckCompatibilitySelect),
 					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/games/view/" + response.game.id),
+				onSuccess: async (response) => PjaxClientLib.changeView("/games/edit/" + response.game.id),
 			}
 		)
 	}
