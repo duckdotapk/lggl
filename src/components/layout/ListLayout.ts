@@ -3,7 +3,6 @@
 //
 
 import { Child, DE, ElementAttributes } from "@donutteam/document-builder";
-import * as Utilities from "@donutteam/utilities";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
@@ -94,7 +93,7 @@ function Group(options: ListLayoutGroupOptions)
 				[
 					options.name,
 					" (",
-					Utilities.NumberLib.format(options.items.length),
+					options.items.length.toLocaleString(),
 					")",
 				]),
 

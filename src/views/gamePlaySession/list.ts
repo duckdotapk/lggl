@@ -3,7 +3,6 @@
 //
 
 import { DE } from "@donutteam/document-builder";
-import * as Utilities from "@donutteam/utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -81,7 +80,7 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						Paragraph(
 							[
 								"You have ",
-								new DE("b", null, Utilities.NumberLib.format(options.gamePlaySessionCount)),
+								new DE("b", null, options.gamePlaySessionCount.toLocaleString()),
 								" play session",
 								options.gamePlaySessionCount == 1 ? "" : "s",
 								" recorded for this game.",
