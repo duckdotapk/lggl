@@ -8,6 +8,8 @@ import { Anchor } from "../../components/basic/Anchor.js";
 import { Header } from "../../components/basic/Header.js";
 import { Paragraph } from "../../components/basic/Paragraph.js";
 
+import { Block } from "../../components/basic/Block.js";
+
 import { Button } from "../../components/input/Button.js";
 
 import { SiteOptions } from "../../components/Site.js";
@@ -60,33 +62,30 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 						totalProblems == 0 ? "." : ":",
 					]),
 
-				options.problemLists.map(
-					(problemList) =>
-					{
-						return [
-							Header(2,
-								[
-									Anchor(problemList.name, problemList.viewHref),
-									" ",
-									Anchor(new DE("span", "fa-solid fa-pen-to-square"), problemList.editHref, "_blank"),
-								]),
+				options.problemLists.map((problemList) => Block(
+					[
+						Header(2,
+							[
+								Anchor(problemList.name, problemList.viewHref),
+								" ",
+								Anchor(new DE("span", "fa-solid fa-pen-to-square"), problemList.editHref, "_blank"),
+							]),
 
-							new DE("ul", null, problemList.problems.map((problem) =>
+						new DE("ul", null, problemList.problems.map((problem) =>
+							{
+								let children: Child[] = [];
+
+								if (problem.isStrictModeOnly)
 								{
-									let children: Child[] = [];
+									children.push(new DE("strong", null, "Strict Mode:"));
+									children.push(" ");
+								}
 
-									if (problem.isStrictModeOnly)
-									{
-										children.push(new DE("strong", null, "Strict Mode:"));
-										children.push(" ");
-									}
+								children.push(problem.description);
 
-									children.push(problem.description);
-
-									return new DE("li", null, children);
-								})),
-						];
-					}),
+								return new DE("li", null, children);
+							})),
+					])),
 			]),
 	};
 }
