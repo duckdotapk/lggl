@@ -1222,19 +1222,49 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	// Images
 	const imagePaths = getImagePaths(game);
 
-	if (game.hasBannerImage && !fs.existsSync(imagePaths.banner))
+	if (game.hasBannerImage)
 	{
-		problemList.addProblem("hasBannerImage is true but banner image does not exist on disk", false);
+		if (!fs.existsSync(imagePaths.banner))
+		{
+			problemList.addProblem("hasBannerImage is true but banner image does not exist on disk", false);
+		}
+	}
+	else
+	{
+		if (fs.existsSync(imagePaths.banner))
+		{
+			problemList.addProblem("hasBannerImage is false but banner image exists on disk", false);
+		}
 	}
 
-	if (game.hasCoverImage && !fs.existsSync(imagePaths.cover))
+	if (game.hasCoverImage)
 	{
-		problemList.addProblem("hasCoverImage is true but cover image does not exist on disk", false);
+		if (!fs.existsSync(imagePaths.cover))
+		{
+			problemList.addProblem("hasCoverImage is true but cover image does not exist on disk", false);
+		}
+	}
+	else
+	{
+		if (fs.existsSync(imagePaths.cover))
+		{
+			problemList.addProblem("hasCoverImage is false but cover image exists on disk", false);
+		}
 	}
 
-	if (game.hasIconImage && !fs.existsSync(imagePaths.icon))
+	if (game.hasIconImage)
 	{
-		problemList.addProblem("hasIconImage is true but icon image does not exist on disk", false);
+		if (!fs.existsSync(imagePaths.icon))
+		{
+			problemList.addProblem("hasIconImage is true but icon image does not exist on disk", false);
+		}
+	}
+	else
+	{
+		if (fs.existsSync(imagePaths.icon))
+		{
+			problemList.addProblem("hasIconImage is false but icon image exists on disk", false);
+		}
 	}
 
 	if (game.hasLogoImage)
@@ -1255,6 +1285,13 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 		}
 
 		// TODO: check logo image dimensions
+	}
+	else
+	{
+		if (fs.existsSync(imagePaths.logo))
+		{
+			problemList.addProblem("hasLogoImage is false but logo image exists on disk", false);
+		}
 	}
 
 	// Play data
