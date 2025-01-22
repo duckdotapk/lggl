@@ -23,11 +23,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/companies/create",
 	handler: async (context) =>
 	{
-		const groupManager = await CompanyModelLib.findGroups(prismaClient,
-			{ 
-				settings: context.settings,
-				selectedCompany: null,
-			});
+		const groupManager = await CompanyModelLib.createGroupManager(prismaClient, context.settings, null);
 
 		context.renderComponent(view(
 			{

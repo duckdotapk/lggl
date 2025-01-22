@@ -28,7 +28,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof SeriesModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof SeriesModelLib.createGroupManager>>;
 	series: Prisma.SeriesGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 	seriesGames: Prisma.SeriesGameGetPayload<null>[];

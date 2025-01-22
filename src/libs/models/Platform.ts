@@ -3,9 +3,8 @@
 //
 
 import { Prisma } from "@prisma/client";
-import { DateTime } from "luxon";
 
-import { GroupManager } from "../../classes/GroupManager.js";
+import { NamePlatformGroupManager, NumberOfGamesPlatformGroupManager } from "../../classes/PlatformGroupManager.js";
 
 import * as SettingModelLib from "../models/Setting.js";
 
@@ -13,13 +12,7 @@ import * as SettingModelLib from "../models/Setting.js";
 // Create/Find/Update/Delete Functions
 //
 
-export type FindGroupsOptions =
-{
-	settings: SettingModelLib.Settings;
-	selectedPlatform: Prisma.PlatformGetPayload<null> | null;
-};
-
-export async function findGroups(transactionClient: Prisma.TransactionClient, options: FindGroupsOptions)
+export async function createGroupManager(transactionClient: Prisma.TransactionClient, settings: SettingModelLib.Settings, selectedPlatform: Prisma.PlatformGetPayload<null> | null)
 {
 	const platforms = await transactionClient.platform.findMany(
 		{
@@ -29,50 +22,12 @@ export async function findGroups(transactionClient: Prisma.TransactionClient, op
 			},
 		});
 
-	const groupManager = new GroupManager<typeof platforms[0]>(
-		{
-			mapGroupModel: (platform) =>
-			{
-				return {
-					selected: platform.id == options.selectedPlatform?.id,
-					href: "/platforms/view/" + platform.id,
-					iconName: platform.iconName,
-					name: platform.name,
-					info: "Last updated " + DateTime.fromJSDate(platform.lastUpdatedDate).toLocaleString(DateTime.DATE_MED),
-				};
-			},
-		});
-
-	switch (options.settings.platformGroupMode)
+	switch (settings.platformGroupMode)
 	{
 		case "name":
-		{
-			const sortedPlatforms = platforms.toSorted((a, b) => a.name.localeCompare(b.name));
-
-			for (const platform of sortedPlatforms)
-			{
-				const groupName = GroupManager.getNameGroupName(platform.name);
-		
-				groupManager.addItemToGroup(groupName, platform);
-			}
-
-			break;
-		}
+			return new NamePlatformGroupManager(settings, platforms, selectedPlatform);
 
 		case "numberOfGames":
-		{
-			const sortedPlatforms = platforms.toSorted((a, b) => b.gamePlatforms.length - a.gamePlatforms.length);
-
-			for (const platform of sortedPlatforms)
-			{
-				const groupName = platform.gamePlatforms.length + " game" + (platform.gamePlatforms.length == 1 ? "" : "s");
-
-				groupManager.addItemToGroup(groupName, platform);
-			}
-
-			break;
-		}
+			return new NumberOfGamesPlatformGroupManager(settings, platforms, selectedPlatform);
 	}
-
-	return groupManager;
 }

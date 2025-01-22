@@ -33,7 +33,7 @@ import * as HumanizationLib from "../../libs/Humanization.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof GameModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
 	game: Prisma.GameGetPayload<null>;
 	gamePlaySessions: Prisma.GamePlaySessionGetPayload<{ include: { gamePlayAction: true; platform: true } }>[];
 	gamePlaySessionCount: number;

@@ -22,7 +22,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof GameModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
 	game: GameDetailsGame;
 };
 

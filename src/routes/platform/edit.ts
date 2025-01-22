@@ -49,11 +49,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			return;
 		}
 
-		const groupManager = await PlatformModelLib.findGroups(prismaClient,
-			{
-				settings: context.settings,
-				selectedPlatform: platform,
-			});
+		const groupManager = await PlatformModelLib.createGroupManager(prismaClient, context.settings, platform);
 
 		context.renderComponent(view(
 			{

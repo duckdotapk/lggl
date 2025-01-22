@@ -136,10 +136,7 @@ export function ListLayout(options: ListLayoutOptions)
 		[
 			new DE("div", "toolbar", options.toolbar),
 
-			new DE("aside", "list",
-				[
-					options.groupManager.getListLayoutGroups().map((group) => Group(group)),
-				]),
+			new DE("aside", "list", options.groupManager.getListLayoutGroups().map((group) => Group(group))),
 
 			new DE("div", "buttons",
 				[

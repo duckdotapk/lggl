@@ -35,7 +35,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof GameModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
 	companies: UpsertGameCompanyFormOptions["companies"];
 	engines: UpsertGameEngineFormOptions["engines"];
 	game: NonNullable<UpsertGameFormGame>;

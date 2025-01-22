@@ -23,11 +23,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 	path: "/games/create",
 	handler: async (context) =>
 	{
-		const groupManager = await GameModelLib.findGroups(prismaClient,
-			{
-				settings: context.settings,
-				selectedGame: null,
-			});
+		const groupManager = await GameModelLib.createGroupManager(prismaClient, context.settings, null);
 
 		context.renderComponent(view(
 			{

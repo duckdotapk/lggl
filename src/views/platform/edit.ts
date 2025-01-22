@@ -26,7 +26,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof PlatformModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof PlatformModelLib.createGroupManager>>;
 	platform: Prisma.PlatformGetPayload<null>;
 };
 

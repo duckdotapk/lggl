@@ -49,11 +49,7 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			return;
 		}
 
-		const groupManager = await CompanyModelLib.findGroups(prismaClient,
-			{ 
-				settings: context.settings,
-				selectedCompany: company,
-			});
+		const groupManager = await CompanyModelLib.createGroupManager(prismaClient, context.settings, company);
 
 		const gamesDeveloped = await prismaClient.game.findMany(
 			{

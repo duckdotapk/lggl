@@ -24,7 +24,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof EngineModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof EngineModelLib.createGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>

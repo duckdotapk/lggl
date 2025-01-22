@@ -18,7 +18,7 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 export type ViewOptions =
 {
 	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof CompanyModelLib.findGroups>>;
+	groupManager: Awaited<ReturnType<typeof CompanyModelLib.createGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
