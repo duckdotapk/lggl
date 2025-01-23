@@ -346,7 +346,7 @@ export function GameDetails(game: GameDetailsGame)
 						DataList(
 							[
 								{
-									iconName: "fa-solid fa-fingerprint",
+									iconName: "fa-solid fa-hashtag",
 									name: "ID",
 									value: game.steamAppId,
 								},
@@ -378,7 +378,7 @@ export function GameDetails(game: GameDetailsGame)
 					DataList(
 						[
 							{
-								iconName: "fa-solid fa-fingerprint",
+								iconName: "fa-solid fa-hashtag",
 								name: "ID",
 								value: game.id,
 							},
