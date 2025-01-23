@@ -7,7 +7,9 @@ model GameInstallation {
     fileSizeGibiBytes Int
     fileSizeBytes     Int
 
-    game_id Int
+    directory_id Int
+    game_id      Int
 
-    game Game @relation(fields: [game_id], references: [id])
+    directory Directory @relation(fields: [directory_id], references: [id])
+    game      Game      @relation(fields: [game_id], references: [id])
 }

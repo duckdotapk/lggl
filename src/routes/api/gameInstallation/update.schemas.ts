@@ -16,6 +16,8 @@ export const RequestBodySchema = z.object(
 		updateData: z.object(
 			{
 				path: z.string(),
+
+				directory_id: z.number().int(),
 			}).partial(),
 	});
 

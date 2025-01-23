@@ -3,6 +3,7 @@
 //
 
 import fs from "node:fs";
+import path from "node:path";
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { Prisma } from "@prisma/client";
@@ -42,22 +43,42 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "GameInstallation not found." });
 			}
 
+			const directory = await prismaClient.directory.findUnique(
+				{
+					where:
+					{
+						id: requestBody.updateData.directory_id ?? gameInstallation.directory_id,
+					},
+				});
+
+			if (directory == null)
+			{
+				throw new FritterApiUtilities.APIError({ code: "INVALID_INPUT", message: "Directory not found." });
+			}
+
 			const gameInstallationUpdateData: Prisma.GameInstallationUpdateArgs["data"] = {};
 
 			if (requestBody.updateData.path !== undefined)
 			{
-				if (!fs.existsSync(requestBody.updateData.path))
+				const gameInstallationFullPath = path.normalize(path.join(directory.path, gameInstallation.path));
+
+				if (!fs.existsSync(gameInstallationFullPath))
 				{
-					throw new FritterApiUtilities.APIError({ code: "INVALID_INPUT", message: "Path does not exist." });
+					throw new FritterApiUtilities.APIError({ code: "INVALID_INPUT", message: "Full path does not exist." });
 				}
 
-				const gameInstallationPathSize = await FileSizeLib.getFolderSize(requestBody.updateData.path);
+				const gameInstallationPathSize = await FileSizeLib.getFolderSize(gameInstallationFullPath);
 				
 				const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(gameInstallationPathSize);
 
 				gameInstallationUpdateData.path = requestBody.updateData.path;
 				gameInstallationUpdateData.fileSizeGibiBytes = fileSizeGibiBytes;
 				gameInstallationUpdateData.fileSizeBytes = fileSizeBytes;
+			}
+
+			if (requestBody.updateData.directory_id !== undefined)
+			{
+				gameInstallationUpdateData.directory_id = requestBody.updateData.directory_id;
 			}
 
 			if (Object.keys(gameInstallationUpdateData).length == 0)

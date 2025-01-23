@@ -34,7 +34,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 					gameCompanies: true,
 					gameEngines: true,
 					gameGenres: true,
-					gameInstallations: true,
+					gameInstallations:
+					{
+						include:
+						{
+							directory: true,
+						},
+					},
 					gameLinks: true,
 					gamePlatforms: true,
 					gamePlayActions: true,
