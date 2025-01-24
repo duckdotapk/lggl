@@ -25,7 +25,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 		middlewares: [],
 		requestBodySchema: Schemas.RequestBodySchema,
 		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		handler: async (requestBody, context) =>
 		{
 			const gamePlayAction = await prismaClient.gamePlayAction.findUnique(
 				{
@@ -49,7 +49,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "GAME_HAS_ACTIVE_SESSION", message: "Game has an active session." });
 			}
 
-			const launchGameResult = await GamePlayActionModelLib.execute(gamePlayAction);
+			const launchGameResult = await GamePlayActionModelLib.execute(gamePlayAction, context.settings);
 
 			if (!launchGameResult.success)
 			{

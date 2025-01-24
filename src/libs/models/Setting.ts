@@ -26,6 +26,10 @@ export class Settings
 
 	seriesGroupMode: SettingSchemaLib.SeriesGroupMode = "name";
 
+	gameLauncherCheckInterval: SettingSchemaLib.GameLauncherCheckInterval = 2000;
+	gameLauncherInitialCheckDelay: SettingSchemaLib.GameLauncherInitialCheckDelay = 2000;
+	gameLauncherMaxTrackingAttempts: SettingSchemaLib.GameLauncherMaxTrackingAttempts = 20;
+
 	constructor(settings: Prisma.SettingGetPayload<null>[])
 	{
 		for (const setting of settings)
@@ -138,6 +142,42 @@ export class Settings
 					}
 
 					break
+				}
+
+				case "gameLauncherCheckInterval":
+				{
+					const valueParseResult = SettingSchemaLib.GameLauncherCheckIntervalSchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.gameLauncherCheckInterval = valueParseResult.data;
+					}
+
+					break;
+				}
+
+				case "gameLauncherInitialCheckDelay":
+				{
+					const valueParseResult = SettingSchemaLib.GameLauncherInitialCheckDelaySchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.gameLauncherInitialCheckDelay = valueParseResult.data;
+					}
+
+					break;
+				}
+
+				case "gameLauncherMaxTrackingAttempts":
+				{
+					const valueParseResult = SettingSchemaLib.GameLauncherMaxTrackingAttemptsSchema.safeParse(setting.value);
+
+					if (valueParseResult.success)
+					{
+						this.gameLauncherMaxTrackingAttempts = valueParseResult.data;
+					}
+
+					break;
 				}
 			}
 		}

@@ -6,9 +6,10 @@ import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { LGGL_CURRENT_PLATFORM_ID } from "../../env/LGGL_CURRENT_PLATFORM_ID.js";
-import { LGGL_LAUNCH_CHECK_INTERVAL } from "../../env/LGGL_LAUNCH_CHECK_INTERVAL.js";
 
 import { prismaClient } from "../../instances/prismaClient.js";
+
+import * as SettingModelLib from "./Setting.js";
 
 import * as SystemLib from "../System.js";
 
@@ -105,7 +106,7 @@ async function end(gamePlaySession: Prisma.GamePlaySessionGetPayload<{ include: 
 				});
 		});
 }
-export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ include: { game: true } }>)
+export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ include: { game: true } }>, settings: SettingModelLib.Settings)
 {	
 	const gamePlaySessionStartDateTime = DateTime.now();
 
@@ -139,7 +140,7 @@ export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ in
 		{
 			update(gamePlaySession);
 
-			setTimeout(timeoutCallback, LGGL_LAUNCH_CHECK_INTERVAL);
+			setTimeout(timeoutCallback, settings.gameLauncherCheckInterval);
 		}
 		else
 		{
@@ -149,7 +150,7 @@ export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ in
 		}
 	}
 
-	setTimeout(timeoutCallback, LGGL_LAUNCH_CHECK_INTERVAL);
+	setTimeout(timeoutCallback, settings.gameLauncherCheckInterval);
 
 	return gamePlaySession;
 }

@@ -5,13 +5,10 @@
 import { GamePlayActionType, Prisma } from "@prisma/client";
 import { z } from "zod";
 
-import { LGGL_LAUNCH_CHECK_INTERVAL } from "../../env/LGGL_LAUNCH_CHECK_INTERVAL.js";
-import { LGGL_LAUNCH_INITIAL_CHECK_DELAY } from "../../env/LGGL_LAUNCH_INITIAL_CHECK_DELAY.js";
-import { LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS } from "../../env/LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS.js";
-
 import { prismaClient } from "../../instances/prismaClient.js";
 
 import * as GamePlaySessionModelLib from "./GamePlaySession.js";
+import * as SettingModelLib from "./Setting.js";
 
 import * as SystemLib from "../System.js";
 
@@ -46,7 +43,7 @@ export type ExecuteResult =
 	message: string;
 };
 
-export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<ExecuteResult>
+export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: SettingModelLib.Settings): Promise<ExecuteResult>
 {
 	//
 	// Start Process
@@ -98,18 +95,18 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<Ex
 	// Initial Check Delay
 	//
 
-	if (LGGL_LAUNCH_INITIAL_CHECK_DELAY > 0)
+	if (settings.gameLauncherInitialCheckDelay > 0)
 	{
-		console.log("[LauncherLib] Waiting %dms for initial check...", LGGL_LAUNCH_INITIAL_CHECK_DELAY);
+		console.log("[LauncherLib] Waiting %dms for initial check...", settings.gameLauncherInitialCheckDelay);
 
-		await new Promise(resolve => setTimeout(resolve, LGGL_LAUNCH_INITIAL_CHECK_DELAY));
+		await new Promise(resolve => setTimeout(resolve, settings.gameLauncherInitialCheckDelay));
 	}
 
 	//
 	// Find Game Process
 	//
 
-	for (let trackingAttempt = 1; trackingAttempt <= LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS; trackingAttempt++)
+	for (let trackingAttempt = 1; trackingAttempt <= settings.gameLauncherMaxTrackingAttempts; trackingAttempt++)
 	{
 		console.log("[LauncherLib] Checking for game process for game %d, attempt %d...", gamePlayAction.game.id, trackingAttempt);
 
@@ -120,24 +117,24 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction): Promise<Ex
 			break;
 		}
 
-		if (trackingAttempt == LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS)
+		if (trackingAttempt == settings.gameLauncherMaxTrackingAttempts)
 		{	
-			console.log("[LauncherLib] Game process not found after %d attempts!", LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS);
+			console.log("[LauncherLib] Game process not found after %d attempts!", settings.gameLauncherMaxTrackingAttempts);
 
 			return {
 				success: false,
-				message: "Game process not found after " + LGGL_LAUNCH_MAX_TRACKING_ATTEMPTS + " attempts!",
+				message: "Game process not found after " + settings.gameLauncherMaxTrackingAttempts + " attempts!",
 			};
 		}
 
-		await new Promise(resolve => setTimeout(resolve, LGGL_LAUNCH_CHECK_INTERVAL));
+		await new Promise(resolve => setTimeout(resolve, settings.gameLauncherCheckInterval));
 	}
 
 	//
 	// Create Game Play Session
 	//
 
-	const gamePlaySession = await GamePlaySessionModelLib.start(gamePlayAction);
+	const gamePlaySession = await GamePlaySessionModelLib.start(gamePlayAction, settings);
 
 	//
 	// Update Game
