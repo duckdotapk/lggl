@@ -17,7 +17,7 @@ export abstract class SeriesGroupManager<T extends Prisma.SeriesGetPayload<null>
 {
 	override getItemHref(series: T)
 	{
-		return "/companies/view/" + series.id;
+		return "/series/view/" + series.id;
 	}
 
 	override getItemIconName(_series: T)
