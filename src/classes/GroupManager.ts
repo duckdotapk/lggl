@@ -182,7 +182,7 @@ export abstract class GroupManager<T extends { id: number }>
 					({
 						selected: model.id == this.selectedModel?.id,
 						href: this.getItemHref(model, group),
-						attributes: this.getItemAttributes(model, group),
+						extraAttributes: this.getItemAttributes(model, group),
 						iconName: this.getItemIconName(model, group),
 						name: this.getItemName(model, group),
 						info: this.getItemInfo(model, group),
