@@ -95,18 +95,18 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 	// Initial Check Delay
 	//
 
-	if (settings.gameLauncherInitialCheckDelay > 0)
+	if (settings.initialProcessCheckDelay > 0)
 	{
-		console.log("[LauncherLib] Waiting %dms for initial check...", settings.gameLauncherInitialCheckDelay);
+		console.log("[LauncherLib] Waiting %dms for initial check...", settings.initialProcessCheckDelay);
 
-		await new Promise(resolve => setTimeout(resolve, settings.gameLauncherInitialCheckDelay));
+		await new Promise(resolve => setTimeout(resolve, settings.initialProcessCheckDelay));
 	}
 
 	//
 	// Find Game Process
 	//
 
-	for (let trackingAttempt = 1; trackingAttempt <= settings.gameLauncherMaxTrackingAttempts; trackingAttempt++)
+	for (let trackingAttempt = 1; trackingAttempt <= settings.maxProcessCheckAttempts; trackingAttempt++)
 	{
 		console.log("[LauncherLib] Checking for game process for game %d, attempt %d...", gamePlayAction.game.id, trackingAttempt);
 
@@ -117,17 +117,17 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 			break;
 		}
 
-		if (trackingAttempt == settings.gameLauncherMaxTrackingAttempts)
+		if (trackingAttempt == settings.maxProcessCheckAttempts)
 		{	
-			console.log("[LauncherLib] Game process not found after %d attempts!", settings.gameLauncherMaxTrackingAttempts);
+			console.log("[LauncherLib] Game process not found after %d attempts!", settings.maxProcessCheckAttempts);
 
 			return {
 				success: false,
-				message: "Game process not found after " + settings.gameLauncherMaxTrackingAttempts + " attempts!",
+				message: "Game process not found after " + settings.maxProcessCheckAttempts + " attempts!",
 			};
 		}
 
-		await new Promise(resolve => setTimeout(resolve, settings.gameLauncherCheckInterval));
+		await new Promise(resolve => setTimeout(resolve, settings.processCheckInterval));
 	}
 
 	//

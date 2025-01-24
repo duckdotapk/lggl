@@ -140,7 +140,7 @@ export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ in
 		{
 			update(gamePlaySession);
 
-			setTimeout(timeoutCallback, settings.gameLauncherCheckInterval);
+			setTimeout(timeoutCallback, settings.processCheckInterval);
 		}
 		else
 		{
@@ -150,7 +150,7 @@ export async function start(gamePlayAction: Prisma.GamePlayActionGetPayload<{ in
 		}
 	}
 
-	setTimeout(timeoutCallback, settings.gameLauncherCheckInterval);
+	setTimeout(timeoutCallback, settings.processCheckInterval);
 
 	return gamePlaySession;
 }

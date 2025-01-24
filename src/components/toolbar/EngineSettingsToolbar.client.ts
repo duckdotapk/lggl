@@ -31,7 +31,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "engineGroupMode",
+							name: "ENGINE_GROUP_MODE",
 							value: engineGroupModeSelect.value as SettingSchemaLib.EngineGroupMode,
 						},
 					],

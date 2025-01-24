@@ -29,9 +29,9 @@ export const PlatformGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
 
 export const SeriesGroupModeSchema = z.enum([ "name", "numberOfGames" ]);
 
-export const GameLauncherCheckIntervalSchema = z.number();
-export const GameLauncherInitialCheckDelaySchema = z.number();
-export const GameLauncherMaxTrackingAttemptsSchema = z.number();
+export const InitialProcessCheckDelaySchema = z.number();
+export const ProcessCheckIntervalSchema = z.number();
+export const MaxProcessCheckAttemptsSchema = z.number();
 
 //
 // Types
@@ -51,6 +51,6 @@ export type PlatformGroupMode = z.infer<typeof PlatformGroupModeSchema>;
 
 export type SeriesGroupMode = z.infer<typeof SeriesGroupModeSchema>;
 
-export type GameLauncherCheckInterval = z.infer<typeof GameLauncherCheckIntervalSchema>;
-export type GameLauncherInitialCheckDelay = z.infer<typeof GameLauncherInitialCheckDelaySchema>;
-export type GameLauncherMaxTrackingAttempts = z.infer<typeof GameLauncherMaxTrackingAttemptsSchema>;
+export type InitialProcessCheckDelay = z.infer<typeof InitialProcessCheckDelaySchema>;
+export type ProcessCheckInterval = z.infer<typeof ProcessCheckIntervalSchema>;
+export type MaxProcessCheckAttempts = z.infer<typeof MaxProcessCheckAttemptsSchema>;

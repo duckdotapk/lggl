@@ -26,9 +26,9 @@ export class Settings
 
 	seriesGroupMode: SettingSchemaLib.SeriesGroupMode = "name";
 
-	gameLauncherCheckInterval: SettingSchemaLib.GameLauncherCheckInterval = 2000;
-	gameLauncherInitialCheckDelay: SettingSchemaLib.GameLauncherInitialCheckDelay = 2000;
-	gameLauncherMaxTrackingAttempts: SettingSchemaLib.GameLauncherMaxTrackingAttempts = 20;
+	initialProcessCheckDelay: SettingSchemaLib.InitialProcessCheckDelay = 2000;
+	processCheckInterval: SettingSchemaLib.ProcessCheckInterval = 2000;
+	maxProcessCheckAttempts: SettingSchemaLib.MaxProcessCheckAttempts = 20;
 
 	constructor(settings: Prisma.SettingGetPayload<null>[])
 	{
@@ -36,7 +36,7 @@ export class Settings
 		{
 			switch (setting.name)
 			{
-				case "gameGroupMode":
+				case "GAME_GROUP_MODE":
 				{
 					const valueParseResult = SettingSchemaLib.GameGroupModeSchema.safeParse(setting.value);
 
@@ -48,7 +48,7 @@ export class Settings
 					break;
 				}
 
-				case "showFavoritesGroup":
+				case "SHOW_FAVORITES_GROUP":
 				{
 					const valueParseResult = SettingSchemaLib.ShowFavoritesGroupSchema.safeParse(setting.value);
 
@@ -60,7 +60,7 @@ export class Settings
 					break;
 				}
 
-				case "showRegularGames":
+				case "SHOW_REGULAR_GAMES":
 				{
 					const valueParseResult = SettingSchemaLib.ShowRegularGamesSchema.safeParse(setting.value);
 
@@ -72,7 +72,7 @@ export class Settings
 					break;
 				}
 
-				case "showHiddenGames":
+				case "SHOW_HIDDEN_GAMES":
 				{
 					const valueParseResult = SettingSchemaLib.ShowHiddenGamesSchema.safeParse(setting.value);
 
@@ -84,7 +84,7 @@ export class Settings
 					break;
 				}
 
-				case "showNsfwGames":
+				case "SHOW_NSFW_GAMES":
 				{
 					const valueParseResult = SettingSchemaLib.ShowNsfwGamesSchema.safeParse(setting.value);
 
@@ -96,7 +96,7 @@ export class Settings
 					break;
 				}
 
-				case "companyGroupMode":
+				case "COMPANY_GROUP_MODE":
 				{
 					const valueParseResult = SettingSchemaLib.CompanyGroupModeSchema.safeParse(setting.value);
 
@@ -108,7 +108,7 @@ export class Settings
 					break;
 				}
 
-				case "engineGroupMode":
+				case "ENGINE_GROUP_MODE":
 				{
 					const valueParseResult = SettingSchemaLib.EngineGroupModeSchema.safeParse(setting.value);
 
@@ -120,7 +120,7 @@ export class Settings
 					break;
 				}
 
-				case "platformGroupMode":
+				case "PLATFORM_GROUP_MODE":
 				{
 					const valueParseResult = SettingSchemaLib.PlatformGroupModeSchema.safeParse(setting.value);
 
@@ -132,7 +132,7 @@ export class Settings
 					break;
 				}
 
-				case "seriesGroupMode":
+				case "SERIES_GROUP_MODE":
 				{
 					const valueParseResult = SettingSchemaLib.SeriesGroupModeSchema.safeParse(setting.value);
 
@@ -144,37 +144,37 @@ export class Settings
 					break
 				}
 
-				case "gameLauncherCheckInterval":
+				case "INITIAL_PROCESS_CHECK_DELAY":
 				{
-					const valueParseResult = SettingSchemaLib.GameLauncherCheckIntervalSchema.safeParse(setting.value);
+					const valueParseResult = SettingSchemaLib.InitialProcessCheckDelaySchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
-						this.gameLauncherCheckInterval = valueParseResult.data;
+						this.initialProcessCheckDelay = valueParseResult.data;
 					}
 
 					break;
 				}
 
-				case "gameLauncherInitialCheckDelay":
+				case "PROCESS_CHECK_INTERVAL":
 				{
-					const valueParseResult = SettingSchemaLib.GameLauncherInitialCheckDelaySchema.safeParse(setting.value);
+					const valueParseResult = SettingSchemaLib.ProcessCheckIntervalSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
-						this.gameLauncherInitialCheckDelay = valueParseResult.data;
+						this.processCheckInterval = valueParseResult.data;
 					}
 
 					break;
 				}
 
-				case "gameLauncherMaxTrackingAttempts":
+				case "MAX_PROCESS_CHECK_ATTEMPTS":
 				{
-					const valueParseResult = SettingSchemaLib.GameLauncherMaxTrackingAttemptsSchema.safeParse(setting.value);
+					const valueParseResult = SettingSchemaLib.MaxProcessCheckAttemptsSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
-						this.gameLauncherMaxTrackingAttempts = valueParseResult.data;
+						this.maxProcessCheckAttempts = valueParseResult.data;
 					}
 
 					break;

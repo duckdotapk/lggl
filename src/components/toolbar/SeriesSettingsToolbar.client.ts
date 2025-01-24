@@ -31,7 +31,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "seriesGroupMode",
+							name: "SERIES_GROUP_MODE",
 							value: seriesGroupModeSelect.value as SettingSchemaLib.SeriesGroupMode,
 						},
 					],

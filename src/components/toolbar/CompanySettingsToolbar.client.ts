@@ -31,7 +31,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "companyGroupMode",
+							name: "COMPANY_GROUP_MODE",
 							value: companyGroupModeSelect.value as SettingSchemaLib.CompanyGroupMode,
 						},
 					],

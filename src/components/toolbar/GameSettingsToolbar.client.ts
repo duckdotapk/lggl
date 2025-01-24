@@ -39,7 +39,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "gameGroupMode",
+							name: "GAME_GROUP_MODE",
 							value: gameGroupModeSelect.value as SettingSchemaLib.GameGroupMode,
 						},
 					],
@@ -57,7 +57,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "showFavoritesGroup",
+							name: "SHOW_FAVORITES_GROUP",
 							value: showFavoritesGroupCheckbox.checked,
 						},
 					],
@@ -75,7 +75,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "showRegularGames",
+							name: "SHOW_REGULAR_GAMES",
 							value: showRegularGamesCheckbox.checked,
 						},
 					],
@@ -93,7 +93,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "showHiddenGames",
+							name: "SHOW_HIDDEN_GAMES",
 							value: showHiddenGamesCheckbox.checked,
 						},
 					],
@@ -111,7 +111,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "showNsfwGames",
+							name: "SHOW_NSFW_GAMES",
 							value: showNsfwGamesCheckbox.checked,
 						},
 					],

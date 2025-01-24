@@ -1,8 +1,28 @@
+enum SettingName {
+    GAME_GROUP_MODE
+    SHOW_FAVORITES_GROUP
+    SHOW_REGULAR_GAMES
+    SHOW_HIDDEN_GAMES
+    SHOW_NSFW_GAMES
+
+    COMPANY_GROUP_MODE
+
+    ENGINE_GROUP_MODE
+
+    PLATFORM_GROUP_MODE
+
+    SERIES_GROUP_MODE
+
+    INITIAL_PROCESS_CHECK_DELAY
+    PROCESS_CHECK_INTERVAL
+    MAX_PROCESS_CHECK_ATTEMPTS
+}
+
 model Setting {
     id              Int      @id @default(autoincrement())
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
-    name  String @unique
+    name  SettingName @unique
     value String
 }

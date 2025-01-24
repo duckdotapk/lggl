@@ -31,7 +31,7 @@ async function initialise(toolbar: HTMLFormElement)
 					settingUpdates:
 					[
 						{
-							name: "platformGroupMode",
+							name: "PLATFORM_GROUP_MODE",
 							value: platformGroupModeSelect.value as SettingSchemaLib.PlatformGroupMode,
 						},
 					],
