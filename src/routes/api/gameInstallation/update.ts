@@ -60,7 +60,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 
 			if (requestBody.updateData.path !== undefined)
 			{
-				const gameInstallationFullPath = path.normalize(path.join(directory.path, gameInstallation.path));
+				const gameInstallationFullPath = path.normalize(path.join(directory.path, requestBody.updateData.path));
 
 				if (!fs.existsSync(gameInstallationFullPath))
 				{
