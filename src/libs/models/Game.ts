@@ -457,7 +457,12 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 			{
 				if (gamePlayAction.workingDirectory != null && !fs.existsSync(gamePlayAction.workingDirectory))
 				{
-					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory is null", false);
+					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory does not exist", false);
+				}
+
+				if (!fs.existsSync(gamePlayAction.trackingPath))
+				{
+					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": trackingPath does not exist", false);
 				}
 
 				if (gamePlayAction.argumentsJson != null)
@@ -478,6 +483,11 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 				if (!URL.canParse(gamePlayAction.path))
 				{
 					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
+				}
+
+				if (!fs.existsSync(gamePlayAction.trackingPath))
+				{
+					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": trackingPath does not exist", false);
 				}
 
 				break;
