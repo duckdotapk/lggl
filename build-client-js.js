@@ -23,6 +23,7 @@ const whitelistedPackages =
 {
 	// Direct Dependencies
 	"@donutteam/browser-utilities": true,
+	"@donutteam/document-builder": true,
 	"@donutteam/fritter-api-utilities": true,
 	"zod": true,
 };
