@@ -10,11 +10,11 @@ import { z } from "zod";
 // Utility Functions
 //
 
-export async function startExecutable(executablePath: string, workingDirectory: string, additionalArguments: string[])
+export async function startExecutable(executablePath: string, workingDirectory: string | null, additionalArguments: string[])
 {
 	const child = child_process.spawn(executablePath, additionalArguments,
 		{
-			cwd: workingDirectory,
+			cwd: workingDirectory ?? undefined,
 			detached: true,
 			stdio: "ignore",
 		});

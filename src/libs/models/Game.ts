@@ -455,7 +455,7 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 		{
 			case "EXECUTABLE":
 			{
-				if (gamePlayAction.workingDirectory == null)
+				if (gamePlayAction.workingDirectory != null && !fs.existsSync(gamePlayAction.workingDirectory))
 				{
 					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory is null", false);
 				}

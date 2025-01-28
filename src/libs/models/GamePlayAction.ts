@@ -55,15 +55,7 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 	{
 		case "EXECUTABLE":
 		{
-			const workingDirectory = gamePlayAction.workingDirectory;
-
-			if (workingDirectory == null)
-			{
-				return {
-					success: false,
-					message: "Working directory is required for EXECUTABLE type GamePlayAction."
-				};
-			}
+			const workingDirectory = gamePlayAction.workingDirectory ?? null;
 
 			const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
 		
