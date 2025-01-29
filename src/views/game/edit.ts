@@ -37,7 +37,6 @@ export type ViewOptions =
 	settings: SettingModelLib.Settings;
 	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
 	companies: UpsertGameCompanyFormOptions["companies"];
-	directories: UpsertGameInstallationFormOptions["directories"];
 	engines: UpsertGameEngineFormOptions["engines"];
 	game: NonNullable<UpsertGameFormGame>;
 	gameCompanies: NonNullable<UpsertGameCompanyFormOptions["gameCompany"]>[];
@@ -130,14 +129,12 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 									[
 										options.gameInstallations.map((gameInstallation) => Block(UpsertGameInstallationForm(
 											{
-												directories: options.directories,
 												game: options.game,
 												gameInstallation,
 											}))),
 						
 										Block(UpsertGameInstallationForm(
 											{
-												directories: options.directories,
 												game: options.game,
 												gameInstallation: null,
 											})),

@@ -3,7 +3,6 @@
 //
 
 import fs from "node:fs";
-import path from "node:path";
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 
@@ -42,27 +41,12 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
 			}
 
-			let directory = await prismaClient.directory.findUnique(
-				{
-					where:
-					{
-						id: requestBody.directory_id,
-					},
-				});
-
-			if (directory == null)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Directory not found." });
-			}
-
-			const gameInstallationFullPath = path.normalize(path.join(directory.path, requestBody.path));
-
-			if (!fs.existsSync(gameInstallationFullPath))
+			if (!fs.existsSync(requestBody.path))
 			{
 				throw new FritterApiUtilities.APIError({ code: "INVALID_INPUT", message: "Full installation path does not exist." });
 			}
 
-			const gameInstallationPathSize = await FileSizeLib.getFolderSize(gameInstallationFullPath);
+			const gameInstallationPathSize = await FileSizeLib.getFolderSize(requestBody.path);
 			
 			const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(gameInstallationPathSize);
 
@@ -74,7 +58,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						fileSizeGibiBytes,
 						fileSizeBytes,
 
-						directory_id: directory.id,
 						game_id: game.id,
 					},
 				});

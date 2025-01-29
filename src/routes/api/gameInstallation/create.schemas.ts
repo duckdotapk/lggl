@@ -13,7 +13,6 @@ export const RequestBodySchema = z.object(
 	{
 		path: z.string(),
 
-		directory_id: z.number().int(),
 		game_id: z.number().int(),
 	});
 

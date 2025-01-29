@@ -186,13 +186,7 @@ export type AuditGame = Prisma.GameGetPayload<
 			gameCompanies: true;
 			gameEngines: true;
 			gameGenres: true;
-			gameInstallations:
-			{
-				include:
-				{
-					directory: true;
-				};
-			};
+			gameInstallations: true;
 			gameLinks: true;
 			gamePlatforms: true;
 			gamePlayActions: true;
@@ -416,14 +410,12 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 	for (const gameInstallation of game.gameInstallations)
 	{
-		const gameInstallationFullPath = path.normalize(path.join(gameInstallation.directory.path, gameInstallation.path));
-
-		if (fs.existsSync(gameInstallationFullPath))
+		if (fs.existsSync(gameInstallation.path))
 		{
 			continue;
 		}
 
-		problemList.addProblem("gameInstallation #" + gameInstallation.id + ": full path does not exist: " + gameInstallationFullPath, false);
+		problemList.addProblem("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path, false);
 	}
 
 	//

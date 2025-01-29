@@ -20,7 +20,6 @@ async function initialise(form: HTMLFormElement)
 	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
 	const gameInstallationId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gameInstallationId");
 
-	const directoryIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="directoryId"]`);
 	const pathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
 
 	if (gameInstallationId == null)
@@ -34,7 +33,6 @@ async function initialise(form: HTMLFormElement)
 					{
 						path: InputClientLib.getStringValue(pathInput),
 
-						directory_id: InputClientLib.getNumberValue(directoryIdSelect),
 						game_id: gameId,
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),
@@ -61,8 +59,6 @@ async function initialise(form: HTMLFormElement)
 				onSubmit: async () => await updateGameInstallation(gameInstallationId,
 					{
 						path: InputClientLib.getChangedStringValue(pathInput),
-
-						directory_id: InputClientLib.getChangedNumberValue(directoryIdSelect),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),
 			});

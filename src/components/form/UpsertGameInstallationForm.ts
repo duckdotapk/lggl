@@ -17,7 +17,6 @@ import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 export type UpsertGameInstallationFormOptions =
 {
-	directories: Prisma.DirectoryGetPayload<null>[];
 	game: Prisma.GameGetPayload<null>;
 	gameInstallation: Prisma.GameInstallationGetPayload<null> | null;
 };
@@ -33,41 +32,16 @@ export function UpsertGameInstallationForm(options: UpsertGameInstallationFormOp
 			"data-game-installation-id": options.gameInstallation?.id ?? null,
 		},
 		[
-			ColumnLayout(2,
-				[
-					new DE("div", null,
-						[
-							Label("directoryId", "Directory"),
+			Label("path", "Path"),
 
-							Control(
-								{
-									type: "select",
-									name: "directoryId",
-									required: false,
-									showEmptyOption: true,
-									value: options.gameInstallation?.directory_id,
-									options: options.directories.map(directory =>
-										({
-											value: directory.id,
-											label: directory.name + " (" + directory.path + ")",
-										})),
-								}),
-						]),
-
-					new DE("div", null,
-						[
-							Label("path", "Path"),
-
-							Control(
-								{
-									type: "text",
-									name: "path",
-									required: true,
-									value: options.gameInstallation?.path,
-									placeholder: "Path",
-								}),
-						]),
-				]),
+			Control(
+				{
+					type: "text",
+					name: "path",
+					required: true,
+					value: options.gameInstallation?.path,
+					placeholder: "Path",
+				}),
 
 			ColumnLayout(options.gameInstallation != null ? 2 : 1,
 				[

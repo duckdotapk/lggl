@@ -59,14 +59,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				],
 			});
 
-		const directories = await prismaClient.directory.findMany(
-			{
-				orderBy:
-				[
-					{ name: "asc" },
-				],
-			});
-
 		const engines = await prismaClient.engine.findMany(
 			{
 				orderBy:
@@ -170,7 +162,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				settings: context.settings,
 				groupManager,
 				companies,
-				directories,
 				engines,
 				game,
 				gameCompanies,
