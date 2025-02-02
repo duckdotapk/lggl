@@ -3,9 +3,9 @@ model GamePlaySession {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
-    startDate       DateTime
-    endDate         DateTime
-    playTimeSeconds Int
+    startDate       DateTime @default(now())
+    endDate         DateTime @default(now())
+    playTimeSeconds Int      @default(0)
     addedToTotal    Boolean  @default(false)
     isHistorical    Boolean  @default(false)
     notes           String?
