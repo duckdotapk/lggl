@@ -11,14 +11,5 @@
 			"program": "${workspaceFolder}/build/server.js",
 			"console": "integratedTerminal",
 		},
-		{
-			"name": "Run Script: sync-historical-steam-playtime",
-			"type": "node",
-			"request": "launch",
-			"runtimeVersion": "22.12.0",
-			"cwd": "${workspaceFolder}",
-			"program": "${workspaceFolder}/build/scripts/sync-historical-steam-playtime.js",
-			"console": "integratedTerminal",
-		},
 	],
 }
