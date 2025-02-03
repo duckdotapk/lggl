@@ -77,8 +77,6 @@ if (!fs.existsSync(fontAwesomeDirectory))
 			await fs.promises.mkdir(path.dirname(path.join(fontAwesomeDirectory, filePath)), { recursive: true });
 
 			await fs.promises.writeFile(path.join(fontAwesomeDirectory, filePath), await file.buffer());
-
-			console.log(file.path, filePath);
 		}
 
 		await fs.promises.unlink(fontAwesomeZipPath);
