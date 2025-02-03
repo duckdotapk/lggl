@@ -3,36 +3,44 @@
 //
 
 import { GamePlayActionType, Prisma } from "@prisma/client";
+import { DateTime } from "luxon";
 import { z } from "zod";
+
+import { LGGL_CURRENT_PLATFORM_ID } from "../../env/LGGL_CURRENT_PLATFORM_ID.js";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 
-import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
 import * as SystemLib from "../System.js";
 
 //
+// Types
+//
+
+export type GameProcess =
+{
+	id: number;
+	executable: string;
+	commandLineArguments: string[];
+	environmentVariables: Record<string, string>;
+};
+
+//
 // Constants
 //
 
-const typeNames: Record<GamePlayActionType, string> =
+export const typeNames: Record<GamePlayActionType, string> =
 {
 	"EXECUTABLE": "Executable",
 	"URL": "URL",
 };
 
 //
-// Create/Find/Update/Delete Functions
+// Utility Functions
 //
 
-export type ExecuteGamePlayAction = Prisma.GamePlayActionGetPayload<
-	{
-		include:
-		{
-			game: true;
-		};
-	}>;
+export type ExecuteGamePlayAction = Prisma.GamePlayActionGetPayload<{ include: { game: true } }>;
 
 export type ExecuteResult =
 {
@@ -40,16 +48,29 @@ export type ExecuteResult =
 } |
 {
 	success: false;
-	message: string;
+	error: string;
 };
 
-export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: SettingModelLib.Settings): Promise<ExecuteResult>
+export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: SettingModelLib.Settings): Promise<string | null>
 {
+	//
+	// Parse Process Requirements
+	//
+
+	console.log("[GamePlayActionLib] Parsing GamePlayAction processRequirements...");
+
+	const [ processRequirements, parseProcessRequirementsError ] = SystemLib.parseProcessRequirements(gamePlayAction.processRequirements);
+
+	if (parseProcessRequirementsError != null)
+	{
+		return parseProcessRequirementsError;
+	}
+
 	//
 	// Start Process
 	//
 
-	console.log("[LauncherLib] Starting process for game %d using game play action %d...", gamePlayAction.game.id, gamePlayAction.id);
+	console.log("[GamePlayActionLib] Starting process...");
 
 	switch (gamePlayAction.type)
 	{
@@ -57,39 +78,51 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 		{
 			const workingDirectory = gamePlayAction.workingDirectory ?? null;
 
-			const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
-		
-			if (!additionalArgumentsParseResult.success)
-			{
-				return {
-					success: false,
-					message: "Failed to parse additional arguments for EXECUTABLE type GamePlayAction: " + additionalArgumentsParseResult.error.message,
-				};
-			}
-		
-			const additionalArguments = additionalArgumentsParseResult.data;
+			let additionalArguments: string[] = [];
 
-			await SystemLib.startExecutable(gamePlayAction.path, workingDirectory, additionalArguments);
+			if (gamePlayAction.additionalArguments != null)
+			{
+				let additionalArgumentsJson;
+
+				try
+				{
+					additionalArgumentsJson = JSON.parse(gamePlayAction.additionalArguments);
+				}
+				catch (error)
+				{
+					return "GamePlayAction " + gamePlayAction.id + " additionalArguments is not valid JSON.";
+				}
+
+				const additionalArgumentsParseResult = z.array(z.string()).safeParse(additionalArgumentsJson);
+
+				if (!additionalArgumentsParseResult.success)
+				{
+					return "GamePlayAction " + gamePlayAction.id + " additionalArguments is not an array of strings.";
+				}
+
+				additionalArguments = additionalArgumentsParseResult.data;
+			}
+
+			SystemLib.startProcessViaExecutable(gamePlayAction.path, workingDirectory, additionalArguments);
 
 			break;
 		}
 
 		case "URL":
 		{
-			await SystemLib.startUrl(gamePlayAction.path);
+			SystemLib.startProcessViaUrl(gamePlayAction.path);
 
 			break;
 		}
 	}
 
-
 	//
-	// Initial Check Delay
+	// Initial Process Check Delay
 	//
 
 	if (settings.initialProcessCheckDelay > 0)
 	{
-		console.log("[LauncherLib] Waiting %dms for initial check...", settings.initialProcessCheckDelay);
+		console.log("[GamePlayActionLib] Waiting %d ms before checking for process...", settings.initialProcessCheckDelay);
 
 		await new Promise(resolve => setTimeout(resolve, settings.initialProcessCheckDelay));
 	}
@@ -98,39 +131,33 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 	// Find Game Process
 	//
 
-	for (let trackingAttempt = 1; trackingAttempt <= settings.maxProcessCheckAttempts; trackingAttempt++)
+	const runningProcess = await SystemLib.findRunningProcess(processRequirements, settings.maxProcessCheckAttempts, settings.processCheckInterval);
+
+	if (runningProcess == null)
 	{
-		console.log("[LauncherLib] Checking for game process for game %d, attempt %d...", gamePlayAction.game.id, trackingAttempt);
-
-		const isGameProcessRunning = await SystemLib.isProcessRunning(gamePlayAction.trackingPath);
-
-		if (isGameProcessRunning)
-		{
-			break;
-		}
-
-		if (trackingAttempt == settings.maxProcessCheckAttempts)
-		{	
-			console.log("[LauncherLib] Game process not found after %d attempts!", settings.maxProcessCheckAttempts);
-
-			return {
-				success: false,
-				message: "Game process not found after " + settings.maxProcessCheckAttempts + " attempts!",
-			};
-		}
-
-		await new Promise(resolve => setTimeout(resolve, settings.processCheckInterval));
+		return "GamePlayAction processRequirements not met.";
 	}
-
 	//
 	// Create Game Play Session
 	//
 
-	const gamePlaySession = await GamePlaySessionModelLib.start(gamePlayAction, settings);
+	console.log("[GamePlayActionLib] Creating game play session...");
+	
+	const gamePlaySession = await prismaClient.gamePlaySession.create(
+		{
+			data:
+			{
+				game_id: gamePlayAction.game.id,
+				gamePlayAction_id: gamePlayAction.id,
+				platform_id: LGGL_CURRENT_PLATFORM_ID,
+			},
+		});
 
 	//
 	// Update Game
 	//
+
+	console.log("[GamePlayActionLib] Updating game...");
 
 	const updateCompletionStatus =
 		gamePlayAction.game.progressionType != "NONE" && 
@@ -144,29 +171,73 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 			},
 			data:
 			{
-				completionStatus: updateCompletionStatus ? "IN_PROGRESS" : undefined,
-				firstPlayedDate: gamePlayAction.game.firstPlayedDate == null ? gamePlaySession.startDate : undefined,
+				completionStatus: updateCompletionStatus 
+					? "IN_PROGRESS"
+					: undefined,
+				firstPlayedDate: gamePlayAction.game.firstPlayedDate == null 
+					? gamePlaySession.startDate
+					: undefined,
 				lastPlayedDate: gamePlaySession.startDate,
 				playCount: { increment: 1 },
 			},
 		});
 
 	//
+	// Start Timeout
+	//
+
+	const timeoutCallback = async () =>
+	{
+		const processStillRunning = await SystemLib.isProcessStillRunning(runningProcess);
+
+		const gamePlaySessionEndDateTime = DateTime.now();
+
+		const gamePlaySessionPlayTimeSeconds = Math.round(gamePlaySessionEndDateTime.toSeconds() - DateTime.fromJSDate(gamePlaySession.startDate).toSeconds());
+
+		console.log("[GamePlayActionLib] Updating game play session %d with %d seconds of play time...", gamePlaySession.id, gamePlaySessionPlayTimeSeconds);
+
+		await prismaClient.gamePlaySession.update(
+			{
+				where:
+				{
+					id: gamePlaySession.id,
+				},
+				data:
+				{
+					endDate: gamePlaySessionEndDateTime.toJSDate(),
+					playTimeSeconds: gamePlaySessionPlayTimeSeconds,
+					addedToTotal: !processStillRunning,
+				},
+			});
+
+		if (processStillRunning)
+		{
+			setTimeout(timeoutCallback, settings.processCheckInterval);
+
+			return;
+		}
+
+		console.log("[GamePlayActionLib] Game process is no longer running. Updating game play time...");
+		
+		await prismaClient.game.update(
+			{
+				where:
+				{
+					id: gamePlaySession.game_id,
+				},
+				data:
+				{
+					lastPlayedDate: gamePlaySessionEndDateTime.toJSDate(),
+					playTimeTotalSeconds: { increment: gamePlaySessionPlayTimeSeconds },
+				},
+			});
+	}
+
+	setTimeout(timeoutCallback, settings.processCheckInterval);
+
+	//
 	// Return
 	//
 
-	return {
-		success: true,
-	};
-}
-
-//
-// Utility Functions
-//
-
-export function getTypeName(gamePlayActionOrType: Prisma.GameCompanyGetPayload<null> | GamePlayActionType)
-{
-	return typeof gamePlayActionOrType == "string"
-		? typeNames[gamePlayActionOrType]
-		: gamePlayActionOrType.type;
+	return null;
 }

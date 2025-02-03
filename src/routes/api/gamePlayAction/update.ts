@@ -4,9 +4,12 @@
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { Prisma } from "@prisma/client";
+import { z } from "zod";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
+
+import * as SystemLib from "../../../libs/System.js";
 
 import * as Schemas from "./update.schemas.js";
 
@@ -60,14 +63,57 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gamePlayActionUpdateData.workingDirectory = requestBody.updateData.workingDirectory;
 			}
 
-			if (requestBody.updateData.trackingPath !== undefined)
+			if (requestBody.updateData.additionalArguments !== undefined)
 			{
-				gamePlayActionUpdateData.trackingPath = requestBody.updateData.trackingPath;
+				if (requestBody.updateData.additionalArguments !== null)
+				{
+					let additionalArgumentsJson;
+	
+					try
+					{
+						additionalArgumentsJson = JSON.parse(requestBody.updateData.additionalArguments);
+					}
+					catch (error)
+					{
+						throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "additionalArguments is not valid JSON." });
+					}
+
+					const additionalArgumentsParseResult = z.array(z.string()).safeParse(additionalArgumentsJson);
+
+					if (!additionalArgumentsParseResult.success)
+					{
+						throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "additionalArguments is not the correct shape." });
+					}
+				}
+
+				gamePlayActionUpdateData.additionalArguments = requestBody.updateData.additionalArguments;
 			}
 
-			if (requestBody.updateData.argumentsJson !== undefined)
+			if (requestBody.updateData.processRequirements !== undefined)
 			{
-				gamePlayActionUpdateData.argumentsJson = requestBody.updateData.argumentsJson;
+				if (requestBody.updateData.processRequirements !== null)
+				{
+					let processRequirementsJson;
+		
+					try
+					{
+						processRequirementsJson = JSON.parse(requestBody.updateData.processRequirements);
+					}
+					catch (error)
+					{
+						throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "processRequirements is not valid JSON." });
+					}
+	
+					const processRequirementsParseResult = SystemLib.ProcessRequirementsSchema.safeParse(processRequirementsJson);
+	
+					if (!processRequirementsParseResult.success)
+					{
+						throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "processRequirements is not the correct shape." });
+					}
+
+				}
+
+				gamePlayActionUpdateData.processRequirements = requestBody.updateData.processRequirements;
 			}
 
 			if (requestBody.updateData.isArchived !== undefined)

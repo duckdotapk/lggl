@@ -62,7 +62,7 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 									required: true,
 									value: options.gamePlayAction?.type,
 									showEmptyOption: true,
-									options: Object.values($Enums.GamePlayActionType).map((option) => ({ value: option, label: GamePlayActionModelLib.getTypeName(option) })),
+									options: Object.values($Enums.GamePlayActionType).map((option) => ({ value: option, label: GamePlayActionModelLib.typeNames[option] })),
 								}),
 						]),
 				]),
@@ -98,26 +98,28 @@ export function UpsertGamePlayActionForm(options: UpsertGamePlayActionFormOption
 						]),
 				]),
 
-			Label("trackingPath", "Tracking path"),
-
-			Control(
-				{
-					type: "text",
-					name: "trackingPath",
-					required: true,
-					value: options.gamePlayAction?.trackingPath,
-					placeholder: "Tracking path",
-				}),
-
-			Label("argumentsJson", "Arguments (as JSON string array)"),
+			// TODO: an actual frontend for editing these, not just a text box
+			Label("additionalArguments", "Additional arguments"),
 
 			Control(
 				{
 					type: "textarea",
-					name: "argumentsJson",
-					required: true,
-					value: JSON.stringify(options.gamePlayAction?.argumentsJson ?? []),
-					placeholder: "Arguments (as JSON string array)",
+					name: "additionalArguments",
+					required: false,
+					value: options.gamePlayAction?.additionalArguments ?? null,
+					placeholder: "Additional arguments",
+				}),
+
+			// TODO: an actual frontend for editing these, not just a text box
+			Label("processRequirements", "Process requirements"),
+
+			Control(
+				{
+					type: "textarea",
+					name: "processRequirements",
+					required: false,
+					value: options.gamePlayAction?.processRequirements ?? null,
+					placeholder: "Process requirements",
 				}),
 
 			Checkbox("isArchived", "Is archived", options.gamePlayAction?.isArchived ?? false),

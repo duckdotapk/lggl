@@ -7,7 +7,6 @@ import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as GameModelLib from "../../../libs/models/Game.js";
 import * as GamePlayActionModelLib from "../../../libs/models/GamePlayAction.js";
 
 import * as Schemas from "./execute.schemas.js";
@@ -44,16 +43,13 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game play action not found." });
 			}
 
-			if (GameModelLib.hasActiveSession(gamePlayAction.game))
-			{
-				throw new FritterApiUtilities.APIError({ code: "GAME_HAS_ACTIVE_SESSION", message: "Game has an active session." });
-			}
+			const executeGamePlayActionError = await GamePlayActionModelLib.execute(gamePlayAction, context.settings);
 
-			const launchGameResult = await GamePlayActionModelLib.execute(gamePlayAction, context.settings);
-
-			if (!launchGameResult.success)
+			if (executeGamePlayActionError != null)
 			{
-				throw new FritterApiUtilities.APIError({ code: "LAUNCH_FAILED", message: launchGameResult.message });
+				console.error("[/api/gamePlayActions/execute] Failed to execute game play action:", executeGamePlayActionError);
+
+				throw new FritterApiUtilities.APIError({ code: "EXECUTION_FAILED", message: executeGamePlayActionError });
 			}
 
 			return {

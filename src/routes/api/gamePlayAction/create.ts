@@ -3,9 +3,12 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { z } from "zod";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
+
+import * as SystemLib from "../../../libs/System.js";
 
 import * as Schemas from "./create.schemas.js";
 
@@ -37,6 +40,48 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
 			}
 
+			if (requestBody.additionalArguments != null)
+			{
+				let additionalArgumentsJson;
+
+				try
+				{
+					additionalArgumentsJson = JSON.parse(requestBody.additionalArguments);
+				}
+				catch (error)
+				{
+					throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "additionalArguments is not valid JSON." });
+				}
+
+				const additionalArgumentsParseResult = z.array(z.string()).safeParse(additionalArgumentsJson);
+
+				if (!additionalArgumentsParseResult.success)
+				{
+					throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "additionalArguments is not the correct shape." });
+				}
+			}
+
+			if (requestBody.processRequirements != null)
+			{
+				let processRequirementsJson;
+	
+				try
+				{
+					processRequirementsJson = JSON.parse(requestBody.processRequirements);
+				}
+				catch (error)
+				{
+					throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "processRequirements is not valid JSON." });
+				}
+
+				const processRequirementsParseResult = SystemLib.ProcessRequirementsSchema.safeParse(processRequirementsJson);
+
+				if (!processRequirementsParseResult.success)
+				{
+					throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "processRequirements is not the correct shape." });
+				}
+			}
+
 			await prismaClient.gamePlayAction.create(
 				{
 					data:
@@ -45,9 +90,8 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						type: requestBody.type,
 						path: requestBody.path,
 						workingDirectory: requestBody.workingDirectory,
-						trackingPath: requestBody.trackingPath,
-						argumentsJson: requestBody.argumentsJson,
-
+						additionalArguments: requestBody.additionalArguments,
+						processRequirements: requestBody.processRequirements,
 						isArchived: requestBody.isArchived,
 
 						game_id: game.id,

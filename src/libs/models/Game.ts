@@ -12,7 +12,6 @@ import { CompletionStatusGameGroupManager, CreatedDateGameGroupManager, Develope
 
 import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
-import * as GamePlaySessionModelLib from "./GamePlaySession.js";
 import * as SettingModelLib from "./Setting.js";
 
 import * as AuditLib from "../Audit.js"; 
@@ -443,47 +442,40 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 	for (const gamePlayAction of game.gamePlayActions)
 	{
-		switch (gamePlayAction.type)
+		if (gamePlayAction.type == "URL" && !URL.canParse(gamePlayAction.path))
 		{
-			case "EXECUTABLE":
+			problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
+		}
+
+		if (gamePlayAction.type == "EXECUTABLE" && gamePlayAction.workingDirectory != null && !fs.existsSync(gamePlayAction.workingDirectory))
+		{
+			problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory does not exist", false);
+		}
+
+		if (gamePlayAction.type == "EXECUTABLE" && gamePlayAction.additionalArguments != null)
+		{
+			let additionalArgumentsJson;
+
+			try
 			{
-				if (gamePlayAction.workingDirectory != null && !fs.existsSync(gamePlayAction.workingDirectory))
-				{
-					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory does not exist", false);
-				}
-
-				if (!fs.existsSync(gamePlayAction.trackingPath))
-				{
-					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": trackingPath does not exist", false);
-				}
-
-				if (gamePlayAction.argumentsJson != null)
-				{
-					const additionalArgumentsParseResult = z.array(z.string()).safeParse(gamePlayAction.argumentsJson);
-	
-					if (!additionalArgumentsParseResult.success)
-					{
-						problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but additionalArguments is not a string array", false);
-					}
-				}
-
-				break;
+				additionalArgumentsJson = JSON.parse(gamePlayAction.additionalArguments);
+			}
+			catch (error)
+			{
+				problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but arguments is not valid JSON", false);
 			}
 
-			case "URL":
+			const additionalArgumentsParseResult = z.array(z.string()).safeParse(additionalArgumentsJson);
+
+			if (!additionalArgumentsParseResult.success)
 			{
-				if (!URL.canParse(gamePlayAction.path))
-				{
-					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
-				}
-
-				if (!fs.existsSync(gamePlayAction.trackingPath))
-				{
-					problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": trackingPath does not exist", false);
-				}
-
-				break;
+				problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but additionalArguments is not a string array", false);
 			}
+		}
+
+		if (gamePlayAction.processRequirements == null)
+		{
+			problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": processRequirements is null", false);
 		}
 	}
 
@@ -674,9 +666,4 @@ export function getSteamDeckCompatibilityName(gameOrSteamDeckCompatibility: Pris
 	return gameOrSteamDeckCompatibility.steamDeckCompatibility != null
 		? steamDeckCompatibilityNames[gameOrSteamDeckCompatibility.steamDeckCompatibility]
 		: "-";
-}
-
-export function hasActiveSession(game: Prisma.GameGetPayload<null>)
-{
-	return GamePlaySessionModelLib.gamesWithActiveSessions.has(game.id);
 }

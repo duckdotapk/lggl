@@ -25,8 +25,8 @@ async function initialise(form: HTMLFormElement)
 	const typeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
 	const pathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
 	const workingDirectoryInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="workingDirectory"]`);
-	const trackingPathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="trackingPath"]`);
-	const argumentsJsonTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="argumentsJson"]`);
+	const additionalArgumentsTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="additionalArguments"]`);
+	const processRequirementsTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="processRequirements"]`);
 	const isArchivedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isArchived"]`);
 
 	if (gamePlayActionId == null)
@@ -44,8 +44,8 @@ async function initialise(form: HTMLFormElement)
 						type: InputClientLib.getEnumValue<GamePlayActionType>(typeSelect),
 						path: InputClientLib.getStringValue(pathInput),
 						workingDirectory: InputClientLib.getStringValueNullable(workingDirectoryInput),
-						trackingPath: InputClientLib.getStringValue(trackingPathInput),
-						argumentsJson: JSON.parse(InputClientLib.getStringValue(argumentsJsonTextArea)),
+						additionalArguments: InputClientLib.getStringValueNullable(additionalArgumentsTextArea),
+						processRequirements: InputClientLib.getStringValueNullable(processRequirementsTextArea),
 						isArchived: InputClientLib.getBooleanValue(isArchivedInput),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),
@@ -75,10 +75,8 @@ async function initialise(form: HTMLFormElement)
 						type: InputClientLib.getChangedEnumValue<GamePlayActionType>(typeSelect),
 						path: InputClientLib.getChangedStringValue(pathInput),
 						workingDirectory: InputClientLib.getChangedStringValueNullable(workingDirectoryInput),
-						trackingPath: InputClientLib.getChangedStringValue(trackingPathInput),
-						argumentsJson: InputClientLib.isInputDirty(argumentsJsonTextArea)
-							? JSON.parse(InputClientLib.getStringValue(argumentsJsonTextArea))
-							: undefined,
+						additionalArguments: InputClientLib.getChangedStringValueNullable(additionalArgumentsTextArea),
+						processRequirements: InputClientLib.getChangedStringValueNullable(processRequirementsTextArea),
 						isArchived: InputClientLib.getChangedBooleanValue(isArchivedInput),
 					}),
 				onSuccess: async () => PjaxClientLib.reloadView(),

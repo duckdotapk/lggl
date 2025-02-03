@@ -8,13 +8,17 @@ model GamePlayAction {
     createdDate     DateTime @default(now())
     lastUpdatedDate DateTime @default(now()) @updatedAt
 
-    name             String
-    type             GamePlayActionType
-    path             String
-    workingDirectory String?
-    trackingPath     String
-    argumentsJson    Json
-    isArchived       Boolean            @default(false)
+    name                String
+    type                GamePlayActionType
+    path                String
+    workingDirectory    String?
+    additionalArguments String?
+    processRequirements String?
+    isArchived          Boolean            @default(false)
+
+    // TODO: These are deprecated in favor of processRequirements, remove them
+    trackingPath  String?
+    argumentsJson Json?
 
     game_id Int
 
