@@ -3,6 +3,7 @@
 //
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
@@ -40,6 +41,17 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
 			}
 
+			const gamePlayActionCreateData: Prisma.GamePlayActionCreateArgs["data"] =
+			{
+				name: requestBody.name,
+				type: requestBody.type,
+				path: requestBody.path,
+				workingDirectory: requestBody.workingDirectory,
+				isArchived: requestBody.isArchived,
+
+				game_id: game.id,
+			};
+
 			if (requestBody.additionalArguments != null)
 			{
 				let additionalArgumentsJson;
@@ -59,6 +71,8 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				{
 					throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "additionalArguments is not the correct shape." });
 				}
+
+				gamePlayActionCreateData.additionalArguments = JSON.stringify(JSON.parse(requestBody.additionalArguments));
 			}
 
 			if (requestBody.processRequirements != null)
@@ -80,22 +94,13 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				{
 					throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "processRequirements is not the correct shape." });
 				}
+
+				gamePlayActionCreateData.processRequirements = JSON.stringify(JSON.parse(requestBody.processRequirements));
 			}
 
 			await prismaClient.gamePlayAction.create(
 				{
-					data:
-					{
-						name: requestBody.name,
-						type: requestBody.type,
-						path: requestBody.path,
-						workingDirectory: requestBody.workingDirectory,
-						additionalArguments: requestBody.additionalArguments,
-						processRequirements: requestBody.processRequirements,
-						isArchived: requestBody.isArchived,
-
-						game_id: game.id,
-					},
+					data: gamePlayActionCreateData,
 				});
 
 			return {

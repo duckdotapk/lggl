@@ -111,9 +111,12 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						throw new FritterApiUtilities.APIError({ code: "INVALID_REQUEST_BODY", message: "processRequirements is not the correct shape." });
 					}
 
+					gamePlayActionUpdateData.processRequirements = JSON.stringify(JSON.parse(requestBody.updateData.processRequirements));
 				}
-
-				gamePlayActionUpdateData.processRequirements = requestBody.updateData.processRequirements;
+				else
+				{
+					gamePlayActionUpdateData.processRequirements = null;
+				}
 			}
 
 			if (requestBody.updateData.isArchived !== undefined)
