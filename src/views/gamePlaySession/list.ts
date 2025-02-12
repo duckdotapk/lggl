@@ -93,8 +93,6 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 							{
 								return Block(
 									[
-										Header(2, "Play session #" + gamePlaySession.id),
-
 										ColumnLayout(4,
 											[
 												new DE("div", null,
