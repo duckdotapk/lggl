@@ -59,7 +59,7 @@ async function createHistoricalGamePlaySession(game_id: number, platform_id: num
 				playTimeSeconds: historicalPlayTimeSeconds,
 				addedToTotal: true,
 				isHistorical: true,
-				notes: "Historical playtime from Steam.",
+				notes: "Historical play time from Steam.",
 
 				game_id,
 				platform_id,
@@ -104,7 +104,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 							where:
 							{
 								isHistorical: true,
-								notes: "Historical playtime from Steam.",
+								notes: "Historical play time from Steam.",
 
 								game_id: game.id,
 							},
