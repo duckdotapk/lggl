@@ -39,6 +39,7 @@ export const RequestBodySchema = z.object(
 				isUnknownEngine: z.boolean(),
 				isUnreleased: z.boolean(),
 
+				purchaseDate: z.string().nullable(),
 				completionStatus: z.custom<GameCompletionStatus>().nullable(),
 				firstPlayedDate: z.string().nullable(),
 				firstPlayedDateApproximated: z.boolean(),

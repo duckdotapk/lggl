@@ -8,7 +8,7 @@ import path from "node:path";
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameSteamDeckCompatibility, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { z } from "zod";
 
-import { CompletionStatusGameGroupManager, CreatedDateGameGroupManager, DeveloperGameGroupManager, EngineGameGroupManager, FirstCompletedDateGameGroupManager, FirstPlayedDateGameGroupManager, LastPlayedDateGameGroupManager, NameGameGroupManager, PlayTimeTotalSecondsGameGroupManager, PublisherGameGroupManager, SeriesGameGroupManager, SteamDeckCompatibilityGameGroupManager } from "../../classes/GameGroupManager.js";
+import { CompletionStatusGameGroupManager, CreatedDateGameGroupManager, DeveloperGameGroupManager, EngineGameGroupManager, FirstCompletedDateGameGroupManager, FirstPlayedDateGameGroupManager, LastPlayedDateGameGroupManager, NameGameGroupManager, PlayTimeTotalSecondsGameGroupManager, PublisherGameGroupManager, PurchaseDateGameGroupManager, SeriesGameGroupManager, SteamDeckCompatibilityGameGroupManager } from "../../classes/GameGroupManager.js";
 
 import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
@@ -114,7 +114,7 @@ export async function createGroupManager(transactionClient: Prisma.TransactionCl
 				{
 					include:
 					{
-						company: true,
+						company: true, 
 					},
 				},
 				gameEngines:
@@ -165,6 +165,9 @@ export async function createGroupManager(transactionClient: Prisma.TransactionCl
 
 		case "publisher":
 			return new PublisherGameGroupManager(settings, games, selectedGame);
+
+		case "purchaseDate":
+			return new PurchaseDateGameGroupManager(settings, games, selectedGame);
 
 		case "series":
 			return new SeriesGameGroupManager(settings, games, selectedGame);

@@ -143,6 +143,13 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.isUnreleased = requestBody.updateData.isUnreleased;
 			}
 
+			if (requestBody.updateData.purchaseDate !== undefined)
+			{
+				gameUpdateData.purchaseDate = requestBody.updateData.purchaseDate !== null
+					? DateTime.fromISO(requestBody.updateData.purchaseDate).toJSDate()
+					: null;	
+			}
+
 			if (requestBody.updateData.completionStatus !== undefined)
 			{
 				gameUpdateData.completionStatus = requestBody.updateData.completionStatus;

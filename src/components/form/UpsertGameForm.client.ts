@@ -42,6 +42,7 @@ async function initialise(form: HTMLFormElement)
 	const isUnknownEngineInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isUnknownEngine"]`);
 	const isUnreleasedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isUnreleased"]`);
 
+	const purchaseDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="purchaseDate"]`);
 	const completionStatusSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="completionStatus"]`);
 	const firstPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="firstPlayedDate"]`);
 	const firstPlayedDateApproximatedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="firstPlayedDateApproximated"]`);
@@ -94,6 +95,7 @@ async function initialise(form: HTMLFormElement)
 						isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
 						isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
 
+						purchaseDate: InputClientLib.getDateValueNullable(purchaseDateInput),
 						completionStatus: InputClientLib.getEnumValueNullable<GameCompletionStatus>(completionStatusSelect),
 						firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
 						firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
@@ -159,6 +161,7 @@ async function initialise(form: HTMLFormElement)
 						isUnknownEngine: InputClientLib.getChangedBooleanValue(isUnknownEngineInput),
 						isUnreleased: InputClientLib.getChangedBooleanValue(isUnreleasedInput),
 
+						purchaseDate: InputClientLib.getChangedDateValueNullable(purchaseDateInput),
 						completionStatus: InputClientLib.getChangedEnumValueNullable<GameCompletionStatus>(completionStatusSelect),
 						firstPlayedDate: InputClientLib.getChangedDateTimeValueNullable(firstPlayedDateInput),
 						firstPlayedDateApproximated: InputClientLib.getChangedBooleanValue(firstPlayedDateApproximatedInput),

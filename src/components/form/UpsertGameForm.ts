@@ -186,6 +186,18 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 						title: "Play data",
 						content: Block(
 							[
+								Label("purchaseDate", "Purchase date"),
+
+								Control(
+									{
+										type: "datetime",
+										name: "purchaseDate",
+										required: false,
+										value: game?.purchaseDate != null
+											? DateTime.fromJSDate(game.purchaseDate)
+											: null,
+									}),
+
 								Label("completionStatus", "Completion status"),
 					
 								Control(

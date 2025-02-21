@@ -54,6 +54,9 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						isUnknownEngine: requestBody.isUnknownEngine,
 						isUnreleased: requestBody.isUnreleased,
 
+						purchaseDate: requestBody.purchaseDate != null
+							? DateTime.fromISO(requestBody.purchaseDate).toJSDate()
+							: null,
 						completionStatus: requestBody.completionStatus,
 						firstPlayedDate: requestBody.firstPlayedDate != null
 							? DateTime.fromISO(requestBody.firstPlayedDate).toJSDate()

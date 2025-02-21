@@ -200,6 +200,7 @@ const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 	name: "Name",
 	playTime: "Play time",
 	publisher: "Publisher",
+	purchaseDate: "Purchase date",
 	series: "Series",
 	steamDeckCompatibility: "Steam Deck compatibility",
 };

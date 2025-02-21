@@ -726,6 +726,67 @@ export class PublisherGameGroupManager extends GameGroupManager<PublisherGameGro
 	}
 }
 
+export class PurchaseDateGameGroupManager extends GameGroupManager
+{
+	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	{
+		return game.purchaseDate != null
+			? [ "Purchased ", HumanDateTime(DateTime.fromJSDate(game.purchaseDate), DateTime.DATE_MED) ]
+			: null;
+	}
+
+	override sortModels(games: Prisma.GameGetPayload<null>[])
+	{
+		return games
+			.map((game) => ({ game, purchaseDate: game.purchaseDate ?? new Date(0) }))
+			.sort((a, b) =>
+			{
+				if (a.purchaseDate > b.purchaseDate)
+				{
+					return -1;
+				}
+
+				if (a.purchaseDate < b.purchaseDate)
+				{
+					return 1;
+				}
+
+				return a.game.sortName.localeCompare(b.game.sortName);
+			})
+			.map((item) => item.game);
+	}
+
+	override groupModels(games: Prisma.GameGetPayload<null>[])
+	{
+		this.addGroup("Favorites", 1);
+
+		this.addGroup("No Purchase Date", -1);
+
+		for (const game of games)
+		{
+			if (this.settings.showFavoritesGroup && game.isFavorite)
+			{
+				this.addModelToGroup("Favorites", game);
+			}
+
+			if (game.purchaseDate == null)
+			{
+				this.addModelToGroup("No Purchase Date", game);
+
+				continue;
+			}
+
+			const lastPlayedDateTime = DateTime.fromJSDate(game.purchaseDate);
+
+			const groupName = GroupManager.getDateGroupName(lastPlayedDateTime);
+
+			this.addModelToGroup(groupName, game);
+		}
+
+		return Array.from(this.groupsByName.values());
+	}
+}
+
 export type SeriesGameGroupManagerGame = Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>;
 
 export class SeriesGameGroupManager extends GameGroupManager<SeriesGameGroupManagerGame>
