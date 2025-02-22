@@ -51,9 +51,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				
 					const coverDownloaded = await NetworkLib.downloadUrl(imageUrls.libraryCapsule, [ "images", "games", game.id.toString(), "cover.jpg" ]);
 				
-					const iconDownloaded = imageUrls.icon != null 
-						? await NetworkLib.downloadUrl(imageUrls.icon, [ "images", "games", game.id.toString(), "icon.jpg" ])
-						: false;
+					const iconDownloaded = await NetworkLib.downloadUrl(imageUrls.icon, [ "images", "games", game.id.toString(), "icon.jpg" ]);
 				
 					const logoDownloaded = await NetworkLib.downloadUrl(imageUrls.libraryLogo, [ "images", "games", game.id.toString(), "logo.png" ]);
 				
