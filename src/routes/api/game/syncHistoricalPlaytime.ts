@@ -110,7 +110,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 							},
 						});
 
-					const clientLastPlayedTimes = await SteamThirdPartyLib.fetchClientLastPlayedTimes(LGGL_STEAM_API_KEY);
+					const clientLastPlayedTimes = await SteamThirdPartyLib.callPlayServiceClientGetLastPlayedTimesV1(LGGL_STEAM_API_KEY);
 
 					const steamPlayedGame = clientLastPlayedTimes.games.find((steamPlayedGame) => steamPlayedGame.appid == game.steamAppId);
 			

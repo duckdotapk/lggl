@@ -86,7 +86,7 @@ export const IPlayerServiceClientGetLastPlayedTimesV1ResponseSchema = z.object(
 			}),
 	});
 
-export const IPlayerServiceGetOwnedGamesResponseSchema = z.object(
+export const IPlayerServiceGetOwnedGamesV1ResponseSchema = z.object(
 	{
 		response: z.object(
 			{
@@ -123,7 +123,7 @@ export type AppDetailsResponse = z.infer<typeof AppDetailsResponseSchema>;
 
 export type IPlayerServiceClientGetLastPlayedTimesV1Response = z.infer<typeof IPlayerServiceClientGetLastPlayedTimesV1ResponseSchema>;
 
-export type IPlayerServiceGetOwnedGamesResponse = z.infer<typeof IPlayerServiceGetOwnedGamesResponseSchema>;
+export type IPlayerServiceGetOwnedGamesV1Response = z.infer<typeof IPlayerServiceGetOwnedGamesV1ResponseSchema>;
 
 //
 // API Functions
@@ -151,25 +151,25 @@ export async function fetchAppDetails(steamAppId: number)
 	return appDetails.data;
 }
 
-export async function fetchClientLastPlayedTimes(steamApiKey: string)
+export async function callPlayServiceClientGetLastPlayedTimesV1(steamApiKey: string)
 {
-	const playerLastPlayedTimesSearchParameters = new URLSearchParams();
+	const searchParameters = new URLSearchParams();
 
-	playerLastPlayedTimesSearchParameters.set("key", steamApiKey);
+	searchParameters.set("key", steamApiKey);
 
-	const playerLastPlayedTimesResponse = await fetch("https://api.steampowered.com/IPlayerService/ClientGetLastPlayedTimes/v1?" + playerLastPlayedTimesSearchParameters.toString());
+	const response = await fetch("https://api.steampowered.com/IPlayerService/ClientGetLastPlayedTimes/v1?" + searchParameters.toString());
 
-	const playerLastPlayedTimesResponseParseResult = IPlayerServiceClientGetLastPlayedTimesV1ResponseSchema.safeParse(await playerLastPlayedTimesResponse.json());
+	const responseParseResult = IPlayerServiceClientGetLastPlayedTimesV1ResponseSchema.safeParse(await response.json());
 
-	if (!playerLastPlayedTimesResponseParseResult.success)
+	if (!responseParseResult.success)
 	{
-		throw new Error("Failed to get client last played times: " + JSON.stringify(playerLastPlayedTimesResponseParseResult.error));
+		throw new Error("Failed to get client last played times: " + JSON.stringify(responseParseResult.error));
 	}
 
-	return playerLastPlayedTimesResponseParseResult.data.response;
+	return responseParseResult.data.response;
 }
 
-export async function fetchOwnedGames(steamApiKey: string, steamUserId: string)
+export async function callPlayerServiceGetOwnedGamesV1(steamApiKey: string, steamUserId: string)
 {
 	const searchParameters = new URLSearchParams();
 
@@ -187,7 +187,7 @@ export async function fetchOwnedGames(steamApiKey: string, steamUserId: string)
 
 	const responseJson = await response.json();
 
-	const parseResponse = IPlayerServiceGetOwnedGamesResponseSchema.parse(responseJson);
+	const parseResponse = IPlayerServiceGetOwnedGamesV1ResponseSchema.parse(responseJson);
 
 	return parseResponse.response;
 }
@@ -198,7 +198,7 @@ export async function fetchOwnedGames(steamApiKey: string, steamUserId: string)
 
 export async function fetchImageUrls(steamApiKey: string, steamUserId: string, steamAppId: number)
 {
-	const ownedGames = await fetchOwnedGames(steamApiKey, steamUserId);
+	const ownedGames = await callPlayerServiceGetOwnedGamesV1(steamApiKey, steamUserId);
 
 	const ownedGame = ownedGames.games.find((ownedGame) => ownedGame.appid == steamAppId) ?? null;
 
