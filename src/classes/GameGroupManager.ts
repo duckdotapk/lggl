@@ -106,7 +106,7 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 
 		for (const game of games)
 		{
-			if (game.isFavorite)
+			if (this.settings.showFavoritesGroup && game.isFavorite)
 			{
 				this.addModelToGroup("Favorites", game);
 			}
