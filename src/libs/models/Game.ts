@@ -307,6 +307,11 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	}
 
 	// Play data
+	if (!game.isFamilyShared && game.purchaseDate == null)
+	{
+		problemList.addProblem("isFamilyShared is false but purchaseDate is null", false);
+	}
+
 	if (game.completionStatus == null && game.progressionType != "NONE")
 	{
 		problemList.addProblem("completionStatus is null", false);

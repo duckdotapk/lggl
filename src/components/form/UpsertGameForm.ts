@@ -166,6 +166,8 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 						content: Block(
 							[
 								Checkbox("isEarlyAccess", "Is early access", game?.isEarlyAccess ?? false),
+
+								Checkbox("isFamilyShared", "Is family shared", game?.isFamilyShared ?? false),
 					
 								Checkbox("isFavorite", "Is favorite", game?.isFavorite ?? false),
 					

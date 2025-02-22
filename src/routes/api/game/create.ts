@@ -49,6 +49,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						logoImageJustification: requestBody.logoImageJustification,
 
 						isEarlyAccess: requestBody.isEarlyAccess,
+						isFamilyShared: requestBody.isFamilyShared,
 						isFavorite: requestBody.isFavorite,
 						isHidden: requestBody.isHidden,
 						isInstalled: requestBody.isInstalled,

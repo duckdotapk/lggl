@@ -28,6 +28,7 @@ export const RequestBodySchema = z.object(
 		logoImageJustification: z.custom<GameLogoImageJustification>().nullable(),
 
 		isEarlyAccess: z.boolean(),
+		isFamilyShared: z.boolean(),
 		isFavorite: z.boolean(),
 		isHidden: z.boolean(),
 		isInstalled: z.boolean(),

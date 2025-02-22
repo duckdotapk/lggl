@@ -108,6 +108,11 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.isEarlyAccess = requestBody.updateData.isEarlyAccess;
 			}
 
+			if (requestBody.updateData.isFamilyShared !== undefined)
+			{
+				gameUpdateData.isFamilyShared = requestBody.updateData.isFamilyShared;
+			}
+
 			if (requestBody.updateData.isFavorite !== undefined)
 			{
 				gameUpdateData.isFavorite = requestBody.updateData.isFavorite;

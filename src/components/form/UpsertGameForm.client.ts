@@ -34,6 +34,7 @@ async function initialise(form: HTMLFormElement)
 	const logoImageJustificationSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageJustification"]`);
 
 	const isEarlyAccessInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isEarlyAccess"]`);
+	const isFamilySharedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFamilyShared"]`);
 	const isFavoriteInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFavorite"]`);
 	const isHiddenInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isHidden"]`);
 	const isInstalledInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isInstalled"]`);
@@ -87,6 +88,7 @@ async function initialise(form: HTMLFormElement)
 						logoImageJustification: InputClientLib.getEnumValueNullable<GameLogoImageJustification>(logoImageJustificationSelect),
 
 						isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
+						isFamilyShared: InputClientLib.getBooleanValue(isFamilySharedInput),
 						isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
 						isHidden: InputClientLib.getBooleanValue(isHiddenInput),
 						isInstalled: InputClientLib.getBooleanValue(isInstalledInput),
@@ -153,6 +155,7 @@ async function initialise(form: HTMLFormElement)
 						logoImageJustification: InputClientLib.getChangedEnumValueNullable<GameLogoImageJustification>(logoImageJustificationSelect),
 
 						isEarlyAccess: InputClientLib.getChangedBooleanValue(isEarlyAccessInput),
+						isFamilyShared: InputClientLib.getChangedBooleanValue(isFamilySharedInput),
 						isFavorite: InputClientLib.getChangedBooleanValue(isFavoriteInput),
 						isHidden: InputClientLib.getChangedBooleanValue(isHiddenInput),
 						isInstalled: InputClientLib.getChangedBooleanValue(isInstalledInput),

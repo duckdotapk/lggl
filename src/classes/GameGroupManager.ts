@@ -760,6 +760,8 @@ export class PurchaseDateGameGroupManager extends GameGroupManager
 	{
 		this.addGroup("Favorites", 1);
 
+		this.addGroup("Family Shared", -1);
+
 		this.addGroup("No Purchase Date", -1);
 
 		for (const game of games)
@@ -767,6 +769,13 @@ export class PurchaseDateGameGroupManager extends GameGroupManager
 			if (this.settings.showFavoritesGroup && game.isFavorite)
 			{
 				this.addModelToGroup("Favorites", game);
+			}
+
+			if (game.isFamilyShared)
+			{
+				this.addModelToGroup("Family Shared", game);
+
+				continue;
 			}
 
 			if (game.purchaseDate == null)
