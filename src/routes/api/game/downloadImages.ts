@@ -4,9 +4,6 @@
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 
-import { LGGL_STEAM_API_KEY } from "../../../env/LGGL_STEAM_API_KEY.js";
-import { LGGL_STEAM_USER_ID } from "../../../env/LGGL_STEAM_USER_ID.js";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
@@ -48,7 +45,7 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 			{
 				case "steam":
 				{
-					const imageUrls = await SteamThirdPartyLib.fetchImageUrls(LGGL_STEAM_API_KEY, LGGL_STEAM_USER_ID, requestBody.provider.steamAppId);
+					const imageUrls = await SteamThirdPartyLib.fetchImageUrls(requestBody.provider.steamAppId);
 		
 					const bannerDownloaded = await NetworkLib.downloadUrl(imageUrls.libraryBackground, [ "images", "games", game.id.toString(), "banner.jpg" ]);
 				
