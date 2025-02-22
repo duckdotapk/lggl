@@ -76,7 +76,7 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 {
 	override getItemInfo(game: Prisma.GameGetPayload<null>, group: GroupManagerGroup<Prisma.GameGetPayload<null>>)
 	{
-		if (group.name != "Favorites" && group.name != "Shelved")
+		if (group.name != "Favorites")
 		{
 			return null;
 		}
