@@ -188,7 +188,7 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 
 	const timeoutCallback = async () =>
 	{
-		const processStillRunning = await SystemLib.isProcessStillRunning(runningProcess);
+		const processStillRunning = await SystemLib.isProcessStillRunning(processRequirements, runningProcess);
 
 		const gamePlaySessionEndDateTime = DateTime.now();
 
