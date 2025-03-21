@@ -4,12 +4,9 @@
 
 import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { DateTime } from "luxon";
-import { z } from "zod";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
-
-import * as SystemLib from "../../../libs/System.js";
 
 import * as Schemas from "./create.schemas.js";
 
@@ -86,31 +83,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						steamDeckCompatibility: requestBody.steamDeckCompatibility,
 					},
 				});
-
-			if (game.isInstalled && game.steamAppId != null)
-			{
-				// HACK: This is to save me having to create one of these for each Steam game
-				//	This should maybe be done somewhere else, or defined in a more generic way, idk
-				await prismaClient.gamePlayAction.create(
-					{
-						data:
-						{
-							name: "Launch via Steam",
-							type: "URL",
-							path: "steam://rungameid/" + game.steamAppId,
-							processRequirements: JSON.stringify(
-								{
-									requireEnvironmentVariables: true,
-									environmentVariables:
-									{
-										"SteamGameId": game.steamAppId.toString(),
-									},
-								} satisfies z.input<typeof SystemLib.ProcessRequirementsSchema>),
-
-							game_id: game.id,
-						},
-					});
-			}
 
 			return {
 				success: true,
