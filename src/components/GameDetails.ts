@@ -47,6 +47,7 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					engine: true;
 				};
 			};
+			gameInstallations: true;
 			gameLinks: true;
 			gamePlatforms:
 			{
@@ -55,6 +56,7 @@ export type GameDetailsGame = Prisma.GameGetPayload<
 					platform: true;
 				};
 			};
+			gamePlayActions: true;
 			seriesGames:
 			{
 				include:

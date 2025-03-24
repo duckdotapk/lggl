@@ -124,6 +124,7 @@ export async function createGroupManager(transactionClient: Prisma.TransactionCl
 						engine: true,
 					},
 				},
+				gameInstallations: true,
 				seriesGames:
 				{
 					include:
@@ -405,16 +406,6 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	// Check Game Installations
 	//
 
-	if (game.isInstalled && game.gameInstallations.length == 0)
-	{
-		problemList.addProblem("isInstalled is true but there are no GameInstallation relations", false);
-	}
-
-	if (!game.isInstalled && game.gameInstallations.length > 0)
-	{
-		problemList.addProblem("isInstalled is false but there are GameInstallation relations", false);
-	}
-
 	for (const gameInstallation of game.gameInstallations)
 	{
 		if (fs.existsSync(gameInstallation.path))
@@ -437,16 +428,6 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	//
 	// Check Game Play Actions
 	//
-
-	if (game.isInstalled && game.gamePlayActions.length == 0)
-	{
-		problemList.addProblem("isInstalled is true but there are no GamePlayAction relations", false);
-	}
-
-	if (!game.isInstalled && game.gamePlayActions.length > 0)
-	{
-		problemList.addProblem("isInstalled is false but there are GamePlayAction relations", false);
-	}
 
 	for (const gamePlayAction of game.gamePlayActions)
 	{

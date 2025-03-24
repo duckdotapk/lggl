@@ -18,7 +18,9 @@ import * as HumanizationLib from "../libs/Humanization.js";
 // Class
 //
 
-export abstract class GameGroupManager<T extends Prisma.GameGetPayload<null> = Prisma.GameGetPayload<null>> extends GroupManager<T>
+export type GameGroupManagerGame = Prisma.GameGetPayload<{ include: { gameInstallations: true } }>;
+
+export abstract class GameGroupManager<T extends GameGroupManagerGame = GameGroupManagerGame> extends GroupManager<T>
 {
 	override filterModels(games: T[])
 	{
@@ -48,7 +50,7 @@ export abstract class GameGroupManager<T extends Prisma.GameGetPayload<null> = P
 	override getItemAttributes(game: T)
 	{
 		return {
-			"data-is-installed": game.isInstalled,
+			"data-is-installed": game.gameInstallations.length > 0,
 		};
 	}
 
@@ -74,7 +76,7 @@ export abstract class GameGroupManager<T extends Prisma.GameGetPayload<null> = P
 
 export class CompletionStatusGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>, group: GroupManagerGroup<Prisma.GameGetPayload<null>>)
+	override getItemInfo(game: GameGroupManagerGame, group: GroupManagerGroup<GameGroupManagerGame>)
 	{
 		if (group.name != "Favorites")
 		{
@@ -86,12 +88,12 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 			: null;
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites");
 
@@ -134,17 +136,17 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 
 export class CreatedDateGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return [ "Created ", HumanDateTime(DateTime.fromJSDate(game.createdDate)) ];
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games.toSorted((a, b) => b.createdDate.getTime() - a.createdDate.getTime());
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -166,7 +168,7 @@ export class CreatedDateGameGroupManager extends GameGroupManager
 	}
 }
 
-export type DeveloperGameGroupManagerGame = Prisma.GameGetPayload<{ include: { gameCompanies: { include: { company: true } } } }>;
+export type DeveloperGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { gameCompanies: { include: { company: true } } } }>;
 
 export class DeveloperGameGroupManager extends GameGroupManager<DeveloperGameGroupManagerGame>
 {
@@ -246,7 +248,7 @@ export class DeveloperGameGroupManager extends GameGroupManager<DeveloperGameGro
 	}
 }
 
-export type EngineGameGroupManagerGame = Prisma.GameGetPayload<{ include: { gameEngines: { include: { engine: true } } } }>;
+export type EngineGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { gameEngines: { include: { engine: true } } } }>;
 
 export class EngineGameGroupManager extends GameGroupManager<EngineGameGroupManagerGame>
 {
@@ -335,14 +337,14 @@ export class EngineGameGroupManager extends GameGroupManager<EngineGameGroupMana
 
 export class FirstCompletedDateGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.firstCompletedDate != null && !game.firstCompletedDateApproximated
 			? [ "First completed ", HumanDateTime(DateTime.fromJSDate(game.firstCompletedDate), DateTime.DATE_MED) ]
 			: null;
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
 			.map((game) => ({ game, firstCompletedDate: game.firstCompletedDate ?? new Date(0) }))
@@ -363,7 +365,7 @@ export class FirstCompletedDateGameGroupManager extends GameGroupManager
 			.map((item) => item.game);
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -396,14 +398,14 @@ export class FirstCompletedDateGameGroupManager extends GameGroupManager
 
 export class FirstPlayedDateGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.firstPlayedDate != null && !game.firstPlayedDateApproximated
 			? [ "First played ", HumanDateTime(DateTime.fromJSDate(game.firstPlayedDate), DateTime.DATE_MED) ]
 			: null;
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
 			.map((game) => ({ game, firstPlayedDate: game.firstPlayedDate ?? new Date(0) }))
@@ -424,7 +426,7 @@ export class FirstPlayedDateGameGroupManager extends GameGroupManager
 			.map((item) => item.game);
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -457,14 +459,14 @@ export class FirstPlayedDateGameGroupManager extends GameGroupManager
 
 export class LastPlayedDateGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.lastPlayedDate != null
 			? [ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ]
 			: null;
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
 			.map((game) => ({ game, lastPlayedDate: game.lastPlayedDate ?? new Date(0) }))
@@ -485,7 +487,7 @@ export class LastPlayedDateGameGroupManager extends GameGroupManager
 			.map((item) => item.game);
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -518,12 +520,12 @@ export class LastPlayedDateGameGroupManager extends GameGroupManager
 
 export class NameGameGroupManager extends GameGroupManager
 {
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games.toSorted((a, b) => a.sortName.localeCompare(b.sortName));
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -545,14 +547,14 @@ export class NameGameGroupManager extends GameGroupManager
 
 export class PlayTimeTotalSecondsGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.playTimeTotalSeconds > 0
 			? [ "Played ", HumanizationLib.formatSeconds(game.playTimeTotalSeconds, false) ]
 			: null;
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games.toSorted(
 			(a, b) =>
@@ -571,7 +573,7 @@ export class PlayTimeTotalSecondsGameGroupManager extends GameGroupManager
 			});
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -646,7 +648,7 @@ export class PlayTimeTotalSecondsGameGroupManager extends GameGroupManager
 	}
 }
 
-export type PublisherGameGroupManagerGame = Prisma.GameGetPayload<{ include: { gameCompanies: { include: { company: true } } } }>;
+export type PublisherGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { gameCompanies: { include: { company: true } } } }>;
 
 export class PublisherGameGroupManager extends GameGroupManager<PublisherGameGroupManagerGame>
 {
@@ -728,14 +730,14 @@ export class PublisherGameGroupManager extends GameGroupManager<PublisherGameGro
 
 export class PurchaseDateGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: Prisma.GameGetPayload<null>)
+	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.purchaseDate != null
 			? [ "Purchased ", HumanDateTime(DateTime.fromJSDate(game.purchaseDate), DateTime.DATE_MED) ]
 			: null;
 	}
 
-	override sortModels(games: Prisma.GameGetPayload<null>[])
+	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
 			.map((game) => ({ game, purchaseDate: game.purchaseDate ?? new Date(0) }))
@@ -756,7 +758,7 @@ export class PurchaseDateGameGroupManager extends GameGroupManager
 			.map((item) => item.game);
 	}
 
-	override groupModels(games: Prisma.GameGetPayload<null>[])
+	override groupModels(games: GameGroupManagerGame[])
 	{
 		this.addGroup("Favorites", 1);
 
@@ -796,7 +798,7 @@ export class PurchaseDateGameGroupManager extends GameGroupManager
 	}
 }
 
-export type SeriesGameGroupManagerGame = Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>;
+export type SeriesGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>;
 
 export class SeriesGameGroupManager extends GameGroupManager<SeriesGameGroupManagerGame>
 {

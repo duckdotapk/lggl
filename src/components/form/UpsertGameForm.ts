@@ -173,8 +173,6 @@ export function UpsertGameForm(game: UpsertGameFormGame)
 					
 								Checkbox("isHidden", "Is hidden", game?.isHidden ?? false),
 					
-								Checkbox("isInstalled", "Is installed", game?.isInstalled ?? false),
-					
 								Checkbox("isNsfw", "Is NSFW", game?.isNsfw ?? false),
 					
 								Checkbox("isShelved", "Is shelved", game?.isShelved ?? false),

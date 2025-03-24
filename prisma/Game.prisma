@@ -79,7 +79,7 @@ model Game {
     isFamilyShared  Boolean @default(false)
     isFavorite      Boolean @default(false)
     isHidden        Boolean @default(false)
-    isInstalled     Boolean @default(false)
+    isInstalled     Boolean @default(false) @ignore
     isNsfw          Boolean @default(false)
     isShelved       Boolean @default(false)
     isUnknownEngine Boolean @default(false)

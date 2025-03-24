@@ -123,11 +123,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 				gameUpdateData.isHidden = requestBody.updateData.isHidden;
 			}
 
-			if (requestBody.updateData.isInstalled !== undefined)
-			{
-				gameUpdateData.isInstalled = requestBody.updateData.isInstalled;
-			}
-
 			if (requestBody.updateData.isNsfw !== undefined)
 			{
 				gameUpdateData.isNsfw = requestBody.updateData.isNsfw;

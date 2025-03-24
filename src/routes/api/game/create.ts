@@ -49,7 +49,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 						isFamilyShared: requestBody.isFamilyShared,
 						isFavorite: requestBody.isFavorite,
 						isHidden: requestBody.isHidden,
-						isInstalled: requestBody.isInstalled,
 						isNsfw: requestBody.isNsfw,
 						isShelved: requestBody.isShelved,
 						isUnknownEngine: requestBody.isUnknownEngine,

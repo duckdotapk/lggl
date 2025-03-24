@@ -20,15 +20,25 @@ import * as HumanizationLib from "../../libs/Humanization.js";
 // Component
 //
 
-export type GameActionToolbarGame = Prisma.GameGetPayload<null>;
+export type GameActionToolbarGame = Prisma.GameGetPayload<
+{
+	include:
+	{
+		gameInstallations: true;
+		gamePlayActions: true;
+	};
+}>;
 
 export function GameActionToolbar(game: GameActionToolbarGame)
 {
+	const gameIsInstalled = game.gameInstallations.length > 0;
+	const gameHasPlayActions = game.gamePlayActions.length > 0;
+
 	return new DE("div", "component-game-action-toolbar",
 		[
 			new DE("div", "buttons",
 				[
-					!game.isInstalled
+					!gameIsInstalled
 						? Button(
 							{
 								style: "secondary",
@@ -40,7 +50,24 @@ export function GameActionToolbar(game: GameActionToolbarGame)
 								iconName: "fa-solid fa-ban",
 								text: "Not installed",
 							})
-						: Button(
+						: null,
+
+					gameIsInstalled && !gameHasPlayActions
+						? Button(
+							{
+								style: "secondary",
+								type: "button",
+								extraAttributes:
+								{
+									disabled: true,
+								},
+								iconName: "fa-solid fa-ban",
+								text: "No play actions",
+							})
+						: null,
+
+					gameIsInstalled && gameHasPlayActions
+						? Button(
 							{
 								style: "success",
 								type: "button",
@@ -51,7 +78,8 @@ export function GameActionToolbar(game: GameActionToolbarGame)
 								},
 								iconName: "fa-solid fa-play",
 								text: "Play",
-							}),
+							})
+						: null,
 				]),
 
 			new DE("div", "data-list", DataList(
