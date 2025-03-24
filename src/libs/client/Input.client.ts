@@ -3,6 +3,9 @@
 //
 
 import * as BrowserUtilities from "@donutteam/browser-utilities";
+import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
+
+import { notyf } from "../../instances/notyf.js";
 
 //
 // Utility Functions
@@ -187,7 +190,7 @@ export function enableInputs(form: HTMLFormElement)
 	}
 }
 
-type InitialiseFormOptions<T extends { success: boolean }> =
+type InitialiseFormOptions<T extends FritterApiUtilities.ResponseBody> =
 {
 	form: HTMLFormElement;
 	submitter: HTMLButtonElement | HTMLFormElement | HTMLInputElement | HTMLSelectElement;
@@ -196,7 +199,7 @@ type InitialiseFormOptions<T extends { success: boolean }> =
 	onSuccess: (successResponse: Extract<T, { success: true }>) => Promise<void>;
 };
 
-export function initialiseForm<T extends { success: boolean }>(options: InitialiseFormOptions<T>)
+export function initialiseForm<T extends FritterApiUtilities.ResponseBody>(options: InitialiseFormOptions<T>)
 {
 	let eventName: string;
 
@@ -228,19 +231,27 @@ export function initialiseForm<T extends { success: boolean }>(options: Initiali
 
 				if (!response.success)
 				{
-					// TODO: show error(s)
-					console.error("[FormClientLib] Error submitting form:", response);
+					for (const error of response.errors)
+					{
+						notyf.error(error);
+					}
+
+					console.error("[FormClientLib] Error response:", response);
 
 					enableInputs(options.form);
 
 					return;
 				}
 
+				notyf.success("Saved successfully.");
+
 				// HACK: I hate that this cast is seemingly necessary
 				await options.onSuccess(response as Extract<T, { success: true }>);
 			}
 			catch (error)
 			{
+				notyf.error("Error submitting form. See console for details.");
+
 				console.error("[FormClientLib] Error submitting form:", error);
 			}
 		});

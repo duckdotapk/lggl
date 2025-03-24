@@ -6,6 +6,8 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import { GameNotesDialog } from "./GameNotesDialog.js";
 
+import { notyf } from "../../instances/notyf.js";
+
 import * as InputClientLib from "../../libs/client/Input.client.js";
 import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
 
@@ -36,12 +38,19 @@ async function initialise(dialog: HTMLDialogElement)
 
 			if (!response.success)
 			{
+				for (const error of response.errors)
+				{
+					notyf.error(error.message);
+				}
+
 				return console.error("[GameNotesDialog] Failed to update game:", response.errors);
 			}
 
 			dialog.close();
 
 			PjaxClientLib.reloadView();
+
+			notyf.success("Game notes updated successfully.");
 		});
 
 	dialog.addEventListener("close", () => dialog.remove());
@@ -60,11 +69,15 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 			if (!response.success)
 			{
-				// TODO: show notification
+				for (const error of response.errors)
+				{
+					notyf.error(error.message);
+				}
+
 				return console.error("[GameNotesDialog] Failed to find game:", response.errors);
 			}
 
-			const dialog = await GameNotesDialog(response.game).renderToHTMLElement<HTMLDialogElement>();
+			const dialog = GameNotesDialog(response.game).renderToHTMLElement<HTMLDialogElement>();
 
 			dialogContainer.appendChild(dialog);
 

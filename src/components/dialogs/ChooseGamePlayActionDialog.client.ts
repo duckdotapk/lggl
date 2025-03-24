@@ -6,6 +6,8 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 import { ChooseGamePlayActionDialog } from "./ChooseGamePlayActionDialog.js";
 
+import { notyf } from "../../instances/notyf.js";
+
 import { executeGamePlayAction } from "../../routes/api/gamePlayAction/execute.schemas.js";
 import { findGamePlayActions } from "../../routes/api/gamePlayAction/findAll.schemas.js";
 
@@ -30,9 +32,15 @@ async function initialise(dialog: HTMLDialogElement)
 
 				if (!response.success)
 				{
-					// TODO: show notification
+					for (const error of response.errors)
+					{
+						notyf.error(error.message);
+					}
+
 					console.error("[ChooseGamePlayActionDialog] Failed to launch game:", response.errors);
 				}
+
+				notyf.success("Game launched successfully.");
 			});
 	}
 
@@ -52,13 +60,18 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 			if (!findGamePlayActionsResponse.success)
 			{
-				// TODO: show notification
+				for (const error of findGamePlayActionsResponse.errors)
+				{
+					notyf.error(error.message);
+				}
+
 				return console.error("[ChooseGamePlayActionDialog] Failed to find game play actions:", findGamePlayActionsResponse.errors);
 			}
 
 			if (findGamePlayActionsResponse.gamePlayActions.length == 0)
 			{
-				// TODO: show notification
+				notyf.error("No game play actions found for this game.");
+
 				return console.error("[ChooseGamePlayActionDialog] No game play actions found for game:", gameId);
 			}
 
@@ -68,9 +81,15 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 				if (!launchGameResponse.success)
 				{
-					// TODO: show notification
+					for (const error of launchGameResponse.errors)
+					{
+						notyf.error(error.message);
+					}
+
 					return console.error("[ChooseGamePlayActionDialog] Failed to launch game:", launchGameResponse.errors);
 				}
+
+				notyf.success("Game launched successfully.");
 
 				return;
 			}

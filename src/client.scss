@@ -3,6 +3,7 @@
 //
 
 @use "../node_modules/normalize.css/normalize.css";
+@use "../node_modules/notyf/notyf.min.css";
 
 @use "components/_Globals.scss";
 
@@ -40,6 +41,16 @@
 //
 
 @include Globals.Resets();
+
+body
+{
+	font-family: Arial, Helvetica, "sans-serif";
+}
+
+.notyf-notification
+{
+	font-family: inherit;
+}
 
 @include Anchor.Anchor();
 @include Block.Block();
