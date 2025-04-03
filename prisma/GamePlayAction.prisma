@@ -16,10 +16,6 @@ model GamePlayAction {
     processRequirements String?
     isArchived          Boolean            @default(false)
 
-    // TODO: These are deprecated in favor of processRequirements, remove them
-    trackingPath  String?
-    argumentsJson Json?
-
     game_id Int
 
     game             Game              @relation(fields: [game_id], references: [id])
