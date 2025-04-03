@@ -61,7 +61,7 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 
 	const [ processRequirements, parseProcessRequirementsError ] = SystemLib.parseProcessRequirements(gamePlayAction.processRequirements);
 
-	if (parseProcessRequirementsError != null)
+	if (parseProcessRequirementsError != null)             
 	{
 		return parseProcessRequirementsError;
 	}
@@ -137,6 +137,7 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 	{
 		return "GamePlayAction processRequirements not met.";
 	}
+
 	//
 	// Create Game Play Session
 	//
