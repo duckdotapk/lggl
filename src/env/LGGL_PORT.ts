@@ -15,4 +15,5 @@ export const LGGL_PORT = z
 	.number()
 	.min(1)
 	.max(65535)
+	.default(8008)
 	.parse(process.env["LGGL_PORT"]);
