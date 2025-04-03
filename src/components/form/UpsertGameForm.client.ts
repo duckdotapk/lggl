@@ -37,7 +37,6 @@ async function initialise(form: HTMLFormElement)
 	const isFamilySharedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFamilyShared"]`);
 	const isFavoriteInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFavorite"]`);
 	const isHiddenInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isHidden"]`);
-	const isInstalledInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isInstalled"]`);
 	const isNsfwInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isNsfw"]`);
 	const isShelvedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isShelved"]`);
 	const isUnknownEngineInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isUnknownEngine"]`);
@@ -91,7 +90,6 @@ async function initialise(form: HTMLFormElement)
 						isFamilyShared: InputClientLib.getBooleanValue(isFamilySharedInput),
 						isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
 						isHidden: InputClientLib.getBooleanValue(isHiddenInput),
-						isInstalled: InputClientLib.getBooleanValue(isInstalledInput),
 						isNsfw: InputClientLib.getBooleanValue(isNsfwInput),
 						isShelved: InputClientLib.getBooleanValue(isShelvedInput),
 						isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
@@ -158,7 +156,6 @@ async function initialise(form: HTMLFormElement)
 						isFamilyShared: InputClientLib.getChangedBooleanValue(isFamilySharedInput),
 						isFavorite: InputClientLib.getChangedBooleanValue(isFavoriteInput),
 						isHidden: InputClientLib.getChangedBooleanValue(isHiddenInput),
-						isInstalled: InputClientLib.getChangedBooleanValue(isInstalledInput),
 						isNsfw: InputClientLib.getChangedBooleanValue(isNsfwInput),
 						isShelved: InputClientLib.getChangedBooleanValue(isShelvedInput),
 						isUnknownEngine: InputClientLib.getChangedBooleanValue(isUnknownEngineInput),

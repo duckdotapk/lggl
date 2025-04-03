@@ -31,7 +31,6 @@ export const RequestBodySchema = z.object(
 		isFamilyShared: z.boolean(),
 		isFavorite: z.boolean(),
 		isHidden: z.boolean(),
-		isInstalled: z.boolean(),
 		isNsfw: z.boolean(),
 		isShelved: z.boolean(),
 		isUnknownEngine: z.boolean(),
