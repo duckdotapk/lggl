@@ -431,9 +431,24 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 	for (const gamePlayAction of game.gamePlayActions)
 	{
-		if (gamePlayAction.type == "URL" && !URL.canParse(gamePlayAction.path))
+		if (gamePlayAction.type == "URL")
 		{
-			problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
+			if (!URL.canParse(gamePlayAction.path))
+			{
+				problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
+			}
+			else
+			{
+				const url = new URL(gamePlayAction.path);
+
+				if (url.protocol == "steam:")
+				{
+					if (url.hostname == "rungameid" && isNaN(parseInt(url.pathname.substring(1))))
+					{
+						problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": Steam rungameid URL invalid", false);
+					}
+				}
+			}
 		}
 
 		if (gamePlayAction.type == "EXECUTABLE" && gamePlayAction.workingDirectory != null && !fs.existsSync(gamePlayAction.workingDirectory))
