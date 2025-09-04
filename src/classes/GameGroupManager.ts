@@ -308,7 +308,14 @@ export class EngineGameGroupManager extends GameGroupManager<EngineGameGroupMana
 
 			for (const gameEngine of game.gameEngines)
 			{
-				this.addModelToGroup(gameEngine.engine.name, game);
+				if (gameEngine.version == null)
+				{
+					this.addModelToGroup(gameEngine.engine.name, game);
+				}
+				else
+				{
+					this.addModelToGroup(gameEngine.engine.name + " " + gameEngine.version, game);
+				}
 			}
 		}
 
