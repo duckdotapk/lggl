@@ -2,14 +2,22 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputStringValue,
+	getElementOrThrow,
+	getInputStringValue,
+	getIntegerData,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { changeView, reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createCompany } from "../../routes/api/company/create.schemas.js";
-import { deleteCompany } from "../../routes/api/company/delete.schemas.js";
-import { updateCompany } from "../../routes/api/company/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createCompanySchema from "../../routes/api/company/create.schemas.js";
+import * as deleteCompanySchema from "../../routes/api/company/delete.schemas.js";
+import * as updateCompanySchema from "../../routes/api/company/update.schemas.js";
 
 //
 // Locals
@@ -17,49 +25,70 @@ import { updateCompany } from "../../routes/api/company/update.schemas.js";
 
 async function initialise(form: HTMLFormElement)
 {
-	const companyId = BrowserUtilities.ElementClientLib.getIntegerData(form, "companyId");
+	const companyId = getIntegerData(form, "companyId");
 
-	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
+	const nameInput = getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
 
 	if (companyId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createCompany(
-					{
-						name: InputClientLib.getStringValue(nameInput),
-					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/companies/edit/" + response.company.id),
-			});
+				schema: createCompanySchema,
+				requestBody:
+				{
+					name: getInputStringValue(nameInput),
+				},
+			}).getResponse(),
+			onSuccess: async (response) => changeView("/companies/edit/" + response.company.id),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteCompany(companyId),
-				onSuccess: async () => PjaxClientLib.changeView("/companies"),
-			});
+				schema: deleteCompanySchema,
+				requestBody:
+				{
+					id: companyId,
+				},
+			}).getResponse(),
+			onSuccess: async () => changeView("/companies"),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () =>  await updateCompany(companyId,
+				schema: updateCompanySchema,
+				requestBody:
+				{
+					id: companyId,
+					updateData:
 					{
-						name: InputClientLib.getChangedStringValue(nameInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						name: getChangedInputStringValue(nameInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -68,19 +97,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertCompanyForms()
 {
-	const upsertCompanyForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-company-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-company-form:not(.initialised)",
+	);
 
-	for (const upsertCompanyForm of upsertCompanyForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertCompanyForm);
-
-			upsertCompanyForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertCompanyForm] Error initialising:", upsertCompanyForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertCompanyForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertCompanyForm] Error initialising:", form, error));
 	}
 }

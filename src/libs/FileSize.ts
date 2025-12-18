@@ -37,9 +37,9 @@ export async function getFolderSize(folderPath: string): Promise<bigint>
     return totalSize;
 }
 
-export function fromGibiBytes(gigaBytes: number, bytes: number): bigint
+export function fromGibiBytes(gibaBytes: number, bytes: number): bigint
 {
-	return BigInt(gigaBytes * 1024 ** 3 + bytes);
+	return BigInt(gibaBytes * 1024 ** 3 + bytes);
 }
 
 export function toGibiBytesAndBytes(inputBytes: bigint): [ number, number ]

@@ -2,15 +2,29 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
-import { GameCompanyType } from "@prisma/client";
+import
+{
+	getChangedInputEnumValue,
+	getChangedInputNumberValue,
+	getChangedInputStringValueNullable,
+	getElementOrThrow,
+	getInputEnumValue,
+	getInputNumberValue,
+	getInputStringValueNullable,
+	getIntegerData,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createGameCompany } from "../../routes/api/gameCompany/create.schemas.js";
-import { deleteGameCompany } from "../../routes/api/gameCompany/delete.schemas.js";
-import { updateGameCompany } from "../../routes/api/gameCompany/update.schemas.js";
+import { GameCompanyTypeSchema } from "../../libs/models/GameCompany.schemas.js";
+
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGameCompanySchema from "../../routes/api/gameCompany/create.schemas.js";
+import * as deleteGameCompanySchema from "../../routes/api/gameCompany/delete.schemas.js";
+import * as updateGameCompanySchema from "../../routes/api/gameCompany/update.schemas.js";
 
 //
 // Locals
@@ -18,57 +32,78 @@ import { updateGameCompany } from "../../routes/api/gameCompany/update.schemas.j
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
-	const gameCompanyId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gameCompanyId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
+	const gameCompanyId = getIntegerData(form, "gameCompanyId");
 
-	const companyIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="company_id"]`);
-	const typeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
-	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
+	const companyIdSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="company_id"]`);
+	const typeSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
+	const notesInput = getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
 	if (gameCompanyId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () =>await createGameCompany(
-					{
-						game_id: gameId,
-						company_id: InputClientLib.getNumberValue(companyIdSelect),
-						type: InputClientLib.getEnumValue<GameCompanyType>(typeSelect),
-						notes: InputClientLib.getStringValueNullable(notesInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: createGameCompanySchema,
+				requestBody:
+				{
+					game_id: gameId,
+					company_id: getInputNumberValue(companyIdSelect),
+					type: getInputEnumValue(typeSelect, GameCompanyTypeSchema),
+					notes: getInputStringValueNullable(notesInput),
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteGameCompany(gameCompanyId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteGameCompanySchema,
+				requestBody:
+				{
+					id: gameCompanyId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGameCompany(gameCompanyId,
+				schema: updateGameCompanySchema,
+				requestBody:
+				{
+					id: gameCompanyId,
+					updateData:
 					{
-						company_id: InputClientLib.getChangedNumberValue(companyIdSelect),
-						type: InputClientLib.getChangedEnumValue<GameCompanyType>(typeSelect),
-						notes: InputClientLib.getChangedStringValueNullable(notesInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						company_id: getChangedInputNumberValue(companyIdSelect),
+						type: getChangedInputEnumValue(typeSelect, GameCompanyTypeSchema),
+						notes: getChangedInputStringValueNullable(notesInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -77,19 +112,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGameCompanyForms()
 {
-	const upsertGameCompanyForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-company-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-company-form:not(.initialised)",
+	);
 
-	for (const upsertGameCompanyForm of upsertGameCompanyForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGameCompanyForm);
-
-			upsertGameCompanyForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGameCompanyForm] Error initialising:", upsertGameCompanyForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGameCompanyForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertGameCompanyForm] Error initialising:", form, error));
 	}
 }

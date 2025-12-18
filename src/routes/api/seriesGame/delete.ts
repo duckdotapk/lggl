@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./delete.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./delete.schemas.js";
 
 //
 // Route
@@ -15,38 +15,39 @@ import * as Schemas from "./delete.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const seriesGame = await prismaClient.seriesGame.findUnique(
 		{
-			const seriesGame = await prismaClient.seriesGame.findUnique(
-				{
-					where:
-					{
-						id: requestBody.id,
-					},
-				});
-
-			if (seriesGame == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT FOUND", message: "SeriesGame not found." });
-			}
+				id: requestBody.id,
+			},
+		});
 
-			await prismaClient.seriesGame.delete(
-				{
-					where:
-					{
-						id: requestBody.id,
-					},
-				});
+		if (seriesGame == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT FOUND",
+				message: "SeriesGame not found.",
+			});
+		}
 
-			return {
-				success: true,
-			};
-		},
-	});
+		await prismaClient.seriesGame.delete(
+		{
+			where:
+			{
+				id: requestBody.id,
+			},
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

@@ -5,16 +5,43 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameSteamDeckCompatibility, GameVirtualRealitySupport, Prisma } from "@prisma/client";
+import
+{
+	GameAchievementSupport,
+	GameCompletionStatus,
+	GameControllerSupport,
+	GameLogoImageAlignment,
+	GameLogoImageJustification,
+	GameModSupport,
+	GameProgressionType,
+	GameSteamDeckCompatibility,
+	GameVirtualRealitySupport,
+	Prisma,
+} from "@prisma/client";
 import { z } from "zod";
 
-import { CompletionStatusGameGroupManager, CreatedDateGameGroupManager, DeveloperGameGroupManager, EngineGameGroupManager, FirstCompletedDateGameGroupManager, FirstPlayedDateGameGroupManager, LastPlayedDateGameGroupManager, NameGameGroupManager, PlayTimeTotalSecondsGameGroupManager, PublisherGameGroupManager, PurchaseDateGameGroupManager, SeriesGameGroupManager, SteamDeckCompatibilityGameGroupManager } from "../../classes/GameGroupManager.js";
+import
+{
+	CompletionStatusGameGroupManager,
+	CreatedDateGameGroupManager,
+	DeveloperGameGroupManager,
+	EngineGameGroupManager,
+	FirstCompletedDateGameGroupManager,
+	FirstPlayedDateGameGroupManager,
+	LastPlayedDateGameGroupManager,
+	NameGameGroupManager,
+	PlayTimeTotalSecondsGameGroupManager,
+	PublisherGameGroupManager,
+	PurchaseDateGameGroupManager,
+	SeriesGameGroupManager,
+	SteamDeckCompatibilityGameGroupManager,
+} from "../../classes/GameGroupManager.js";
 
 import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
-import * as SettingModelLib from "./Setting.js";
+import { Settings } from "./Setting.js";
 
-import * as AuditLib from "../Audit.js"; 
+import { ProblemList } from "../Audit.js"; 
 
 //
 // Constants
@@ -104,75 +131,68 @@ const steamDeckCompatibilityNames: Record<GameSteamDeckCompatibility, string> =
 // Create/Find/Update/Delete Functions
 //
 
-export async function createGroupManager(transactionClient: Prisma.TransactionClient, settings: SettingModelLib.Settings, selectedGame: Prisma.GameGetPayload<null> | null)
+export async function createGameGroupManager
+(
+	transactionClient: Prisma.TransactionClient,
+	settings: Settings,
+	selectedGame: Prisma.GameGetPayload<null> | null,
+)
 {
-	let games = await transactionClient.game.findMany(
+	const games = await transactionClient.game.findMany(
+	{
+		include:
 		{
-			include:
+			gameCompanies:
 			{
-				gameCompanies:
+				include:
 				{
-					include:
-					{
-						company: true, 
-					},
-				},
-				gameEngines:
-				{
-					include:
-					{
-						engine: true,
-					},
-				},
-				gameInstallations: true,
-				seriesGames:
-				{
-					include:
-					{
-						series: true,
-					},
+					company: true, 
 				},
 			},
-		});
+			gameEngines:
+			{
+				include:
+				{
+					engine: true,
+				},
+			},
+			gameInstallations: true,
+			seriesGames:
+			{
+				include:
+				{
+					series: true,
+				},
+			},
+		},
+	});
 
 	switch (settings.gameGroupMode)
 	{
 		case "completionStatus":
 			return new CompletionStatusGameGroupManager(settings, games, selectedGame);
-
 		case "createdDate":
 			return new CreatedDateGameGroupManager(settings, games, selectedGame);
-
 		case "developer":
 			return new DeveloperGameGroupManager(settings, games, selectedGame);
-
 		case "engine":
 			return new EngineGameGroupManager(settings, games, selectedGame);
-
 		case "firstCompletedDate":
 			return new FirstCompletedDateGameGroupManager(settings, games, selectedGame);
-
 		case "firstPlayedDate":
 			return new FirstPlayedDateGameGroupManager(settings, games, selectedGame);
-
 		case "lastPlayedDate":
 			return new LastPlayedDateGameGroupManager(settings, games, selectedGame);
-
 		case "name":
 			return new NameGameGroupManager(settings, games, selectedGame);
-
 		case "playTime":
 			return new PlayTimeTotalSecondsGameGroupManager(settings, games, selectedGame);
-
 		case "publisher":
 			return new PublisherGameGroupManager(settings, games, selectedGame);
-
 		case "purchaseDate":
 			return new PurchaseDateGameGroupManager(settings, games, selectedGame);
-
 		case "series":
 			return new SeriesGameGroupManager(settings, games, selectedGame);
-
 		case "steamDeckCompatibility":
 			return new SteamDeckCompatibilityGameGroupManager(settings, games, selectedGame);
 	}
@@ -182,7 +202,9 @@ export async function createGroupManager(transactionClient: Prisma.TransactionCl
 // Utility Functions
 //
 
-export type AuditGame = Prisma.GameGetPayload<
+export async function auditGame
+(
+	game: Prisma.GameGetPayload<
 	{
 		include:
 		{
@@ -196,15 +218,18 @@ export type AuditGame = Prisma.GameGetPayload<
 			gamePlaySessions: true;
 			seriesGames: true;
 		};
-	}>;
-
-export async function audit(game: AuditGame, strictMode: boolean): Promise<AuditLib.ProblemList>
+	}>,
+	strictMode: boolean,
+): Promise<ProblemList>
 {
 	//
 	// Create Problem List
 	//
 
-	const problemList = new AuditLib.ProblemList(game.name, "/games/view/" + game.id, "/games/edit/" + game.id);
+	const problemList = new ProblemList(
+		game.name,
+		"/games/view/" + game.id, "/games/edit/" + game.id,
+	);
 
 	//
 	// Check Game
@@ -233,20 +258,26 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	}
 
 	// Images
-	const imagePaths = getImagePaths(game);
+	const imagePaths = getGameImagePaths(game);
 
 	if (game.hasBannerImage)
 	{
 		if (!fs.existsSync(imagePaths.banner))
 		{
-			problemList.addProblem("hasBannerImage is true but banner image does not exist on disk", false);
+			problemList.addProblem(
+				"hasBannerImage is true but banner image does not exist on disk",
+				false,
+			);
 		}
 	}
 	else
 	{
 		if (fs.existsSync(imagePaths.banner))
 		{
-			problemList.addProblem("hasBannerImage is false but banner image exists on disk", false);
+			problemList.addProblem(
+				"hasBannerImage is false but banner image exists on disk",
+				false,
+			);
 		}
 	}
 
@@ -254,14 +285,20 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	{
 		if (!fs.existsSync(imagePaths.cover))
 		{
-			problemList.addProblem("hasCoverImage is true but cover image does not exist on disk", false);
+			problemList.addProblem(
+				"hasCoverImage is true but cover image does not exist on disk",
+				false,
+			);
 		}
 	}
 	else
 	{
 		if (fs.existsSync(imagePaths.cover))
 		{
-			problemList.addProblem("hasCoverImage is false but cover image exists on disk", false);
+			problemList.addProblem(
+				"hasCoverImage is false but cover image exists on disk",
+				false,
+			);
 		}
 	}
 
@@ -269,7 +306,10 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	{
 		if (!fs.existsSync(imagePaths.icon))
 		{
-			problemList.addProblem("hasIconImage is true but icon image does not exist on disk", false);
+			problemList.addProblem(
+				"hasIconImage is true but icon image does not exist on disk",
+				false,
+			);
 		}
 	}
 	else
@@ -284,7 +324,10 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	{
 		if (!fs.existsSync(imagePaths.logo))
 		{
-			problemList.addProblem("hasLogoImage is true but logo image does not exist on disk", false);
+			problemList.addProblem(
+				"hasLogoImage is true but logo image does not exist on disk",
+				false,
+			);
 		}
 
 		if (game.logoImageAlignment == null)
@@ -294,7 +337,10 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 		if (game.logoImageJustification == null)
 		{
-			problemList.addProblem("hasLogoImage is true but logoImageJustification is null", false);
+			problemList.addProblem(
+				"hasLogoImage is true but logoImageJustification is null",
+				false,
+			);
 		}
 
 		// TODO: check logo image dimensions
@@ -325,7 +371,10 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 	if (game.completionStatus == "TODO" && game.playTimeTotalSeconds > 0)
 	{
-		problemList.addProblem("completionStatus is TODO but playTimeTotalSeconds is greater than 0", false);
+		problemList.addProblem(
+			"completionStatus is TODO but playTimeTotalSeconds is greater than 0",
+			false,
+		);
 	}
 
 	if (game.playCount == 0 && game.playTimeTotalSeconds > 0)
@@ -366,7 +415,10 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 		if (game.steamDeckCompatibility == null)
 		{
-			problemList.addProblem("steamAppId is not null but steamDeckCompatibility is null", false);
+			problemList.addProblem(
+				"steamAppId is not null but steamDeckCompatibility is null",
+				false,
+			);
 		}
 	}
 
@@ -374,14 +426,18 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	// Check Game Companies
 	//
 
-	const gameDevelopers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER");
+	const gameDevelopers = game.gameCompanies.filter(
+		(gameCompany) => gameCompany.type == "DEVELOPER",
+	);
 
 	if (gameDevelopers.length == 0)
 	{
 		problemList.addProblem("no GameCompany relations with DEVELOPER type", false);
 	}
 
-	const gamePublishers = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER");
+	const gamePublishers = game.gameCompanies.filter(
+		(gameCompany) => gameCompany.type == "PUBLISHER",
+	);
 
 	if (gamePublishers.length == 0)
 	{
@@ -394,12 +450,18 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 
 	if (game.isUnknownEngine && game.gameEngines.length > 0)
 	{
-		problemList.addProblem("isUnknownEngine is true but there are GameEngine relations", false);
+		problemList.addProblem(
+			"isUnknownEngine is true but there are GameEngine relations",
+			false,
+		);
 	}
 
 	if (!game.isUnknownEngine && game.gameEngines.length == 0)
 	{
-		problemList.addProblem("isUnknownEngine is false but there are no GameEngine relations", false);
+		problemList.addProblem(
+			"isUnknownEngine is false but there are no GameEngine relations",
+			false,
+		);
 	}
 
 	//
@@ -413,7 +475,11 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 			continue;
 		}
 
-		problemList.addProblem("gameInstallation #" + gameInstallation.id + ": path does not exist: " + gameInstallation.path, false);
+		problemList.addProblem(
+			"gameInstallation #" + gameInstallation.id + 
+			": path does not exist: " + gameInstallation.path,
+			false,
+		);
 	}
 
 	//
@@ -435,7 +501,11 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 		{
 			if (!URL.canParse(gamePlayAction.path))
 			{
-				problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is URL but path is not a valid URL", false);
+				problemList.addProblem(
+					"gamePlayAction #" + gamePlayAction.id +
+					": type is URL but path is not a valid URL",
+					false,
+				);
 			}
 			else
 			{
@@ -445,15 +515,28 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 				{
 					if (url.hostname == "rungameid" && isNaN(parseInt(url.pathname.substring(1))))
 					{
-						problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": Steam rungameid URL invalid", false);
+						problemList.addProblem(
+							"gamePlayAction #" + gamePlayAction.id +
+							": Steam rungameid URL invalid",
+							false,
+						);
 					}
 				}
 			}
 		}
 
-		if (gamePlayAction.type == "EXECUTABLE" && gamePlayAction.workingDirectory != null && !fs.existsSync(gamePlayAction.workingDirectory))
+		if
+		(
+			gamePlayAction.type == "EXECUTABLE" &&
+			gamePlayAction.workingDirectory != null &&
+			!fs.existsSync(gamePlayAction.workingDirectory)
+		)
 		{
-			problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but workingDirectory does not exist", false);
+			problemList.addProblem(
+				"gamePlayAction #" + gamePlayAction.id +
+				": type is EXECUTABLE but workingDirectory does not exist",
+				false,
+			);
 		}
 
 		if (gamePlayAction.type == "EXECUTABLE" && gamePlayAction.additionalArguments != null)
@@ -466,20 +549,34 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 			}
 			catch (error)
 			{
-				problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but arguments is not valid JSON", false);
+				problemList.addProblem(
+					"gamePlayAction #" + gamePlayAction.id +
+					": type is EXECUTABLE but arguments is not valid JSON",
+					false,
+				);
 			}
 
-			const additionalArgumentsParseResult = z.array(z.string()).safeParse(additionalArgumentsJson);
+			const additionalArgumentsParseResult = z.array(z.string()).safeParse(
+				additionalArgumentsJson,
+			);
 
 			if (!additionalArgumentsParseResult.success)
 			{
-				problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": type is EXECUTABLE but additionalArguments is not a string array", false);
+				problemList.addProblem(
+					"gamePlayAction #" + gamePlayAction.id +
+					": type is EXECUTABLE but additionalArguments is not a string array",
+					false,
+				);
 			}
 		}
 
 		if (gamePlayAction.processRequirements == null)
 		{
-			problemList.addProblem("gamePlayAction #" + gamePlayAction.id + ": processRequirements is null", false);
+			problemList.addProblem(
+				"gamePlayAction #" + gamePlayAction.id +
+				": processRequirements is null",
+				false,
+			);
 		}
 	}
 
@@ -498,7 +595,12 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	{
 		const difference = game.playTimeTotalSeconds - playTimeTotalSeconds;
 
-		problemList.addProblem("playTimeTotalSeconds is " + game.playTimeTotalSeconds + " but sum of GamePlaySession relations is " + playTimeTotalSeconds + " (difference: " + difference + ")", false);
+		problemList.addProblem(
+			"playTimeTotalSeconds is " + game.playTimeTotalSeconds +
+			" but sum of GamePlaySession relations is " +
+			playTimeTotalSeconds + " (difference: " + difference + ")",
+			false,
+		);
 	}
 
 	//
@@ -508,7 +610,7 @@ export async function audit(game: AuditGame, strictMode: boolean): Promise<Audit
 	return problemList;
 }
 
-export function getImageUrls(game: Prisma.GameGetPayload<null>)
+export function getGameImageUrls(game: Prisma.GameGetPayload<null>)
 {
 	return {
 		banner: "/data/images/games/" + game.id + "/banner.jpg",
@@ -518,7 +620,7 @@ export function getImageUrls(game: Prisma.GameGetPayload<null>)
 	};
 }
 
-export function getImagePaths(game: Prisma.GameGetPayload<null>)
+export function getGameImagePaths(game: Prisma.GameGetPayload<null>)
 {
 	return {
 		banner: path.join(LGGL_DATA_DIRECTORY, "images", "games", game.id.toString(), "banner.jpg"),
@@ -528,7 +630,10 @@ export function getImagePaths(game: Prisma.GameGetPayload<null>)
 	}
 }
 
-export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayload<null> | GameProgressionType)
+export function getGameProgressionTypeName
+(
+	gameOrProgressionType: Prisma.GameGetPayload<null> | GameProgressionType,
+)
 {
 	if (typeof gameOrProgressionType == "string")
 	{
@@ -540,7 +645,10 @@ export function getProgressionTypeName(gameOrProgressionType: Prisma.GameGetPayl
 		: "-";
 }
 
-export function getLogoImageAlignmentName(gameOrLogoImageAlignment: Prisma.GameGetPayload<null> | GameLogoImageAlignment)
+export function getGameLogoImageAlignmentName
+(
+	gameOrLogoImageAlignment: Prisma.GameGetPayload<null> | GameLogoImageAlignment,
+)
 {
 	if (typeof gameOrLogoImageAlignment == "string")
 	{
@@ -552,7 +660,10 @@ export function getLogoImageAlignmentName(gameOrLogoImageAlignment: Prisma.GameG
 		: "-";
 }
 
-export function getLogoImageJustificationName(gameOrLogoImageJustification: Prisma.GameGetPayload<null> | GameLogoImageJustification)
+export function getGameLogoImageJustificationName
+(
+	gameOrLogoImageJustification: Prisma.GameGetPayload<null> | GameLogoImageJustification,
+)
 {
 	if (typeof gameOrLogoImageJustification == "string")
 	{
@@ -564,7 +675,10 @@ export function getLogoImageJustificationName(gameOrLogoImageJustification: Pris
 		: "-";
 }
 
-export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameCompletionStatus)
+export function getGameCompletionStatusIconName
+(
+	gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameCompletionStatus,
+)
 {
 	if (typeof gameOrCompletionStatus == "string")
 	{
@@ -582,7 +696,10 @@ export function getCompletionStatusIconName(gameOrCompletionStatus: Prisma.GameG
 		: "fa-solid fa-question";
 }
 
-export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameCompletionStatus)
+export function getGameCompletionStatusName
+(
+	gameOrCompletionStatus: Prisma.GameGetPayload<null> | GameCompletionStatus,
+)
 {
 	if (typeof gameOrCompletionStatus == "string")
 	{
@@ -600,7 +717,10 @@ export function getCompletionStatusName(gameOrCompletionStatus: Prisma.GameGetPa
 		: "-";
 }
 
-export function getAchievementSupportName(gameOrAchievementSupport: Prisma.GameGetPayload<null> | GameAchievementSupport)
+export function getGameAchievementSupportName
+(
+	gameOrAchievementSupport: Prisma.GameGetPayload<null> | GameAchievementSupport,
+)
 {
 	if (typeof gameOrAchievementSupport == "string")
 	{
@@ -612,7 +732,10 @@ export function getAchievementSupportName(gameOrAchievementSupport: Prisma.GameG
 		: "-";
 }
 
-export function getControllerSupportName(gameOrControllerSupport: Prisma.GameGetPayload<null> | GameControllerSupport)
+export function getGameControllerSupportName
+(
+	gameOrControllerSupport: Prisma.GameGetPayload<null> | GameControllerSupport,
+)
 {
 	if (typeof gameOrControllerSupport == "string")
 	{
@@ -624,7 +747,10 @@ export function getControllerSupportName(gameOrControllerSupport: Prisma.GameGet
 		: "-";
 }
 
-export function getModSupportName(gameOrModSupport: Prisma.GameGetPayload<null> | GameModSupport)
+export function getGameModSupportName
+(
+	gameOrModSupport: Prisma.GameGetPayload<null> | GameModSupport,
+)
 {
 	if (typeof gameOrModSupport == "string")
 	{
@@ -636,7 +762,10 @@ export function getModSupportName(gameOrModSupport: Prisma.GameGetPayload<null> 
 		: "-";
 }
 
-export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma.GameGetPayload<null> | GameVirtualRealitySupport)
+export function getGameVirtualRealitySupportName
+(
+	gameOrVirtualRealitySupport: Prisma.GameGetPayload<null> | GameVirtualRealitySupport,
+)
 {
 	if (typeof gameOrVirtualRealitySupport == "string")
 	{
@@ -648,7 +777,10 @@ export function getVirtualRealitySupportName(gameOrVirtualRealitySupport: Prisma
 		: "-";
 }
 
-export function getSteamDeckCompatibilityIconName(gameOrSteamDeckCompatibility: Prisma.GameGetPayload<null> | GameSteamDeckCompatibility)
+export function getGameSteamDeckCompatibilityIconName
+(
+	gameOrSteamDeckCompatibility: Prisma.GameGetPayload<null> | GameSteamDeckCompatibility,
+)
 {
 	if (typeof gameOrSteamDeckCompatibility == "string")
 	{
@@ -660,7 +792,10 @@ export function getSteamDeckCompatibilityIconName(gameOrSteamDeckCompatibility: 
 		: "fa-solid fa-question";
 }
 
-export function getSteamDeckCompatibilityName(gameOrSteamDeckCompatibility: Prisma.GameGetPayload<null> | GameSteamDeckCompatibility)
+export function getGameSteamDeckCompatibilityName
+(
+	gameOrSteamDeckCompatibility: Prisma.GameGetPayload<null> | GameSteamDeckCompatibility,
+)
 {
 	if (typeof gameOrSteamDeckCompatibility == "string")
 	{

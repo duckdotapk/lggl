@@ -2,13 +2,14 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { Prisma } from "@prisma/client";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./update.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./update.schemas.js";
 
 //
 // Route
@@ -16,58 +17,59 @@ import * as Schemas from "./update.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		schema,
+	middlewares: [],
+	handler: async (requestBody) =>
+	{
+		const gameLink = await prismaClient.gameLink.findUnique(
 		{
-			const gameLink = await prismaClient.gameLink.findUnique(
-				{
-					where:
-					{
-						id: requestBody.id,
-					},
-				});
-
-			if (gameLink == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "GameLink not found." });
-			}
+				id: requestBody.id,
+			},
+		});
 
-			const gameLinkUpdateData: Prisma.GameLinkUpdateArgs["data"] = {};
-
-			if (requestBody.updateData.title != null)
+		if (gameLink == null)
+		{
+			throw new ApiError(
 			{
-				gameLinkUpdateData.title = requestBody.updateData.title;
-			}
+				code: "NOT_FOUND",
+				message: "GameLink not found.",
+			});
+		}
 
-			if (requestBody.updateData.url != null)
-			{
-				gameLinkUpdateData.url = requestBody.updateData.url;
-			}
+		const gameLinkUpdateData: Prisma.GameLinkUpdateArgs["data"] = {};
 
-			if (Object.keys(gameLinkUpdateData).length == 0)
-			{
-				return {
-					success: true,
-				};
-			}
+		if (requestBody.updateData.title != null)
+		{
+			gameLinkUpdateData.title = requestBody.updateData.title;
+		}
 
-			await prismaClient.gameLink.update(
-				{
-					where:
-					{
-						id: gameLink.id,
-					},
-					data: gameLinkUpdateData,
-				});
+		if (requestBody.updateData.url != null)
+		{
+			gameLinkUpdateData.url = requestBody.updateData.url;
+		}
 
+		if (Object.keys(gameLinkUpdateData).length == 0)
+		{
 			return {
 				success: true,
 			};
-		},
-	});
+		}
+
+		await prismaClient.gameLink.update(
+		{
+			where:
+			{
+				id: gameLink.id,
+			},
+			data: gameLinkUpdateData,
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

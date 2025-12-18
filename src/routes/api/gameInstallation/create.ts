@@ -4,14 +4,13 @@
 
 import fs from "node:fs";
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as FileSizeLib from "../../../libs/FileSize.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+import { getFolderSize, toGibiBytesAndBytes } from "../../../libs/FileSize.js";
 
-import * as Schemas from "./create.schemas.js";
+import * as schema from "./create.schemas.js";
 
 //
 // Route
@@ -19,51 +18,60 @@ import * as Schemas from "./create.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const game = await prismaClient.game.findUnique(
 		{
-			const game = await prismaClient.game.findUnique(
-				{
-					where:
-					{
-						id: requestBody.game_id,
-					},
-				});
-
-			if (game == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
+				id: requestBody.game_id,
+			},
+		});
 
-			if (!fs.existsSync(requestBody.path))
+		if (game == null)
+		{
+			throw new ApiError(
 			{
-				throw new FritterApiUtilities.APIError({ code: "INVALID_INPUT", message: "Full installation path does not exist." });
-			}
+				code: "NOT_FOUND",
+				message: "Game not found.",
+			});
+		}
 
-			const gameInstallationPathSize = await FileSizeLib.getFolderSize(requestBody.path);
-			
-			const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(gameInstallationPathSize);
+		if (!fs.existsSync(requestBody.path))
+		{
+			throw new ApiError(
+			{
+				code: "INVALID_INPUT",
+				message: "Full installation path does not exist.",
+			});
+		}
 
-			await prismaClient.gameInstallation.create(
-				{
-					data:
-					{
-						path: requestBody.path,
-						fileSizeGibiBytes,
-						fileSizeBytes,
+		const gameInstallationPathSize = await getFolderSize(requestBody.path);
+		
+		const
+		[
+			fileSizeGibiBytes,
+			fileSizeBytes,
+		] = toGibiBytesAndBytes(gameInstallationPathSize);
 
-						game_id: game.id,
-					},
-				});
+		await prismaClient.gameInstallation.create(
+		{
+			data:
+			{
+				path: requestBody.path,
+				fileSizeGibiBytes,
+				fileSizeBytes,
 
-			return {
-				success: true,
-			};
-		},
-	});
+				game_id: game.id,
+			},
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

@@ -9,7 +9,7 @@ import { Paragraph } from "../../components/basic/Paragraph.js";
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as StatisticLib from "../../libs/Statistic.js";
+import { StatCategoryManager } from "../../libs/Statistic.js";
 
 //
 // View
@@ -17,7 +17,7 @@ import * as StatisticLib from "../../libs/Statistic.js";
 
 export type ViewOptions =
 {
-	statCategoryManager: StatisticLib.StatCategoryManager;
+	statCategoryManager: StatCategoryManager;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -26,20 +26,20 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "stats",
 		pageTitle: "Stats",
 		content: Wrapper(
+		[
+			Header(1, "Stats"),
+
+			options.statCategoryManager.statCategories.map((statCategory) => Block(
 			[
-				Header(1, "Stats"),
+				Header(2, statCategory.name),
 
-				options.statCategoryManager.statCategories.map((statCategory) => Block(
-					[
-						Header(2, statCategory.name),
+				statCategory.stats.map((stat) => Block(
+				[
+					Header(3, stat.name),
 
-						statCategory.stats.map((stat) => Block(
-							[
-								Header(3, stat.name),
-	
-								Paragraph(stat.value),
-							])),
-					])),
-			]),
+					Paragraph(stat.value),
+				])),
+			])),
+		]),
 	};
 }

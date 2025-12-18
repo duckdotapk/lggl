@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./create.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./create.schemas.js";
 
 //
 // Route
@@ -15,54 +15,59 @@ import * as Schemas from "./create.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const game = await prismaClient.game.findUnique(
 		{
-			const game = await prismaClient.game.findUnique(
-				{
-					where:
-					{
-						id: requestBody.game_id,
-					},
-				});
-
-			if (game == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
+				id: requestBody.game_id,
+			},
+		});
 
-			const platform = await prismaClient.platform.findUnique(
-				{
-					where:
-					{
-						id: requestBody.platform_id,
-					},
-				});
-
-			if (platform == null)
+		if (game == null)
+		{
+			throw new ApiError(
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Platform not found." });
-			}
+				code: "NOT_FOUND",
+				message: "Game not found.",
+			});
+		}
 
-			await prismaClient.gamePlatform.create(
-				{
-					data:
-					{
-						notes: requestBody.notes,
+		const platform = await prismaClient.platform.findUnique(
+		{
+			where:
+			{
+				id: requestBody.platform_id,
+			},
+		});
 
-						platform_id: platform.id,
-						game_id: game.id,
-					},
-				});
+		if (platform == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT_FOUND",
+				message: "Platform not found.",
+			});
+		}
 
-			return {
-				success: true,
-			};
-		},
-	});
+		await prismaClient.gamePlatform.create(
+		{
+			data:
+			{
+				notes: requestBody.notes,
+
+				platform_id: platform.id,
+				game_id: game.id,
+			},
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

@@ -8,8 +8,8 @@ import { GameSettingsToolbar } from "../../components/toolbar/GameSettingsToolba
 
 import { SiteOptions } from "../../components/Site.js";
 
-import * as GameModelLib from "../../libs/models/Game.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createGameGroupManager } from "../../libs/models/Game.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -17,8 +17,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createGameGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -27,11 +27,11 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "games",
 		pageTitle: "Games",
 		content: ListLayout(
-			{
-				toolbar: GameSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/games/create",
-				content: null,
-			}),
+		{
+			toolbar: GameSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/games/create",
+			content: null,
+		}),
 	};
 }

@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child } from "@donutteam/document-builder";
+import { Child } from "@lorenstuff/document-builder";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -10,15 +10,25 @@ import { GroupManager, GroupManagerGroup } from "./GroupManager.js";
 
 import { HumanDateTime } from "../components/basic/HumanDateTime.js";
 
-import * as GameModelLib from "../libs/models/Game.js";
+import
+{
+	getGameCompletionStatusName,
+	getGameSteamDeckCompatibilityName,
+} from "../libs/models/Game.js";
 
-import * as HumanizationLib from "../libs/Humanization.js";
+import { formatSeconds } from "../libs/Humanization.js";
 
 //
 // Class
 //
 
-export type GameGroupManagerGame = Prisma.GameGetPayload<{ include: { gameInstallations: true } }>;
+export type GameGroupManagerGame = Prisma.GameGetPayload<
+{
+	include:
+	{
+		gameInstallations: true;
+	};
+}>;
 
 export abstract class GameGroupManager<T extends GameGroupManagerGame = GameGroupManagerGame> extends GroupManager<T>
 {
@@ -69,7 +79,10 @@ export abstract class GameGroupManager<T extends GameGroupManagerGame = GameGrou
 	override getItemInfo(game: T, _group: GroupManagerGroup<T>): Child
 	{
 		return game.lastPlayedDate != null
-			? [ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate)) ]
+			? [
+				"Last played ",
+				HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate))
+			]
 			: null;
 	}
 }
@@ -84,7 +97,7 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 		}
 
 		return game.completionStatus != null
-			? GameModelLib.getCompletionStatusName(game.completionStatus)
+			? getGameCompletionStatusName(game.completionStatus)
 			: null;
 	}
 
@@ -97,10 +110,10 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 	{
 		this.addGroup("Favorites");
 
-		this.addGroup(GameModelLib.getCompletionStatusName("ONE_HUNDRED_PERCENT"));
-		this.addGroup(GameModelLib.getCompletionStatusName("COMPLETE"));
-		this.addGroup(GameModelLib.getCompletionStatusName("IN_PROGRESS"));
-		this.addGroup(GameModelLib.getCompletionStatusName("TODO"));
+		this.addGroup(getGameCompletionStatusName("ONE_HUNDRED_PERCENT"));
+		this.addGroup(getGameCompletionStatusName("COMPLETE"));
+		this.addGroup(getGameCompletionStatusName("IN_PROGRESS"));
+		this.addGroup(getGameCompletionStatusName("TODO"));
 
 		this.addGroup("Shelved");
 
@@ -127,7 +140,7 @@ export class CompletionStatusGameGroupManager extends GameGroupManager
 				continue;
 			}
 
-			this.addModelToGroup(GameModelLib.getCompletionStatusName(game.completionStatus), game);
+			this.addModelToGroup(getGameCompletionStatusName(game.completionStatus), game);
 		}
 
 		return Array.from(this.groupsByName.values());
@@ -168,18 +181,36 @@ export class CreatedDateGameGroupManager extends GameGroupManager
 	}
 }
 
-export type DeveloperGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { gameCompanies: { include: { company: true } } } }>;
+export type DeveloperGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<
+{
+	include:
+	{
+		gameCompanies:
+		{
+			include:
+			{
+				company: true;
+			};
+		};
+	};
+}>;
 
 export class DeveloperGameGroupManager extends GameGroupManager<DeveloperGameGroupManagerGame>
 {
-	override getItemInfo(game: DeveloperGameGroupManagerGame, group: GroupManagerGroup<DeveloperGameGroupManagerGame>)
+	override getItemInfo
+	(
+		game: DeveloperGameGroupManagerGame,
+		group: GroupManagerGroup<DeveloperGameGroupManagerGame>
+	)
 	{
 		if (group.name != "Favorites")
 		{
 			return null;
 		}
 
-		const companyNames = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER").map((gameCompany) => gameCompany.company.name);
+		const companyNames = game.gameCompanies
+			.filter((gameCompany) => gameCompany.type == "DEVELOPER")
+			.map((gameCompany) => gameCompany.company.name);
 
 		if (companyNames.length == 0)
 		{
@@ -210,7 +241,9 @@ export class DeveloperGameGroupManager extends GameGroupManager<DeveloperGameGro
 				this.addModelToGroup("Favorites", game);
 			}
 
-			const gameCompanies = game.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER");
+			const gameCompanies = game.gameCompanies.filter(
+				(gameCompany) => gameCompany.type == "DEVELOPER",
+			);
 
 			if (gameCompanies.length == 0)
 			{
@@ -230,45 +263,59 @@ export class DeveloperGameGroupManager extends GameGroupManager<DeveloperGameGro
 
 	override sortGroups(groups: GroupManagerGroup<DeveloperGameGroupManagerGame>[])
 	{
-		return groups.toSorted(
-			(a, b) =>
+		return groups.toSorted((a, b) =>
+		{
+			if (a.sortOrder > b.sortOrder)
 			{
-				if (a.sortOrder > b.sortOrder)
-				{
-					return -1;
-				}
+				return -1;
+			}
 
-				if (a.sortOrder < b.sortOrder)
-				{
-					return 1;
-				}
+			if (a.sortOrder < b.sortOrder)
+			{
+				return 1;
+			}
 
-				return a.name.localeCompare(b.name);
-			});
+			return a.name.localeCompare(b.name);
+		});
 	}
 }
 
-export type EngineGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { gameEngines: { include: { engine: true } } } }>;
+export type EngineGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<
+{
+	include:
+	{
+		gameEngines:
+		{
+			include:
+			{
+				engine: true;
+			};
+		};
+	};
+}>;
 
 export class EngineGameGroupManager extends GameGroupManager<EngineGameGroupManagerGame>
 {
-	override getItemInfo(game: EngineGameGroupManagerGame, group: GroupManagerGroup<EngineGameGroupManagerGame>)
+	override getItemInfo
+	(
+		game: EngineGameGroupManagerGame,
+		group: GroupManagerGroup<EngineGameGroupManagerGame>,
+	)
 	{
 		if (group.name != "Favorites")
 		{
 			return null;
 		}
 
-		const engineNames = game.gameEngines.map(
-			(gameEngine) =>
+		const engineNames = game.gameEngines.map((gameEngine) =>
+		{
+			if (gameEngine.version != null)
 			{
-				if (gameEngine.version != null)
-				{
-					return gameEngine.engine.name + " " + gameEngine.version;
-				}
+				return gameEngine.engine.name + " " + gameEngine.version;
+			}
 
-				return gameEngine.engine.name;
-			});
+			return gameEngine.engine.name;
+		});
 
 		if (engineNames.length == 0)
 		{
@@ -324,21 +371,20 @@ export class EngineGameGroupManager extends GameGroupManager<EngineGameGroupMana
 
 	override sortGroups(groups: GroupManagerGroup<EngineGameGroupManagerGame>[])
 	{
-		return groups.toSorted(
-			(a, b) =>
+		return groups.toSorted((a, b) =>
+		{
+			if (a.sortOrder > b.sortOrder)
 			{
-				if (a.sortOrder > b.sortOrder)
-				{
-					return -1;
-				}
+				return -1;
+			}
 
-				if (a.sortOrder < b.sortOrder)
-				{
-					return 1;
-				}
+			if (a.sortOrder < b.sortOrder)
+			{
+				return 1;
+			}
 
-				return a.name.localeCompare(b.name);
-			});
+			return a.name.localeCompare(b.name);
+		});
 	}
 }
 
@@ -347,14 +393,21 @@ export class FirstCompletedDateGameGroupManager extends GameGroupManager
 	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.firstCompletedDate != null && !game.firstCompletedDateApproximated
-			? [ "First completed ", HumanDateTime(DateTime.fromJSDate(game.firstCompletedDate), DateTime.DATE_MED) ]
+			? [
+				"First completed ",
+				HumanDateTime(DateTime.fromJSDate(game.firstCompletedDate), DateTime.DATE_MED),
+			]
 			: null;
 	}
 
 	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
-			.map((game) => ({ game, firstCompletedDate: game.firstCompletedDate ?? new Date(0) }))
+			.map((game) =>
+			({
+				game,
+				firstCompletedDate: game.firstCompletedDate ?? new Date(0),
+			}))
 			.sort((a, b) =>
 			{
 				if (a.firstCompletedDate > b.firstCompletedDate)
@@ -408,14 +461,21 @@ export class FirstPlayedDateGameGroupManager extends GameGroupManager
 	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.firstPlayedDate != null && !game.firstPlayedDateApproximated
-			? [ "First played ", HumanDateTime(DateTime.fromJSDate(game.firstPlayedDate), DateTime.DATE_MED) ]
+			? [
+				"First played ",
+				HumanDateTime(DateTime.fromJSDate(game.firstPlayedDate), DateTime.DATE_MED),
+			]
 			: null;
 	}
 
 	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
-			.map((game) => ({ game, firstPlayedDate: game.firstPlayedDate ?? new Date(0) }))
+			.map((game) =>
+			({
+				game,
+				firstPlayedDate: game.firstPlayedDate ?? new Date(0),
+			}))
 			.sort((a, b) =>
 			{
 				if (a.firstPlayedDate > b.firstPlayedDate)
@@ -469,14 +529,21 @@ export class LastPlayedDateGameGroupManager extends GameGroupManager
 	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.lastPlayedDate != null
-			? [ "Last played ", HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED) ]
+			? [
+				"Last played ",
+				HumanDateTime(DateTime.fromJSDate(game.lastPlayedDate), DateTime.DATE_MED),
+			]
 			: null;
 	}
 
 	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
-			.map((game) => ({ game, lastPlayedDate: game.lastPlayedDate ?? new Date(0) }))
+			.map((game) =>
+			({
+				game,
+				lastPlayedDate: game.lastPlayedDate ?? new Date(0),
+			}))
 			.sort((a, b) =>
 			{
 				if (a.lastPlayedDate > b.lastPlayedDate)
@@ -557,27 +624,29 @@ export class PlayTimeTotalSecondsGameGroupManager extends GameGroupManager
 	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.playTimeTotalSeconds > 0
-			? [ "Played ", HumanizationLib.formatSeconds(game.playTimeTotalSeconds, false) ]
+			? [
+				"Played ",
+				formatSeconds(game.playTimeTotalSeconds, false),
+			]
 			: null;
 	}
 
 	override sortModels(games: GameGroupManagerGame[])
 	{
-		return games.toSorted(
-			(a, b) =>
+		return games.toSorted((a, b) =>
+		{
+			if (a.playTimeTotalSeconds > b.playTimeTotalSeconds)
 			{
-				if (a.playTimeTotalSeconds > b.playTimeTotalSeconds)
-				{
-					return -1;
-				}
+				return -1;
+			}
 
-				if (a.playTimeTotalSeconds < b.playTimeTotalSeconds)
-				{
-					return 1;
-				}
+			if (a.playTimeTotalSeconds < b.playTimeTotalSeconds)
+			{
+				return 1;
+			}
 
-				return a.sortName.localeCompare(b.sortName);
-			});
+			return a.sortName.localeCompare(b.sortName);
+		});
 	}
 
 	override groupModels(games: GameGroupManagerGame[])
@@ -655,18 +724,36 @@ export class PlayTimeTotalSecondsGameGroupManager extends GameGroupManager
 	}
 }
 
-export type PublisherGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { gameCompanies: { include: { company: true } } } }>;
+export type PublisherGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<
+{
+	include:
+	{
+		gameCompanies:
+		{
+			include:
+			{
+				company: true;
+			};
+		};
+	};
+}>;
 
 export class PublisherGameGroupManager extends GameGroupManager<PublisherGameGroupManagerGame>
 {
-	override getItemInfo(game: PublisherGameGroupManagerGame, group: GroupManagerGroup<PublisherGameGroupManagerGame>)
+	override getItemInfo
+	(
+		game: PublisherGameGroupManagerGame,
+		group: GroupManagerGroup<PublisherGameGroupManagerGame>,
+	)
 	{
 		if (group.name != "Favorites")
 		{
 			return null;
 		}
 
-		const companyNames = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER").map((gameCompany) => gameCompany.company.name);
+		const companyNames = game.gameCompanies
+			.filter((gameCompany) => gameCompany.type == "PUBLISHER")
+			.map((gameCompany) => gameCompany.company.name);
 
 		if (companyNames.length == 0)
 		{
@@ -697,7 +784,9 @@ export class PublisherGameGroupManager extends GameGroupManager<PublisherGameGro
 				this.addModelToGroup("Favorites", game);
 			}
 
-			const gameCompanies = game.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER");
+			const gameCompanies = game.gameCompanies.filter(
+				(gameCompany) => gameCompany.type == "PUBLISHER",
+			);
 
 			if (gameCompanies.length == 0)
 			{
@@ -717,21 +806,20 @@ export class PublisherGameGroupManager extends GameGroupManager<PublisherGameGro
 
 	override sortGroups(groups: GroupManagerGroup<PublisherGameGroupManagerGame>[])
 	{
-		return groups.toSorted(
-			(a, b) =>
+		return groups.toSorted((a, b) =>
+		{
+			if (a.sortOrder > b.sortOrder)
 			{
-				if (a.sortOrder > b.sortOrder)
-				{
-					return -1;
-				}
+				return -1;
+			}
 
-				if (a.sortOrder < b.sortOrder)
-				{
-					return 1;
-				}
+			if (a.sortOrder < b.sortOrder)
+			{
+				return 1;
+			}
 
-				return a.name.localeCompare(b.name);
-			});
+			return a.name.localeCompare(b.name);
+		});
 	}
 }
 
@@ -740,14 +828,21 @@ export class PurchaseDateGameGroupManager extends GameGroupManager
 	override getItemInfo(game: GameGroupManagerGame)
 	{
 		return game.purchaseDate != null
-			? [ "Purchased ", HumanDateTime(DateTime.fromJSDate(game.purchaseDate), DateTime.DATE_MED) ]
+			? [
+				"Purchased ",
+				HumanDateTime(DateTime.fromJSDate(game.purchaseDate), DateTime.DATE_MED),
+			]
 			: null;
 	}
 
 	override sortModels(games: GameGroupManagerGame[])
 	{
 		return games
-			.map((game) => ({ game, purchaseDate: game.purchaseDate ?? new Date(0) }))
+			.map((game) =>
+			({
+				game,
+				purchaseDate: game.purchaseDate ?? new Date(0),
+			}))
 			.sort((a, b) =>
 			{
 				if (a.purchaseDate > b.purchaseDate)
@@ -805,11 +900,27 @@ export class PurchaseDateGameGroupManager extends GameGroupManager
 	}
 }
 
-export type SeriesGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<{ include: { seriesGames: { include: { series: true } } } }>;
+export type SeriesGameGroupManagerGame = GameGroupManagerGame & Prisma.GameGetPayload<
+{
+	include:
+	{
+		seriesGames:
+		{
+			include:
+			{
+				series: true;
+			};
+		};
+	};
+}>;
 
 export class SeriesGameGroupManager extends GameGroupManager<SeriesGameGroupManagerGame>
 {
-	override getItemInfo(game: SeriesGameGroupManagerGame, group: GroupManagerGroup<SeriesGameGroupManagerGame>)
+	override getItemInfo
+	(
+		game: SeriesGameGroupManagerGame,
+		group: GroupManagerGroup<SeriesGameGroupManagerGame>,
+	)
 	{
 		if (group.name != "Favorites")
 		{
@@ -865,21 +976,20 @@ export class SeriesGameGroupManager extends GameGroupManager<SeriesGameGroupMana
 
 	override sortGroups(groups: GroupManagerGroup<SeriesGameGroupManagerGame>[])
 	{
-		return groups.toSorted(
-			(a, b) =>
+		return groups.toSorted((a, b) =>
+		{
+			if (a.sortOrder > b.sortOrder)
 			{
-				if (a.sortOrder > b.sortOrder)
-				{
-					return -1;
-				}
+				return -1;
+			}
 
-				if (a.sortOrder < b.sortOrder)
-				{
-					return 1;
-				}
+			if (a.sortOrder < b.sortOrder)
+			{
+				return 1;
+			}
 
-				return a.name.localeCompare(b.name);
-			});
+			return a.name.localeCompare(b.name);
+		});
 	}
 
 	override sortGroupModels(groupName: string, games: SeriesGameGroupManagerGame[])
@@ -892,7 +1002,9 @@ export class SeriesGameGroupManager extends GameGroupManager<SeriesGameGroupMana
 		return games
 			.map((game) =>
 			{
-				const seriesGame = game.seriesGames.find((seriesGame) => seriesGame.series.name == groupName) ?? null;
+				const seriesGame = game.seriesGames.find(
+					(seriesGame) => seriesGame.series.name == groupName,
+				) ?? null;
 
 				const seriesGameNumber = seriesGame?.number ?? 0;
 
@@ -921,7 +1033,11 @@ export class SeriesGameGroupManager extends GameGroupManager<SeriesGameGroupMana
 
 export class SteamDeckCompatibilityGameGroupManager extends GameGroupManager
 {
-	override getItemInfo(game: SeriesGameGroupManagerGame, group: GroupManagerGroup<SeriesGameGroupManagerGame>)
+	override getItemInfo
+	(
+		game: SeriesGameGroupManagerGame,
+		group: GroupManagerGroup<SeriesGameGroupManagerGame>,
+	)
 	{
 		if (group.name != "Favorites")
 		{
@@ -934,7 +1050,7 @@ export class SteamDeckCompatibilityGameGroupManager extends GameGroupManager
 		}
 
 		return game.steamDeckCompatibility != null 
-			? GameModelLib.getSteamDeckCompatibilityName(game.steamDeckCompatibility)
+			? getGameSteamDeckCompatibilityName(game.steamDeckCompatibility)
 			: null;
 	}
 
@@ -947,10 +1063,10 @@ export class SteamDeckCompatibilityGameGroupManager extends GameGroupManager
 	{
 		this.addGroup("Favorites", 1);
 		
-		this.addGroup(GameModelLib.getSteamDeckCompatibilityName("VERIFIED"));
-		this.addGroup(GameModelLib.getSteamDeckCompatibilityName("PLAYABLE"));
-		this.addGroup(GameModelLib.getSteamDeckCompatibilityName("UNSUPPORTED"));
-		this.addGroup(GameModelLib.getSteamDeckCompatibilityName("UNKNOWN"));
+		this.addGroup(getGameSteamDeckCompatibilityName("VERIFIED"));
+		this.addGroup(getGameSteamDeckCompatibilityName("PLAYABLE"));
+		this.addGroup(getGameSteamDeckCompatibilityName("UNSUPPORTED"));
+		this.addGroup(getGameSteamDeckCompatibilityName("UNKNOWN"));
 
 		this.addGroup("Non-Steam Games");
 
@@ -977,7 +1093,7 @@ export class SteamDeckCompatibilityGameGroupManager extends GameGroupManager
 				continue;
 			}
 
-			this.addModelToGroup(GameModelLib.getSteamDeckCompatibilityName(game.steamDeckCompatibility), game);
+			this.addModelToGroup(getGameSteamDeckCompatibilityName(game.steamDeckCompatibility), game);
 		}
 
 		return Array.from(this.groupsByName.values());

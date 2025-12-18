@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./create.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./create.schemas.js";
 
 //
 // Route
@@ -15,54 +15,59 @@ import * as Schemas from "./create.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const series = await prismaClient.series.findUnique(
+			{
+				where:
+				{
+					id: requestBody.series_id,
+				},
+			});
+
+		if (series == null)
 		{
-			const series = await prismaClient.series.findUnique(
-				{
-					where:
-					{
-						id: requestBody.series_id,
-					},
-				});
-
-			if (series == null)
+			throw new ApiError(
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Series not found." });
-			}
+				code: "NOT_FOUND",
+				message: "Series not found.",
+			});
+		}
 
-			const game = await prismaClient.game.findUnique(
-				{
-					where:
-					{
-						id: requestBody.game_id,
-					},
-				});
-
-			if (game == null)
+		const game = await prismaClient.game.findUnique(
+		{
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
+				id: requestBody.game_id,
+			},
+		});
 
-			await prismaClient.seriesGame.create(
-				{
-					data:
-					{
-						number: requestBody.number,
+		if (game == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT_FOUND",
+				message: "Game not found.",
+			});
+		}
 
-						game_id: requestBody.game_id,
-						series_id: requestBody.series_id,
-					},
-				});
+		await prismaClient.seriesGame.create(
+		{
+			data:
+			{
+				number: requestBody.number,
 
-			return {
-				success: true,
-			};
-		},
-	});
+				game_id: requestBody.game_id,
+				series_id: requestBody.series_id,
+			},
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

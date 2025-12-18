@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child } from "@donutteam/document-builder";
+import { Child } from "@lorenstuff/document-builder";
 
 //
 // Classes

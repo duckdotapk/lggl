@@ -2,14 +2,22 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputStringValue,
+	getElementOrThrow,
+	getInputStringValue,
+	getIntegerData,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { changeView, reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createPlatform } from "../../routes/api/platform/create.schemas.js";
-import { deletePlatform } from "../../routes/api/platform/delete.schemas.js";
-import { updatePlatform } from "../../routes/api/platform/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createPlatformSchema from "../../routes/api/platform/create.schemas.js";
+import * as deletePlatformSchema from "../../routes/api/platform/delete.schemas.js";
+import * as updatePlatformSchema from "../../routes/api/platform/update.schemas.js";
 
 //
 // Locals
@@ -17,52 +25,73 @@ import { updatePlatform } from "../../routes/api/platform/update.schemas.js";
 
 async function initialise(form: HTMLFormElement)
 {
-	const platformId = BrowserUtilities.ElementClientLib.getIntegerData(form, "platformId");
+	const platformId = getIntegerData(form, "platformId");
 
-	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
-	const iconNameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="iconName"]`);
+	const nameInput = getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
+	const iconNameInput = getElementOrThrow<HTMLInputElement>(form, `[name="iconName"]`);
 
 	if (platformId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createPlatform(
-					{
-						name: InputClientLib.getStringValue(nameInput),
-						iconName: InputClientLib.getStringValue(iconNameInput),
-					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/platforms/edit/" + response.platform.id),
-			});
+				schema: createPlatformSchema,
+				requestBody:
+				{
+					name: getInputStringValue(nameInput),
+					iconName: getInputStringValue(iconNameInput),
+				},
+			}).getResponse(),
+			onSuccess: async (response) => changeView("/platforms/edit/" + response.platform.id),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deletePlatform(platformId),
-				onSuccess: async () => PjaxClientLib.changeView("/platforms"),
-			});
+				schema: deletePlatformSchema,
+				requestBody:
+				{
+					id: platformId,
+				},
+			}).getResponse(),
+			onSuccess: async () => changeView("/platforms"),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updatePlatform(platformId,
+				schema: updatePlatformSchema,
+				requestBody:
+				{
+					id: platformId,
+					updateData:
 					{
-						name: InputClientLib.getChangedStringValue(nameInput),
-						iconName: InputClientLib.getChangedStringValue(iconNameInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						name: getChangedInputStringValue(nameInput),
+						iconName: getChangedInputStringValue(iconNameInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -71,19 +100,14 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertPlatformForms()
 {
-	const upsertPlatformForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-platform-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-platform-form:not(.initialised)",
+	);
 
-	for (const upsertPlatformForm of upsertPlatformForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertPlatformForm);
-
-			upsertPlatformForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertPlatformForm] Error initialising:", upsertPlatformForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertPlatformForm] Initialised:", form))
+			.catch((error) => console.error("[UpsertPlatformForm] Error initialising:", form, error));
 	}
 }

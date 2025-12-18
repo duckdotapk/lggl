@@ -2,14 +2,24 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import {
+	getChangedInputNumberValue,
+	getChangedInputStringValueNullable,
+	getElementOrThrow,
+	getIntegerData,
+	getIntegerDataOrThrow,
+	getInputNumberValue,
+	getInputStringValueNullable,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createGameEngine } from "../../routes/api/gameEngine/create.schemas.js";
-import { deleteGameEngine } from "../../routes/api/gameEngine/delete.schemas.js";
-import { updateGameEngine } from "../../routes/api/gameEngine/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGameEngineSchema from "../../routes/api/gameEngine/create.schemas.js";
+import * as deleteGameEngineSchema from "../../routes/api/gameEngine/delete.schemas.js";
+import * as updateGameEngineSchema from "../../routes/api/gameEngine/update.schemas.js";
 
 //
 // Locals
@@ -17,57 +27,78 @@ import { updateGameEngine } from "../../routes/api/gameEngine/update.schemas.js"
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
-	const gameEngineId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gameEngineId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
+	const gameEngineId = getIntegerData(form, "gameEngineId");
 
-	const engineIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="engine_id"]`);
-	const versionInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="version"]`);
-	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
+	const engineIdSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="engine_id"]`);
+	const versionInput = getElementOrThrow<HTMLInputElement>(form, `[name="version"]`);
+	const notesInput = getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
 	if (gameEngineId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createGameEngine(
-					{
-						game_id: gameId,
-						engine_id: InputClientLib.getNumberValue(engineIdSelect),
-						version: InputClientLib.getStringValueNullable(versionInput),
-						notes: InputClientLib.getStringValueNullable(notesInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: createGameEngineSchema,
+				requestBody:
+				{
+					game_id: gameId,
+					engine_id: getInputNumberValue(engineIdSelect),
+					version: getInputStringValueNullable(versionInput),
+					notes: getInputStringValueNullable(notesInput),
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteGameEngine(gameEngineId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteGameEngineSchema,
+				requestBody:
+				{
+					id: gameEngineId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGameEngine(gameEngineId,
+				schema: updateGameEngineSchema,
+				requestBody:
+				{
+					id: gameEngineId,
+					updateData:
 					{
-						engine_id: InputClientLib.getChangedNumberValue(engineIdSelect),
-						version: InputClientLib.getChangedStringValueNullable(versionInput),
-						notes: InputClientLib.getChangedStringValueNullable(notesInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						engine_id: getChangedInputNumberValue(engineIdSelect),
+						version: getChangedInputStringValueNullable(versionInput),
+						notes: getChangedInputStringValueNullable(notesInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -76,19 +107,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGameEngineForms()
 {
-	const upsertGameEngineForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-engine-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-engine-form:not(.initialised)",
+	);
 
-	for (const upsertGameEngineForm of upsertGameEngineForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGameEngineForm);
-
-			upsertGameEngineForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGameEngineForm] Error initialising:", upsertGameEngineForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGameEngineForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertGameEngineForm] Error initialising:", form, error));
 	}
 }

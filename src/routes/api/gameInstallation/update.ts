@@ -4,15 +4,15 @@
 
 import fs from "node:fs";
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { Prisma } from "@prisma/client";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as FileSizeLib from "../../../libs/FileSize.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+import { getFolderSize, toGibiBytesAndBytes } from "../../../libs/FileSize.js";
 
-import * as Schemas from "./update.schemas.js";
+import * as schema from "./update.schemas.js";
 
 //
 // Route
@@ -20,64 +20,73 @@ import * as Schemas from "./update.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const gameInstallation = await prismaClient.gameInstallation.findUnique(
 		{
-			const gameInstallation = await prismaClient.gameInstallation.findUnique(
+			where:
+			{
+				id: requestBody.id,
+			},
+		});
+
+		if (gameInstallation == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT_FOUND",
+				message: "GameInstallation not found.",
+			});
+		}
+
+		const gameInstallationUpdateData: Prisma.GameInstallationUpdateArgs["data"] = {};
+
+		if (requestBody.updateData.path !== undefined)
+		{
+			if (!fs.existsSync(requestBody.updateData.path))
+			{
+				throw new ApiError(
 				{
-					where:
-					{
-						id: requestBody.id,
-					},
+					code: "INVALID_INPUT",
+					message: "Full path does not exist.",
 				});
-
-			if (gameInstallation == null)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "GameInstallation not found." });
 			}
 
-			const gameInstallationUpdateData: Prisma.GameInstallationUpdateArgs["data"] = {};
+			const gameInstallationPathSize = await getFolderSize(requestBody.updateData.path);
+			
+			const
+			[
+				fileSizeGibiBytes,
+				fileSizeBytes,
+			] = toGibiBytesAndBytes(gameInstallationPathSize);
 
-			if (requestBody.updateData.path !== undefined)
-			{
-				if (!fs.existsSync(requestBody.updateData.path))
-				{
-					throw new FritterApiUtilities.APIError({ code: "INVALID_INPUT", message: "Full path does not exist." });
-				}
+			gameInstallationUpdateData.path = requestBody.updateData.path;
+			gameInstallationUpdateData.fileSizeGibiBytes = fileSizeGibiBytes;
+			gameInstallationUpdateData.fileSizeBytes = fileSizeBytes;
+		}
 
-				const gameInstallationPathSize = await FileSizeLib.getFolderSize(requestBody.updateData.path);
-				
-				const [ fileSizeGibiBytes, fileSizeBytes ] = FileSizeLib.toGibiBytesAndBytes(gameInstallationPathSize);
-
-				gameInstallationUpdateData.path = requestBody.updateData.path;
-				gameInstallationUpdateData.fileSizeGibiBytes = fileSizeGibiBytes;
-				gameInstallationUpdateData.fileSizeBytes = fileSizeBytes;
-			}
-
-			if (Object.keys(gameInstallationUpdateData).length == 0)
-			{
-				return {
-					success: true,
-				};
-			}
-
-			await prismaClient.gameInstallation.update(
-				{
-					where:
-					{
-						id: gameInstallation.id,
-					},
-					data: gameInstallationUpdateData,
-				});
-
+		if (Object.keys(gameInstallationUpdateData).length == 0)
+		{
 			return {
 				success: true,
 			};
-		},
-	});
+		}
+
+		await prismaClient.gameInstallation.update(
+			{
+				where:
+				{
+					id: gameInstallation.id,
+				},
+				data: gameInstallationUpdateData,
+			});
+
+		return {
+			success: true,
+		};
+	},
+});

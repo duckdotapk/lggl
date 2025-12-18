@@ -18,7 +18,10 @@ const typeNames: Record<GameCompanyType, string> =
 // Utility Functions
 //
 
-export function getTypeName(gameCompanyOrType: Prisma.GameCompanyGetPayload<null> | GameCompanyType)
+export function getGameCompanyTypeName
+(
+	gameCompanyOrType: Prisma.GameCompanyGetPayload<null> | GameCompanyType,
+)
 {
 	return typeof gameCompanyOrType == "string"
 		? typeNames[gameCompanyOrType]

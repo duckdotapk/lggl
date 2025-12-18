@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as GameModelLib from "../../libs/models/Game.js";
+import { createGameGroupManager } from "../../libs/models/Game.js";
 
 import { view } from "../../views/game/edit.js";
 
@@ -23,154 +23,152 @@ type RouteFritterContext = ServerFritterContext &
 	};
 };
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/games/edit/:gameId",
 	handler: async (context) =>
 	{
 		const gameId = parseInt(context.routeParameters.gameId);
-
 		if (isNaN(gameId))
 		{
 			return;
 		}
 
 		const game = await prismaClient.game.findUnique(
+		{
+			where:
 			{
-				where:
-				{
-					id: gameId,
-				},
-			});
-
+				id: gameId,
+			},
+		});
 		if (game == null)
 		{
 			return;
 		}
 
-		const groupManager = await GameModelLib.createGroupManager(prismaClient, context.settings, game);
+		const groupManager = await createGameGroupManager(prismaClient, context.settings, game);
 
 		const companies = await prismaClient.company.findMany(
-			{
-				orderBy:
-				[
-					{ name: "asc" },
-				],
-			});
+		{
+			orderBy:
+			[
+				{ name: "asc" },
+			],
+		});
 
 		const engines = await prismaClient.engine.findMany(
-			{
-				orderBy:
-				[
-					{ name: "asc" },
-				],
-			});
+		{
+			orderBy:
+			[
+				{ name: "asc" },
+			],
+		});
 
 		const gameCompanies = await prismaClient.gameCompany.findMany(
+		{
+			where:
 			{
-				where:
-				{
-					game_id: game.id,
-				},
-				include:
-				{
-					company: true,
-				},
-				orderBy:
-				[
-					{ type: "asc" },
-					{ company: { name: "asc" } },
-				],
-			});
+				game_id: game.id,
+			},
+			include:
+			{
+				company: true,
+			},
+			orderBy:
+			[
+				{ type: "asc" },
+				{ company: { name: "asc" } },
+			],
+		});
 
 		const gameEngines = await prismaClient.gameEngine.findMany(
+		{
+			where:
 			{
-				where:
-				{
-					game_id: game.id,
-				},
-				include:
-				{
-					engine: true,
-				},
-				orderBy:
-				[
-					{ engine: { shortName: "asc" } },
-				],
-			});
+				game_id: game.id,
+			},
+			include:
+			{
+				engine: true,
+			},
+			orderBy:
+			[
+				{ engine: { shortName: "asc" } },
+			],
+		});
 
 		const gameInstallations = await prismaClient.gameInstallation.findMany(
+		{
+			where:
 			{
-				where:
-				{
-					game_id: game.id,
-				},
-				orderBy:
-				[
-					{ path: "asc" },
-				],
-			});
+				game_id: game.id,
+			},
+			orderBy:
+			[
+				{ path: "asc" },
+			],
+		});
 
 		const gameLinks = await prismaClient.gameLink.findMany(
+		{
+			where:
 			{
-				where:
-				{
-					game_id: game.id,
-				},
-				orderBy:
-				[
-					{ title: "asc" },
-				],
-			});
+				game_id: game.id,
+			},
+			orderBy:
+			[
+				{ title: "asc" },
+			],
+		});
 
 		const gamePlatforms = await prismaClient.gamePlatform.findMany(
+		{
+			where:
 			{
-				where:
-				{
-					game_id: game.id,
-				},
-				orderBy:
-				[
-					{ platform: { name: "asc" } },
-				],
-			});
+				game_id: game.id,
+			},
+			orderBy:
+			[
+				{ platform: { name: "asc" } },
+			],
+		});
 
 		const gamePlayActions = await prismaClient.gamePlayAction.findMany(
+		{
+			where:
 			{
-				where:
-				{
-					game_id: game.id,
-				},
-				orderBy:
-				[
-					{ isArchived: "asc" },
-					{ name: "asc" },
-				],
-			});
+				game_id: game.id,
+			},
+			orderBy:
+			[
+				{ isArchived: "asc" },
+				{ name: "asc" },
+			],
+		});
 
 		const platforms = await prismaClient.platform.findMany(
-			{
-				orderBy:
-				[
-					{ name: "asc" },
-				],
-			});
+		{
+			orderBy:
+			[
+				{ name: "asc" },
+			],
+		});
 
 		context.renderComponent(view(
-			{
-				settings: context.settings,
-				groupManager,
-				companies,
-				engines,
-				game,
-				gameCompanies,
-				gameEngines,
-				gameInstallations,
-				gameLinks,
-				gamePlatforms,
-				gamePlayActions,
-				platforms,
-			}));
+		{
+			settings: context.settings,
+			groupManager,
+			companies,
+			engines,
+			game,
+			gameCompanies,
+			gameEngines,
+			gameInstallations,
+			gameLinks,
+			gamePlatforms,
+			gamePlayActions,
+			platforms,
+		}));
 	},
 };

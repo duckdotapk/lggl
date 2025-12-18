@@ -2,14 +2,15 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./update.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./update.schemas.js";
 
 //
 // Route
@@ -17,238 +18,241 @@ import * as Schemas from "./update.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const game = await prismaClient.game.findUnique(
 		{
-			const game = await prismaClient.game.findUnique(
-				{
-					where:
-					{
-						id: requestBody.id,
-					},
-				});
-
-			if (game == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
+				id: requestBody.id,
+			},
+		});
 
-			const gameUpdateData: Prisma.GameUpdateArgs["data"] = {};
-
-			if (requestBody.updateData.name !== undefined)
+		if (game == null)
+		{
+			throw new ApiError(
 			{
-				gameUpdateData.name = requestBody.updateData.name;
-			}
+				code: "NOT_FOUND",
+				message: "Game not found.",
+			});
+		}
 
-			if (requestBody.updateData.sortName !== undefined)
-			{
-				gameUpdateData.sortName = requestBody.updateData.sortName;
-			}
+		const gameUpdateData: Prisma.GameUpdateArgs["data"] = {};
 
-			if (requestBody.updateData.releaseDate !== undefined)
-			{
-				gameUpdateData.releaseDate = requestBody.updateData.releaseDate !== null
-					? DateTime.fromISO(requestBody.updateData.releaseDate).toJSDate()
-					: null;
-			}
+		if (requestBody.updateData.name !== undefined)
+		{
+			gameUpdateData.name = requestBody.updateData.name;
+		}
 
-			if (requestBody.updateData.description !== undefined)
-			{
-				gameUpdateData.description = requestBody.updateData.description;
-			}
+		if (requestBody.updateData.sortName !== undefined)
+		{
+			gameUpdateData.sortName = requestBody.updateData.sortName;
+		}
 
-			if (requestBody.updateData.notes !== undefined)
-			{
-				gameUpdateData.notes = requestBody.updateData.notes;
-			}
+		if (requestBody.updateData.releaseDate !== undefined)
+		{
+			gameUpdateData.releaseDate = requestBody.updateData.releaseDate !== null
+				? DateTime.fromISO(requestBody.updateData.releaseDate).toJSDate()
+				: null;
+		}
 
-			if (requestBody.updateData.progressionType !== undefined)
-			{
-				gameUpdateData.progressionType = requestBody.updateData.progressionType;
-			}
+		if (requestBody.updateData.description !== undefined)
+		{
+			gameUpdateData.description = requestBody.updateData.description;
+		}
 
-			if (requestBody.updateData.hasBannerImage !== undefined)
-			{
-				gameUpdateData.hasBannerImage = requestBody.updateData.hasBannerImage;
-			}
+		if (requestBody.updateData.notes !== undefined)
+		{
+			gameUpdateData.notes = requestBody.updateData.notes;
+		}
 
-			if (requestBody.updateData.hasCoverImage !== undefined)
-			{
-				gameUpdateData.hasCoverImage = requestBody.updateData.hasCoverImage;
-			}
+		if (requestBody.updateData.progressionType !== undefined)
+		{
+			gameUpdateData.progressionType = requestBody.updateData.progressionType;
+		}
 
-			if (requestBody.updateData.hasIconImage !== undefined)
-			{
-				gameUpdateData.hasIconImage = requestBody.updateData.hasIconImage;
-			}
+		if (requestBody.updateData.hasBannerImage !== undefined)
+		{
+			gameUpdateData.hasBannerImage = requestBody.updateData.hasBannerImage;
+		}
 
-			if (requestBody.updateData.hasLogoImage !== undefined)
-			{
-				gameUpdateData.hasLogoImage = requestBody.updateData.hasLogoImage;
-			}
+		if (requestBody.updateData.hasCoverImage !== undefined)
+		{
+			gameUpdateData.hasCoverImage = requestBody.updateData.hasCoverImage;
+		}
 
-			if (requestBody.updateData.logoImageAlignment !== undefined)
-			{
-				gameUpdateData.logoImageAlignment = requestBody.updateData.logoImageAlignment;
-			}
+		if (requestBody.updateData.hasIconImage !== undefined)
+		{
+			gameUpdateData.hasIconImage = requestBody.updateData.hasIconImage;
+		}
 
-			if (requestBody.updateData.logoImageJustification !== undefined)
-			{
-				gameUpdateData.logoImageJustification = requestBody.updateData.logoImageJustification;
-			}
+		if (requestBody.updateData.hasLogoImage !== undefined)
+		{
+			gameUpdateData.hasLogoImage = requestBody.updateData.hasLogoImage;
+		}
 
-			if (requestBody.updateData.isEarlyAccess !== undefined)
-			{
-				gameUpdateData.isEarlyAccess = requestBody.updateData.isEarlyAccess;
-			}
+		if (requestBody.updateData.logoImageAlignment !== undefined)
+		{
+			gameUpdateData.logoImageAlignment = requestBody.updateData.logoImageAlignment;
+		}
 
-			if (requestBody.updateData.isFamilyShared !== undefined)
-			{
-				gameUpdateData.isFamilyShared = requestBody.updateData.isFamilyShared;
-			}
+		if (requestBody.updateData.logoImageJustification !== undefined)
+		{
+			gameUpdateData.logoImageJustification = requestBody.updateData.logoImageJustification;
+		}
 
-			if (requestBody.updateData.isFavorite !== undefined)
-			{
-				gameUpdateData.isFavorite = requestBody.updateData.isFavorite;
-			}
+		if (requestBody.updateData.isEarlyAccess !== undefined)
+		{
+			gameUpdateData.isEarlyAccess = requestBody.updateData.isEarlyAccess;
+		}
 
-			if (requestBody.updateData.isHidden !== undefined)
-			{
-				gameUpdateData.isHidden = requestBody.updateData.isHidden;
-			}
+		if (requestBody.updateData.isFamilyShared !== undefined)
+		{
+			gameUpdateData.isFamilyShared = requestBody.updateData.isFamilyShared;
+		}
 
-			if (requestBody.updateData.isNsfw !== undefined)
-			{
-				gameUpdateData.isNsfw = requestBody.updateData.isNsfw;
-			}
+		if (requestBody.updateData.isFavorite !== undefined)
+		{
+			gameUpdateData.isFavorite = requestBody.updateData.isFavorite;
+		}
 
-			if (requestBody.updateData.isShelved !== undefined)
-			{
-				gameUpdateData.isShelved = requestBody.updateData.isShelved;
-			}
+		if (requestBody.updateData.isHidden !== undefined)
+		{
+			gameUpdateData.isHidden = requestBody.updateData.isHidden;
+		}
 
-			if (requestBody.updateData.isUnknownEngine !== undefined)
-			{
-				gameUpdateData.isUnknownEngine = requestBody.updateData.isUnknownEngine;
-			}
+		if (requestBody.updateData.isNsfw !== undefined)
+		{
+			gameUpdateData.isNsfw = requestBody.updateData.isNsfw;
+		}
 
-			if (requestBody.updateData.isUnreleased !== undefined)
-			{
-				gameUpdateData.isUnreleased = requestBody.updateData.isUnreleased;
-			}
+		if (requestBody.updateData.isShelved !== undefined)
+		{
+			gameUpdateData.isShelved = requestBody.updateData.isShelved;
+		}
 
-			if (requestBody.updateData.purchaseDate !== undefined)
-			{
-				gameUpdateData.purchaseDate = requestBody.updateData.purchaseDate !== null
-					? DateTime.fromISO(requestBody.updateData.purchaseDate).toJSDate()
-					: null;	
-			}
+		if (requestBody.updateData.isUnknownEngine !== undefined)
+		{
+			gameUpdateData.isUnknownEngine = requestBody.updateData.isUnknownEngine;
+		}
 
-			if (requestBody.updateData.completionStatus !== undefined)
-			{
-				gameUpdateData.completionStatus = requestBody.updateData.completionStatus;
-			}
+		if (requestBody.updateData.isUnreleased !== undefined)
+		{
+			gameUpdateData.isUnreleased = requestBody.updateData.isUnreleased;
+		}
 
-			if (requestBody.updateData.firstPlayedDate !== undefined)
-			{
-				gameUpdateData.firstPlayedDate = requestBody.updateData.firstPlayedDate !== null
-					? DateTime.fromISO(requestBody.updateData.firstPlayedDate).toJSDate()
-					: null;
-			}
+		if (requestBody.updateData.purchaseDate !== undefined)
+		{
+			gameUpdateData.purchaseDate = requestBody.updateData.purchaseDate !== null
+				? DateTime.fromISO(requestBody.updateData.purchaseDate).toJSDate()
+				: null;	
+		}
 
-			if (requestBody.updateData.firstPlayedDateApproximated !== undefined)
-			{
-				gameUpdateData.firstPlayedDateApproximated = requestBody.updateData.firstPlayedDateApproximated;
-			}
+		if (requestBody.updateData.completionStatus !== undefined)
+		{
+			gameUpdateData.completionStatus = requestBody.updateData.completionStatus;
+		}
 
-			if (requestBody.updateData.firstCompletedDate !== undefined)
-			{
-				gameUpdateData.firstCompletedDate = requestBody.updateData.firstCompletedDate !== null
-					? DateTime.fromISO(requestBody.updateData.firstCompletedDate).toJSDate()
-					: null;
-			}
+		if (requestBody.updateData.firstPlayedDate !== undefined)
+		{
+			gameUpdateData.firstPlayedDate = requestBody.updateData.firstPlayedDate !== null
+				? DateTime.fromISO(requestBody.updateData.firstPlayedDate).toJSDate()
+				: null;
+		}
 
-			if (requestBody.updateData.firstCompletedDateApproximated !== undefined)
-			{
-				gameUpdateData.firstCompletedDateApproximated = requestBody.updateData.firstCompletedDateApproximated;
-			}
+		if (requestBody.updateData.firstPlayedDateApproximated !== undefined)
+		{
+			gameUpdateData.firstPlayedDateApproximated =
+				requestBody.updateData.firstPlayedDateApproximated;
+		}
 
-			if (requestBody.updateData.lastPlayedDate !== undefined)
-			{
-				gameUpdateData.lastPlayedDate = requestBody.updateData.lastPlayedDate !== null
-					? DateTime.fromISO(requestBody.updateData.lastPlayedDate).toJSDate()
-					: null;
-			}
+		if (requestBody.updateData.firstCompletedDate !== undefined)
+		{
+			gameUpdateData.firstCompletedDate = requestBody.updateData.firstCompletedDate !== null
+				? DateTime.fromISO(requestBody.updateData.firstCompletedDate).toJSDate()
+				: null;
+		}
 
-			if (requestBody.updateData.playCount !== undefined)
-			{
-				gameUpdateData.playCount = requestBody.updateData.playCount;
-			}
+		if (requestBody.updateData.firstCompletedDateApproximated !== undefined)
+		{
+			gameUpdateData.firstCompletedDateApproximated =
+				requestBody.updateData.firstCompletedDateApproximated;
+		}
 
-			if (requestBody.updateData.playTimeTotalSeconds !== undefined)
-			{
-				gameUpdateData.playTimeTotalSeconds = requestBody.updateData.playTimeTotalSeconds;
-			}
+		if (requestBody.updateData.lastPlayedDate !== undefined)
+		{
+			gameUpdateData.lastPlayedDate = requestBody.updateData.lastPlayedDate !== null
+				? DateTime.fromISO(requestBody.updateData.lastPlayedDate).toJSDate()
+				: null;
+		}
 
-			if (requestBody.updateData.achievementSupport !== undefined)
-			{
-				gameUpdateData.achievementSupport = requestBody.updateData.achievementSupport;
-			}
+		if (requestBody.updateData.playCount !== undefined)
+		{
+			gameUpdateData.playCount = requestBody.updateData.playCount;
+		}
 
-			if (requestBody.updateData.controllerSupport !== undefined)
-			{
-				gameUpdateData.controllerSupport = requestBody.updateData.controllerSupport;
-			}
+		if (requestBody.updateData.playTimeTotalSeconds !== undefined)
+		{
+			gameUpdateData.playTimeTotalSeconds = requestBody.updateData.playTimeTotalSeconds;
+		}
 
-			if (requestBody.updateData.modSupport !== undefined)
-			{
-				gameUpdateData.modSupport = requestBody.updateData.modSupport;
-			}
+		if (requestBody.updateData.achievementSupport !== undefined)
+		{
+			gameUpdateData.achievementSupport = requestBody.updateData.achievementSupport;
+		}
 
-			if (requestBody.updateData.virtualRealitySupport !== undefined)
-			{
-				gameUpdateData.virtualRealitySupport = requestBody.updateData.virtualRealitySupport;
-			}
+		if (requestBody.updateData.controllerSupport !== undefined)
+		{
+			gameUpdateData.controllerSupport = requestBody.updateData.controllerSupport;
+		}
 
-			if (requestBody.updateData.steamAppId !== undefined)
-			{
-				gameUpdateData.steamAppId = requestBody.updateData.steamAppId;
-			}
+		if (requestBody.updateData.modSupport !== undefined)
+		{
+			gameUpdateData.modSupport = requestBody.updateData.modSupport;
+		}
 
-			if (requestBody.updateData.steamAppName !== undefined)
-			{
-				gameUpdateData.steamAppName = requestBody.updateData.steamAppName;
-			}
+		if (requestBody.updateData.virtualRealitySupport !== undefined)
+		{
+			gameUpdateData.virtualRealitySupport = requestBody.updateData.virtualRealitySupport;
+		}
 
-			if (requestBody.updateData.steamDeckCompatibility !== undefined)
-			{
-				gameUpdateData.steamDeckCompatibility = requestBody.updateData.steamDeckCompatibility;
-			}
+		if (requestBody.updateData.steamAppId !== undefined)
+		{
+			gameUpdateData.steamAppId = requestBody.updateData.steamAppId;
+		}
 
-			if (Object.keys(gameUpdateData).length == 0)
-			{
-				return {
-					success: true,
-				};
-			}
+		if (requestBody.updateData.steamAppName !== undefined)
+		{
+			gameUpdateData.steamAppName = requestBody.updateData.steamAppName;
+		}
 
-			await prismaClient.game.update(
-				{
-					where:
-					{
-						id: game.id,
-					},
-					data: gameUpdateData,
-				});
+		if (requestBody.updateData.steamDeckCompatibility !== undefined)
+		{
+			gameUpdateData.steamDeckCompatibility = requestBody.updateData.steamDeckCompatibility;
+		}
 
+		if (Object.keys(gameUpdateData).length == 0)
+		{
 			return {
 				success: true,
 			};
-		},
-	});
+		}
+
+		await prismaClient.game.update(
+		{
+			where:
+			{
+				id: game.id,
+			},
+			data: gameUpdateData,
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

@@ -2,60 +2,34 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { GamePlayActionType } from "@prisma/client";
 import { z } from "zod";
 
-//
-// Schemas
-//
-
-export const RequestBodySchema = z.object(
-	{
-		name: z.string(),
-		type: z.custom<GamePlayActionType>(),
-		path: z.string(),
-		workingDirectory: z.string().nullable(),
-		additionalArguments: z.string().nullable(),
-		processRequirements: z.string().nullable(),
-		isArchived: z.boolean(),
-
-		game_id: z.number().int(),
-	});
-
-export const ResponseBodySchema = z.union(
-	[
-		FritterApiUtilities.SuccessResponseBodySchema,
-
-		FritterApiUtilities.ErrorResponseBodySchema,
-	]);
+import { ErrorResponseBodySchema, SuccessResponseBodySchema } from "../../../libs/Api.client.js";
 
 //
-// Types
-//
-
-export type RequestBody = z.infer<typeof RequestBodySchema>;
-	
-export type ResponseBody = z.infer<typeof ResponseBodySchema>;
-
-//
-// Constants
+// Schema
 //
 
 export const method = "POST";
 
 export const path = "/api/gamePlayActions/create";
 
-//
-// Utility Functions
-//
-
-export function createGamePlayAction(requestBody: RequestBody)
+export const RequestBodySchema = z.object(
 {
-	return FritterApiUtilities.request(method, path,
-		{
-			requestBodySchema: RequestBodySchema,
-			responseBodySchema: ResponseBodySchema,
-			requestBody,
-		});
-}
+	name: z.string(),
+	type: z.custom<GamePlayActionType>(),
+	path: z.string(),
+	workingDirectory: z.string().nullable(),
+	additionalArguments: z.string().nullable(),
+	processRequirements: z.string().nullable(),
+	isArchived: z.boolean(),
+
+	game_id: z.number().int(),
+});
+
+export const ResponseBodySchema = z.union(
+[
+	SuccessResponseBodySchema,
+	ErrorResponseBodySchema,
+]);

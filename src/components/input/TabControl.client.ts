@@ -10,20 +10,21 @@ async function initialise(element: HTMLElement)
 
 	for (const [ tabIndex, tab ]  of tabs.entries())
 	{
-		tab.addEventListener("click",
-			() =>
+		tab.addEventListener("click", () =>
+		{
+			for (const [ tabIndex2, tab ] of tabs.entries())
 			{
-				for (const [ tabIndex2, tab ] of tabs.entries())
-				{
-					tab.dataset["active"] = (tabIndex == tabIndex2).toString();
-				}
+				tab.dataset["active"] = (tabIndex == tabIndex2).toString();
+			}
 
-				for (const [ tabContentIndex, tabContent ] of tabContents.entries())
-				{
-					tabContent.dataset["active"] = (tabContentIndex == tabIndex).toString();
-				}
-			});
+			for (const [ tabContentIndex, tabContent ] of tabContents.entries())
+			{
+				tabContent.dataset["active"] = (tabContentIndex == tabIndex).toString();
+			}
+		});
 	}
+
+	element.classList.add("initialised");
 }
 
 //
@@ -32,19 +33,14 @@ async function initialise(element: HTMLElement)
 
 export async function initialiseTabControls()
 {
-	const tabControls = document.querySelectorAll<HTMLElement>(".component-tab-control:not(.initialised)");
+	const elements = document.querySelectorAll<HTMLElement>(
+		".component-tab-control:not(.initialised)",
+	);
 
-	for (const tabControl of tabControls)
+	for (const element of elements)
 	{
-		try
-		{
-			await initialise(tabControl);
-
-			tabControl.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[TabControl] Error initialising:", tabControl, error);
-		}
+		initialise(element)
+			.then(() => console.log("[TabControl] Initialised:", element))
+			.catch((error) => console.error("[TabControl] Error initialising:", element, error));
 	}
 }

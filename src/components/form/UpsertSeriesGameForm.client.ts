@@ -2,14 +2,22 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getElementOrThrow,
+	getInputNumberValue,
+	getIntegerData,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createSeriesGame } from "../../routes/api/seriesGame/create.schemas.js";
-import { deleteSeriesGame } from "../../routes/api/seriesGame/delete.schemas.js";
-import { updateSeriesGame } from "../../routes/api/seriesGame/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createSeriesGameSchema from "../../routes/api/seriesGame/create.schemas.js";
+import * as deleteSeriesGameSchema from "../../routes/api/seriesGame/delete.schemas.js";
+import * as updateSeriesGameSchema from "../../routes/api/seriesGame/update.schemas.js";
 
 //
 // Locals
@@ -17,56 +25,77 @@ import { updateSeriesGame } from "../../routes/api/seriesGame/update.schemas.js"
 
 async function initialise(form: HTMLFormElement)
 {
-	const seriesId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "seriesId");
-	const seriesGameId = BrowserUtilities.ElementClientLib.getIntegerData(form, "seriesGameId");
+	const seriesId = getIntegerDataOrThrow(form, "seriesId");
+	const seriesGameId = getIntegerData(form, "seriesGameId");
 
-	const gameIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="game_id"]`);
-	const numberInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="number"]`);
+	const gameIdSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="game_id"]`);
+	const numberInput = getElementOrThrow<HTMLInputElement>(form, `[name="number"]`);
 
 	if (seriesGameId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () =>await createSeriesGame(
-					{
-						number: InputClientLib.getNumberValue(numberInput),
+				schema: createSeriesGameSchema,
+				requestBody:
+				{
+					number: getInputNumberValue(numberInput),
 
-						game_id: InputClientLib.getNumberValue(gameIdSelect),
-						series_id: seriesId,
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+					game_id: getInputNumberValue(gameIdSelect),
+					series_id: seriesId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteSeriesGame(seriesGameId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteSeriesGameSchema,
+				requestBody:
+				{
+					id: seriesGameId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateSeriesGame(seriesGameId,
+				schema: updateSeriesGameSchema,
+				requestBody:
+				{
+					id: seriesGameId,
+					updateData:
 					{
-						number: InputClientLib.getNumberValue(numberInput),
+						number: getInputNumberValue(numberInput),
 
-						game_id: InputClientLib.getNumberValue(gameIdSelect),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						game_id: getInputNumberValue(gameIdSelect),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -75,19 +104,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertSeriesGameForms()
 {
-	const upsertSeriesGameForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-series-game-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-series-game-form:not(.initialised)",
+	);
 
-	for (const upsertSeriesGameForm of upsertSeriesGameForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertSeriesGameForm);
-
-			upsertSeriesGameForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertSeriesGameForm] Error initialising:", upsertSeriesGameForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertSeriesGameForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertSeriesGameForm] Error initialising:", form, error));
 	}
 }

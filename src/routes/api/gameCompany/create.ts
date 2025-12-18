@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./create.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./create.schemas.js";
 
 //
 // Route
@@ -15,55 +15,60 @@ import * as Schemas from "./create.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const game = await prismaClient.game.findUnique(
 		{
-			const game = await prismaClient.game.findUnique(
-				{
-					where:
-					{
-						id: requestBody.game_id,
-					},
-				});
-
-			if (game == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
+				id: requestBody.game_id,
+			},
+		});
 
-			const company = await prismaClient.company.findUnique(
-				{
-					where:
-					{
-						id: requestBody.company_id,
-					},
-				});
-
-			if (company == null)
+		if (game == null)
+		{
+			throw new ApiError(
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Company not found." });
-			}
+				code: "NOT_FOUND",
+				message: "Game not found.",
+			});
+		}
 
-			await prismaClient.gameCompany.create(
-				{
-					data:
-					{
-						notes: requestBody.notes,
-						type: requestBody.type,
+		const company = await prismaClient.company.findUnique(
+		{
+			where:
+			{
+				id: requestBody.company_id,
+			},
+		});
 
-						company_id: company.id,
-						game_id: game.id,
-					},
-				});
+		if (company == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT_FOUND",
+				message: "Company not found.",
+			});
+		}
 
-			return {
-				success: true,
-			};
-		},
-	});
+		await prismaClient.gameCompany.create(
+		{
+			data:
+			{
+				notes: requestBody.notes,
+				type: requestBody.type,
+
+				company_id: company.id,
+				game_id: game.id,
+			},
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

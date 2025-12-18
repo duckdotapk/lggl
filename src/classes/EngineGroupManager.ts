@@ -2,6 +2,8 @@
 // Imports
 //
 
+import util from "node:util";
+
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -32,7 +34,10 @@ export abstract class EngineGroupManager<T extends Prisma.EngineGetPayload<null>
 
 	override getItemInfo(engine: T)
 	{
-		return [ "Last updated ", HumanDateTime(DateTime.fromJSDate(engine.lastUpdatedDate)) ];
+		return [
+			"Last updated ",
+			HumanDateTime(DateTime.fromJSDate(engine.lastUpdatedDate)),
+		];
 	}
 }
 
@@ -56,34 +61,43 @@ export class NameEngineGroupManager extends EngineGroupManager
 	}
 }
 
-export type NumberOfGamesEngineGroupManagerEngine = Prisma.EngineGetPayload<{ include: { gameEngines: true } }>;
+export type NumberOfGamesEngineGroupManagerEngine = Prisma.EngineGetPayload<
+{
+	include:
+	{
+		gameEngines: true;
+	};
+}>;
 
 export class NumberOfGamesEngineGroupManager extends EngineGroupManager<NumberOfGamesEngineGroupManagerEngine>
 {
 	override sortModels(engines: NumberOfGamesEngineGroupManagerEngine[])
 	{
-		return engines.toSorted(
-			(a, b) =>
+		return engines.toSorted((a, b) =>
+		{
+			if (a.gameEngines.length > b.gameEngines.length)
 			{
-				if (a.gameEngines.length > b.gameEngines.length)
-				{
-					return -1;
-				}
+				return -1;
+			}
 
-				if (a.gameEngines.length < b.gameEngines.length)
-				{
-					return 1;
-				}
+			if (a.gameEngines.length < b.gameEngines.length)
+			{
+				return 1;
+			}
 
-				return a.name.localeCompare(b.name);
-			});
+			return a.name.localeCompare(b.name);
+		});
 	}
 
 	override groupModels(engines: NumberOfGamesEngineGroupManagerEngine[])
 	{
 		for (const engine of engines)
 		{
-			const groupName = engine.gameEngines.length + " game" + (engine.gameEngines.length == 1 ? "" : "s");
+			const groupName = util.format(
+				"%d game%s",
+				engine.gameEngines.length,
+				engine.gameEngines.length == 1 ? "" : "s",
+			);
 
 			this.addModelToGroup(groupName, engine);
 		}

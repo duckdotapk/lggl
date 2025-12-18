@@ -2,12 +2,12 @@
 // Imports
 //
 
-import { Child, ElementAttributes } from "@donutteam/document-builder";
+import { Child, ElementAttributes } from "@lorenstuff/document-builder";
 import { DateTime } from "luxon";
 
 import { ListLayoutGroupOptions } from "../components/layout/ListLayout.js";
 
-import * as SettingModelLib from "../libs/models/Setting.js";
+import { Settings } from "../libs/models/Setting.js";
 
 //
 // Class
@@ -89,13 +89,18 @@ export abstract class GroupManager<T extends { id: number }>
 		}
 	}
 
-	settings: SettingModelLib.Settings;
+	settings: Settings;
 	models: T[];
 	selectedModel: { id: number } | null;
 
 	groupsByName: Map<string, GroupManagerGroup<T>>;
 
-	constructor(settings: SettingModelLib.Settings, models: T[], selectedModel: { id: number } | null)
+	constructor
+	(
+		settings: Settings,
+		models: T[],
+		selectedModel: { id: number } | null,
+	)
 	{
 		this.settings = settings;
 		this.models = models;
@@ -179,14 +184,14 @@ export abstract class GroupManager<T extends { id: number }>
 			({
 				name: group.name,
 				items: this.sortGroupModels(group.name, group.models).map((model) =>
-					({
-						selected: model.id == this.selectedModel?.id,
-						href: this.getItemHref(model, group),
-						extraAttributes: this.getItemAttributes(model, group),
-						iconName: this.getItemIconName(model, group),
-						name: this.getItemName(model, group),
-						info: this.getItemInfo(model, group),
-					})),
-			}))
+				({
+					selected: model.id == this.selectedModel?.id,
+					href: this.getItemHref(model, group),
+					extraAttributes: this.getItemAttributes(model, group),
+					iconName: this.getItemIconName(model, group),
+					name: this.getItemName(model, group),
+					info: this.getItemInfo(model, group),
+				})),
+			}));
 	}
 }

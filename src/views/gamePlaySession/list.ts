@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -21,10 +21,10 @@ import { ListLayout } from "../../components/layout/ListLayout.js";
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as GameModelLib from "../../libs/models/Game.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createGameGroupManager } from "../../libs/models/Game.js";
+import { Settings } from "../../libs/models/Setting.js";
 
-import * as HumanizationLib from "../../libs/Humanization.js";
+import { formatSeconds } from "../../libs/Humanization.js";
 
 //
 // View
@@ -32,10 +32,17 @@ import * as HumanizationLib from "../../libs/Humanization.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createGameGroupManager>>;
 	game: Prisma.GameGetPayload<null>;
-	gamePlaySessions: Prisma.GamePlaySessionGetPayload<{ include: { gamePlayAction: true; platform: true } }>[];
+	gamePlaySessions: Prisma.GamePlaySessionGetPayload<
+	{
+		include:
+		{
+			gamePlayAction: true;
+			platform: true;
+		};
+	}>[];
 	gamePlaySessionCount: number;
 };
 
@@ -45,98 +52,95 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "games",
 		pageTitle: "Play sessions | " + options.game.name + " | Games",
 		content: ListLayout(
-			{
-				toolbar: GameSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/games/create",
-				content: Wrapper(
+		{
+			toolbar: GameSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/games/create",
+			content: Wrapper(
+			[
+				Breadcrumbs(
+				[
+					{ 
+						href: "/games",
+						text: "Games", 
+						pjaxSelector: "main",
+					},
+					{ 
+						href: "/games/view/" + options.game.id, 
+						text: options.game.name,
+						pjaxSelector: "main",
+					},
+					{ 
+						href: "/gamePlaySessions/list/" + options.game.id, 
+						text: "Play sessions",
+						pjaxSelector: "main",
+					},
+				]),
+
+				Header(1,
+				[
+					"Play sessions (",
+					options.gamePlaySessionCount,
+					")",
+				]),
+
+				Paragraph(
+				[
+					"You have ",
+					new DE("b", null, options.gamePlaySessionCount.toLocaleString()),
+					" play session",
+					options.gamePlaySessionCount == 1 ? "" : "s",
+					" recorded for this game.",
+				]),
+
+				// TODO: pagination
+
+				options.gamePlaySessions.map((gamePlaySession) => Block(
+				[
+					ColumnLayout(4,
 					[
-						Breadcrumbs(
+						new DE("div", null,
+						[
+							Label(null, "Date"),
+
+							Paragraph(
 							[
-								{ 
-									href: "/games",
-									text: "Games", 
-									pjaxSelector: "main",
-								},
-								{ 
-									href: "/games/view/" + options.game.id, 
-									text: options.game.name,
-									pjaxSelector: "main",
-								},
-								{ 
-									href: "/gamePlaySessions/list/" + options.game.id, 
-									text: "Play sessions",
-									pjaxSelector: "main",
-								},
+								gamePlaySession.isHistorical
+									? "Historical"
+									: DateTime.fromJSDate(gamePlaySession.startDate)
+										.toLocaleString(DateTime.DATETIME_MED),
 							]),
+						]),
 
-						Header(1,
+						new DE("div", null,
+						[
+							Label(null, "Platform"),
+
+							Paragraph(
 							[
-								"Play sessions (",
-								options.gamePlaySessionCount,
-								")",
+								new DE("span", gamePlaySession.platform.iconName),
+								" ",
+								gamePlaySession.platform.name,
 							]),
+						]),
 
-						Paragraph(
-							[
-								"You have ",
-								new DE("b", null, options.gamePlaySessionCount.toLocaleString()),
-								" play session",
-								options.gamePlaySessionCount == 1 ? "" : "s",
-								" recorded for this game.",
-							]),
+						new DE("div", null,
+						[
+							Label(null, "Play time"),
 
-						// TODO: pagination
-
-						options.gamePlaySessions.map(
-							(gamePlaySession) =>
-							{
-								return Block(
-									[
-										ColumnLayout(4,
-											[
-												new DE("div", null,
-													[
-														Label(null, "Date"),
-				
-														Paragraph(
-															[
-																gamePlaySession.isHistorical
-																	? "Historical"
-																	: DateTime.fromJSDate(gamePlaySession.startDate).toLocaleString(DateTime.DATETIME_MED),
-															]),
-													]),
-
-												new DE("div", null,
-													[
-														Label(null, "Platform"),
-				
-														Paragraph(
-															[
-																new DE("span", gamePlaySession.platform.iconName),
-																" ",
-																gamePlaySession.platform.name,
-															]),
-													]),
-
-												new DE("div", null,
-													[
-														Label(null, "Play time"),
-				
-														Paragraph(HumanizationLib.formatSeconds(gamePlaySession.playTimeSeconds, false)),
-													]),
-											]),
-
-										gamePlaySession.notes != null
-											? [
-												Label(null, "Notes"),
-
-												gamePlaySession.notes.split("\n").map((line) => Paragraph(line)),
-											]
-											: null,
-									]);
-							}),
+							Paragraph(formatSeconds(gamePlaySession.playTimeSeconds, false)),
+						]),
 					]),
-			}),
+
+					gamePlaySession.notes != null
+						? [
+							Label(null, "Notes"),
+
+							gamePlaySession.notes.split("\n").map((line) => Paragraph(line)),
+						]
+						: null,
+				])),
+			]),
+		}),
 	};
 }

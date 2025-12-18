@@ -6,11 +6,12 @@ async function initialise(element: HTMLInputElement | HTMLSelectElement | HTMLTe
 {
 	element.dataset["initialValue"] = element.value;
 
-	element.addEventListener("input",
-		() =>
-		{
-			element.dataset["dirty"] = (element.value != element.dataset["initialValue"]).toString();
-		});
+	element.addEventListener("input", () =>
+	{
+		element.dataset["changed"] = (element.value != element.dataset["initialValue"]).toString();
+	});
+
+	element.classList.add("initialised");
 }
 
 //
@@ -19,19 +20,14 @@ async function initialise(element: HTMLInputElement | HTMLSelectElement | HTMLTe
 
 export async function initialiseControls()
 {
-	const controls = document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(".component-control:not(.initialised)");
+	const elements = document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+		".component-control:not(.initialised)",
+	);
 
-	for (const control of controls)
+	for (const element of elements)
 	{
-		try
-		{
-			await initialise(control);
-
-			control.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[Control] Error initialising:", control, error);
-		}
+		initialise(element)
+			.then(() => console.log("[Control] Initialised:", element))
+			.catch((error) => console.error("[Control] Error initialising:", element, error));
 	}
 }

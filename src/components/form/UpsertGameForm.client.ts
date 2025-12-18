@@ -2,14 +2,47 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
-import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameSteamDeckCompatibility, GameVirtualRealitySupport } from "@prisma/client";
+import
+{
+	getChangedInputBooleanValue,
+	getChangedInputDateTimeValueNullable,
+	getChangedInputDateValueNullable,
+	getChangedInputEnumValueNullable,
+	getChangedInputNumberValue,
+	getChangedInputNumberValueNullable,
+	getChangedInputStringValue,
+	getChangedInputStringValueNullable,
+	getElementOrThrow,
+	getInputBooleanValue,
+	getInputDateTimeValueNullable,
+	getInputDateValueNullable,
+	getInputEnumValueNullable,
+	getInputNumberValueNullable,
+	getInputStringValue,
+	getInputStringValueNullable,
+	getIntegerData,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import
+{
+	GameAchievementSupportSchema,
+	GameCompletionStatusSchema,
+	GameControllerSupportSchema,
+	GameLogoImageAlignmentSchema,
+	GameLogoImageJustificationSchema,
+	GameModSupportSchema,
+	GameProgressionTypeSchema,
+	GameSteamDeckCompatibilitySchema,
+	GameVirtualRealitySupportSchema,
+} from "../../libs/models/Game.schemas.js";
 
-import { createGame } from "../../routes/api/game/create.schemas.js";
-import { updateGame } from "../../routes/api/game/update.schemas.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { changeView, reloadView } from "../../libs/client/Pjax.client.js";
+
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGameSchema from "../../routes/api/game/create.schemas.js";
+import * as updateGameSchema from "../../routes/api/game/update.schemas.js";
 
 //
 // Locals
@@ -17,172 +50,258 @@ import { updateGame } from "../../routes/api/game/update.schemas.js";
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerData(form, `gameId`);
+	const gameId = getIntegerData(form, `gameId`);
 
-	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
-	const sortNameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="sortName"]`);
-	const releaseDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="releaseDate"]`);
-	const progressionTypeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="progressionType"]`);
-	const descriptionInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="description"]`);
-	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
+	const nameInput = getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
+	const sortNameInput = getElementOrThrow<HTMLInputElement>(form, `[name="sortName"]`);
+	const releaseDateInput = getElementOrThrow<HTMLInputElement>(form, `[name="releaseDate"]`);
+	const progressionTypeSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="progressionType"]`);
+	const descriptionInput = getElementOrThrow<HTMLInputElement>(form, `[name="description"]`);
+	const notesInput = getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
-	const hasBannerImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasBannerImage"]`);
-	const hasCoverImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasCoverImage"]`);
-	const hasIconImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasIconImage"]`);
-	const hasLogoImageInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="hasLogoImage"]`);
-	const logoImageAlignmentSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageAlignment"]`);
-	const logoImageJustificationSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageJustification"]`);
+	const hasBannerImageInput = getElementOrThrow<HTMLInputElement>(form, `[name="hasBannerImage"]`);
+	const hasCoverImageInput = getElementOrThrow<HTMLInputElement>(form, `[name="hasCoverImage"]`);
+	const hasIconImageInput = getElementOrThrow<HTMLInputElement>(form, `[name="hasIconImage"]`);
+	const hasLogoImageInput = getElementOrThrow<HTMLInputElement>(form, `[name="hasLogoImage"]`);
+	const logoImageAlignmentSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageAlignment"]`);
+	const logoImageJustificationSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="logoImageJustification"]`);
 
-	const isEarlyAccessInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isEarlyAccess"]`);
-	const isFamilySharedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFamilyShared"]`);
-	const isFavoriteInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isFavorite"]`);
-	const isHiddenInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isHidden"]`);
-	const isNsfwInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isNsfw"]`);
-	const isShelvedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isShelved"]`);
-	const isUnknownEngineInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isUnknownEngine"]`);
-	const isUnreleasedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isUnreleased"]`);
+	const isEarlyAccessInput = getElementOrThrow<HTMLInputElement>(form, `[name="isEarlyAccess"]`);
+	const isFamilySharedInput = getElementOrThrow<HTMLInputElement>(form, `[name="isFamilyShared"]`);
+	const isFavoriteInput = getElementOrThrow<HTMLInputElement>(form, `[name="isFavorite"]`);
+	const isHiddenInput = getElementOrThrow<HTMLInputElement>(form, `[name="isHidden"]`);
+	const isNsfwInput = getElementOrThrow<HTMLInputElement>(form, `[name="isNsfw"]`);
+	const isShelvedInput = getElementOrThrow<HTMLInputElement>(form, `[name="isShelved"]`);
+	const isUnknownEngineInput = getElementOrThrow<HTMLInputElement>(form, `[name="isUnknownEngine"]`);
+	const isUnreleasedInput = getElementOrThrow<HTMLInputElement>(form, `[name="isUnreleased"]`);
 
-	const purchaseDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="purchaseDate"]`);
-	const completionStatusSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="completionStatus"]`);
-	const firstPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="firstPlayedDate"]`);
-	const firstPlayedDateApproximatedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="firstPlayedDateApproximated"]`);
-	const firstCompletedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="firstCompletedDate"]`);
-	const firstCompletedDateApproximatedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="firstCompletedDateApproximated"]`);
-	const lastPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="lastPlayedDate"]`);
-	const playCountInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="playCount"]`);
-	const playTimeTotalSecondsInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="playTimeTotalSeconds"]`);
+	const purchaseDateInput = getElementOrThrow<HTMLInputElement>(form, `[name="purchaseDate"]`);
+	const completionStatusSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="completionStatus"]`);
+	const firstPlayedDateInput = getElementOrThrow<HTMLInputElement>(form, `[name="firstPlayedDate"]`);
+	const firstPlayedDateApproximatedInput = getElementOrThrow<HTMLInputElement>(form, `[name="firstPlayedDateApproximated"]`);
+	const firstCompletedDateInput = getElementOrThrow<HTMLInputElement>(form, `[name="firstCompletedDate"]`);
+	const firstCompletedDateApproximatedInput = getElementOrThrow<HTMLInputElement>(form, `[name="firstCompletedDateApproximated"]`);
+	const lastPlayedDateInput = getElementOrThrow<HTMLInputElement>(form, `[name="lastPlayedDate"]`);
+	const playCountInput = getElementOrThrow<HTMLInputElement>(form, `[name="playCount"]`);
+	const playTimeTotalSecondsInput = getElementOrThrow<HTMLInputElement>(form, `[name="playTimeTotalSeconds"]`);
 
-	const achievementSupportSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="achievementSupport"]`);
-	const controllerSupportSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="controllerSupport"]`);
-	const modSupportSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="modSupport"]`);
-	const virtualRealitySupportSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="virtualRealitySupport"]`);
+	const achievementSupportSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="achievementSupport"]`);
+	const controllerSupportSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="controllerSupport"]`);
+	const modSupportSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="modSupport"]`);
+	const virtualRealitySupportSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="virtualRealitySupport"]`);
 
-	const steamAppIdInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="steamAppId"]`);
-	const steamAppNameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="steamAppName"]`);
-	const steamDeckCompatibilitySelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="steamDeckCompatibility"]`);
+	const steamAppIdInput = getElementOrThrow<HTMLInputElement>(form, `[name="steamAppId"]`);
+	const steamAppNameInput = getElementOrThrow<HTMLInputElement>(form, `[name="steamAppName"]`);
+	const steamDeckCompatibilitySelect = getElementOrThrow<HTMLSelectElement>(form, `[name="steamDeckCompatibility"]`);
 
 	form.addEventListener("submit", (event) => event.preventDefault());
 
 	if (gameId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createGame(
-					{
-						name: InputClientLib.getStringValue(nameInput),
-						sortName: InputClientLib.getStringValue(sortNameInput),
-						releaseDate: InputClientLib.getDateValueNullable(releaseDateInput),
-						description: InputClientLib.getStringValueNullable(descriptionInput),
-						notes: InputClientLib.getStringValueNullable(notesInput),
-						progressionType: InputClientLib.getEnumValueNullable<GameProgressionType>(progressionTypeSelect),
+				schema: createGameSchema,
+				requestBody:
+				{
+					name: getInputStringValue(nameInput),
+					sortName: getInputStringValue(sortNameInput),
+					releaseDate: getInputDateValueNullable(releaseDateInput)?.toISO() ?? null,
+					description: getInputStringValueNullable(descriptionInput),
+					notes: getInputStringValueNullable(notesInput),
+					progressionType: getInputEnumValueNullable(
+						progressionTypeSelect,
+						GameProgressionTypeSchema,
+					),
 
-						hasBannerImage: InputClientLib.getBooleanValue(hasBannerImageInput),
-						hasCoverImage: InputClientLib.getBooleanValue(hasCoverImageInput),
-						hasIconImage: InputClientLib.getBooleanValue(hasIconImageInput),
-						hasLogoImage: InputClientLib.getBooleanValue(hasLogoImageInput),
-						logoImageAlignment: InputClientLib.getEnumValueNullable<GameLogoImageAlignment>(logoImageAlignmentSelect),
-						logoImageJustification: InputClientLib.getEnumValueNullable<GameLogoImageJustification>(logoImageJustificationSelect),
+					hasBannerImage: getInputBooleanValue(hasBannerImageInput),
+					hasCoverImage: getInputBooleanValue(hasCoverImageInput),
+					hasIconImage: getInputBooleanValue(hasIconImageInput),
+					hasLogoImage: getInputBooleanValue(hasLogoImageInput),
+					logoImageAlignment: getInputEnumValueNullable(
+						logoImageAlignmentSelect,
+						GameLogoImageAlignmentSchema,
+					),
+					logoImageJustification: getInputEnumValueNullable(
+						logoImageJustificationSelect,
+						GameLogoImageJustificationSchema,
+					),
 
-						isEarlyAccess: InputClientLib.getBooleanValue(isEarlyAccessInput),
-						isFamilyShared: InputClientLib.getBooleanValue(isFamilySharedInput),
-						isFavorite: InputClientLib.getBooleanValue(isFavoriteInput),
-						isHidden: InputClientLib.getBooleanValue(isHiddenInput),
-						isNsfw: InputClientLib.getBooleanValue(isNsfwInput),
-						isShelved: InputClientLib.getBooleanValue(isShelvedInput),
-						isUnknownEngine: InputClientLib.getBooleanValue(isUnknownEngineInput),
-						isUnreleased: InputClientLib.getBooleanValue(isUnreleasedInput),
+					isEarlyAccess: getInputBooleanValue(isEarlyAccessInput),
+					isFamilyShared: getInputBooleanValue(isFamilySharedInput),
+					isFavorite: getInputBooleanValue(isFavoriteInput),
+					isHidden: getInputBooleanValue(isHiddenInput),
+					isNsfw: getInputBooleanValue(isNsfwInput),
+					isShelved: getInputBooleanValue(isShelvedInput),
+					isUnknownEngine: getInputBooleanValue(isUnknownEngineInput),
+					isUnreleased: getInputBooleanValue(isUnreleasedInput),
 
-						purchaseDate: InputClientLib.getDateValueNullable(purchaseDateInput),
-						completionStatus: InputClientLib.getEnumValueNullable<GameCompletionStatus>(completionStatusSelect),
-						firstPlayedDate: InputClientLib.getDateTimeValueNullable(firstPlayedDateInput),
-						firstPlayedDateApproximated: InputClientLib.getBooleanValue(firstPlayedDateApproximatedInput),
-						firstCompletedDate: InputClientLib.getDateTimeValueNullable(firstCompletedDateInput),
-						firstCompletedDateApproximated: InputClientLib.getBooleanValue(firstCompletedDateApproximatedInput),
-						lastPlayedDate: InputClientLib.getDateTimeValueNullable(lastPlayedDateInput),
-						playCount: InputClientLib.getNumberValue(playCountInput),
-						playTimeTotalSeconds: InputClientLib.getNumberValue(playTimeTotalSecondsInput),
+					purchaseDate: getInputDateValueNullable(purchaseDateInput)?.toISO() ?? null,
+					completionStatus: getInputEnumValueNullable(
+						completionStatusSelect,
+						GameCompletionStatusSchema,
+					),
+					firstPlayedDate: getInputDateTimeValueNullable(
+						firstPlayedDateInput,
+					)?.toISO() ?? null,
+					firstPlayedDateApproximated: getInputBooleanValue(
+						firstPlayedDateApproximatedInput,
+					),
+					firstCompletedDate: getInputDateTimeValueNullable(
+						firstCompletedDateInput,
+					)?.toISO() ?? null,
+					firstCompletedDateApproximated: getInputBooleanValue(
+						firstCompletedDateApproximatedInput,
+					),
+					lastPlayedDate: getInputDateTimeValueNullable(
+						lastPlayedDateInput,
+					)?.toISO() ?? null,
+					playCount: getInputNumberValueNullable(playCountInput),
+					playTimeTotalSeconds: getInputNumberValueNullable(playTimeTotalSecondsInput),
 
-						achievementSupport: InputClientLib.getEnumValueNullable<GameAchievementSupport>(achievementSupportSelect),
-						controllerSupport: InputClientLib.getEnumValueNullable<GameControllerSupport>(controllerSupportSelect),
-						modSupport: InputClientLib.getEnumValueNullable<GameModSupport>(modSupportSelect),
-						virtualRealitySupport: InputClientLib.getEnumValueNullable<GameVirtualRealitySupport>(virtualRealitySupportSelect),
+					achievementSupport: getInputEnumValueNullable(
+						achievementSupportSelect,
+						GameAchievementSupportSchema,
+					),
+					controllerSupport: getInputEnumValueNullable(
+						controllerSupportSelect,
+						GameControllerSupportSchema,
+					),
+					modSupport: getInputEnumValueNullable(
+						modSupportSelect,
+						GameModSupportSchema,
+					),
+					virtualRealitySupport: getInputEnumValueNullable(
+						virtualRealitySupportSelect,
+						GameVirtualRealitySupportSchema,
+					),
 
-						steamAppId: InputClientLib.getNumberValueNullable(steamAppIdInput),
-						steamAppName: InputClientLib.getStringValueNullable(steamAppNameInput),
-						steamDeckCompatibility: InputClientLib.getEnumValueNullable<GameSteamDeckCompatibility>(steamDeckCompatibilitySelect),
-					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/games/edit/" + response.game.id),
-			}
-		)
+					steamAppId: getInputNumberValueNullable(steamAppIdInput),
+					steamAppName: getInputStringValueNullable(steamAppNameInput),
+					steamDeckCompatibility: getInputEnumValueNullable(
+						steamDeckCompatibilitySelect,
+						GameSteamDeckCompatibilitySchema,
+					),
+				},
+			}).getResponse(),
+			onSuccess: async (response) => changeView("/games/edit/" + response.game.id),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
-			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => { throw new Error("Not implemented.") }, // TODO: this
-				onSuccess: async () => PjaxClientLib.changeView("/games"),
-			});
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => { throw new Error("Not implemented.") }, // TODO: this
+			onSuccess: async () => changeView("/games"),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGame(gameId,
+				schema: updateGameSchema,
+				requestBody:
+				{
+					id: gameId,
+					updateData:
 					{
-						name: InputClientLib.getChangedStringValue(nameInput),
-						sortName: InputClientLib.getChangedStringValue(sortNameInput),
-						releaseDate: InputClientLib.getChangedDateValueNullable(releaseDateInput),
-						description: InputClientLib.getChangedStringValueNullable(descriptionInput),
-						notes: InputClientLib.getChangedStringValueNullable(notesInput),
-						progressionType: InputClientLib.getChangedEnumValueNullable<GameProgressionType>(progressionTypeSelect),
+						name: getChangedInputStringValue(nameInput),
+						sortName: getChangedInputStringValue(sortNameInput),
+						releaseDate: getChangedInputDateValueNullable(releaseDateInput)?.toISO(),
+						description: getChangedInputStringValueNullable(descriptionInput),
+						notes: getChangedInputStringValueNullable(notesInput),
+						progressionType: getChangedInputEnumValueNullable(
+							progressionTypeSelect, GameProgressionTypeSchema,
+						),
 
-						hasBannerImage: InputClientLib.getChangedBooleanValue(hasBannerImageInput),
-						hasCoverImage: InputClientLib.getChangedBooleanValue(hasCoverImageInput),
-						hasIconImage: InputClientLib.getChangedBooleanValue(hasIconImageInput),
-						hasLogoImage: InputClientLib.getChangedBooleanValue(hasLogoImageInput),
-						logoImageAlignment: InputClientLib.getChangedEnumValueNullable<GameLogoImageAlignment>(logoImageAlignmentSelect),
-						logoImageJustification: InputClientLib.getChangedEnumValueNullable<GameLogoImageJustification>(logoImageJustificationSelect),
+						hasBannerImage: getChangedInputBooleanValue(hasBannerImageInput),
+						hasCoverImage: getChangedInputBooleanValue(hasCoverImageInput),
+						hasIconImage: getChangedInputBooleanValue(hasIconImageInput),
+						hasLogoImage: getChangedInputBooleanValue(hasLogoImageInput),
+						logoImageAlignment: getChangedInputEnumValueNullable(
+							logoImageAlignmentSelect,
+							GameLogoImageAlignmentSchema,
+						),
+						logoImageJustification: getChangedInputEnumValueNullable(
+							logoImageJustificationSelect,
+							GameLogoImageJustificationSchema,
+						),
 
-						isEarlyAccess: InputClientLib.getChangedBooleanValue(isEarlyAccessInput),
-						isFamilyShared: InputClientLib.getChangedBooleanValue(isFamilySharedInput),
-						isFavorite: InputClientLib.getChangedBooleanValue(isFavoriteInput),
-						isHidden: InputClientLib.getChangedBooleanValue(isHiddenInput),
-						isNsfw: InputClientLib.getChangedBooleanValue(isNsfwInput),
-						isShelved: InputClientLib.getChangedBooleanValue(isShelvedInput),
-						isUnknownEngine: InputClientLib.getChangedBooleanValue(isUnknownEngineInput),
-						isUnreleased: InputClientLib.getChangedBooleanValue(isUnreleasedInput),
+						isEarlyAccess: getChangedInputBooleanValue(isEarlyAccessInput),
+						isFamilyShared: getChangedInputBooleanValue(isFamilySharedInput),
+						isFavorite: getChangedInputBooleanValue(isFavoriteInput),
+						isHidden: getChangedInputBooleanValue(isHiddenInput),
+						isNsfw: getChangedInputBooleanValue(isNsfwInput),
+						isShelved: getChangedInputBooleanValue(isShelvedInput),
+						isUnknownEngine: getChangedInputBooleanValue(isUnknownEngineInput),
+						isUnreleased: getChangedInputBooleanValue(isUnreleasedInput),
 
-						purchaseDate: InputClientLib.getChangedDateValueNullable(purchaseDateInput),
-						completionStatus: InputClientLib.getChangedEnumValueNullable<GameCompletionStatus>(completionStatusSelect),
-						firstPlayedDate: InputClientLib.getChangedDateTimeValueNullable(firstPlayedDateInput),
-						firstPlayedDateApproximated: InputClientLib.getChangedBooleanValue(firstPlayedDateApproximatedInput),
-						firstCompletedDate: InputClientLib.getChangedDateTimeValueNullable(firstCompletedDateInput),
-						firstCompletedDateApproximated: InputClientLib.getChangedBooleanValue(firstCompletedDateApproximatedInput),
-						lastPlayedDate: InputClientLib.getChangedDateTimeValueNullable(lastPlayedDateInput),
-						playCount: InputClientLib.getChangedNumberValue(playCountInput),
-						playTimeTotalSeconds: InputClientLib.getChangedNumberValue(playTimeTotalSecondsInput),
+						purchaseDate: getChangedInputDateValueNullable(purchaseDateInput)?.toISO(),
+						completionStatus: getChangedInputEnumValueNullable(
+							completionStatusSelect,
+							GameCompletionStatusSchema,
+						),
+						firstPlayedDate: getChangedInputDateTimeValueNullable(
+							firstPlayedDateInput,
+						)?.toISO(),
+						firstPlayedDateApproximated: getChangedInputBooleanValue(
+							firstPlayedDateApproximatedInput,
+						),
+						firstCompletedDate: getChangedInputDateTimeValueNullable(
+							firstCompletedDateInput,
+						)?.toISO(),
+						firstCompletedDateApproximated: getChangedInputBooleanValue(
+							firstCompletedDateApproximatedInput,
+						),
+						lastPlayedDate: getChangedInputDateTimeValueNullable(
+							lastPlayedDateInput,
+						)?.toISO(),
+						playCount: getChangedInputNumberValue(playCountInput),
+						playTimeTotalSeconds: getChangedInputNumberValue(playTimeTotalSecondsInput),
 
-						achievementSupport: InputClientLib.getChangedEnumValueNullable<GameAchievementSupport>(achievementSupportSelect),
-						controllerSupport: InputClientLib.getChangedEnumValueNullable<GameControllerSupport>(controllerSupportSelect),
-						modSupport: InputClientLib.getChangedEnumValueNullable<GameModSupport>(modSupportSelect),
-						virtualRealitySupport: InputClientLib.getChangedEnumValueNullable<GameVirtualRealitySupport>(virtualRealitySupportSelect),
+						achievementSupport: getChangedInputEnumValueNullable(
+							achievementSupportSelect,
+							GameAchievementSupportSchema,
+						),
+						controllerSupport: getChangedInputEnumValueNullable(
+							controllerSupportSelect,
+							GameControllerSupportSchema,
+						),
+						modSupport: getChangedInputEnumValueNullable(
+							modSupportSelect,
+							GameModSupportSchema,
+						),
+						virtualRealitySupport: getChangedInputEnumValueNullable(
+							virtualRealitySupportSelect,
+							GameVirtualRealitySupportSchema,
+						),
 
-						steamAppId: InputClientLib.getChangedNumberValueNullable(steamAppIdInput),
-						steamAppName: InputClientLib.getChangedStringValueNullable(steamAppNameInput),
-						steamDeckCompatibility: InputClientLib.getChangedEnumValueNullable<GameSteamDeckCompatibility>(steamDeckCompatibilitySelect),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						steamAppId: getChangedInputNumberValueNullable(steamAppIdInput),
+						steamAppName: getChangedInputStringValueNullable(steamAppNameInput),
+						steamDeckCompatibility: getChangedInputEnumValueNullable(
+							steamDeckCompatibilitySelect,
+							GameSteamDeckCompatibilitySchema,
+						),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -191,19 +310,14 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGameForms()
 {
-	const upsertGameForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-form:not(.initialised)",
+	);
 
-	for (const upsertGameForm of upsertGameForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGameForm);
-
-			upsertGameForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGameForm] Error initialising:", upsertGameForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGameForm] Initialised:", form))
+			.catch((error) => console.error("[UpsertGameForm] Error initialising:", form, error));
 	}
 }

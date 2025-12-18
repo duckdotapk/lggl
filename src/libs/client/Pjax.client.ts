@@ -2,7 +2,7 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { getElementOrThrow, getStringData } from "@lorenstuff/browser-utilities";
 
 //
 // Variables
@@ -22,7 +22,7 @@ function replaceSelectorContent(html: string, selector: string, preserveScrollPo
 	// Get Current Selector Element + Scroll Position
 	//
 
-	const currentSelectorElement = BrowserUtilities.ElementClientLib.getElementOrThrow(document, selector);
+	const currentSelectorElement = getElementOrThrow(document, selector);
 
 	const currentSelectorElementScrollTop = currentSelectorElement.scrollTop;
 
@@ -30,7 +30,9 @@ function replaceSelectorContent(html: string, selector: string, preserveScrollPo
 	// Get Current Selector Element Tab Control Selected Tab Indices
 	//
 
-	const currentSelectorElementTabControls = currentSelectorElement.querySelectorAll<HTMLElement>(".component-tab-control");
+	const currentSelectorElementTabControls = currentSelectorElement.querySelectorAll<HTMLElement>(
+		".component-tab-control",
+	);
 
 	const currentSelectorElementTabControlSelectedTabIndices: number[] = [];
 
@@ -59,13 +61,16 @@ function replaceSelectorContent(html: string, selector: string, preserveScrollPo
 
 	const newDocument = domParser.parseFromString(html, "text/html");
 
-	const newSelectorElement = BrowserUtilities.ElementClientLib.getElementOrThrow(newDocument, selector);
+	const newSelectorElement = getElementOrThrow(newDocument, selector);
 
-	const newSelectorElementTabControls = newSelectorElement.querySelectorAll<HTMLElement>(".component-tab-control");
+	const newSelectorElementTabControls = newSelectorElement.querySelectorAll<HTMLElement>(
+		".component-tab-control",
+	);
 
 	for (const [ tabControlIndex, tabControl ] of newSelectorElementTabControls.entries())
 	{
-		const currentSelectedTabIndex = currentSelectorElementTabControlSelectedTabIndices[tabControlIndex] ?? -1;
+		const currentSelectedTabIndex =
+			currentSelectorElementTabControlSelectedTabIndices[tabControlIndex] ?? -1;
 
 		if (currentSelectedTabIndex == -1)
 		{
@@ -86,7 +91,9 @@ function replaceSelectorContent(html: string, selector: string, preserveScrollPo
 			}
 		}
 
-		const tabContents = tabControl.querySelectorAll<HTMLElement>(".component-tab-control-tab-content");
+		const tabContents = tabControl.querySelectorAll<HTMLElement>(
+			".component-tab-control-tab-content",
+		);
 
 		for (const [ tabContentIndex, tabContent ] of tabContents.entries())
 		{
@@ -126,20 +133,19 @@ function load(href: string, action: "push" | "pop" | "replace", selector: string
 
 	xhr.open("GET", href, true);
 
-	xhr.addEventListener("load", 
-		() =>
+	xhr.addEventListener("load", () =>
+	{
+		replaceSelectorContent(xhr!.responseText, selector, action == "replace");
+
+		if (action == "push")
 		{
-			replaceSelectorContent(xhr!.responseText, selector, action == "replace");
+			window.history.pushState({ selector }, "", xhr!.responseURL);
+		}
 
-			if (action == "push")
-			{
-				window.history.pushState({ selector }, "", xhr!.responseURL);
-			}
+		upgradeAnchors();
 
-			upgradeAnchors();
-
-			document.dispatchEvent(new CustomEvent("lggl:reinitialise"));
-		});
+		document.dispatchEvent(new CustomEvent("lggl:reinitialise"));
+	});
 
 	xhr.send();
 }
@@ -179,35 +185,33 @@ function upgradeAnchors()
 	{
 		anchor.classList.add("pjax");
 
-		anchor.addEventListener("click", 
-			(event) =>
+		anchor.addEventListener("click", (event) =>
+		{
+			// Note: Want CTRL/CMD+Click to work as normal
+			if (event.ctrlKey || event.metaKey)
 			{
-				// Note: Want CTRL/CMD+Click to work as normal
-				if (event.ctrlKey || event.metaKey)
-				{
-					return;
-				}
-			
-				event.preventDefault();
-			
-				const selector = BrowserUtilities.ElementClientLib.getStringData(anchor, "pjaxSelector") ?? defaultSelector;
-			
-				load(anchor.href, "push", selector);
-			});
+				return;
+			}
+		
+			event.preventDefault();
+		
+			const selector = getStringData(anchor, "pjaxSelector") ?? defaultSelector;
+		
+			load(anchor.href, "push", selector);
+		});
 	}
 }
 
-export function initialise()
+export function initialisePjax()
 {
 	upgradeAnchors();
 
-	window.addEventListener("popstate",
-		() =>
-		{
-			const selector = window.history.state?.selector ?? defaultSelector;
+	window.addEventListener("popstate", () =>
+	{
+		const selector = window.history.state?.selector ?? defaultSelector;
 
-			load(window.location.href, "pop", selector);
-		});
+		load(window.location.href, "pop", selector);
+	});
 }
 
 export function changeView(href: string)

@@ -2,14 +2,16 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { getElementOrThrow, getInputEnumValue } from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { defaultSelector, reloadView } from "../../libs/client/Pjax.client.js";
 
-import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
+import { PlatformGroupModeSchema } from "../../libs/models/Setting.schemas.js";
 
-import { updateSettings } from "../../routes/api/setting/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as schema from "../../routes/api/setting/update.schemas.js";
 
 //
 // Locals
@@ -17,27 +19,36 @@ import { updateSettings } from "../../routes/api/setting/update.schemas.js";
 
 async function initialise(toolbar: HTMLFormElement)
 {
-	const platformGroupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="platformGroupMode"]`);
+	const platformGroupModeSelect = getElementOrThrow<HTMLSelectElement>(
+		toolbar,
+		`select[name="platformGroupMode"]`,
+	);
 
 	toolbar.addEventListener("submit", (event) => event.preventDefault());
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form: toolbar,
+		submitter: platformGroupModeSelect,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form: toolbar,
-			submitter: platformGroupModeSelect,
-			requireConfirmation: false,
-			onSubmit: async () => await updateSettings(
-				{
-					settingUpdates:
-					[
-						{
-							name: "PLATFORM_GROUP_MODE",
-							value: platformGroupModeSelect.value as SettingSchemaLib.PlatformGroupMode,
-						},
-					],
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
-		});
+			schema,
+			requestBody:
+			{
+				settingUpdates:
+				[
+					{
+						name: "PLATFORM_GROUP_MODE",
+						value: getInputEnumValue(platformGroupModeSelect, PlatformGroupModeSchema),
+					},
+				],
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(defaultSelector),
+	});
+
+	toolbar.classList.add("initialised");
 }
 
 //
@@ -46,19 +57,15 @@ async function initialise(toolbar: HTMLFormElement)
 
 export async function initialisePlatformSettingsToolbars()
 {
-	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-platform-settings-toolbar:not(.initialised)");
+	const toolbars = document.querySelectorAll<HTMLFormElement>(
+		".component-platform-settings-toolbar:not(.initialised)"
+	);
 
 	for (const toolbar of toolbars)
 	{
-		try
-		{
-			await initialise(toolbar);
-			
-			toolbar.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[PlatformSettingsToolbar] Error initialising:", toolbar, error);
-		}
+		initialise(toolbar)
+			.then(() => console.log("[PlatformSettingsToolbar] Initialised:", toolbar))
+			.catch((error) =>
+				console.error("[PlatformSettingsToolbar] Error initialising:", toolbar, error));
 	}
 }

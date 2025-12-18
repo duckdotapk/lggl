@@ -18,8 +18,8 @@ import { PlatformSettingsToolbar } from "../../components/toolbar/PlatformSettin
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as PlatformModelLib from "../../libs/models/Platform.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createPlatformGroupManager } from "../../libs/models/Platform.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -27,8 +27,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof PlatformModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createPlatformGroupManager>>;
 	platform: Prisma.PlatformGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 };
@@ -41,50 +41,52 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "platforms",
 		pageTitle,
 		content: ListLayout(
-			{
-				toolbar: PlatformSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/platforms/create",
-				content: Wrapper(
-					[		
-						Breadcrumbs(
-							[
-								{
-									href: "/platforms",
-									text: "Platforms",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/platforms/view/" + options.platform.id,
-									text: options.platform.name,
-									pjaxSelector: "main",
-								},
-								{
-									href: "/platforms/edit/" + options.platform.id,
-									text: "Edit",
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: PlatformSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/platforms/create",
+			content: Wrapper(
+			[		
+				Breadcrumbs(
+				[
+					{
+						href: "/platforms",
+						text: "Platforms",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/platforms/view/" + options.platform.id,
+						text: options.platform.name,
+						pjaxSelector: "main",
+					},
+					{
+						href: "/platforms/edit/" + options.platform.id,
+						text: "Edit",
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, pageTitle),
+				Header(1, pageTitle),
+
+				Button(
+				{
+					style: "success",
+					href: "/platforms/edit/" + options.platform.id,
+					iconName: "fa-solid fa-pen-to-square",
+					text: "Edit",
+				}),
+
+				options.games.length > 0
+					? [
+						Header(2, "Games on this platform"),
 		
-						Button(
-							{
-								style: "success",
-								href: "/platforms/edit/" + options.platform.id,
-								iconName: "fa-solid fa-pen-to-square",
-								text: "Edit",
-							}),
-		
-						options.games.length > 0
-							? [
-								Header(2, "Games on this platform"),
-				
-								// TODO: make a "grid" component that shows the game's cover art?
-								options.games.map((game) => Block(Anchor(game.name, "/games/view/" + game.id))),
-							]
-							: null,
-					]),
-			}),
+						// TODO: make a "grid" component that shows the game's cover art?
+						options.games.map(
+							(game) => Block(Anchor(game.name, "/games/view/" + game.id)),
+						),
+					]
+					: null,
+			]),
+		}),
 	};
 }

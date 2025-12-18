@@ -2,61 +2,32 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { z } from "zod";
 
-//
-// Schemas
-//
-
-export const RequestBodySchema = z.object(
-	{
-		game_id: z.number().int().min(1),
-	});
-
-export const ResponseBodySchema = z.union(
-	[
-		FritterApiUtilities.SuccessResponseBodySchema.extend(
-			{
-				gamePlayActions: z.array(z.object(
-					{
-						id: z.number(),
-						name: z.string(),
-					})),
-			}),
-
-		FritterApiUtilities.ErrorResponseBodySchema,
-	]);
+import { ErrorResponseBodySchema, SuccessResponseBodySchema } from "../../../libs/Api.client.js";
 
 //
-// Types
-//
-
-export type RequestBody = z.infer<typeof RequestBodySchema>;
-	
-export type ResponseBody = z.infer<typeof ResponseBodySchema>;
-
-//
-// Constants
+// Schema
 //
 
 export const method = "GET";
 
 export const path = "/api/gamePlayActions/findAll";
 
-//
-// Utility Functions
-//
-
-export function findGamePlayActions(game_id: number)
+export const RequestBodySchema = z.object(
 {
-	return FritterApiUtilities.request(method, path,
+	game_id: z.number().int().min(1),
+});
+
+export const ResponseBodySchema = z.union(
+[
+	SuccessResponseBodySchema.extend(
+	{
+		gamePlayActions: z.array(z.object(
 		{
-			requestBodySchema: RequestBodySchema,
-			responseBodySchema: ResponseBodySchema,
-			requestBody:
-			{
-				game_id,
-			},
-		});
-}
+			id: z.number(),
+			name: z.string(),
+		})),
+	}),
+	ErrorResponseBodySchema,
+]);

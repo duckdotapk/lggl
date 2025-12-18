@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as PlatformModelLib from "../../libs/models/Platform.js";
+import { createPlatformGroupManager } from "../../libs/models/Platform.js";
 
 import { view } from "../../views/platform/view.js";
 
@@ -23,58 +23,60 @@ type RouteFritterContext = ServerFritterContext &
 	};
 };
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/platforms/view/:platformId",
 	handler: async (context) =>
 	{
 		const platformId = parseInt(context.routeParameters.platformId);
-
 		if (isNaN(platformId))
 		{
 			return;
 		}
 
 		const platform = await prismaClient.platform.findUnique(
+		{
+			where:
 			{
-				where:
-				{
-					id: platformId,
-				},
-			});
-
+				id: platformId,
+			},
+		});
 		if (platform == null)
 		{
 			return;
 		}
 		
-		const groupManager = await PlatformModelLib.createGroupManager(prismaClient, context.settings, platform);
+		const groupManager = await createPlatformGroupManager(
+			prismaClient,
+			context.settings,
+			platform,
+		);
 
 		const games = await prismaClient.game.findMany(
+		{
+			where:
 			{
-				where:
+				gamePlatforms:
 				{
-					gamePlatforms:
+					some:
 					{
-						some:
-						{
-							platform_id: platformId,
-						},
+						platform_id: platformId,
 					},
 				},
-				orderBy:
-				[
-					{ sortName: "asc" },
-				],
-			});
+			},
+			orderBy:
+			[
+				{ sortName: "asc" },
+			],
+		});
 
 		context.renderComponent(view(
-			{
-				settings: context.settings,
-				groupManager,
-				platform,
-				games,
-			}));
+		{
+			settings: context.settings,
+			groupManager,
+			platform,
+			games,
+		}));
 	},
 };

@@ -22,8 +22,8 @@ import { DateTime } from "luxon";
 const whitelistedPackages =
 {
 	// Direct Dependencies
-	"@donutteam/browser-utilities": true,
-	"@donutteam/document-builder": true,
+	"@lorenstuff/browser-utilities": true,
+	"@lorenstuff/document-builder": true,
 	"@donutteam/fritter-api-utilities": true,
 	"zod": true,
 };

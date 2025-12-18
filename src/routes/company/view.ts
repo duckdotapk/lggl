@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as CompanyModelLib from "../../libs/models/Company.js";
+import { createCompanyGroupManager } from "../../libs/models/Company.js";
 
 import { view } from "../../views/company/view.js";
 
@@ -23,81 +23,83 @@ type RouteFritterContext = ServerFritterContext &
 	};
 };
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/companies/view/:companyId",
 	handler: async (context) =>
 	{
 		const companyId = parseInt(context.routeParameters.companyId);
-
 		if (isNaN(companyId))
 		{
 			return;
 		}
 
 		const company = await prismaClient.company.findUnique(
+		{
+			where:
 			{
-				where:
-				{
-					id: companyId,
-				},
-			});
-
+				id: companyId,
+			},
+		});
 		if (company == null)
 		{
 			return;
 		}
 
-		const groupManager = await CompanyModelLib.createGroupManager(prismaClient, context.settings, company);
+		const groupManager = await createCompanyGroupManager(
+			prismaClient,
+			context.settings,
+			company,
+		);
 
 		const gamesDeveloped = await prismaClient.game.findMany(
+		{
+			where:
 			{
-				where:
+				gameCompanies:
 				{
-					gameCompanies:
+					some:
 					{
-						some:
-						{
-							type: "DEVELOPER",
+						type: "DEVELOPER",
 
-							company_id: companyId,
-						},
+						company_id: companyId,
 					},
 				},
-				orderBy:
-				[
-					{ sortName: "asc" },
-				],
-			});
+			},
+			orderBy:
+			[
+				{ sortName: "asc" },
+			],
+		});
 
 		const gamesPublished = await prismaClient.game.findMany(
+		{
+			where:
 			{
-				where:
+				gameCompanies:
 				{
-					gameCompanies:
+					some:
 					{
-						some:
-						{
-							type: "PUBLISHER",
+						type: "PUBLISHER",
 
-							company_id: companyId,
-						},
+						company_id: companyId,
 					},
 				},
-				orderBy:
-				[
-					{ sortName: "asc" },
-				],
-			});
+			},
+			orderBy:
+			[
+				{ sortName: "asc" },
+			],
+		});
 
 		context.renderComponent(view(
-			{
-				settings: context.settings,
-				groupManager,
-				company,
-				gamesDeveloped,
-				gamesPublished,
-			}));
+		{
+			settings: context.settings,
+			groupManager,
+			company,
+			gamesDeveloped,
+			gamesPublished,
+		}));
 	},
 };

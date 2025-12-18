@@ -2,14 +2,25 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputNumberValue,
+	getChangedInputStringValueNullable,
+	getElementOrThrow,
+	getInputNumberValue,
+	getInputStringValueNullable,
+	getIntegerData,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createGamePlatform } from "../../routes/api/gamePlatform/create.schemas.js";
-import { deleteGamePlatform } from "../../routes/api/gamePlatform/delete.schemas.js";
-import { updateGamePlatform } from "../../routes/api/gamePlatform/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGamePlatformSchema from "../../routes/api/gamePlatform/create.schemas.js";
+import * as deleteGamePlatformSchema from "../../routes/api/gamePlatform/delete.schemas.js";
+import * as updateGamePlatformSchema from "../../routes/api/gamePlatform/update.schemas.js";
 
 //
 // Locals
@@ -17,56 +28,77 @@ import { updateGamePlatform } from "../../routes/api/gamePlatform/update.schemas
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
-	const gamePlatformId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gamePlatformId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
+	const gamePlatformId = getIntegerData(form, "gamePlatformId");
 
-	const platformIdSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="platform_id"]`);
-	const notesInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
+	const platformIdSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="platform_id"]`);
+	const notesInput = getElementOrThrow<HTMLInputElement>(form, `[name="notes"]`);
 
 	if (gamePlatformId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createGamePlatform(
-					{
-						notes: InputClientLib.getStringValueNullable(notesInput),
+				schema: createGamePlatformSchema,
+				requestBody:
+				{
+					notes: getInputStringValueNullable(notesInput),
 
-						game_id: gameId,
-						platform_id: InputClientLib.getNumberValue(platformIdSelect),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+					game_id: gameId,
+					platform_id: getInputNumberValue(platformIdSelect),
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteGamePlatform(gamePlatformId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteGamePlatformSchema,
+				requestBody:
+				{
+					id: gamePlatformId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGamePlatform(gamePlatformId,
+				schema: updateGamePlatformSchema,
+				requestBody:
+				{
+					id: gamePlatformId,
+					updateData:
 					{
-						notes: InputClientLib.getChangedStringValueNullable(notesInput),
+						notes: getChangedInputStringValueNullable(notesInput),
 
-						platform_id: InputClientLib.getChangedNumberValue(platformIdSelect),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						platform_id: getChangedInputNumberValue(platformIdSelect),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -75,19 +107,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGamePlatformForms()
 {
-	const upsertGamePlatformForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-platform-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-platform-form:not(.initialised)",
+	);
 
-	for (const upsertGamePlatformForm of upsertGamePlatformForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGamePlatformForm);
-
-			upsertGamePlatformForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGamePlatformForm] Error initialising:", upsertGamePlatformForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGamePlatformForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertGamePlatformForm] Error initialising:", form, error));
 	}
 }

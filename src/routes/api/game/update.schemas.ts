@@ -2,101 +2,83 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-import { GameProgressionType, GameLogoImageAlignment, GameLogoImageJustification, GameCompletionStatus, GameAchievementSupport, GameControllerSupport, GameModSupport, GameVirtualRealitySupport, GameSteamDeckCompatibility } from "@prisma/client";
 import { z } from "zod";
 
-//
-// Schemas
-//
+import
+{
+	GameProgressionTypeSchema,
+	GameLogoImageAlignmentSchema,
+	GameLogoImageJustificationSchema,
+	GameCompletionStatusSchema,
+	GameAchievementSupportSchema,
+	GameControllerSupportSchema,
+	GameModSupportSchema,
+	GameVirtualRealitySupportSchema,
+	GameSteamDeckCompatibilitySchema,
+} from "../../../libs/models/Game.schemas.js";
 
-export const RequestBodySchema = z.object(
-	{
-		id: z.number().int().min(1),
-		
-		updateData: z.object(
-			{
-				name: z.string().trim(),
-				sortName: z.string().trim(),
-				releaseDate: z.string().date().nullable(),
-				description: z.string().trim().nullable(),
-				notes: z.string().trim().nullable(),
-				progressionType: z.custom<GameProgressionType>().nullable(),
-
-				hasBannerImage: z.boolean(),
-				hasCoverImage: z.boolean(),
-				hasIconImage: z.boolean(),
-				hasLogoImage: z.boolean(),
-				logoImageAlignment: z.custom<GameLogoImageAlignment>().nullable(),
-				logoImageJustification: z.custom<GameLogoImageJustification>().nullable(),
-
-				isEarlyAccess: z.boolean(),
-				isFamilyShared: z.boolean(),
-				isFavorite: z.boolean(),
-				isHidden: z.boolean(),
-				isNsfw: z.boolean(),
-				isShelved: z.boolean(),
-				isUnknownEngine: z.boolean(),
-				isUnreleased: z.boolean(),
-
-				purchaseDate: z.string().nullable(),
-				completionStatus: z.custom<GameCompletionStatus>().nullable(),
-				firstPlayedDate: z.string().nullable(),
-				firstPlayedDateApproximated: z.boolean(),
-				firstCompletedDate: z.string().nullable(),
-				firstCompletedDateApproximated: z.boolean(),
-				lastPlayedDate: z.string().nullable(),
-				playCount: z.number(),
-				playTimeTotalSeconds: z.number(),
-
-				achievementSupport: z.custom<GameAchievementSupport>().nullable(),
-				controllerSupport: z.custom<GameControllerSupport>().nullable(),
-				modSupport: z.custom<GameModSupport>().nullable(),
-				virtualRealitySupport: z.custom<GameVirtualRealitySupport>().nullable(),
-
-				steamAppId: z.number().nullable(),
-				steamAppName: z.string().nullable(),
-				steamDeckCompatibility: z.custom<GameSteamDeckCompatibility>().nullable(),
-			}).partial(),
-	});
-
-export const ResponseBodySchema = z.union(
-	[
-		FritterApiUtilities.SuccessResponseBodySchema,
-
-		FritterApiUtilities.ErrorResponseBodySchema,
-	]);
+import { ErrorResponseBodySchema, SuccessResponseBodySchema } from "../../../libs/Api.client.js";
 
 //
-// Types
-//
-
-export type RequestBody = z.infer<typeof RequestBodySchema>;
-	
-export type ResponseBody = z.infer<typeof ResponseBodySchema>;
-
-//
-// Constants
+// Schema
 //
 
 export const method = "POST";
 
 export const path = "/api/games/update";
 
-//
-// Utility Functions
-//
-
-export function updateGame(id: number, updateData: RequestBody["updateData"])
+export const RequestBodySchema = z.object(
 {
-	return FritterApiUtilities.request(method, path,
-		{
-			requestBodySchema: RequestBodySchema,
-			responseBodySchema: ResponseBodySchema,
-			requestBody:
-			{
-				id,
-				updateData,
-			},
-		});
-}
+	id: z.number().int().min(1),
+	
+	updateData: z.object(
+	{
+		name: z.string().trim(),
+		sortName: z.string().trim(),
+		releaseDate: z.string().date().nullable(),
+		description: z.string().trim().nullable(),
+		notes: z.string().trim().nullable(),
+		progressionType: GameProgressionTypeSchema.nullable(),
+
+		hasBannerImage: z.boolean(),
+		hasCoverImage: z.boolean(),
+		hasIconImage: z.boolean(),
+		hasLogoImage: z.boolean(),
+		logoImageAlignment: GameLogoImageAlignmentSchema.nullable(),
+		logoImageJustification: GameLogoImageJustificationSchema.nullable(),
+
+		isEarlyAccess: z.boolean(),
+		isFamilyShared: z.boolean(),
+		isFavorite: z.boolean(),
+		isHidden: z.boolean(),
+		isNsfw: z.boolean(),
+		isShelved: z.boolean(),
+		isUnknownEngine: z.boolean(),
+		isUnreleased: z.boolean(),
+
+		purchaseDate: z.string().nullable(),
+		completionStatus: GameCompletionStatusSchema.nullable(),
+		firstPlayedDate: z.string().nullable(),
+		firstPlayedDateApproximated: z.boolean(),
+		firstCompletedDate: z.string().nullable(),
+		firstCompletedDateApproximated: z.boolean(),
+		lastPlayedDate: z.string().nullable(),
+		playCount: z.number(),
+		playTimeTotalSeconds: z.number(),
+
+		achievementSupport: GameAchievementSupportSchema.nullable(),
+		controllerSupport: GameControllerSupportSchema.nullable(),
+		modSupport: GameModSupportSchema.nullable(),
+		virtualRealitySupport: GameVirtualRealitySupportSchema.nullable(),
+
+		steamAppId: z.number().nullable(),
+		steamAppName: z.string().nullable(),
+		steamDeckCompatibility: GameSteamDeckCompatibilitySchema.nullable(),
+	}).partial(),
+});
+
+export const ResponseBodySchema = z.union(
+[
+	SuccessResponseBodySchema,
+	ErrorResponseBodySchema,
+]);

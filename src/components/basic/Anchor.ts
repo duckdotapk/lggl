@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 //
 // Component
@@ -16,5 +16,6 @@ export function Anchor(text: Child, href: string, target: "_self" | "_blank" = "
 			href,
 			target,
 		},
-		text);
+		text,
+	);
 }

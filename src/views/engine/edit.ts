@@ -16,8 +16,8 @@ import { EngineSettingsToolbar } from "../../components/toolbar/EngineSettingsTo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as EngineModelLib from "../../libs/models/Engine.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createEngineGroupManager } from "../../libs/models/Engine.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -25,8 +25,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof EngineModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createEngineGroupManager>>;
 	engine: Prisma.EngineGetPayload<null>;
 };
 
@@ -38,35 +38,35 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "engines",
 		pageTitle: "Edit " + engineName + " | Engines",
 		content: ListLayout(
-			{
-				toolbar: EngineSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/engines/create",
-				content: Wrapper(
-					[		
-						Breadcrumbs(
-							[
-								{
-									href: "/engines",
-									text: "Engines",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/engines/view/" + options.engine.id,
-									text: engineName,
-									pjaxSelector: "main",
-								},
-								{
-									href: "/engines/edit/" + options.engine.id,
-									text: "Edit",
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: EngineSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/engines/create",
+			content: Wrapper(
+			[		
+				Breadcrumbs(
+				[
+					{
+						href: "/engines",
+						text: "Engines",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/engines/view/" + options.engine.id,
+						text: engineName,
+						pjaxSelector: "main",
+					},
+					{
+						href: "/engines/edit/" + options.engine.id,
+						text: "Edit",
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, engineName),
-		
-						UpsertEngineForm(options.engine),
-					]),
-			}),
+				Header(1, engineName),
+
+				UpsertEngineForm(options.engine),
+			]),
+		}),
 	};
 }

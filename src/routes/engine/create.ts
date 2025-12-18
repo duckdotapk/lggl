@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as EngineModelLib from "../../libs/models/Engine.js";
+import { createEngineGroupManager } from "../../libs/models/Engine.js";
 
 import { view } from "../../views/engine/create.js";
 
@@ -17,18 +17,18 @@ import { view } from "../../views/engine/create.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/engines/create",
 	handler: async (context) =>
 	{
-		const groupManager = await EngineModelLib.createGroupManager(prismaClient, context.settings, null);
+		const groupManager = await createEngineGroupManager(prismaClient, context.settings, null);
 
 		context.renderComponent(view(
-			{
-				settings: context.settings,
-				groupManager,
-			}));
+		{
+			settings: context.settings,
+			groupManager,
+		}));
 	},
 };

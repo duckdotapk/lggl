@@ -18,8 +18,8 @@ import { CompanySettingsToolbar } from "../../components/toolbar/CompanySettings
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as CompanyModelLib from "../../libs/models/Company.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createCompanyGroupManager } from "../../libs/models/Company.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -27,8 +27,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof CompanyModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createCompanyGroupManager>>;
 	company: Prisma.CompanyGetPayload<null>;
 	gamesDeveloped: Prisma.GameGetPayload<null>[];
 	gamesPublished: Prisma.GameGetPayload<null>[];
@@ -40,54 +40,58 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "companies",
 		pageTitle: options.company.name + " | Companies",
 		content: ListLayout(
-			{
-				toolbar: CompanySettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/companies/create",
-				content: Wrapper(
-					[
-						Breadcrumbs(
-							[
-								{
-									href: "/companies",
-									text: "Companies",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/companies/view/" + options.company.id,
-									text: options.company.name,
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: CompanySettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/companies/create",
+			content: Wrapper(
+			[
+				Breadcrumbs(
+				[
+					{
+						href: "/companies",
+						text: "Companies",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/companies/view/" + options.company.id,
+						text: options.company.name,
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, options.company.name),
+				Header(1, options.company.name),
 
-						Button(
-							{
-								style: "success",
-								href: "/companies/edit/" + options.company.id,
-								iconName: "fa-solid fa-pen-to-square",
-								text: "Edit",
-							}),
+				Button(
+				{
+					style: "success",
+					href: "/companies/edit/" + options.company.id,
+					iconName: "fa-solid fa-pen-to-square",
+					text: "Edit",
+				}),
 
-						options.gamesDeveloped.length > 0
-							? [
-								Header(2, "Games developed"),
-				
-								// TODO: make a "grid" component that shows the game's cover art?
-								options.gamesDeveloped.map((game) => Block(Anchor(game.name, "/games/view/" + game.id))),
-							]
-							: null,
+				options.gamesDeveloped.length > 0
+					? [
+						Header(2, "Games developed"),
+		
+						// TODO: make a "grid" component that shows the game's cover art?
+						options.gamesDeveloped.map(
+							(game) => Block(Anchor(game.name, "/games/view/" + game.id)),
+						),
+					]
+					: null,
 
-						options.gamesPublished.length > 0
-							? [
-								Header(2, "Games published"),
-				
-								// TODO: make a "grid" component that shows the game's cover art?
-								options.gamesPublished.map((game) => Block(Anchor(game.name, "/games/view/" + game.id))),
-							]
-							: null,
-					]),
-			}),
+				options.gamesPublished.length > 0
+					? [
+						Header(2, "Games published"),
+		
+						// TODO: make a "grid" component that shows the game's cover art?
+						options.gamesPublished.map(
+							(game) => Block(Anchor(game.name, "/games/view/" + game.id)),
+						),
+					]
+					: null,
+			]),
+		}),
 	};
 }

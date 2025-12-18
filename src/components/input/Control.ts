@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 import { DateTime } from "luxon";
 
 //
@@ -52,37 +52,37 @@ export function Control(options: ControlOptions)
 		case "date":
 		{
 			return new DE("input",
-				{
-					class: "component-control",
-					type: "date",
-					name: options.name,
-					required: options.required,
-					value: options.value?.toFormat("yyyy-MM-dd"),
-				});
+			{
+				class: "component-control",
+				type: "date",
+				name: options.name,
+				required: options.required,
+				value: options.value?.toFormat("yyyy-MM-dd"),
+			});
 		}
 
 		case "datetime":
 		{
 			return new DE("input",
-				{
-					class: "component-control",
-					type: "datetime-local",
-					name: options.name,
-					required: options.required,
-					value: options.value?.toFormat("yyyy-MM-dd'T'HH:mm"),
-				});
+			{
+				class: "component-control",
+				type: "datetime-local",
+				name: options.name,
+				required: options.required,
+				value: options.value?.toFormat("yyyy-MM-dd'T'HH:mm"),
+			});
 		}
 
 		case "number":
 		{
 			return new DE("input",
-				{
-					class: "component-control",
-					type: "number",
-					name: options.name,
-					required: options.required,
-					value: options.value,
-				});
+			{
+				class: "component-control",
+				type: "number",
+				name: options.name,
+				required: options.required,
+				value: options.value,
+			});
 		}
 
 		case "select":
@@ -100,7 +100,8 @@ export function Control(options: ControlOptions)
 								value: "",
 								selected: options.value == null,
 							},
-							"- Choose an option -")
+							"- Choose an option -",
+						)
 						: null,
 
 					...options.options.map(option => new DE("option",
@@ -109,21 +110,22 @@ export function Control(options: ControlOptions)
 							selected: options.value === option.value,
 						},
 						option.label))
-				]);
+				],
+			);
 		}
 
 		case "text":
 		case "url":
 		{
 			return new DE("input",
-				{
-					class: "component-control",
-					type: options.type,
-					name: options.name,
-					required: options.required,
-					value: options.value,
-					placeholder: options.placeholder,
-				});
+			{
+				class: "component-control",
+				type: options.type,
+				name: options.name,
+				required: options.required,
+				value: options.value,
+				placeholder: options.placeholder,
+			});
 		}
 
 		case "textarea":
@@ -135,7 +137,8 @@ export function Control(options: ControlOptions)
 					required: options.required,
 					placeholder: options.placeholder,
 				},
-				options.value);
+				options.value,
+			);
 		}
 	}
 }

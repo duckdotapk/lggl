@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 import { $Enums, Prisma } from "@prisma/client";
 
 import { Button } from "../input/Button.js";
@@ -11,104 +11,121 @@ import { Label } from "../input/Label.js";
 
 import { ColumnLayout } from "../layout/ColumnLayout.js";
 
-import * as GameCompanyModelLib from "../../libs/models/GameCompany.js";
+import { getGameCompanyTypeName } from "../../libs/models/GameCompany.js";
 
 //
 // Component
 //
 
-export type UpsertGameCompanyFormOptions =
-{
-	companies: Prisma.CompanyGetPayload<null>[];
-	game: Prisma.GameGetPayload<null>;
-	gameCompany: Prisma.GameCompanyGetPayload<{ include: { company: true } }> | null;
-}
-
-export function UpsertGameCompanyForm(options: UpsertGameCompanyFormOptions)
+export function UpsertGameCompanyForm
+(
+	companies: Prisma.CompanyGetPayload<null>[],
+	game: Prisma.GameGetPayload<null>,
+	gameCompany: Prisma.GameCompanyGetPayload<
+	{
+		include:
+		{
+			company: true;
+		};
+	}> | null,
+)
 {
 	return new DE("form",
 		{
 			class: "component-upsert-game-company-form",
 			autocomplete: "off",
 
-			"data-game-id": options.game.id,
-			"data-game-company-id": options.gameCompany?.id ?? null,
+			"data-game-id": game.id,
+			"data-game-company-id": gameCompany?.id ?? null,
 		},
 		[
 			ColumnLayout(3,
+			[
+				new DE("div", null,
 				[
-					new DE("div", null,
-						[
-							Label("company_id", "Company"),
+					Label("company_id", "Company"),
 
-							Control(
-								{
-									type: "select",
-									name: "company_id",
-									required: true,
-									value: options.gameCompany?.company_id,
-									showEmptyOption: true,
-									options: options.companies.map((company) => ({ value: company.id, label: company.name }))
-								}),
-						]),
-
-					new DE("div", null,
-						[
-							Label("type", "Type"),
-
-							Control(
-								{
-									type: "select",
-									name: "type",
-									required: true,
-									value: options.gameCompany?.type,
-									showEmptyOption: true,
-									options: Object.values($Enums.GameCompanyType).map((type) => ({ value: type, label: GameCompanyModelLib.getTypeName(type) })),
-								}),
-						]),
-
-					new DE("div", null,
-						[
-							Label("notes", "Notes (optional)"),
-
-							Control(
-								{
-									type: "text",
-									name: "notes",
-									required: false,
-									placeholder: "Notes",
-									value: options.gameCompany?.notes,
-								}),
-						]),
+					Control(
+					{
+						type: "select",
+						name: "company_id",
+						required: true,
+						value: gameCompany?.company_id,
+						showEmptyOption: true,
+						options: companies.map((company) =>
+						({
+							value: company.id,
+							label: company.name,
+						})),
+					}),
 				]),
 
-			ColumnLayout(options.gameCompany != null ? 2 : 1,
+				new DE("div", null,
 				[
-					options.gameCompany != null
-						? Button(
-							{
-								style: "danger",
-								extraAttributes:
-								{
-									"data-action": "delete",
-								},
-								type: "button",
-								iconName: "fa-solid fa-trash",
-								text: "Delete",
-							})
-						: null,
-				
-					Button(
+					Label("type", "Type"),
+
+					Control(
+					{
+						type: "select",
+						name: "type",
+						required: true,
+						value: gameCompany?.type,
+						showEmptyOption: true,
+						options: Object.values($Enums.GameCompanyType).map((type) =>
+						({
+							value: type,
+							label: getGameCompanyTypeName(type),
+						})),
+					}),
+				]),
+
+				new DE("div", null,
+				[
+					Label("notes", "Notes (optional)"),
+
+					Control(
+					{
+						type: "text",
+						name: "notes",
+						required: false,
+						placeholder: "Notes",
+						value: gameCompany?.notes,
+					}),
+				]),
+			]),
+
+			ColumnLayout(gameCompany != null ? 2 : 1,
+			[
+				gameCompany != null
+					? Button(
+					{
+						style: "danger",
+						extraAttributes:
 						{
-							style: "success",
-							type: "submit",
-							extraAttributes:
-							{
-								"data-action": "save",
-							},
-							iconName: options.gameCompany == null ? "fa-solid fa-plus" : "fa-solid fa-save",
-							text: options.gameCompany == null ? "Create" : "Save",
-						}),
-				]),
-		]);
+							"data-action": "delete",
+						},
+						type: "button",
+						iconName: "fa-solid fa-trash",
+						text: "Delete",
+					})
+					: null,
+			
+				Button(
+				{
+					style: "success",
+					type: "submit",
+					extraAttributes:
+					{
+						"data-action": "save",
+					},
+					iconName: gameCompany == null
+						? "fa-solid fa-plus"
+						: "fa-solid fa-save",
+					text: gameCompany == null
+						? "Create"
+						: "Save",
+				}),
+			]),
+		],
+	);
 }

@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 import { Prisma } from "@prisma/client";
 
 import { Block } from "../basic/Block.js";
@@ -17,9 +17,7 @@ import { ColumnLayout } from "../layout/ColumnLayout.js";
 // Component
 //
 
-export type UpsertSeriesFormSeries = Prisma.SeriesGetPayload<null> | null;
-
-export function UpsertSeriesForm(series: UpsertSeriesFormSeries)
+export function UpsertSeriesForm(series: Prisma.SeriesGetPayload<null> | null)
 {
 	return new DE("form",
 		{
@@ -30,46 +28,46 @@ export function UpsertSeriesForm(series: UpsertSeriesFormSeries)
 		},
 		[
 			Block(
-				[
-					Label("name", "Name"),
-		
-					Control(
-						{
-							type: "text",
-							name: "name",
-							required: true,
-							placeholder: "Name",
-							value: series?.name,
-						}),
-				]),
+			[
+				Label("name", "Name"),
+				Control(
+				{
+					type: "text",
+					name: "name",
+					required: true,
+					placeholder: "Name",
+					value: series?.name,
+				}),
+			]),
 
 			ColumnLayout(series != null ? 2 : 1,
-				[
-					series != null
-						? Button(
-							{
-								style: "danger",
-								extraAttributes:
-								{
-									"data-action": "delete",
-								},
-								type: "button",
-								iconName: "fa-solid fa-trash",
-								text: "Delete",
-							})
-						: null,
-				
-					Button(
+			[
+				series != null
+					? Button(
+					{
+						style: "danger",
+						extraAttributes:
 						{
-							style: "success",
-							type: "submit",
-							extraAttributes:
-							{
-								"data-action": "save",
-							},
-							iconName: series == null ? "fa-solid fa-plus" : "fa-solid fa-save",
-							text: series == null ? "Create" : "Save",
-						}),
-				]),
-		]);
+							"data-action": "delete",
+						},
+						type: "button",
+						iconName: "fa-solid fa-trash",
+						text: "Delete",
+					})
+					: null,
+			
+				Button(
+				{
+					style: "success",
+					type: "submit",
+					extraAttributes:
+					{
+						"data-action": "save",
+					},
+					iconName: series == null ? "fa-solid fa-plus" : "fa-solid fa-save",
+					text: series == null ? "Create" : "Save",
+				}),
+			]),
+		],
+	);
 }

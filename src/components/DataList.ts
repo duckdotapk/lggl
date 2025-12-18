@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 
 //
@@ -19,18 +19,20 @@ type ItemOptions =
 function Item(options: ItemOptions)
 {
 	return new DE("div", "component-data-list-item",
-		[
-			options.iconName != null
-				? new DE("div", "icon", new DE("span", options.iconName))
-				: null,
+	[
+		options.iconName != null
+			? new DE("div", "icon", new DE("span", options.iconName))
+			: null,
 
-			new DE("div", "text",
-				[
-					new DE("div", "name", options.name),
-		
-					options.value != null ? new DE("div", "value", options.value) : null,
-				]),
-		]);
+		new DE("div", "text",
+		[
+			new DE("div", "name", options.name),
+
+			options.value != null
+				? new DE("div", "value", options.value)
+				: null,
+		]),
+	]);
 }
 
 //

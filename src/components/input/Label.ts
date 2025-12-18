@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 //
 // Component
@@ -15,5 +15,6 @@ export function Label(inputName: string | null, text: Child)
 			class: "component-label", 
 			for: inputName,
 		},
-		text);
+		text,
+	);
 }

@@ -2,6 +2,8 @@
 // Imports
 //
 
+import util from "node:util";
+
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -32,7 +34,10 @@ export abstract class PlatformGroupManager<T extends Prisma.PlatformGetPayload<n
 
 	override getItemInfo(platform: T)
 	{
-		return [ "Last updated ", HumanDateTime(DateTime.fromJSDate(platform.lastUpdatedDate)) ];
+		return [
+			"Last updated ",
+			HumanDateTime(DateTime.fromJSDate(platform.lastUpdatedDate)),
+		];
 	}
 }
 
@@ -56,7 +61,13 @@ export class NamePlatformGroupManager extends PlatformGroupManager
 	}
 }
 
-export type NumberOfGamesPlatformGroupManagerPlatform = Prisma.PlatformGetPayload<{ include: { gamePlatforms: true } }>;
+export type NumberOfGamesPlatformGroupManagerPlatform = Prisma.PlatformGetPayload<
+{
+	include:
+	{
+		gamePlatforms: true;
+	};
+}>;
 
 export class NumberOfGamesPlatformGroupManager extends PlatformGroupManager<NumberOfGamesPlatformGroupManagerPlatform>
 {
@@ -69,7 +80,11 @@ export class NumberOfGamesPlatformGroupManager extends PlatformGroupManager<Numb
 	{
 		for (const platform of platforms)
 		{
-			const groupName = platform.gamePlatforms.length + " game" + (platform.gamePlatforms.length == 1 ? "" : "s");
+			const groupName = util.format(
+				"%d game%s",
+				platform.gamePlatforms.length,
+				platform.gamePlatforms.length == 1 ? "" : "s",
+			);
 
 			this.addModelToGroup(groupName, platform);
 		}

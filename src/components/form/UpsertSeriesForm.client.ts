@@ -2,14 +2,22 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputStringValue,
+	getElementOrThrow,
+	getInputStringValue,
+	getIntegerData,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { changeView, reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createSeries } from "../../routes/api/series/create.schemas.js";
-import { deleteSeries } from "../../routes/api/series/delete.schemas.js";
-import { updateSeries } from "../../routes/api/series/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createSeriesSchema from "../../routes/api/series/create.schemas.js";
+import * as deleteSeriesSchema from "../../routes/api/series/delete.schemas.js";
+import * as updateSeriesSchema from "../../routes/api/series/update.schemas.js";
 
 //
 // Locals
@@ -17,49 +25,70 @@ import { updateSeries } from "../../routes/api/series/update.schemas.js";
 
 async function initialise(form: HTMLFormElement)
 {
-	const seriesId = BrowserUtilities.ElementClientLib.getIntegerData(form, "seriesId");
+	const seriesId = getIntegerData(form, "seriesId");
 
-	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
+	const nameInput = getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
 
 	if (seriesId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createSeries(
-					{
-						name: InputClientLib.getStringValue(nameInput),
-					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/series/edit/" + response.series.id),
-			});
+				schema: createSeriesSchema,
+				requestBody:
+				{
+					name: getInputStringValue(nameInput),
+				},
+			}).getResponse(),
+			onSuccess: async (response) => changeView("/series/edit/" + response.series.id),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteSeries(seriesId),
-				onSuccess: async () => PjaxClientLib.changeView("/series"),
-			});
+				schema: deleteSeriesSchema,
+				requestBody:
+				{
+					id: seriesId,
+				},
+			}).getResponse(),
+			onSuccess: async () => changeView("/series"),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateSeries(seriesId,
+				schema: updateSeriesSchema,
+				requestBody:
+				{
+					id: seriesId,
+					updateData:
 					{
-						name: InputClientLib.getChangedStringValue(nameInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						name: getChangedInputStringValue(nameInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -68,19 +97,14 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertSeriesForms()
 {
-	const upsertSeriesForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-series-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-series-form:not(.initialised)",
+	);
 
-	for (const upsertSeriesForm of upsertSeriesForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertSeriesForm);
-
-			upsertSeriesForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertSeriesForm] Error initialising:", upsertSeriesForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertSeriesForm] Initialised:", form))
+			.catch((error) => console.error("[UpsertSeriesForm] Error initialising:", form, error));
 	}
 }

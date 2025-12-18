@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 
 //
 // Locals
@@ -19,25 +19,35 @@ type ItemOptions =
 
 function Item(options: ItemOptions)
 {
-	let className = "component-sidebar-item";
-
-	if (options.page != null && options.page == options.currentPage)
+	const
 	{
-		className += " selected";
+		page,
+		currentPage,
+		href,
+		iconName,
+		text,
+	} = options;
+
+	const classList = [ "component-sidebar-item" ];
+
+	if (page != null && page == currentPage)
+	{
+		classList.push("selected");
 	}
 
 	return new DE("a",
 		{
-			class: className,
+			class: classList.join(" "),
 
-			href: options.href,
-			title: options.text,
+			href,
+			title: text,
 
-			"data-page": options.page,
+			"data-page": page,
 		},
 		[
-			new DE("span", options.iconName),
-		]);
+			new DE("span", iconName),
+		],
+	);
 }
 
 function Separator()
@@ -49,81 +59,89 @@ function Separator()
 // Component
 //
 
-export type SidebarPage = "games" | "companies" | "engines" | "platforms" | "series" | "audit" | "stats" | null;
+export type SidebarPage =
+	"games" |
+	"companies" |
+	"engines" |
+	"platforms" |
+	"series" |
+	"audit" |
+	"stats" |
+	null;
 
 export function Sidebar(currentPage: SidebarPage)
 {
 	return new DE("div", "component-sidebar",
-		[
-			Item(
-				{
-					page: "games",
-					currentPage,
-					href: "/games",
-					iconName: "fa-solid fa-joystick",
-					text: "Games",
-				}),
+	[
+		Item(
+		{
+			page: "games",
+			currentPage,
+			href: "/games",
+			iconName: "fa-solid fa-joystick",
+			text: "Games",
+		}),
 
-			Separator(),
+		Separator(),
 
-			Item(
-				{
-					page: "companies",
-					currentPage,
-					href: "/companies",
-					iconName: "fa-solid fa-building",
-					text: "Companies",
-				}),
+		Item(
+		{
+			page: "companies",
+			currentPage,
+			href: "/companies",
+			iconName: "fa-solid fa-building",
+			text: "Companies",
+		}),
 
-			Item(
-				{
-					page: "engines",
-					currentPage,
-					href: "/engines",
-					iconName: "fa-solid fa-engine",
-					text: "Engines",
-				}),
+		Item(
+		{
+			page: "engines",
+			currentPage,
+			href: "/engines",
+			iconName: "fa-solid fa-engine",
+			text: "Engines",
+		}),
 
-			// TODO: Genres item
+		// TODO: Genres item
 
-			Item(
-				{
-					page: "platforms",
-					currentPage,
-					href: "/platforms",
-					iconName: "fa-solid fa-layer-group",
-					text: "Platforms",
-				}),
+		Item(
+		{
+			page: "platforms",
+			currentPage,
+			href: "/platforms",
+			iconName: "fa-solid fa-layer-group",
+			text: "Platforms",
+		}),
 
-			Item(
-				{
-					page: "series",
-					currentPage,
-					href: "/series",
-					iconName: "fa-solid fa-list-timeline",
-					text: "Series",
-				}),
+		Item(
+		{
+			page: "series",
+			currentPage,
+			href: "/series",
+			iconName: "fa-solid fa-list-timeline",
+			text: "Series",
+		}),
 
-			Separator(),
+		Separator(),
 
-			Item(
-				{
-					page: "audit",
-					currentPage,
-					href: "/audit",
-					iconName: "fa-solid fa-clipboard-list",
-					text: "Audit",
-				}),
+		Item(
+		{
+			page: "audit",
+			currentPage,
+			href: "/audit",
+			iconName: "fa-solid fa-clipboard-list",
+			text: "Audit",
+		}),
 
-			Item(
-				{
-					page: "stats",
-					currentPage,
-					href: "/stats",
-					iconName: "fa-solid fa-stars",
-					text: "Audit",
-				}),
+		Item(
+		{
+			page: "stats",
+			currentPage,
+			href: "/stats",
+			iconName: "fa-solid fa-stars",
+			text: "Audit",
+		}),
 
-			// TODO: Settings item
-		]);
+		// TODO: Settings item
+	]);
 }

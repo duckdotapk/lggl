@@ -2,14 +2,16 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { getElementOrThrow, getInputEnumValue } from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { defaultSelector, reloadView } from "../../libs/client/Pjax.client.js";
 
-import * as SettingSchemaLib from "../../libs/schemas/Setting.js";
+import { GameGroupModeSchema } from "../../libs/models/Setting.schemas.js";
 
-import { updateSettings } from "../../routes/api/setting/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as schema from "../../routes/api/setting/update.schemas.js";
 
 //
 // Locals
@@ -17,107 +19,140 @@ import { updateSettings } from "../../routes/api/setting/update.schemas.js";
 
 async function initialise(toolbar: HTMLFormElement)
 {
-	const gameGroupModeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(toolbar, `select[name="gameGroupMode"]`);
-
-	const showFavoritesGroupCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showFavoritesGroup"]`);
-
-	const showRegularGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showRegularGames"]`);
-
-	const showHiddenGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showHiddenGames"]`);
-
-	const showNsfwGamesCheckbox = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(toolbar, `input[name="showNsfwGames"]`);
+	const gameGroupModeSelect = getElementOrThrow<HTMLSelectElement>(
+		toolbar,
+		`select[name="gameGroupMode"]`,
+	);
+	const showFavoritesGroupCheckbox = getElementOrThrow<HTMLInputElement>(
+		toolbar,
+		`input[name="showFavoritesGroup"]`,
+	);
+	const showRegularGamesCheckbox = getElementOrThrow<HTMLInputElement>(
+		toolbar,
+		`input[name="showRegularGames"]`,
+	);
+	const showHiddenGamesCheckbox = getElementOrThrow<HTMLInputElement>(
+		toolbar,
+		`input[name="showHiddenGames"]`,
+	);
+	const showNsfwGamesCheckbox = getElementOrThrow<HTMLInputElement>(
+		toolbar,
+		`input[name="showNsfwGames"]`,
+	);
 
 	toolbar.addEventListener("submit", (event) => event.preventDefault());
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form: toolbar,
+		submitter: gameGroupModeSelect,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form: toolbar,
-			submitter: gameGroupModeSelect,
-			requireConfirmation: false,
-			onSubmit: async () => await updateSettings(
-				{
-					settingUpdates:
-					[
-						{
-							name: "GAME_GROUP_MODE",
-							value: gameGroupModeSelect.value as SettingSchemaLib.GameGroupMode,
-						},
-					],
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
-		});
+			schema,
+			requestBody:
+			{
+				settingUpdates:
+				[
+					{
+						name: "GAME_GROUP_MODE",
+						value: getInputEnumValue(gameGroupModeSelect, GameGroupModeSchema),
+					},
+				],
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(defaultSelector),
+	});
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form: toolbar,
+		submitter: showFavoritesGroupCheckbox,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form: toolbar,
-			submitter: showFavoritesGroupCheckbox,
-			requireConfirmation: false,
-			onSubmit: async () => await updateSettings(
-				{
-					settingUpdates:
-					[
-						{
-							name: "SHOW_FAVORITES_GROUP",
-							value: showFavoritesGroupCheckbox.checked,
-						},
-					],
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
-		});
+			schema,
+			requestBody:
+			{
+				settingUpdates:
+				[
+					{
+						name: "SHOW_FAVORITES_GROUP",
+						value: showFavoritesGroupCheckbox.checked,
+					},
+				],
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(defaultSelector),
+	});
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form: toolbar,
+		submitter: showRegularGamesCheckbox,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form: toolbar,
-			submitter: showRegularGamesCheckbox,
-			requireConfirmation: false,
-			onSubmit: async () => await updateSettings(
-				{
-					settingUpdates:
-					[
-						{
-							name: "SHOW_REGULAR_GAMES",
-							value: showRegularGamesCheckbox.checked,
-						},
-					],
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
-		});
+			schema,
+			requestBody:
+			{
+				settingUpdates:
+				[
+					{
+						name: "SHOW_REGULAR_GAMES",
+						value: showRegularGamesCheckbox.checked,
+					},
+				],
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(defaultSelector),
+	});
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form: toolbar,
+		submitter: showHiddenGamesCheckbox,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form: toolbar,
-			submitter: showHiddenGamesCheckbox,
-			requireConfirmation: false,
-			onSubmit: async () => await updateSettings(
-				{
-					settingUpdates:
-					[
-						{
-							name: "SHOW_HIDDEN_GAMES",
-							value: showHiddenGamesCheckbox.checked,
-						},
-					],
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
-		});
+			schema,
+			requestBody:
+			{
+				settingUpdates:
+				[
+					{
+						name: "SHOW_HIDDEN_GAMES",
+						value: showHiddenGamesCheckbox.checked,
+					},
+				],
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(defaultSelector),
+	});
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form: toolbar,
+		submitter: showNsfwGamesCheckbox,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form: toolbar,
-			submitter: showNsfwGamesCheckbox,
-			requireConfirmation: false,
-			onSubmit: async () => await updateSettings(
-				{
-					settingUpdates:
-					[
-						{
-							name: "SHOW_NSFW_GAMES",
-							value: showNsfwGamesCheckbox.checked,
-						},
-					],
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(PjaxClientLib.defaultSelector),
-		});
+			schema,
+			requestBody:
+			{
+				settingUpdates:
+				[
+					{
+						name: "SHOW_NSFW_GAMES",
+						value: showNsfwGamesCheckbox.checked
+					},
+				],
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(defaultSelector),
+	});
+
+	toolbar.classList.add("initialised");
 }
 
 //
@@ -126,19 +161,15 @@ async function initialise(toolbar: HTMLFormElement)
 
 export async function initialiseGameSettingsToolbars()
 {
-	const toolbars = document.querySelectorAll<HTMLFormElement>(".component-game-settings-toolbar:not(.initialised)");
+	const toolbars = document.querySelectorAll<HTMLFormElement>(
+		".component-game-settings-toolbar:not(.initialised)",
+	);
 
 	for (const toolbar of toolbars)
 	{
-		try
-		{
-			await initialise(toolbar);
-			
-			toolbar.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[GameSettingsToolbar] Error initialising:", toolbar, error);
-		}
+		initialise(toolbar)
+			.then(() => console.log("[GameSettingsToolbar] Initialised:", toolbar))
+			.catch((error) =>
+				console.error("[GameSettingsToolbar] Error initialising:", toolbar, error));
 	}
 }

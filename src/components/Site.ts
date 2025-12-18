@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 import { Sidebar, SidebarPage } from "./Sidebar.js";
 
@@ -33,49 +33,56 @@ export function Site(options: SiteOptions)
 		},
 		[
 			new DE("head", null,
-				[
-					new DE("meta", { charset: "utf-8" }),
-					
-					new DE("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
+			[
+				new DE("meta",
+				{
+					charset: "utf-8",
+				}),
+				
+				new DE("meta",
+				{
+					name: "viewport",
+					content: "width=device-width, initial-scale=1",
+				}),
 
-					new DE("title", null, pageTitle),
+				new DE("title", null, pageTitle),
 
-					new DE("link",
-						{
-							rel: "icon",
-							href: "/favicon.ico",
-							type: "image/x-icon",
-						}),
+				new DE("link",
+				{
+					rel: "icon",
+					href: "/favicon.ico",
+					type: "image/x-icon",
+				}),
 
-					new DE("link",
-						{
-							rel: "stylesheet",
-							href: staticMiddleware.getCacheBustedPath("/data/fontawesome/css/all.min.css"),
-						}),
+				new DE("link",
+				{
+					rel: "stylesheet",
+					href: staticMiddleware.getCacheBustedPath("/data/fontawesome/css/all.min.css"),
+				}),
 
-					new DE("link",
-						{
-							rel: "stylesheet",
-							href: staticMiddleware.getCacheBustedPath("/data/generated/client.css"),
-						}),
+				new DE("link",
+				{
+					rel: "stylesheet",
+					href: staticMiddleware.getCacheBustedPath("/data/generated/client.css"),
+				}),
 
-					new DE("script",
-						{
-							type: "module",
-							src: staticMiddleware.getCacheBustedPath("/data/generated/client.js"),
-						}),
-				]),
+				new DE("script",
+				{
+					type: "module",
+					src: staticMiddleware.getCacheBustedPath("/data/generated/client.js"),
+				}),
+			]),
 
 			new DE("body", null,
+			[
+				new DE("div", "component-site",
 				[
-					new DE("div", "component-site",
-						[
-							new DE("div", "sidebar", Sidebar(options.currentPage)),
+					new DE("div", "sidebar", Sidebar(options.currentPage)),
 
-							new DE("div", "content", content),
+					new DE("div", "content", content),
 
-							new DE("div", "dialog-container"),
-						]),
+					new DE("div", "dialog-container"),
 				]),
+			]),
 		]);
 }

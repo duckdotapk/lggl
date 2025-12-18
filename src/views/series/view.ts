@@ -18,8 +18,8 @@ import { SeriesSettingsToolbar } from "../../components/toolbar/SeriesSettingsTo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as SeriesModelLib from "../../libs/models/Series.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createSeriesGroupManager } from "../../libs/models/Series.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -27,8 +27,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof SeriesModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createSeriesGroupManager>>;
 	series: Prisma.SeriesGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 };

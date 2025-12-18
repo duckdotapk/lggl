@@ -13,30 +13,30 @@ import { z } from "zod";
 //
 
 export const ProcessRequirementsSchema = z.object(
-	{
-		requireExecutable: z.boolean().default(false),
-		executables: z.array(z.string()).default([]),
+{
+	requireExecutable: z.boolean().default(false),
+	executables: z.array(z.string()).default([]),
 
-		requireCommandLineArguments: z.boolean().default(false),
-		commandLineArguments: z.array(z.string()).default([]),
+	requireCommandLineArguments: z.boolean().default(false),
+	commandLineArguments: z.array(z.string()).default([]),
 
-		requireEnvironmentVariables: z.boolean().default(false),
-		environmentVariables: z.record(z.string(), z.string()).default({}),
-	});
+	requireEnvironmentVariables: z.boolean().default(false),
+	environmentVariables: z.record(z.string(), z.string()).default({}),
+});
 
 export const Win32ProcessSchema = z.object(
-	{
-		ProcessId: z.number(),
-		Name: z.string(),
-		ExecutablePath: z.string().nullable(),
-		CommandLine: z.string().nullable(),
-	});
+{
+	ProcessId: z.number(),
+	Name: z.string(),
+	ExecutablePath: z.string().nullable(),
+	CommandLine: z.string().nullable(),
+});
 
 export const StartInfoEnvironmentVariablesSchema = z.array(z.object(
-	{
-		Key: z.string(),
-		Value: z.string(),
-	}));
+{
+	Key: z.string(),
+	Value: z.string(),
+}));
 
 //
 // Types
@@ -60,7 +60,10 @@ export type RunningProcess =
 // Utility Functions
 //
 
-export function parseProcessRequirements(processRequirementsString: string | null): [ ProcessRequirements, null ] | [ null, string ]
+export function parseProcessRequirements
+(
+	processRequirementsString: string | null,
+): [ ProcessRequirements, null ] | [ null, string ]
 {
 	if (processRequirementsString == null)
 	{
@@ -78,7 +81,8 @@ export function parseProcessRequirements(processRequirementsString: string | nul
 		return [ null, "processRequirementsString is not valid JSON." ];
 	}
 
-	const processRequirementsParseResult = ProcessRequirementsSchema.safeParse(processRequirementsJson);
+	const processRequirementsParseResult =
+	ProcessRequirementsSchema.safeParse(processRequirementsJson);
 
 	if (!processRequirementsParseResult.success)
 	{
@@ -88,7 +92,11 @@ export function parseProcessRequirements(processRequirementsString: string | nul
 	return [ processRequirementsParseResult.data, null ];
 }
 
-export function checkRunningProcess(runningProcess: RunningProcess, processRequirements: ProcessRequirements)
+export function checkRunningProcess
+(
+	runningProcess: RunningProcess,
+	processRequirements: ProcessRequirements,
+)
 {
 	if (processRequirements.requireExecutable)
 	{
@@ -123,13 +131,20 @@ export function checkRunningProcess(runningProcess: RunningProcess, processRequi
 	return true;
 }
 
-async function readRunningProcessLinux(processRequirements: ProcessRequirements, id: number): Promise<RunningProcess | null>
+async function readRunningProcessLinux
+(
+	processRequirements: ProcessRequirements,
+	id: number,
+): Promise<RunningProcess | null>
 {
 	try
 	{
 		const executable = await fs.promises.readlink("/proc/" + id + "/exe");
 	
-		const commandLine = await fs.promises.readFile("/proc/" + id + "/cmdline", { encoding: "utf8" });
+		const commandLine = await fs.promises.readFile("/proc/" + id + "/cmdline",
+		{
+			encoding: "utf8",
+		});
 	
 		const commandLineArguments = commandLine.split("\0");
 	
@@ -146,7 +161,10 @@ async function readRunningProcessLinux(processRequirements: ProcessRequirements,
 			return runningProcess;
 		}
 
-		const environment = await fs.promises.readFile("/proc/" + id + "/environ", { encoding: "utf8" });
+		const environment = await fs.promises.readFile("/proc/" + id + "/environ",
+		{
+			encoding: "utf8",
+		});
 	
 		for (const environmentVariable of environment.split("\0"))
 		{
@@ -163,7 +181,11 @@ async function readRunningProcessLinux(processRequirements: ProcessRequirements,
 	}
 }
 
-async function readRunningProcessWindows(processRequirements: ProcessRequirements, id: number): Promise<RunningProcess | null>
+async function readRunningProcessWindows
+(
+	processRequirements: ProcessRequirements,
+	id: number,
+): Promise<RunningProcess | null>
 {
 	let win32Process: Win32Process;
 
@@ -177,7 +199,12 @@ async function readRunningProcessWindows(processRequirements: ProcessRequirement
 			"ConvertTo-Json"
 		].join(" | ");
 
-		const rawRunningProcess = child_process.execSync("powershell -Command \"" + runningProcessCommand + "\"", { encoding: "utf8" });
+		const rawRunningProcess = child_process.execSync(
+			"powershell -Command \"" + runningProcessCommand + "\"",
+			{
+				encoding: "utf8",
+			},
+		);
 
 		win32Process = Win32ProcessSchema.parse(JSON.parse(rawRunningProcess));
 	}
@@ -194,7 +221,9 @@ async function readRunningProcessWindows(processRequirements: ProcessRequirement
         return null;
     }
 
-    const commandLineArguments = shellQuote.parse(win32Process.CommandLine ?? "").filter((argument) => typeof argument === "string");
+    const commandLineArguments = shellQuote
+		.parse(win32Process.CommandLine ?? "")
+		.filter((argument) => typeof argument === "string");
 
 	const runningProcess: RunningProcess =
 	{
@@ -230,19 +259,20 @@ async function readRunningProcessWindows(processRequirements: ProcessRequirement
     return runningProcess;
 }
 
-export async function readRunningProcess(processRequirements: ProcessRequirements, id: number): Promise<RunningProcess | null>
+export async function readRunningProcess
+(
+	processRequirements: ProcessRequirements,
+	id: number,
+): Promise<RunningProcess | null>
 {
 	switch (process.platform)
 	{
 		case "linux":
 			return await readRunningProcessLinux(processRequirements, id);
-
 		case "win32":
 			return await readRunningProcessWindows(processRequirements, id);
-
 		default:
 			console.error("[SystemLib] Unsupported platform %s.", process.platform);
-
 			return null;
 	}
 }
@@ -272,7 +302,10 @@ async function searchForRunningProcessLinux(processRequirements: ProcessRequirem
 			continue;
 		}
 
-		const runningProcessMatchesRequirements = checkRunningProcess(runningProcess, processRequirements);
+		const runningProcessMatchesRequirements = checkRunningProcess(
+			runningProcess,
+			processRequirements,
+		);
 
 		if (!runningProcessMatchesRequirements)
 		{
@@ -290,12 +323,20 @@ async function searchForRunningProcessWindows(processRequirements: ProcessRequir
 	console.log("[SystemLib] [searchForRunningProcessWindows] Getting session ID...");
 
 	const sessionIdCommand = "(Get-Process -Id $PID).SessionId"
-	const rawSessionId = child_process.execSync("powershell -Command \"" + sessionIdCommand + "\"", { encoding: "utf8" }).trim();
+	const rawSessionId = child_process.execSync(
+		"powershell -Command \"" + sessionIdCommand + "\"",
+		{
+			encoding: "utf8",
+		},
+	).trim();
 	const sessionId = parseInt(rawSessionId);
 
 	if (isNaN(sessionId))
 	{
-		console.error("[SystemLib] [searchForRunningProcessWindows] Failed to parse sessionId: %s", rawSessionId);
+		console.error(
+			"[SystemLib] [searchForRunningProcessWindows] Failed to parse sessionId: %s",
+			rawSessionId,
+		);
 
 		return null;
 	}
@@ -315,17 +356,28 @@ async function searchForRunningProcessWindows(processRequirements: ProcessRequir
 			"Select-Object ProcessId, Name, ExecutablePath, CommandLine",
 			"ConvertTo-Json",
 		].join(" | ");
-		const rawRunningProcesses = child_process.execSync("powershell -Command \"" + runningProcessesCommand + "\"", { encoding: "utf8" });
+		const rawRunningProcesses = child_process.execSync(
+			"powershell -Command \"" + runningProcessesCommand + "\"",
+			{
+				encoding: "utf8",
+			},
+		);
 		win32Processes = z.array(Win32ProcessSchema).parse(JSON.parse(rawRunningProcesses));
 	}
 	catch (error)
 	{
-		console.log("[SystemLib] [searchForRunningProcessWindows] runningProcessesCommand error:", error);
+		console.log(
+			"[SystemLib] [searchForRunningProcessWindows] runningProcessesCommand error:",
+			error,
+		);
 
 		return null;
 	}
 
-	console.log("[SystemLib] [searchForRunningProcessWindows] Found %d running processes.", win32Processes.length);
+	console.log(
+		"[SystemLib] [searchForRunningProcessWindows] Found %d running processes.",
+		win32Processes.length,
+	);
 
 	console.log("[SystemLib] [searchForRunningProcessWindows] Checking running processes...");
 
@@ -336,7 +388,9 @@ async function searchForRunningProcessWindows(processRequirements: ProcessRequir
 			continue;
 		}
 
-		const commandLineArguments = shellQuote.parse(win32Process.CommandLine ?? "").filter((argument) => typeof argument === "string");
+		const commandLineArguments = shellQuote
+			.parse(win32Process.CommandLine ?? "")
+			.filter((argument) => typeof argument === "string");
 
 		const runningProcess: RunningProcess =
 		{
@@ -369,30 +423,34 @@ async function searchForRunningProcessWindows(processRequirements: ProcessRequir
 		return runningProcess;
 	}
 
-	console.log("[SystemLib] [searchForRunningProcessWindows] No running processes match requirements.");
+	console.log(
+		"[SystemLib] [searchForRunningProcessWindows] No running processes match requirements.",
+	);
 
 	return null;
 }
 
+// TODO: make this work on macOS
 export async function searchForRunningProcess(processRequirements: ProcessRequirements)
 {
 	switch (process.platform)
 	{
 		case "linux":
 			return searchForRunningProcessLinux(processRequirements);
-
 		case "win32":
 			return searchForRunningProcessWindows(processRequirements);
-
-		// TODO: make this work on macOS
 		default:
 			console.error("[GamePlayActionLib] Unsupported platform %s.", process.platform);
-
 			return null;
 	}
 }
 
-export function startProcessViaExecutable(executablePath: string, workingDirectory: string | null, additionalArguments: string[] | null)
+export function startProcessViaExecutable
+(
+	executablePath: string,
+	workingDirectory: string | null,
+	additionalArguments: string[] | null,
+)
 {
 	additionalArguments = additionalArguments ?? [];
 
@@ -400,12 +458,15 @@ export function startProcessViaExecutable(executablePath: string, workingDirecto
 	{
 		case "linux":
 		{
-			const child = child_process.spawn(executablePath, additionalArguments,
+			const child = child_process.spawn(
+				executablePath,
+				additionalArguments,
 				{
 					cwd: workingDirectory ?? undefined,
 					detached: true,
 					stdio: "ignore",
-				});
+				},
+			);
 
 			child.unref();
 
@@ -414,12 +475,20 @@ export function startProcessViaExecutable(executablePath: string, workingDirecto
 
 		case "win32":
 		{
-			const child = child_process.spawn("cmd", [ "/c", "start", "", executablePath, ...additionalArguments ],
+			const child = child_process.spawn("cmd",
+				[
+					"/c",
+					"start",
+					"",
+					executablePath,
+					...additionalArguments,
+				],
 				{
 					cwd: workingDirectory ?? undefined,
 					detached: true,
 					stdio: "ignore",
-				});
+				},
+			);
 
 			child.unref();
 
@@ -436,10 +505,10 @@ export function startProcessViaUrl(url: string)
 		case "linux":
 		{
 			const child = child_process.spawn("xdg-open", [ url ],
-				{
-					detached: true,
-					stdio: "ignore",
-				});
+			{
+				detached: true,
+				stdio: "ignore",
+			});
 
 			child.unref();
 
@@ -449,10 +518,10 @@ export function startProcessViaUrl(url: string)
 		case "win32":
 		{
 			const child = child_process.spawn("cmd", [ "/c", "start", url ],
-				{
-					detached: true,
-					stdio: "ignore",
-				});
+			{
+				detached: true,
+				stdio: "ignore",
+			});
 
 			child.unref();
 	
@@ -464,7 +533,12 @@ export function startProcessViaUrl(url: string)
 	}
 }
 
-export async function findRunningProcess(processRequirements: ProcessRequirements, maxAttempts: number, interval: number)
+export async function findRunningProcess
+(
+	processRequirements: ProcessRequirements,
+	maxAttempts: number,
+	interval: number,
+)
 {
 	console.log("[SystemLib] Finding process...");
 
@@ -476,7 +550,12 @@ export async function findRunningProcess(processRequirements: ProcessRequirement
 
 		if (runningProcess != null)
 		{
-			console.log("[SystemLib] findProcess found process after %d attempts: %d => %s", attempt, runningProcess.id, runningProcess.executable);
+			console.log(
+				"[SystemLib] findProcess found process after %d attempts: %d => %s",
+				attempt,
+				runningProcess.id,
+				runningProcess.executable,
+			);
 
 			return runningProcess;
 		}
@@ -487,9 +566,16 @@ export async function findRunningProcess(processRequirements: ProcessRequirement
 	return null;
 }
 
-export async function isProcessStillRunning(processRequirements: ProcessRequirements, cachedRunningProcess: RunningProcess): Promise<boolean>
+export async function isProcessStillRunning
+(
+	processRequirements: ProcessRequirements,
+	cachedRunningProcess: RunningProcess,
+): Promise<boolean>
 {
-	const currentRunningProcess = await readRunningProcess(processRequirements, cachedRunningProcess.id);
+	const currentRunningProcess = await readRunningProcess(
+		processRequirements,
+		cachedRunningProcess.id,
+	);
 
 	if (currentRunningProcess == null)
 	{
@@ -506,14 +592,22 @@ export async function isProcessStillRunning(processRequirements: ProcessRequirem
 
 	if (processRequirements.requireCommandLineArguments)
 	{
-		if (cachedRunningProcess.commandLineArguments.length != currentRunningProcess.commandLineArguments.length)
+		if
+		(
+			cachedRunningProcess.commandLineArguments.length !=
+			currentRunningProcess.commandLineArguments.length
+		)
 		{
 			return false;
 		}
 	
 		for (let i = 0; i < cachedRunningProcess.commandLineArguments.length; i++)
 		{
-			if (cachedRunningProcess.commandLineArguments[i] != currentRunningProcess.commandLineArguments[i])
+			if
+			(
+				cachedRunningProcess.commandLineArguments[i] !=
+				currentRunningProcess.commandLineArguments[i]
+			)
 			{
 				return false;
 			}
@@ -522,7 +616,11 @@ export async function isProcessStillRunning(processRequirements: ProcessRequirem
 
 	if (processRequirements.requireEnvironmentVariables)
 	{
-		if (Object.keys(cachedRunningProcess.environmentVariables).length != Object.keys(currentRunningProcess.environmentVariables).length)
+		if
+		(
+			Object.keys(cachedRunningProcess.environmentVariables).length !=
+			Object.keys(currentRunningProcess.environmentVariables).length
+		)
 		{
 			return false;
 		}

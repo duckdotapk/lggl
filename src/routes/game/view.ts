@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
-import * as GameModelLib from "../../libs/models/Game.js";
+import { createGameGroupManager } from "../../libs/models/Game.js";
 
 import { view } from "../../views/game/view.js";
 
@@ -23,7 +23,7 @@ type RouteFritterContext = ServerFritterContext &
 	};
 };
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/games/view/:gameId",
@@ -102,13 +102,13 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 			return;
 		}
 
-		const groupManager = await GameModelLib.createGroupManager(prismaClient, context.settings, game);
+		const groupManager = await createGameGroupManager(prismaClient, context.settings, game);
 
 		context.renderComponent(view(
-			{
-				settings: context.settings,
-				groupManager,
-				game, 
-			}));
+		{
+			settings: context.settings,
+			groupManager,
+			game, 
+		}));
 	},
 };

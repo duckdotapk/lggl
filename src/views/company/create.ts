@@ -14,8 +14,8 @@ import { CompanySettingsToolbar } from "../../components/toolbar/CompanySettings
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as CompanyModelLib from "../../libs/models/Company.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createCompanyGroupManager } from "../../libs/models/Company.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -23,8 +23,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof CompanyModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createCompanyGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -33,30 +33,30 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "companies",
 		pageTitle: "Create | Companies",
 		content: ListLayout(
-			{
-				toolbar: CompanySettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/companies/create",
-				content: Wrapper(
-					[
-						Breadcrumbs(
-							[
-								{
-									href: "/companies",
-									text: "Companies",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/companies/create",
-									text: "Create",
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: CompanySettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/companies/create",
+			content: Wrapper(
+			[
+				Breadcrumbs(
+				[
+					{
+						href: "/companies",
+						text: "Companies",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/companies/create",
+						text: "Create",
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, "Create company"),
+				Header(1, "Create company"),
 
-						UpsertCompanyForm(null),
-					]),
-			}),
+				UpsertCompanyForm(null),
+			]),
+		}),
 	};
 }

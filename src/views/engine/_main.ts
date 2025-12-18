@@ -8,8 +8,8 @@ import { EngineSettingsToolbar } from "../../components/toolbar/EngineSettingsTo
 
 import { SiteOptions } from "../../components/Site.js";
 
-import * as EngineModelLib from "../../libs/models/Engine.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createEngineGroupManager } from "../../libs/models/Engine.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -17,8 +17,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof EngineModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createEngineGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -27,11 +27,11 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "engines",
 		pageTitle: "Engines",
 		content: ListLayout(
-			{
-				toolbar: EngineSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/engines/create",
-				content: null,
-			}),
+		{
+			toolbar: EngineSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/engines/create",
+			content: null,
+		}),
 	};
 }

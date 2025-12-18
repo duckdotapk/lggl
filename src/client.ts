@@ -34,7 +34,7 @@ import { initialiseSeriesSettingsToolbars } from "./components/toolbar/SeriesSet
 
 import { updateSidebars } from "./components/Sidebar.client.js";
 
-import * as PjaxClientLib from "./libs/client/Pjax.client.js";
+import { initialisePjax } from "./libs/client/Pjax.client.js";
 
 //
 // Client
@@ -91,4 +91,4 @@ initialiseComponents();
 
 document.addEventListener("lggl:reinitialise", () => initialiseComponents());
 
-PjaxClientLib.initialise();
+initialisePjax();

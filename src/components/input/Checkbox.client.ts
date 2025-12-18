@@ -2,7 +2,7 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import { getElementOrThrow } from "@lorenstuff/browser-utilities";
 
 //
 // Locals
@@ -10,15 +10,16 @@ import * as BrowserUtilities from "@donutteam/browser-utilities";
 
 async function initialise(element: HTMLElement)
 {
-	const input = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(element, "input");
+	const input = getElementOrThrow<HTMLInputElement>(element, "input");
 
 	input.dataset["initialValue"] = input.checked.toString();
 
-	element.addEventListener("input",
-		() =>
-		{
-			input.dataset["dirty"] = (input.checked.toString() != input.dataset["initialValue"]).toString();
-		});
+	element.addEventListener("input", () =>
+	{
+		input.dataset["changed"] = (input.checked.toString() != input.dataset["initialValue"]).toString();
+	});
+
+	element.classList.add("initialised");
 }
 
 //
@@ -27,19 +28,14 @@ async function initialise(element: HTMLElement)
 
 export async function initialiseCheckboxes()
 {
-	const checkboxes = document.querySelectorAll<HTMLInputElement>(".component-checkbox:not(.initialised)");
+	const elements = document.querySelectorAll<HTMLInputElement>(
+		".component-checkbox:not(.initialised)",
+	);
 
-	for (const checkbox of checkboxes)
+	for (const element of elements)
 	{
-		try
-		{
-			await initialise(checkbox);
-
-			checkbox.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[Checkbox] Error initialising:", checkbox, error);
-		}
+		initialise(element)
+			.then(() => console.log("[Checkbox] Initialised:", element))
+			.catch((error) => console.error("[Checkbox] Error initialising:", element, error));
 	}
 }

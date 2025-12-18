@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 //
 // Component
@@ -15,5 +15,6 @@ export function ColumnLayout(numberOfColumns: number, children: Child[])
 			class: "component-column-layout",
 			style: "--component-column-layout-number-of-columns: " + numberOfColumns + ";",
 		},
-		children);
+		children,
+	);
 }

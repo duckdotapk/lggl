@@ -2,17 +2,23 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputStringValueNullable,
+	getElementOrThrow,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
 import { GameNotesDialog } from "./GameNotesDialog.js";
 
 import { notyf } from "../../instances/notyf.js";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { findGame } from "../../routes/api/game/findOne.schemas.js";
-import { updateGame } from "../../routes/api/game/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as findGameSchema from "../../routes/api/game/findOne.schemas.js";
+import * as updateGameSchema from "../../routes/api/game/update.schemas.js";
 
 //
 // Locals
@@ -20,71 +26,87 @@ import { updateGame } from "../../routes/api/game/update.schemas.js";
 
 async function initialise(dialog: HTMLDialogElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(dialog, "gameId");
+	const gameId = getIntegerDataOrThrow(dialog, "gameId");
 
-	const form = BrowserUtilities.ElementClientLib.getElementOrThrow(dialog, "form");
+	const form = getElementOrThrow(dialog, "form");
+	const notesTextArea = getElementOrThrow<HTMLTextAreaElement>(form, `[name="notes"]`);
 
-	const notesTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="notes"]`);
+	form.addEventListener("submit", async (event) =>
+	{
+		event.preventDefault();
 
-	form.addEventListener("submit",
-		async (event) =>
+		const response = await apiRequest(
 		{
-			event.preventDefault();
-
-			const response = await updateGame(gameId,
-				{
-					notes: InputClientLib.getChangedStringValueNullable(notesTextArea),
-				});
-
-			if (!response.success)
+			schema: updateGameSchema,
+			requestBody:
 			{
-				for (const error of response.errors)
+				id: gameId,
+				updateData:
 				{
-					notyf.error(error.message);
-				}
+					notes: getChangedInputStringValueNullable(notesTextArea),
+				},
+			},
+		}).getResponse();
 
-				return console.error("[GameNotesDialog] Failed to update game:", response.errors);
+		if (!response.success)
+		{
+			for (const error of response.errors)
+			{
+				notyf.error(error.message);
 			}
 
-			dialog.close();
+			return console.error("[GameNotesDialog] Failed to update game:", response.errors);
+		}
 
-			PjaxClientLib.reloadView();
+		dialog.close();
 
-			notyf.success("Game notes updated successfully.");
-		});
+		reloadView();
+
+		notyf.success("Game notes updated successfully.");
+	});
 
 	dialog.addEventListener("close", () => dialog.remove());
+
+	dialog.classList.add("initialised");
 }
 
 async function initialiseOpenButton(button: HTMLButtonElement)
 {
-	const dialogContainer = BrowserUtilities.ElementClientLib.getElementOrThrow(document, ".dialog-container");
+	const dialogContainer = getElementOrThrow(document, ".dialog-container");
 
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(button, "gameId");
+	const gameId = getIntegerDataOrThrow(button, "gameId");
 
-	button.addEventListener("click",
-		async () =>
+	button.addEventListener("click", async () =>
+	{
+		const response = await apiRequest(
 		{
-			const response = await findGame(gameId);
-
-			if (!response.success)
+			schema: findGameSchema,
+			requestBody:
 			{
-				for (const error of response.errors)
-				{
-					notyf.error(error.message);
-				}
+				id: gameId,
+			},
+		}).getResponse();
 
-				return console.error("[GameNotesDialog] Failed to find game:", response.errors);
+		if (!response.success)
+		{
+			for (const error of response.errors)
+			{
+				notyf.error(error.message);
 			}
 
-			const dialog = GameNotesDialog(response.game).renderToHTMLElement<HTMLDialogElement>();
+			return console.error("[GameNotesDialog] Failed to find game:", response.errors);
+		}
 
-			dialogContainer.appendChild(dialog);
+		const dialog = GameNotesDialog(response.game).renderToHTMLElement() as HTMLDialogElement;
 
-			document.dispatchEvent(new CustomEvent("lggl:reinitialise"));
+		dialogContainer.appendChild(dialog);
 
-			dialog.showModal();
-		});
+		document.dispatchEvent(new CustomEvent("lggl:reinitialise"));
+
+		dialog.showModal();
+	});
+
+	button.classList.add("initialised");
 }
 
 //
@@ -93,38 +115,30 @@ async function initialiseOpenButton(button: HTMLButtonElement)
 
 export async function initialiseGameNotesDialogs()
 {
-	const dialogs = document.querySelectorAll<HTMLDialogElement>(`.component-game-notes-dialog:not(.initialised)`);
+	const dialogs = document.querySelectorAll<HTMLDialogElement>(
+		".component-game-notes-dialog:not(.initialised)"
+	);
 
 	for (const dialog of dialogs)
 	{
-		try
-		{
-			await initialise(dialog);
-
-			dialog.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[GameNotesDialog] Failed to initialise dialog:", dialog, error);
-		}
+		initialise(dialog)
+			.then(() => console.log("[GameNotesDialog] Initialised:", dialog))
+			.catch((error) =>
+				console.error("[GameNotesDialog] Error initialising:", dialog, error));
 	}
 }
 
 export async function initialiseOpenGameNotesDialogButtons()
 {
-	const openButtons = document.querySelectorAll<HTMLButtonElement>(`[data-open-game-notes-dialog="true"]:not(.initialised)`);
+	const buttons = document.querySelectorAll<HTMLButtonElement>(
+		`[data-open-game-notes-dialog="true"]:not(.initialised)`,
+	);
 
-	for (const openButton of openButtons)
+	for (const button of buttons)
 	{
-		try
-		{
-			await initialiseOpenButton(openButton);
-
-			openButton.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[GameNotesDialog] Failed to initialise open button:", openButton, error);
-		}
+		initialiseOpenButton(button)
+			.then(() => console.log("[GameNotesDialog] Initialised open button:", button))
+			.catch((error) =>
+				console.error("[GameNotesDialog] Error initialising open button:", button, error));
 	}
 }

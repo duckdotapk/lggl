@@ -2,8 +2,8 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
-import * as Fritter from "@donutteam/fritter";
+import { DE } from "@lorenstuff/document-builder";
+import { FritterContext, FritterMiddlewareFunction } from "@lorenstuff/fritter";
 
 //
 // Types
@@ -11,11 +11,11 @@ import * as Fritter from "@donutteam/fritter";
 
 export type ComponentFunction<ComponentFunctionOptions> = (options: ComponentFunctionOptions) => DE;
 
-export type GetOptionsFunction<ComponentFunctionOptions, BaseFritterContext extends Fritter.FritterContext = Fritter.FritterContext> =
-	(
-		context : MiddlewareFritterContext<ComponentFunctionOptions, BaseFritterContext>,
-		options : Partial<ComponentFunctionOptions>,
-	) => ComponentFunctionOptions;
+export type GetOptionsFunction<ComponentFunctionOptions, BaseFritterContext extends FritterContext = FritterContext> =
+(
+	context : MiddlewareFritterContext<ComponentFunctionOptions, BaseFritterContext>,
+	options : Partial<ComponentFunctionOptions>,
+) => ComponentFunctionOptions;
 
 export type RenderComponentFunction<ComponentFunctionOptions> = (options: Partial<ComponentFunctionOptions>) => void;
 
@@ -23,26 +23,26 @@ export type RenderComponentFunction<ComponentFunctionOptions> = (options: Partia
 // Middleware
 //
 
-export type MiddlewareFritterContext<RenderComponentOptions, BaseFritterContext extends Fritter.FritterContext = Fritter.FritterContext> = BaseFritterContext &
+export type MiddlewareFritterContext<RenderComponentOptions, BaseFritterContext extends FritterContext = FritterContext> = BaseFritterContext &
 {
 	renderComponent: RenderComponentFunction<RenderComponentOptions>
 };
 
-export type CreateOptions<ComponentFunctionOptions, BaseFritterContext extends Fritter.FritterContext = Fritter.FritterContext> =
+export type CreateOptions<ComponentFunctionOptions, BaseFritterContext extends FritterContext = FritterContext> =
 {
 	componentFunction: ComponentFunction<ComponentFunctionOptions>;
 	getOptionsFunction: GetOptionsFunction<ComponentFunctionOptions, BaseFritterContext>;
 };
 
-export type CreateResult<ComponentFunctionOptions, BaseFritterContext extends Fritter.FritterContext = Fritter.FritterContext> =
+export type CreateResult<ComponentFunctionOptions, BaseFritterContext extends FritterContext = FritterContext> =
 {
 	componentFunction: ComponentFunction<ComponentFunctionOptions>;
 	getOptionsFunction: GetOptionsFunction<ComponentFunctionOptions, BaseFritterContext>;
 
-	execute: Fritter.MiddlewareFunction<MiddlewareFritterContext<ComponentFunctionOptions, BaseFritterContext>>;
+	execute: FritterMiddlewareFunction<MiddlewareFritterContext<ComponentFunctionOptions, BaseFritterContext>>;
 };
 
-export function create<ComponentFunctionOptions, BaseFritterContext extends Fritter.FritterContext = Fritter.FritterContext>(
+export function create<ComponentFunctionOptions, BaseFritterContext extends FritterContext = FritterContext>(
 	options: CreateOptions<ComponentFunctionOptions, BaseFritterContext>
 ): CreateResult<ComponentFunctionOptions, BaseFritterContext>
 {

@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { ButtonElementAttributes, DE } from "@donutteam/document-builder";
+import { ButtonElementAttributes, DE } from "@lorenstuff/document-builder";
 
 //
 // Component
@@ -41,8 +41,13 @@ export function Button(options: ButtonOptions)
 			...options.extraAttributes,
 		},
 		[
-			options.iconName != null ? new DE("span", "icon " + options.iconName) : null,
+			options.iconName != null
+				? new DE("span", "icon " + options.iconName)
+				: null,
 
-			options.text != null ? new DE("span", "text", options.text) : null,
-		]);
+			options.text != null
+				? new DE("span", "text", options.text)
+				: null,
+		],
+	);
 }

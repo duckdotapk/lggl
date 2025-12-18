@@ -14,8 +14,8 @@ import { EngineSettingsToolbar } from "../../components/toolbar/EngineSettingsTo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as EngineModelLib from "../../libs/models/Engine.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createEngineGroupManager } from "../../libs/models/Engine.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -23,8 +23,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof EngineModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createEngineGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -33,30 +33,30 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "engines",
 		pageTitle: "Create | Engines",
 		content: ListLayout(
-			{
-				toolbar: EngineSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/engines/create",
-				content: Wrapper(
-					[
-						Breadcrumbs(
-							[
-								{
-									href: "/engines",
-									text: "Engines",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/engines/create",
-									text: "Create",
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: EngineSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/engines/create",
+			content: Wrapper(
+			[
+				Breadcrumbs(
+				[
+					{
+						href: "/engines",
+						text: "Engines",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/engines/create",
+						text: "Create",
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, "Create engine"),
-		
-						UpsertEngineForm(null),
-					]),
-			}),
+				Header(1, "Create engine"),
+
+				UpsertEngineForm(null),
+			]),
+		}),
 	};
 }

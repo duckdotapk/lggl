@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./update.schemas.js";
+import { createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./update.schemas.js";
 
 //
 // Route
@@ -15,37 +15,34 @@ import * as Schemas from "./update.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		for (const settingUpdate of requestBody.settingUpdates)
 		{
-			for (const settingUpdate of requestBody.settingUpdates)
+			await prismaClient.setting.upsert(
 			{
-				await prismaClient.setting.upsert(
-					{
-						where:
-						{
-							name: settingUpdate.name,
-						},
-						create:
-						{
-							name: settingUpdate.name,
-							value: settingUpdate.value.toString(),
-						},
-						update:
-						{
-							value: settingUpdate.value.toString(),
-						},
-					});
-			}
+				where:
+				{
+					name: settingUpdate.name,
+				},
+				create:
+				{
+					name: settingUpdate.name,
+					value: settingUpdate.value.toString(),
+				},
+				update:
+				{
+					value: settingUpdate.value.toString(),
+				},
+			});
+		}
 
-			return {
-				success: true,
-			};
-		},
-	});
+		return {
+			success: true,
+		};
+	},
+});

@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 //
 // Locals
@@ -21,7 +21,8 @@ function Tab(title: Child, active: boolean)
 
 			"data-active": active,
 		},
-		title);
+		title,
+	);
 }
 
 function TabContent(content: Child, active: boolean)
@@ -32,7 +33,8 @@ function TabContent(content: Child, active: boolean)
 
 			"data-active": active,
 		},
-		content);
+		content,
+	);
 }
 
 //
@@ -47,13 +49,10 @@ export type TabControlTabOptions =
 
 export function TabControl(tabs: TabControlTabOptions[])
 {
-	return new DE("div",
-		{
-			class: "component-tab-control",
-		},
-		[
-			Tabs(tabs.map((tab, tabIndex) => Tab(tab.title, tabIndex == 0))),
+	return new DE("div","component-tab-control",
+	[
+		Tabs(tabs.map((tab, tabIndex) => Tab(tab.title, tabIndex == 0))),
 
-			tabs.map((tab, tabIndex) => TabContent(tab.content, tabIndex == 0)),
-		]);
+		tabs.map((tab, tabIndex) => TabContent(tab.content, tabIndex == 0)),
+	]);
 }

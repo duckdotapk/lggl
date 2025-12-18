@@ -18,8 +18,8 @@ import { SeriesSettingsToolbar } from "../../components/toolbar/SeriesSettingsTo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as SeriesModelLib from "../../libs/models/Series.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createSeriesGroupManager } from "../../libs/models/Series.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -27,8 +27,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof SeriesModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createSeriesGroupManager>>;
 	series: Prisma.SeriesGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 	seriesGames: Prisma.SeriesGameGetPayload<null>[];
@@ -42,51 +42,45 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "series",
 		pageTitle,
 		content: ListLayout(
-			{
-				toolbar: SeriesSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/series/create",
-				content: Wrapper(
-					[
-						Breadcrumbs(
-							[
-								{
-									href: "/series",
-									text: "Series",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/series/view/" + options.series.id,
-									text: options.series.name,
-									pjaxSelector: "main",
-								},
-								{
-									href: "/series/edit/" + options.series.id,
-									text: "Edit",
-									pjaxSelector: "main",
-								},
-							]),
-					
-						Header(1, pageTitle),
-		
-						UpsertSeriesForm(options.series),
+		{
+			toolbar: SeriesSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/series/create",
+			content: Wrapper(
+			[
+				Breadcrumbs(
+				[
+					{
+						href: "/series",
+						text: "Series",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/series/view/" + options.series.id,
+						text: options.series.name,
+						pjaxSelector: "main",
+					},
+					{
+						href: "/series/edit/" + options.series.id,
+						text: "Edit",
+						pjaxSelector: "main",
+					},
+				]),
+			
+				Header(1, pageTitle),
 
-						Header(2, "Series games"),
+				UpsertSeriesForm(options.series),
 
-						options.seriesGames.map((seriesGame) => Block(UpsertSeriesGameForm(
-							{
-								games: options.games,
-								series: options.series,
-								seriesGame,
-							}))),
+				Header(2, "Series games"),
 
-						Block(UpsertSeriesGameForm(
-							{
-								games: options.games,
-								series: options.series,
-								seriesGame: null,
-							})),
-					]),
-			}),
+				options.seriesGames.map((seriesGame) => Block(UpsertSeriesGameForm(
+					options.games,
+					options.series,
+					seriesGame,
+				))),
+
+				Block(UpsertSeriesGameForm(options.games, options.series, null)),
+			]),
+		}),
 	};
 }

@@ -2,57 +2,31 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { z } from "zod";
 
-//
-// Schemas
-//
-
-export const RequestBodySchema = z.object(
-	{
-		name: z.string(),
-	});
-
-export const ResponseBodySchema = z.union(
-	[
-		FritterApiUtilities.SuccessResponseBodySchema.extend(
-			{
-				series: z.object(
-					{
-						id: z.number(),
-					}),
-			}),
-
-		FritterApiUtilities.ErrorResponseBodySchema,
-	]);
+import { ErrorResponseBodySchema, SuccessResponseBodySchema } from "../../../libs/Api.client.js";
 
 //
-// Types
-//
-
-export type RequestBody = z.infer<typeof RequestBodySchema>;
-	
-export type ResponseBody = z.infer<typeof ResponseBodySchema>;
-
-//
-// Constants
+// Schema
 //
 
 export const method = "POST";
 
 export const path = "/api/series/create";
 
-//
-// Utility Functions
-//
-
-export function createSeries(requestBody: RequestBody)
+export const RequestBodySchema = z.object(
 {
-	return FritterApiUtilities.request(method, path,
+	name: z.string(),
+});
+
+export const ResponseBodySchema = z.union(
+[
+	SuccessResponseBodySchema.extend(
+	{
+		series: z.object(
 		{
-			requestBodySchema: RequestBodySchema,
-			responseBodySchema: ResponseBodySchema,
-			requestBody,
-		});
-}
+			id: z.number(),
+		}),
+	}),
+	ErrorResponseBodySchema,
+]);

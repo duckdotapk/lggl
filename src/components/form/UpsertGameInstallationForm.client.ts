@@ -2,14 +2,23 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputStringValue,
+	getElementOrThrow,
+	getInputStringValue,
+	getIntegerData,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createGameInstallation } from "../../routes/api/gameInstallation/create.schemas.js";
-import { deleteGameInstallation } from "../../routes/api/gameInstallation/delete.schemas.js";
-import { updateGameInstallation } from "../../routes/api/gameInstallation/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGameInstallationSchema from "../../routes/api/gameInstallation/create.schemas.js";
+import * as deleteGameInstallationSchema from "../../routes/api/gameInstallation/delete.schemas.js";
+import * as updateGameInstallationSchema from "../../routes/api/gameInstallation/update.schemas.js";
 
 //
 // Locals
@@ -17,52 +26,73 @@ import { updateGameInstallation } from "../../routes/api/gameInstallation/update
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
-	const gameInstallationId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gameInstallationId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
+	const gameInstallationId = getIntegerData(form, "gameInstallationId");
 
-	const pathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
+	const pathInput = getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
 
 	if (gameInstallationId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createGameInstallation(
-					{
-						path: InputClientLib.getStringValue(pathInput),
+				schema: createGameInstallationSchema,
+				requestBody:
+				{
+					path: getInputStringValue(pathInput),
 
-						game_id: gameId,
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+					game_id: gameId,
+				}
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteGameInstallation(gameInstallationId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteGameInstallationSchema,
+				requestBody:
+				{
+					id: gameInstallationId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGameInstallation(gameInstallationId,
+				schema: updateGameInstallationSchema,
+				requestBody:
+				{
+					id: gameInstallationId,
+					updateData:
 					{
-						path: InputClientLib.getChangedStringValue(pathInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						path: getChangedInputStringValue(pathInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -71,19 +101,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGameInstallationForms()
 {
-	const upsertGameInstallationForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-installation-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-installation-form:not(.initialised)",
+	);
 
-	for (const upsertGameInstallationForm of upsertGameInstallationForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGameInstallationForm);
-
-			upsertGameInstallationForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGameInstallationForm] Error initialising:", upsertGameInstallationForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGameInstallationForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertGameInstallationForm] Error initialising:", form, error));
 	}
 }

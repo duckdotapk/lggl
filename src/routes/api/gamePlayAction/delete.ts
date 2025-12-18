@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./delete.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./delete.schemas.js";
 
 //
 // Route
@@ -15,54 +15,54 @@ import * as Schemas from "./delete.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const gamePlayAction = await prismaClient.gamePlayAction.findUnique(
 		{
-			const gamePlayAction = await prismaClient.gamePlayAction.findUnique(
-				{
-					where:
-					{
-						id: requestBody.id,
-					},
-				});
-
-			if (gamePlayAction == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT FOUND", message: "GamePlayAction not found." });
-			}
+				id: requestBody.id,
+			},
+		});
 
-			await prismaClient.$transaction(
-				async (transactionClient) =>
+		if (gamePlayAction == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT FOUND",
+				message: "GamePlayAction not found.",
+			});
+		}
+
+		await prismaClient.$transaction(async (transactionClient) =>
+		{
+			await transactionClient.gamePlaySession.updateMany(
+			{
+				where:
 				{
-					await transactionClient.gamePlaySession.updateMany(
-						{
-							where:
-							{
-								gamePlayAction_id: requestBody.id,
-							},
-							data:
-							{
-								gamePlayAction_id: null,
-							},
-						});
+					gamePlayAction_id: requestBody.id,
+				},
+				data:
+				{
+					gamePlayAction_id: null,
+				},
+			});
 
-					await transactionClient.gamePlayAction.delete(
-						{
-							where:
-							{
-								id: requestBody.id,
-							},
-						});
-				});
+			await transactionClient.gamePlayAction.delete(
+			{
+				where:
+				{
+					id: requestBody.id,
+				},
+			});
+		});
 
-			return {
-				success: true,
-			};
-		},
-	});
+		return {
+			success: true,
+		};
+	},
+});

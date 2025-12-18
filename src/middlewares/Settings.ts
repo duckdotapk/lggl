@@ -2,24 +2,24 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { FritterContext, FritterMiddlewareFunction } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../instances/prismaClient.js";
 
-import * as SettingModelLib from "../libs/models/Setting.js";
+import { getSettings, Settings } from "../libs/models/Setting.js";
 
 //
 // Middleware
 //
 
-export type MiddlewareFritterContext = Fritter.FritterContext &
+export type MiddlewareFritterContext = FritterContext &
 {
-	settings: SettingModelLib.Settings;
+	settings: Settings;
 };
 
 export type CreateResult =
 {
-	execute: Fritter.MiddlewareFunction<MiddlewareFritterContext>;
+	execute: FritterMiddlewareFunction<MiddlewareFritterContext>;
 };
 
 export function create(): CreateResult
@@ -27,7 +27,7 @@ export function create(): CreateResult
 	return {
 		execute: async (context, next) =>
 		{
-			context.settings = await SettingModelLib.getSettings(prismaClient);
+			context.settings = await getSettings(prismaClient);
 
 			await next();
 		},

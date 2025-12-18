@@ -2,13 +2,14 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
 import { Prisma } from "@prisma/client";
 
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./update.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./update.schemas.js";
 
 //
 // Route
@@ -16,76 +17,81 @@ import * as Schemas from "./update.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const gameCompany = await prismaClient.gameCompany.findUnique(
 		{
-			const gameCompany = await prismaClient.gameCompany.findUnique(
+			where:
+			{
+				id: requestBody.id,
+			},
+		});
+
+		if (gameCompany == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT_FOUND",
+				message: "GameCompany not found.",
+			});
+		}
+
+		const gameCompanyUpdateData: Prisma.GameCompanyUpdateArgs["data"] = {};
+
+		if (requestBody.updateData.notes !== undefined)
+		{
+			gameCompanyUpdateData.notes = requestBody.updateData.notes;
+		}
+
+		if (requestBody.updateData.type !== undefined)
+		{
+			gameCompanyUpdateData.type = requestBody.updateData.type;
+		}
+
+		if (requestBody.updateData.company_id !== undefined)
+		{
+			const company = await prismaClient.company.findUnique(
+			{
+				where:
 				{
-					where:
-					{
-						id: requestBody.id,
-					},
+					id: requestBody.updateData.company_id,
+				},
+			});
+			
+			if (company == null)
+			{
+				throw new ApiError(
+				{
+					code: "NOT_FOUND",
+					message: "Company not found.",
 				});
-
-			if (gameCompany == null)
-			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "GameCompany not found." });
 			}
 
-			const gameCompanyUpdateData: Prisma.GameCompanyUpdateArgs["data"] = {};
+			gameCompanyUpdateData.company_id = company.id;
+		}
 
-			if (requestBody.updateData.notes !== undefined)
-			{
-				gameCompanyUpdateData.notes = requestBody.updateData.notes;
-			}
-
-			if (requestBody.updateData.type !== undefined)
-			{
-				gameCompanyUpdateData.type = requestBody.updateData.type;
-			}
-
-			if (requestBody.updateData.company_id !== undefined)
-			{
-				const company = await prismaClient.company.findUnique(
-					{
-						where:
-						{
-							id: requestBody.updateData.company_id,
-						},
-					});
-				
-				if (company == null)
-				{
-					throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Company not found." });
-				}
-
-				gameCompanyUpdateData.company_id = company.id;
-			}
-
-			if (Object.keys(gameCompanyUpdateData).length == 0)
-			{
-				return {
-					success: true,
-				};
-			}
-
-			await prismaClient.gameCompany.update(
-				{
-					where:
-					{
-						id: gameCompany.id,
-					},
-					data: gameCompanyUpdateData,
-				});
-
+		if (Object.keys(gameCompanyUpdateData).length == 0)
+		{
 			return {
 				success: true,
 			};
-		},
-	});
+		}
+
+		await prismaClient.gameCompany.update(
+		{
+			where:
+			{
+				id: gameCompany.id,
+			},
+			data: gameCompanyUpdateData,
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

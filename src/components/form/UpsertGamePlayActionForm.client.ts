@@ -2,15 +2,31 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
-import { GamePlayActionType } from "@prisma/client";
+import
+{
+	getChangedInputBooleanValue,
+	getChangedInputEnumValue,
+	getChangedInputStringValue,
+	getChangedInputStringValueNullable,
+	getElementOrThrow,
+	getInputBooleanValue,
+	getInputEnumValue,
+	getInputStringValue,
+	getInputStringValueNullable,
+	getIntegerData,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createGamePlayAction } from "../../routes/api/gamePlayAction/create.schemas.js";
-import { deleteGamePlayAction } from "../../routes/api/gamePlayAction/delete.schemas.js";
-import { updateGamePlayAction } from "../../routes/api/gamePlayAction/update.schemas.js";
+import { GamePlayActionTypeSchema } from "../../libs/models/GamePlayAction.schemas.js";
+
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGamePlayActionSchema from "../../routes/api/gamePlayAction/create.schemas.js";
+import * as deleteGamePlayActionSchema from "../../routes/api/gamePlayAction/delete.schemas.js";
+import * as updateGamePlayActionSchema from "../../routes/api/gamePlayAction/update.schemas.js";
 
 //
 // Locals
@@ -18,70 +34,104 @@ import { updateGamePlayAction } from "../../routes/api/gamePlayAction/update.sch
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
-	const gamePlayActionId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gamePlayActionId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
+	const gamePlayActionId = getIntegerData(form, "gamePlayActionId");
 
-	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
-	const typeSelect = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
-	const pathInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
-	const workingDirectoryInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="workingDirectory"]`);
-	const additionalArgumentsTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="additionalArguments"]`);
-	const processRequirementsTextArea = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLTextAreaElement>(form, `[name="processRequirements"]`);
-	const isArchivedInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="isArchived"]`);
+	const nameInput = getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
+	const typeSelect = getElementOrThrow<HTMLSelectElement>(form, `[name="type"]`);
+	const pathInput = getElementOrThrow<HTMLInputElement>(form, `[name="path"]`);
+	const workingDirectoryInput = getElementOrThrow<HTMLInputElement>(
+		form,
+		`[name="workingDirectory"]`,
+	);
+	const additionalArgumentsTextArea = getElementOrThrow<HTMLTextAreaElement>(
+		form,
+		`[name="additionalArguments"]`,
+	);
+	const processRequirementsTextArea = getElementOrThrow<HTMLTextAreaElement>(
+		form,
+		`[name="processRequirements"]`,
+	);
+	const isArchivedInput = getElementOrThrow<HTMLInputElement>(form, `[name="isArchived"]`);
 
 	if (gamePlayActionId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createGamePlayAction(
-					{
-						game_id: gameId,
+				schema: createGamePlayActionSchema,
+				requestBody:
+				{
+					game_id: gameId,
 
-						name: InputClientLib.getStringValue(nameInput),
-						type: InputClientLib.getEnumValue<GamePlayActionType>(typeSelect),
-						path: InputClientLib.getStringValue(pathInput),
-						workingDirectory: InputClientLib.getStringValueNullable(workingDirectoryInput),
-						additionalArguments: InputClientLib.getStringValueNullable(additionalArgumentsTextArea),
-						processRequirements: InputClientLib.getStringValueNullable(processRequirementsTextArea),
-						isArchived: InputClientLib.getBooleanValue(isArchivedInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+					name: getInputStringValue(nameInput),
+					type: getInputEnumValue(typeSelect, GamePlayActionTypeSchema),
+					path: getInputStringValue(pathInput),
+					workingDirectory: getInputStringValueNullable(workingDirectoryInput),
+					additionalArguments: getInputStringValueNullable(additionalArgumentsTextArea),
+					processRequirements: getInputStringValueNullable(processRequirementsTextArea),
+					isArchived: getInputBooleanValue(isArchivedInput),
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteGamePlayAction(gamePlayActionId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteGamePlayActionSchema,
+				requestBody:
+				{
+					id: gamePlayActionId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGamePlayAction(gamePlayActionId,
+				schema: updateGamePlayActionSchema,
+				requestBody:
+				{
+					id: gamePlayActionId,
+					updateData:
 					{
-						name: InputClientLib.getChangedStringValue(nameInput),
-						type: InputClientLib.getChangedEnumValue<GamePlayActionType>(typeSelect),
-						path: InputClientLib.getChangedStringValue(pathInput),
-						workingDirectory: InputClientLib.getChangedStringValueNullable(workingDirectoryInput),
-						additionalArguments: InputClientLib.getChangedStringValueNullable(additionalArgumentsTextArea),
-						processRequirements: InputClientLib.getChangedStringValueNullable(processRequirementsTextArea),
-						isArchived: InputClientLib.getChangedBooleanValue(isArchivedInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						name: getChangedInputStringValue(nameInput),
+						type: getChangedInputEnumValue(typeSelect, GamePlayActionTypeSchema),
+						path: getChangedInputStringValue(pathInput),
+						workingDirectory: getChangedInputStringValueNullable(workingDirectoryInput),
+						additionalArguments: getChangedInputStringValueNullable(
+							additionalArgumentsTextArea,
+						),
+						processRequirements: getChangedInputStringValueNullable(
+							processRequirementsTextArea,
+						),
+						isArchived: getChangedInputBooleanValue(isArchivedInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -90,19 +140,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGamePlayActionForms()
 {
-	const upsertGamePlayActionForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-play-action-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-play-action-form:not(.initialised)",
+	);
 
-	for (const upsertGamePlayActionForm of upsertGamePlayActionForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGamePlayActionForm);
-
-			upsertGamePlayActionForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGamePlayActionForm] Error initialising:", upsertGamePlayActionForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGamePlayActionForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertGamePlayActionForm] Error initialising:", form, error));
 	}
 }

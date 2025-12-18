@@ -18,8 +18,8 @@ import { EngineSettingsToolbar } from "../../components/toolbar/EngineSettingsTo
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as EngineModelLib from "../../libs/models/Engine.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createEngineGroupManager } from "../../libs/models/Engine.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -27,8 +27,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof EngineModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createEngineGroupManager>>;
 	engine: Prisma.EngineGetPayload<null>;
 	games: Prisma.GameGetPayload<null>[];
 };
@@ -41,45 +41,47 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "engines",
 		pageTitle: engineName + " | Engines",
 		content: ListLayout(
-			{
-				toolbar: EngineSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/engines/create",
-				content: Wrapper(
-					[		
-						Breadcrumbs(
-							[
-								{
-									href: "/engines",
-									text: "Engines",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/engines/view/" + options.engine.id,
-									text: engineName,
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: EngineSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/engines/create",
+			content: Wrapper(
+			[		
+				Breadcrumbs(
+				[
+					{
+						href: "/engines",
+						text: "Engines",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/engines/view/" + options.engine.id,
+						text: engineName,
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, engineName),
+				Header(1, engineName),
+
+				Button(
+				{
+					style: "success",
+					href: "/engines/edit/" + options.engine.id,
+					iconName: "fa-solid fa-pen-to-square",
+					text: "Edit",
+				}),
+
+				options.games.length > 0
+					? [
+						Header(2, "Games powered by"),
 		
-						Button(
-							{
-								style: "success",
-								href: "/engines/edit/" + options.engine.id,
-								iconName: "fa-solid fa-pen-to-square",
-								text: "Edit",
-							}),
-		
-						options.games.length > 0
-							? [
-								Header(2, "Games powered by"),
-				
-								// TODO: make a "grid" component that shows the game's cover art?
-								options.games.map((game) => Block(Anchor(game.name, "/games/view/" + game.id))),
-							]
-							: null,
-					]),
-			}),
+						// TODO: make a "grid" component that shows the game's cover art?
+						options.games.map(
+							(game) => Block(Anchor(game.name, "/games/view/" + game.id)),
+						),
+					]
+					: null,
+			]),
+		}),
 	};
 }

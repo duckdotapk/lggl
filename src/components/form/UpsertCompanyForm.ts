@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 import { Prisma } from "@prisma/client";
 
 import { Block } from "../basic/Block.js";
@@ -17,9 +17,7 @@ import { ColumnLayout } from "../layout/ColumnLayout.js";
 // Component
 //
 
-export type UpsertCompanyFormCompany = Prisma.CompanyGetPayload<null> | null;
-
-export function UpsertCompanyForm(company: UpsertCompanyFormCompany)
+export function UpsertCompanyForm(company: Prisma.CompanyGetPayload<null> | null)
 {
 	return new DE("form",
 		{
@@ -30,46 +28,51 @@ export function UpsertCompanyForm(company: UpsertCompanyFormCompany)
 		},
 		[
 			Block(
-				[
-					Label("name", "Name"),
+			[
+				Label("name", "Name"),
 
-					Control(
-						{
-							type: "text",
-							name: "name",
-							required: true,
-							placeholder: "Name",
-							value: company?.name,
-						}),
-				]),
+				Control(
+				{
+					type: "text",
+					name: "name",
+					required: true,
+					placeholder: "Name",
+					value: company?.name,
+				}),
+			]),
 
 			ColumnLayout(company != null ? 2 : 1,
-				[
-					company != null
-						? Button(
-							{
-								style: "danger",
-								extraAttributes:
-								{
-									"data-action": "delete",
-								},
-								type: "button",
-								iconName: "fa-solid fa-trash",
-								text: "Delete",
-							})
-						: null,
-				
-					Button(
+			[
+				company != null
+					? Button(
+					{
+						style: "danger",
+						extraAttributes:
 						{
-							style: "success",
-							type: "submit",
-							extraAttributes:
-							{
-								"data-action": "save",
-							},
-							iconName: company == null ? "fa-solid fa-plus" : "fa-solid fa-save",
-							text: company == null ? "Create" : "Save",
-						}),
-				]),
-		]);
+							"data-action": "delete",
+						},
+						type: "button",
+						iconName: "fa-solid fa-trash",
+						text: "Delete",
+					})
+					: null,
+			
+				Button(
+				{
+					style: "success",
+					type: "submit",
+					extraAttributes:
+					{
+						"data-action": "save",
+					},
+					iconName: company == null
+						? "fa-solid fa-plus"
+						: "fa-solid fa-save",
+					text: company == null
+						? "Create"
+						: "Save",
+				}),
+			]),
+		],
+	);
 }

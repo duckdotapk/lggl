@@ -4,7 +4,33 @@
 
 import { Prisma } from "@prisma/client";
 
-import * as SettingSchemaLib from "../schemas/Setting.js";
+import
+{
+	CompanyGroupMode,
+	CompanyGroupModeSchema,
+	EngineGroupMode,
+	EngineGroupModeSchema,
+	GameGroupMode,
+	GameGroupModeSchema,
+	InitialProcessCheckDelay,
+	InitialProcessCheckDelaySchema,
+	MaxProcessCheckAttempts,
+	MaxProcessCheckAttemptsSchema,
+	PlatformGroupMode,
+	PlatformGroupModeSchema,
+	ProcessCheckInterval,
+	ProcessCheckIntervalSchema,
+	SeriesGroupMode,
+	SeriesGroupModeSchema,
+	ShowFavoritesGroup,
+	ShowFavoritesGroupSchema,
+	ShowHiddenGames,
+	ShowHiddenGamesSchema,
+	ShowNsfwGames,
+	ShowNsfwGamesSchema,
+	ShowRegularGames,
+	ShowRegularGamesSchema,	
+} from "./Setting.schemas.js";
 
 //
 // Class
@@ -12,23 +38,23 @@ import * as SettingSchemaLib from "../schemas/Setting.js";
 
 export class Settings
 {
-	gameGroupMode: SettingSchemaLib.GameGroupMode = "lastPlayedDate";
-	showFavoritesGroup: SettingSchemaLib.ShowFavoritesGroup = true;
-	showRegularGames: SettingSchemaLib.ShowRegularGames = true;
-	showHiddenGames: SettingSchemaLib.ShowHiddenGames = false;
-	showNsfwGames: SettingSchemaLib.ShowNsfwGames = false;
+	gameGroupMode: GameGroupMode = "lastPlayedDate";
+	showFavoritesGroup: ShowFavoritesGroup = true;
+	showRegularGames: ShowRegularGames = true;
+	showHiddenGames: ShowHiddenGames = false;
+	showNsfwGames: ShowNsfwGames = false;
 
-	companyGroupMode: SettingSchemaLib.CompanyGroupMode = "name";
+	companyGroupMode: CompanyGroupMode = "name";
 
-	engineGroupMode: SettingSchemaLib.EngineGroupMode = "name";
+	engineGroupMode: EngineGroupMode = "name";
 
-	platformGroupMode: SettingSchemaLib.PlatformGroupMode = "name";
+	platformGroupMode: PlatformGroupMode = "name";
 
-	seriesGroupMode: SettingSchemaLib.SeriesGroupMode = "name";
+	seriesGroupMode: SeriesGroupMode = "name";
 
-	initialProcessCheckDelay: SettingSchemaLib.InitialProcessCheckDelay = 2000;
-	processCheckInterval: SettingSchemaLib.ProcessCheckInterval = 2000;
-	maxProcessCheckAttempts: SettingSchemaLib.MaxProcessCheckAttempts = 20;
+	initialProcessCheckDelay: InitialProcessCheckDelay = 2000;
+	processCheckInterval: ProcessCheckInterval = 2000;
+	maxProcessCheckAttempts: MaxProcessCheckAttempts = 20;
 
 	constructor(settings: Prisma.SettingGetPayload<null>[])
 	{
@@ -38,7 +64,7 @@ export class Settings
 			{
 				case "GAME_GROUP_MODE":
 				{
-					const valueParseResult = SettingSchemaLib.GameGroupModeSchema.safeParse(setting.value);
+					const valueParseResult = GameGroupModeSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -50,7 +76,7 @@ export class Settings
 
 				case "SHOW_FAVORITES_GROUP":
 				{
-					const valueParseResult = SettingSchemaLib.ShowFavoritesGroupSchema.safeParse(setting.value);
+					const valueParseResult = ShowFavoritesGroupSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -62,7 +88,7 @@ export class Settings
 
 				case "SHOW_REGULAR_GAMES":
 				{
-					const valueParseResult = SettingSchemaLib.ShowRegularGamesSchema.safeParse(setting.value);
+					const valueParseResult = ShowRegularGamesSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -74,7 +100,7 @@ export class Settings
 
 				case "SHOW_HIDDEN_GAMES":
 				{
-					const valueParseResult = SettingSchemaLib.ShowHiddenGamesSchema.safeParse(setting.value);
+					const valueParseResult = ShowHiddenGamesSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -86,7 +112,7 @@ export class Settings
 
 				case "SHOW_NSFW_GAMES":
 				{
-					const valueParseResult = SettingSchemaLib.ShowNsfwGamesSchema.safeParse(setting.value);
+					const valueParseResult = ShowNsfwGamesSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -98,7 +124,7 @@ export class Settings
 
 				case "COMPANY_GROUP_MODE":
 				{
-					const valueParseResult = SettingSchemaLib.CompanyGroupModeSchema.safeParse(setting.value);
+					const valueParseResult = CompanyGroupModeSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -110,7 +136,7 @@ export class Settings
 
 				case "ENGINE_GROUP_MODE":
 				{
-					const valueParseResult = SettingSchemaLib.EngineGroupModeSchema.safeParse(setting.value);
+					const valueParseResult = EngineGroupModeSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -122,7 +148,7 @@ export class Settings
 
 				case "PLATFORM_GROUP_MODE":
 				{
-					const valueParseResult = SettingSchemaLib.PlatformGroupModeSchema.safeParse(setting.value);
+					const valueParseResult = PlatformGroupModeSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -134,7 +160,7 @@ export class Settings
 
 				case "SERIES_GROUP_MODE":
 				{
-					const valueParseResult = SettingSchemaLib.SeriesGroupModeSchema.safeParse(setting.value);
+					const valueParseResult = SeriesGroupModeSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -146,7 +172,7 @@ export class Settings
 
 				case "INITIAL_PROCESS_CHECK_DELAY":
 				{
-					const valueParseResult = SettingSchemaLib.InitialProcessCheckDelaySchema.safeParse(setting.value);
+					const valueParseResult = InitialProcessCheckDelaySchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -158,7 +184,7 @@ export class Settings
 
 				case "PROCESS_CHECK_INTERVAL":
 				{
-					const valueParseResult = SettingSchemaLib.ProcessCheckIntervalSchema.safeParse(setting.value);
+					const valueParseResult = ProcessCheckIntervalSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -170,7 +196,7 @@ export class Settings
 
 				case "MAX_PROCESS_CHECK_ATTEMPTS":
 				{
-					const valueParseResult = SettingSchemaLib.MaxProcessCheckAttemptsSchema.safeParse(setting.value);
+					const valueParseResult = MaxProcessCheckAttemptsSchema.safeParse(setting.value);
 
 					if (valueParseResult.success)
 					{
@@ -188,7 +214,7 @@ export class Settings
 // Constants
 //
 
-const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
+const gameGroupModeNames: Record<GameGroupMode, string> =
 {
 	completionStatus: "Completion status",
 	createdDate: "Created date",
@@ -205,26 +231,26 @@ const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 	steamDeckCompatibility: "Steam Deck compatibility",
 };
 
-const companyGroupModeNames: Record<SettingSchemaLib.CompanyGroupMode, string> =
+const companyGroupModeNames: Record<CompanyGroupMode, string> =
 {
 	name: "Name",
 	numberOfGamesDeveloped: "Number of games developed",
 	numberOfGamesPublished: "Number of games published",
 };
 
-const engineGroupModeNames: Record<SettingSchemaLib.EngineGroupMode, string> =
+const engineGroupModeNames: Record<EngineGroupMode, string> =
 {
 	name: "Name",
 	numberOfGames: "Number of games",
 };
 
-const platformGroupModeNames: Record<SettingSchemaLib.PlatformGroupMode, string> =
+const platformGroupModeNames: Record<PlatformGroupMode, string> =
 {
 	name: "Name",
 	numberOfGames: "Number of games",
 };
 
-const seriesGroupModeNames: Record<SettingSchemaLib.SeriesGroupMode, string> =
+const seriesGroupModeNames: Record<SeriesGroupMode, string> =
 {
 	name: "Name",
 	numberOfGames: "Number of games",
@@ -241,27 +267,27 @@ export async function getSettings(transactionClient: Prisma.TransactionClient)
 	return new Settings(settings);
 }
 
-export function getGameGroupModeName(gameGroupMode: SettingSchemaLib.GameGroupMode)
+export function getGameGroupModeName(gameGroupMode: GameGroupMode)
 {
 	return gameGroupModeNames[gameGroupMode];
 }
 
-export function getCompanyGroupModeName(companyGroupMode: SettingSchemaLib.CompanyGroupMode)
+export function getCompanyGroupModeName(companyGroupMode: CompanyGroupMode)
 {
 	return companyGroupModeNames[companyGroupMode];
 }
 
-export function getEngineGroupModeName(engineGroupMode: SettingSchemaLib.EngineGroupMode)
+export function getEngineGroupModeName(engineGroupMode: EngineGroupMode)
 {
 	return engineGroupModeNames[engineGroupMode];
 }
 
-export function getPlatformGroupModeName(platformGroupMode: SettingSchemaLib.PlatformGroupMode)
+export function getPlatformGroupModeName(platformGroupMode: PlatformGroupMode)
 {
 	return platformGroupModeNames[platformGroupMode];
 }
 
-export function getSeriesGroupModeName(seriesGroupMode: SettingSchemaLib.SeriesGroupMode)
+export function getSeriesGroupModeName(seriesGroupMode: SeriesGroupMode)
 {
 	return seriesGroupModeNames[seriesGroupMode];
 }

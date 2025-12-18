@@ -2,14 +2,23 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getChangedInputStringValue,
+	getElementOrThrow,
+	getInputStringValue,
+	getIntegerData,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createGameLink } from "../../routes/api/gameLink/create.schemas.js";
-import { deleteGameLink } from "../../routes/api/gameLink/delete.schemas.js";
-import { updateGameLink } from "../../routes/api/gameLink/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createGameLinkSchema from "../../routes/api/gameLink/create.schemas.js";
+import * as deleteGameLinkSchema from "../../routes/api/gameLink/delete.schemas.js";
+import * as updateGameLinkSchema from "../../routes/api/gameLink/update.schemas.js";
 
 //
 // Locals
@@ -17,54 +26,75 @@ import { updateGameLink } from "../../routes/api/gameLink/update.schemas.js";
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
-	const gameLinkId = BrowserUtilities.ElementClientLib.getIntegerData(form, "gameLinkId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
+	const gameLinkId = getIntegerData(form, "gameLinkId");
 
-	const titleInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="title"]`);
-	const urlInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="url"]`);
+	const titleInput = getElementOrThrow<HTMLInputElement>(form, `[name="title"]`);
+	const urlInput = getElementOrThrow<HTMLInputElement>(form, `[name="url"]`);
 
 	if (gameLinkId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createGameLink(
-					{
-						game_id: gameId,
-						title: InputClientLib.getStringValue(titleInput),
-						url: InputClientLib.getStringValue(urlInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: createGameLinkSchema,
+				requestBody:
+				{
+					game_id: gameId,
+					title: getInputStringValue(titleInput),
+					url: getInputStringValue(urlInput),
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteGameLink(gameLinkId),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+				schema: deleteGameLinkSchema,
+				requestBody:
+				{
+					id: gameLinkId,
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateGameLink(gameLinkId,
+				schema: updateGameLinkSchema,
+				requestBody:
+				{
+					id: gameLinkId,
+					updateData:
 					{
-						title: InputClientLib.getChangedStringValue(titleInput),
-						url: InputClientLib.getChangedStringValue(urlInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						title: getChangedInputStringValue(titleInput),
+						url: getChangedInputStringValue(urlInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
+
+	form.classList.add("initialised");
 }
 
 //
@@ -73,19 +103,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertGameLinkForms()
 {
-	const upsertGameLinkForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-game-link-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-game-link-form:not(.initialised)",
+	);
 
-	for (const upsertGameLinkForm of upsertGameLinkForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertGameLinkForm);
-
-			upsertGameLinkForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertGameLinkForm] Error initialising:", upsertGameLinkForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertGameLinkForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[UpsertGameLinkForm] Error initialising:", form, error));
 	}
 }

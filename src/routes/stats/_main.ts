@@ -2,16 +2,21 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { prismaClient } from "../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../instances/server.js";
 
 import { view } from "../../views/stats/_main.js";
 
-import * as FileSizeLib from "../../libs/FileSize.js";
-import * as HumanizationLib from "../../libs/Humanization.js";
-import * as StatisticLib from "../../libs/Statistic.js";
+import { fromGibiBytes } from "../../libs/FileSize.js";
+import
+{
+	formatBytesAsGibibytes,
+	formatBytesAsGigabytes,
+	formatSeconds,
+} from "../../libs/Humanization.js";
+import { StatCategoryManager } from "../../libs/Statistic.js";
 
 //
 // Route
@@ -19,7 +24,7 @@ import * as StatisticLib from "../../libs/Statistic.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/stats",
@@ -30,18 +35,18 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		//
 
 		const games = await prismaClient.game.findMany(
+		{
+			include:
 			{
-				include:
-				{
-					gameInstallations: true,
-				},
-			});
+				gameInstallations: true,
+			},
+		});
 
 		//
 		// Create StatCategoryManager
 		//
 
-		const statCategoryManager = new StatisticLib.StatCategoryManager();
+		const statCategoryManager = new StatCategoryManager();
 
 		//
 		// Create Game Stats
@@ -59,12 +64,12 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		}
 
 		gamesStatCategory.addStat("Total play time",
-			[
-				HumanizationLib.formatSeconds(totalGamePlayTimeSeconds, true),
-				" (",
-				HumanizationLib.formatSeconds(totalGamePlayTimeSeconds, false),
-				")",
-			]);
+		[
+			formatSeconds(totalGamePlayTimeSeconds, true),
+			" (",
+			formatSeconds(totalGamePlayTimeSeconds, false),
+			")",
+		]);
 
 		//
 		// Create Game Installation Stats
@@ -87,27 +92,30 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 		{
 			for (const gameInstallation of game.gameInstallations)
 			{
-				const fileSize = FileSizeLib.fromGibiBytes(gameInstallation.fileSizeGibiBytes, gameInstallation.fileSizeBytes);
+				const fileSize = fromGibiBytes(
+					gameInstallation.fileSizeGibiBytes,
+					gameInstallation.fileSizeBytes,
+				);
 
 				totalGameInstallationFileSizeBytes += fileSize;
 			}
 		}
 
 		gameInstallationsStatCategory.addStat("Total file size",
-			[
-				HumanizationLib.formatBytesAsGigabytes(totalGameInstallationFileSizeBytes),
-				" (",
-				HumanizationLib.formatBytesAsGibibytes(totalGameInstallationFileSizeBytes),
-				")",
-			]);
+		[
+			formatBytesAsGigabytes(totalGameInstallationFileSizeBytes),
+			" (",
+			formatBytesAsGibibytes(totalGameInstallationFileSizeBytes),
+			")",
+		]);
 
 		//
 		// Render View
 		//
 
 		context.renderComponent(view(
-			{
-				statCategoryManager,
-			}));
+		{
+			statCategoryManager,
+		}));
 	},
 };

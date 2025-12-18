@@ -2,15 +2,14 @@
 // Imports
 //
 
-import { GroupManager } from "../../classes/GroupManager.js";
-
 import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { SeriesSettingsToolbar } from "../../components/toolbar/SeriesSettingsToolbar.js";
 
 import { SiteOptions } from "../../components/Site.js";
 
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createSeriesGroupManager } from "../../libs/models/Series.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -18,8 +17,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: GroupManager<any>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createSeriesGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -28,11 +27,11 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "series",
 		pageTitle: "Series",
 		content: ListLayout(
-			{
-				toolbar: SeriesSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/series/create",
-				content: null,
-			}),
+		{
+			toolbar: SeriesSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/series/create",
+			content: null,
+		}),
 	};
 }

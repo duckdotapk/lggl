@@ -8,8 +8,8 @@ import { PlatformSettingsToolbar } from "../../components/toolbar/PlatformSettin
 
 import { SiteOptions } from "../../components/Site.js";
 
-import * as PlatformModelLib from "../../libs/models/Platform.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createPlatformGroupManager } from "../../libs/models/Platform.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -17,8 +17,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof PlatformModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createPlatformGroupManager>>;
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -27,11 +27,11 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "platforms",
 		pageTitle: "Platforms",
 		content: ListLayout(
-			{
-				toolbar: PlatformSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/platforms/create",
-				content: null,
-			}),
+		{
+			toolbar: PlatformSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/platforms/create",
+			content: null,
+		}),
 	};
 }

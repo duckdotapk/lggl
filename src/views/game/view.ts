@@ -8,12 +8,12 @@ import { ListLayout } from "../../components/layout/ListLayout.js";
 
 import { GameActionToolbar } from "../../components/toolbar/GameActionToolbar.js";
 
-import { GameDetails, GameDetailsGame } from "../../components/GameDetails.js";
+import { GameDetails } from "../../components/GameDetails.js";
 import { GameHeader } from "../../components/GameHeader.js";
 import { SiteOptions } from "../../components/Site.js";
 
-import * as GameModelLib from "../../libs/models/Game.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createGameGroupManager } from "../../libs/models/Game.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -21,9 +21,9 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 export type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof GameModelLib.createGroupManager>>;
-	game: GameDetailsGame;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createGameGroupManager>>;
+	game: Parameters<typeof GameDetails>[0];
 };
 
 export function view(options: ViewOptions): Partial<SiteOptions>
@@ -32,16 +32,16 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "games",
 		pageTitle: options.game.name + " | Games",
 		content: ListLayout(
-			{
-				toolbar: GameSettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/games/create",
-				content:
-				[
-					GameHeader(options.game),
-					GameActionToolbar(options.game),
-					GameDetails(options.game),
-				],
-			}),
+		{
+			toolbar: GameSettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/games/create",
+			content:
+			[
+				GameHeader(options.game),
+				GameActionToolbar(options.game),
+				GameDetails(options.game),
+			],
+		}),
 	};
 }

@@ -2,7 +2,7 @@
 // Component
 //
 
-import { Child, DE, ElementAttributes } from "@donutteam/document-builder";
+import { Child, DE, ElementAttributes } from "@lorenstuff/document-builder";
 
 import { GroupManager } from "../../classes/GroupManager.js";
 
@@ -50,27 +50,28 @@ function GroupItem(options: ListLayoutGroupItemOptions)
 		},
 		[
 			new DE("div", "icon-wrapper",
-				[
-					options.iconName.startsWith("/")
-						? new DE("img",
-							{
-								class: "icon image",
-								src: staticMiddleware.getCacheBustedPath(options.iconName),
-								alt: options.name + " icon",
-							})
-						: new DE("div", "icon font-awesome",
-							[
-								new DE("span", options.iconName + " fa-fw"),
-							]),
-				]),
+			[
+				options.iconName.startsWith("/")
+					? new DE("img",
+					{
+						class: "icon image",
+						src: staticMiddleware.getCacheBustedPath(options.iconName),
+						alt: options.name + " icon",
+					})
+					: new DE("div", "icon font-awesome",
+					[
+						new DE("span", options.iconName + " fa-fw"),
+					]),
+			]),
 
 			new DE("div", "text-wrapper",
-				[
-					new DE("div", "name", options.name),
+			[
+				new DE("div", "name", options.name),
 
-					new DE("div", "info", Muted(options.info)),
-				]),
-		]);
+				new DE("div", "info", Muted(options.info)),
+			]),
+		],
+	);
 }
 
 export type ListLayoutGroupOptions =
@@ -90,32 +91,37 @@ function Group(options: ListLayoutGroupOptions)
 		},
 		[
 			new DE("summary", "title",
-				[
-					options.name,
-					" (",
-					options.items.length.toLocaleString(),
-					")",
-				]),
+			[
+				options.name,
+				" (",
+				options.items.length.toLocaleString(),
+				")",
+			]),
 
 			options.items.map((item) => GroupItem(item)),
-		]);
+		],
+	);
 }
 
 function Logo()
 {
 	return new DE("div", "component-list-layout-logo",
+	[
+		new DE("div", "icon", new DE("span", "fa-solid fa-joystick")),
+
+		new DE("div", "text1", "Loren Goodwin's"),
+
+		new DE("div", "text2", "Game Launcher"),
+
+		new DE("div", "icons",
 		[
-			new DE("div", "icon", new DE("span", "fa-solid fa-joystick")),
-
-			new DE("div", "text1", "Loren Goodwin's"),
-
-			new DE("div", "text2", "Game Launcher"),
-
-			new DE("div", "icons",
-				[
-					Anchor(new DE("span", "fa-brands fa-github"), "https://github.com/duckdotapk/lggl", "_blank"),
-				]),
-		]);
+			Anchor(
+				new DE("span", "fa-brands fa-github"),
+				"https://github.com/duckdotapk/lggl",
+				"_blank",
+			),
+		]),
+	]);
 }
 
 //
@@ -133,38 +139,41 @@ export type ListLayoutOptions =
 export function ListLayout(options: ListLayoutOptions)
 {
 	return new DE("div", "component-list-layout",
+	[
+		new DE("div", "toolbar", options.toolbar),
+
+		new DE("aside", "list",
 		[
-			new DE("div", "toolbar", options.toolbar),
+			options.groupManager.getListLayoutGroups().map((group) => Group(group)),
+		]),
 
-			new DE("aside", "list", options.groupManager.getListLayoutGroups().map((group) => Group(group))),
+		new DE("div", "buttons",
+		[
+			Button(
+			{
+				style: "secondary",
+				type: "button",
+				extraAttributes:
+				{
+					"data-action": "toggleGroups",
+				},
+				iconName: "fa-solid fa-chevron-down",
+				text: "Expand all groups",
+			}),
 
-			new DE("div", "buttons",
-				[
-					Button(
-						{
-							style: "secondary",
-							type: "button",
-							extraAttributes:
-							{
-								"data-action": "toggleGroups",
-							},
-							iconName: "fa-solid fa-chevron-down",
-							text: "Expand all groups",
-						}),
+			Button(
+			{
+				style: "success",
+				href: options.createHref,
+				extraAttributes:
+				{
+					"data-pjax-selector": "main",
+				},
+				iconName: "fa-solid fa-plus",
+				text: "Create new",
+			}),
+		]),
 
-					Button(
-						{
-							style: "success",
-							href: options.createHref,
-							extraAttributes:
-							{
-								"data-pjax-selector": "main",
-							},
-							iconName: "fa-solid fa-plus",
-							text: "Create new",
-						}),
-				]),
-
-			new DE("main", "content", options.content ?? Logo()),
-		]);
+		new DE("main", "content", options.content ?? Logo()),
+	]);
 }

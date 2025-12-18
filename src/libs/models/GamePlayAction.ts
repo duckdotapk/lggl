@@ -10,9 +10,16 @@ import { LGGL_CURRENT_PLATFORM_ID } from "../../env/LGGL_CURRENT_PLATFORM_ID.js"
 
 import { prismaClient } from "../../instances/prismaClient.js";
 
-import * as SettingModelLib from "./Setting.js";
+import { Settings } from "./Setting.js";
 
-import * as SystemLib from "../System.js";
+import
+{
+	findRunningProcess,
+	isProcessStillRunning,
+	parseProcessRequirements,
+	startProcessViaExecutable,
+	startProcessViaUrl,
+} from "../System.js";
 
 //
 // Types
@@ -40,9 +47,7 @@ export const typeNames: Record<GamePlayActionType, string> =
 // Utility Functions
 //
 
-export type ExecuteGamePlayAction = Prisma.GamePlayActionGetPayload<{ include: { game: true } }>;
-
-export type ExecuteResult =
+export type ExecuteGamePlayActionResult =
 {
 	success: true;
 } |
@@ -51,7 +56,17 @@ export type ExecuteResult =
 	error: string;
 };
 
-export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: SettingModelLib.Settings): Promise<string | null>
+export async function executeGamePlayAction
+(
+	gamePlayAction: Prisma.GamePlayActionGetPayload<
+	{
+		include:
+		{
+			game: true;
+		};
+	}>,
+	settings: Settings,
+): Promise<string | null>
 {
 	//
 	// Parse Process Requirements
@@ -59,11 +74,32 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 
 	console.log("[GamePlayActionLib] Parsing GamePlayAction processRequirements...");
 
-	const [ processRequirements, parseProcessRequirementsError ] = SystemLib.parseProcessRequirements(gamePlayAction.processRequirements);
+	const
+	[
+		processRequirements,
+		parseProcessRequirementsError,
+	] = parseProcessRequirements(gamePlayAction.processRequirements);
 
 	if (parseProcessRequirementsError != null)             
 	{
 		return parseProcessRequirementsError;
+	}
+
+	//
+	// Check for Process
+	//
+
+	const alreadyRunningProcess = await findRunningProcess(
+		processRequirements,
+		1,
+		settings.processCheckInterval,
+	);
+
+	if (alreadyRunningProcess != null)
+	{
+		// TODO: check if there is NOT an active session for
+		// 	this game and start one instead of erroring
+		return "Game process is already running.";
 	}
 
 	//
@@ -90,27 +126,31 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 				}
 				catch (error)
 				{
-					return "GamePlayAction " + gamePlayAction.id + " additionalArguments is not valid JSON.";
+					return "GamePlayAction " + gamePlayAction.id +
+						" additionalArguments is not valid JSON.";
 				}
 
-				const additionalArgumentsParseResult = z.array(z.string()).safeParse(additionalArgumentsJson);
+				const additionalArgumentsParseResult = z.array(z.string()).safeParse(
+					additionalArgumentsJson,
+				);
 
 				if (!additionalArgumentsParseResult.success)
 				{
-					return "GamePlayAction " + gamePlayAction.id + " additionalArguments is not an array of strings.";
+					return "GamePlayAction " + gamePlayAction.id +
+						" additionalArguments is not an array of strings.";
 				}
 
 				additionalArguments = additionalArgumentsParseResult.data;
 			}
 
-			SystemLib.startProcessViaExecutable(gamePlayAction.path, workingDirectory, additionalArguments);
+			startProcessViaExecutable(gamePlayAction.path, workingDirectory, additionalArguments);
 
 			break;
 		}
 
 		case "URL":
 		{
-			SystemLib.startProcessViaUrl(gamePlayAction.path);
+			startProcessViaUrl(gamePlayAction.path);
 
 			break;
 		}
@@ -122,7 +162,10 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 
 	if (settings.initialProcessCheckDelay > 0)
 	{
-		console.log("[GamePlayActionLib] Waiting %d ms before checking for process...", settings.initialProcessCheckDelay);
+		console.log(
+			"[GamePlayActionLib] Waiting %d ms before checking for process...",
+			settings.initialProcessCheckDelay,
+		);
 
 		await new Promise(resolve => setTimeout(resolve, settings.initialProcessCheckDelay));
 	}
@@ -131,7 +174,11 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 	// Find Game Process
 	//
 
-	const runningProcess = await SystemLib.findRunningProcess(processRequirements, settings.maxProcessCheckAttempts, settings.processCheckInterval);
+	const runningProcess = await findRunningProcess(
+		processRequirements,
+		settings.maxProcessCheckAttempts,
+		settings.processCheckInterval,
+	);
 
 	if (runningProcess == null)
 	{
@@ -189,27 +236,34 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 
 	const timeoutCallback = async () =>
 	{
-		const processStillRunning = await SystemLib.isProcessStillRunning(processRequirements, runningProcess);
+		const processStillRunning = await isProcessStillRunning(processRequirements, runningProcess);
 
 		const gamePlaySessionEndDateTime = DateTime.now();
 
-		const gamePlaySessionPlayTimeSeconds = Math.round(gamePlaySessionEndDateTime.toSeconds() - DateTime.fromJSDate(gamePlaySession.startDate).toSeconds());
+		const gamePlaySessionPlayTimeSeconds = Math.round(
+			gamePlaySessionEndDateTime.toSeconds() -
+			DateTime.fromJSDate(gamePlaySession.startDate).toSeconds(),
+		);
 
-		console.log("[GamePlayActionLib] Updating game play session %d with %d seconds of play time...", gamePlaySession.id, gamePlaySessionPlayTimeSeconds);
+		console.log(
+			"[GamePlayActionLib] Updating game play session %d with %d seconds of play time...",
+			gamePlaySession.id,
+			gamePlaySessionPlayTimeSeconds,
+		);
 
 		await prismaClient.gamePlaySession.update(
+		{
+			where:
 			{
-				where:
-				{
-					id: gamePlaySession.id,
-				},
-				data:
-				{
-					endDate: gamePlaySessionEndDateTime.toJSDate(),
-					playTimeSeconds: gamePlaySessionPlayTimeSeconds,
-					addedToTotal: !processStillRunning,
-				},
-			});
+				id: gamePlaySession.id,
+			},
+			data:
+			{
+				endDate: gamePlaySessionEndDateTime.toJSDate(),
+				playTimeSeconds: gamePlaySessionPlayTimeSeconds,
+				addedToTotal: !processStillRunning,
+			},
+		});
 
 		if (processStillRunning)
 		{
@@ -218,20 +272,22 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 			return;
 		}
 
-		console.log("[GamePlayActionLib] Game process is no longer running. Updating game play time...");
+		console.log(
+			"[GamePlayActionLib] Game process is no longer running. Updating game play time...",
+		);
 		
 		await prismaClient.game.update(
+		{
+			where:
 			{
-				where:
-				{
-					id: gamePlaySession.game_id,
-				},
-				data:
-				{
-					lastPlayedDate: gamePlaySessionEndDateTime.toJSDate(),
-					playTimeTotalSeconds: { increment: gamePlaySessionPlayTimeSeconds },
-				},
-			});
+				id: gamePlaySession.game_id,
+			},
+			data:
+			{
+				lastPlayedDate: gamePlaySessionEndDateTime.toJSDate(),
+				playTimeTotalSeconds: { increment: gamePlaySessionPlayTimeSeconds },
+			},
+		});
 	}
 
 	setTimeout(timeoutCallback, settings.processCheckInterval);

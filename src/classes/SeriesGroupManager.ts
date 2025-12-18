@@ -2,6 +2,8 @@
 // Imports
 //
 
+import util from "node:util";
+
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
@@ -32,7 +34,10 @@ export abstract class SeriesGroupManager<T extends Prisma.SeriesGetPayload<null>
 
 	override getItemInfo(series: T)
 	{
-		return [ "Last updated ", HumanDateTime(DateTime.fromJSDate(series.lastUpdatedDate)) ];
+		return [
+			"Last updated ",
+			HumanDateTime(DateTime.fromJSDate(series.lastUpdatedDate)),
+		];
 	}
 }
 
@@ -56,7 +61,13 @@ export class NameSeriesGroupManager extends SeriesGroupManager
 	}
 }
 
-export type NumberOfGamesSeriesGroupManagerSeries = Prisma.SeriesGetPayload<{ include: { seriesGames: true } }>;
+export type NumberOfGamesSeriesGroupManagerSeries = Prisma.SeriesGetPayload<
+{
+	include:
+	{
+		seriesGames: true;
+	};
+}>;
 
 export class NumberOfGamesSeriesGroupManager extends SeriesGroupManager<NumberOfGamesSeriesGroupManagerSeries>
 {
@@ -69,7 +80,11 @@ export class NumberOfGamesSeriesGroupManager extends SeriesGroupManager<NumberOf
 	{
 		for (const series of seriesList)
 		{
-			const groupName = series.seriesGames.length + " game" + (series.seriesGames.length == 1 ? "" : "s");
+			const groupName = util.format(
+				"%d game%s",
+				series.seriesGames.length,
+				series.seriesGames.length == 1 ? "" : "s",
+			);
 
 			this.addModelToGroup(groupName, series);
 		}

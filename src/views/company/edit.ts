@@ -16,8 +16,8 @@ import { CompanySettingsToolbar } from "../../components/toolbar/CompanySettings
 import { SiteOptions } from "../../components/Site.js";
 import { Wrapper } from "../../components/Wrapper.js";
 
-import * as CompanyModelLib from "../../libs/models/Company.js";
-import * as SettingModelLib from "../../libs/models/Setting.js";
+import { createCompanyGroupManager } from "../../libs/models/Company.js";
+import { Settings } from "../../libs/models/Setting.js";
 
 //
 // View
@@ -25,8 +25,8 @@ import * as SettingModelLib from "../../libs/models/Setting.js";
 
 type ViewOptions =
 {
-	settings: SettingModelLib.Settings;
-	groupManager: Awaited<ReturnType<typeof CompanyModelLib.createGroupManager>>;
+	settings: Settings;
+	groupManager: Awaited<ReturnType<typeof createCompanyGroupManager>>;
 	company: Prisma.CompanyGetPayload<null>;
 };
 
@@ -36,35 +36,35 @@ export function view(options: ViewOptions): Partial<SiteOptions>
 		currentPage: "companies",
 		pageTitle: "Edit " + options.company.name + " | Companies",
 		content: ListLayout(
-			{
-				toolbar: CompanySettingsToolbar(options.settings),
-				groupManager: options.groupManager,
-				createHref: "/companies/create",
-				content: Wrapper(
-					[
-						Breadcrumbs(
-							[
-								{
-									href: "/companies",
-									text: "Companies",
-									pjaxSelector: "main",
-								},
-								{
-									href: "/companies/view/" + options.company.id,
-									text: options.company.name,
-									pjaxSelector: "main",
-								},
-								{
-									href: "/companies/edit/" + options.company.id,
-									text: "Edit",
-									pjaxSelector: "main",
-								},
-							]),
+		{
+			toolbar: CompanySettingsToolbar(options.settings),
+			groupManager: options.groupManager,
+			createHref: "/companies/create",
+			content: Wrapper(
+			[
+				Breadcrumbs(
+				[
+					{
+						href: "/companies",
+						text: "Companies",
+						pjaxSelector: "main",
+					},
+					{
+						href: "/companies/view/" + options.company.id,
+						text: options.company.name,
+						pjaxSelector: "main",
+					},
+					{
+						href: "/companies/edit/" + options.company.id,
+						text: "Edit",
+						pjaxSelector: "main",
+					},
+				]),
 
-						Header(1, "Edit " + options.company.name),
-		
-						UpsertCompanyForm(options.company),
-					]),
-			}),
+				Header(1, "Edit " + options.company.name),
+
+				UpsertCompanyForm(options.company),
+			]),
+		}),
 	};
 }

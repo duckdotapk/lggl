@@ -2,7 +2,7 @@
 // Imports
 //
 
-import * as Fritter from "@donutteam/fritter";
+import { RouterMiddleware } from "@lorenstuff/fritter";
 
 import { ServerFritterContext } from "../instances/server.js";
 
@@ -12,7 +12,7 @@ import { ServerFritterContext } from "../instances/server.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
+export const route: RouterMiddleware.Route<RouteFritterContext> =
 {
 	method: "GET",
 	path: "/",

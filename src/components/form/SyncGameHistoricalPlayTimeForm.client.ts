@@ -2,12 +2,20 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getElementOrThrow,
+	getInputBooleanValue,
+	getInputNumberValue,
+	getIntegerDataOrThrow,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { reloadView } from "../../libs/client/Pjax.client.js";
 
-import { syncHistoricalPlayTime } from "../../routes/api/game/syncHistoricalPlaytime.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as schema from "../../routes/api/game/syncHistoricalPlaytime.schemas.js";
 
 //
 // Locals
@@ -15,26 +23,42 @@ import { syncHistoricalPlayTime } from "../../routes/api/game/syncHistoricalPlay
 
 async function initialise(form: HTMLFormElement)
 {
-	const gameId = BrowserUtilities.ElementClientLib.getIntegerDataOrThrow(form, "gameId");
+	const gameId = getIntegerDataOrThrow(form, "gameId");
 
-	const steamAppIdInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="steamAppId"]`);
-	const updateFirstPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="updateFirstPlayedDate"]`);
-	const updateLastPlayedDateInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="updateLastPlayedDate"]`);
+	const steamAppIdInput = getElementOrThrow<HTMLInputElement>(form, `[name="steamAppId"]`);
+	const updateFirstPlayedDateInput = getElementOrThrow<HTMLInputElement>(
+		form,
+		`[name="updateFirstPlayedDate"]`,
+	);
+	const updateLastPlayedDateInput = getElementOrThrow<HTMLInputElement>(
+		form,
+		`[name="updateLastPlayedDate"]`,
+	);
 
-	InputClientLib.initialiseForm(
+	initialiseForm(
+	{
+		form,
+		submitter: form,
+		requireConfirmation: false,
+		onSubmit: async () => await apiRequest(
 		{
-			form,
-			submitter: form,
-			requireConfirmation: false,
-			onSubmit: async () => await syncHistoricalPlayTime(gameId,
+			schema,
+			requestBody:
+			{
+				id: gameId,
+				provider:
 				{
 					name: "steam",
-					steamAppId: InputClientLib.getNumberValue(steamAppIdInput),
-					updateFirstPlayedDate: InputClientLib.getBooleanValue(updateFirstPlayedDateInput),
-					updateLastPlayedDate: InputClientLib.getBooleanValue(updateLastPlayedDateInput),
-				}),
-			onSuccess: async () => PjaxClientLib.reloadView(),
-		});
+					steamAppId: getInputNumberValue(steamAppIdInput),
+					updateFirstPlayedDate: getInputBooleanValue(updateFirstPlayedDateInput),
+					updateLastPlayedDate: getInputBooleanValue(updateLastPlayedDateInput),
+				},
+			},
+		}).getResponse(),
+		onSuccess: async () => reloadView(),
+	});
+
+	form.classList.add("initialised");
 }
 
 //
@@ -43,19 +67,15 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseSyncGameHistoricalSteamPlayTimeForm()
 {
-	const syncGameHistoricalSteamPlayTimeForms = document.querySelectorAll<HTMLFormElement>(".component-sync-game-historical-play-time-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-sync-game-historical-play-time-form:not(.initialised)"
+	);
 
-	for (const syncGameHistoricalSteamPlayTimeForm of syncGameHistoricalSteamPlayTimeForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(syncGameHistoricalSteamPlayTimeForm);
-
-			syncGameHistoricalSteamPlayTimeForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[SyncGameHistoricalPlayTimeForm] Error initialising:", syncGameHistoricalSteamPlayTimeForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[SyncGameHistoricalPlayTimeForm] Initialised:", form))
+			.catch((error) =>
+				console.error("[SyncGameHistoricalPlayTimeForm] Error initialised:", form, error));
 	}
 }

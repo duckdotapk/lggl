@@ -2,14 +2,22 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getElementOrThrow,
+	getInputStringValue,
+	getInputStringValueNullable,
+	getIntegerData,
+} from "@lorenstuff/browser-utilities";
 
-import * as InputClientLib from "../../libs/client/Input.client.js";
-import * as PjaxClientLib from "../../libs/client/Pjax.client.js";
+import { initialiseForm } from "../../libs/client/Input.client.js";
+import { changeView, reloadView } from "../../libs/client/Pjax.client.js";
 
-import { createEngine } from "../../routes/api/engine/create.schemas.js";
-import { deleteEngine } from "../../routes/api/engine/delete.schemas.js";
-import { updateEngine } from "../../routes/api/engine/update.schemas.js";
+import { apiRequest } from "../../libs/Api.client.js";
+
+import * as createEngineSchema from "../../routes/api/engine/create.schemas.js";
+import * as deleteEngineSchema from "../../routes/api/engine/delete.schemas.js";
+import * as updateEngineSchema from "../../routes/api/engine/update.schemas.js";
 
 //
 // Locals
@@ -17,51 +25,70 @@ import { updateEngine } from "../../routes/api/engine/update.schemas.js";
 
 async function initialise(form: HTMLFormElement)
 {
-	const engineId = BrowserUtilities.ElementClientLib.getIntegerData(form, "engineId");
+	const engineId = getIntegerData(form, "engineId");
 
-	const nameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
-	const shortNameInput = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLInputElement>(form, `[name="shortName"]`);
+	const nameInput = getElementOrThrow<HTMLInputElement>(form, `[name="name"]`);
+	const shortNameInput = getElementOrThrow<HTMLInputElement>(form, `[name="shortName"]`);
 
 	if (engineId == null)
 	{
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await createEngine(
-					{
-						name: InputClientLib.getStringValue(nameInput),
-						shortName: InputClientLib.getStringValueNullable(shortNameInput),
-					}),
-				onSuccess: async (response) => PjaxClientLib.changeView("/engines/edit/" + response.engine.id),
-			});
+				schema: createEngineSchema,
+				requestBody:
+				{
+					name: getInputStringValue(nameInput),
+					shortName: getInputStringValueNullable(shortNameInput),
+				},
+			}).getResponse(),
+			onSuccess: async (response) => changeView("/engines/edit/" + response.engine.id),
+		});
 	}
 	else
 	{
-		const deleteButton = BrowserUtilities.ElementClientLib.getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
+		const deleteButton = getElementOrThrow<HTMLButtonElement>(form, `[data-action="delete"]`);
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: deleteButton,
+			requireConfirmation: true,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: deleteButton,
-				requireConfirmation: true,
-				onSubmit: async () => await deleteEngine(engineId),
-				onSuccess: async () => PjaxClientLib.changeView("/engines"),
-			});
+				schema: deleteEngineSchema,
+				requestBody:
+				{
+					id: engineId,
+				},
+			}).getResponse(),
+			onSuccess: async () => changeView("/engines"),
+		});
 
-		InputClientLib.initialiseForm(
+		initialiseForm(
+		{
+			form,
+			submitter: form,
+			requireConfirmation: false,
+			onSubmit: async () => await apiRequest(
 			{
-				form,
-				submitter: form,
-				requireConfirmation: false,
-				onSubmit: async () => await updateEngine(engineId,
+				schema: updateEngineSchema,
+				requestBody:
+				{
+					id: engineId,
+					updateData:
 					{
-						name: InputClientLib.getStringValue(nameInput),
-						shortName: InputClientLib.getStringValueNullable(shortNameInput),
-					}),
-				onSuccess: async () => PjaxClientLib.reloadView(),
-			});
+						name: getInputStringValue(nameInput),
+						shortName: getInputStringValueNullable(shortNameInput),
+					},
+				},
+			}).getResponse(),
+			onSuccess: async () => reloadView(),
+		});
 	}
 }
 
@@ -71,19 +98,14 @@ async function initialise(form: HTMLFormElement)
 
 export async function initialiseUpsertEngineForms()
 {
-	const upsertEngineForms = document.querySelectorAll<HTMLFormElement>(".component-upsert-engine-form:not(.initialised)");
+	const forms = document.querySelectorAll<HTMLFormElement>(
+		".component-upsert-engine-form:not(.initialised)",
+	);
 
-	for (const upsertEngineForm of upsertEngineForms)
+	for (const form of forms)
 	{
-		try
-		{
-			await initialise(upsertEngineForm);
-
-			upsertEngineForm.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[UpsertEngineForm] Error initialising:", upsertEngineForm, error);
-		}
+		initialise(form)
+			.then(() => console.log("[UpsertEngineForm] Initialised:", form))
+			.catch((error) => console.error("[UpsertEngineForm] Error initialising:", form, error));
 	}
 }

@@ -14,31 +14,32 @@ import { Button } from "../input/Button.js";
 // Component
 //
 
-export type ChooseGamePlayActionDialogGamePlayActions = Prisma.GamePlayActionGetPayload<
+export function ChooseGamePlayActionDialog
+(
+	gamePlayActions: Prisma.GamePlayActionGetPayload<
 	{
 		select:
 		{
 			id: true;
 			name: true;
 		};
-	}>[];
-
-export function ChooseGamePlayActionDialog(gamePlayActions: ChooseGamePlayActionDialogGamePlayActions)
+	}>[],
+)
 {
 	return Dialog("component-choose-game-play-action-dialog", null,
-		[
-			Header(2, "Choose play action"),
+	[
+		Header(2, "Choose play action"),
 
-			gamePlayActions.map((gamePlayAction) => Button(
-				{
-					style: "success",
-					type: "button",
-					extraAttributes:
-					{
-						"data-game-play-action-id": gamePlayAction.id,
-					},
-					iconName: "fa-solid fa-play",
-					text: gamePlayAction.name,
-				})),
-		]);
+		gamePlayActions.map((gamePlayAction) => Button(
+		{
+			style: "success",
+			type: "button",
+			extraAttributes:
+			{
+				"data-game-play-action-id": gamePlayAction.id,
+			},
+			iconName: "fa-solid fa-play",
+			text: gamePlayAction.name,
+		})),
+	]);
 }

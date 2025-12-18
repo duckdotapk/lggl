@@ -9,20 +9,20 @@ import * as Notyf from "notyf";
 //
 
 export const notyf = new Notyf.Notyf(
-	{
-		duration: 5000,
-		ripple: false,
-		types:
-		[
+{
+	duration: 5000,
+	ripple: false,
+	types:
+	[
+		{
+			type: "error",
+			className: "notyf-notification",
+			icon:
 			{
-				type: "error",
-				className: "notyf-notification",
-				icon:
-				{
-					className: "fa-solid fa-exclamation-triangle",
-					tagName: "span",
-					color: "#ffffff",
-				},
+				className: "fa-solid fa-exclamation-triangle",
+				tagName: "span",
+				color: "#ffffff",
 			},
-		],
-	});
+		},
+	],
+});

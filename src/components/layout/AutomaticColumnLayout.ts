@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { Child, DE } from "@donutteam/document-builder";
+import { Child, DE } from "@lorenstuff/document-builder";
 
 //
 // Component
@@ -15,5 +15,6 @@ export function AutomaticColumnLayout(minimumColumnWidth: string, children: Chil
 			class: "component-automatic-column-layout",
 			style: "--component-automatic-column-layout-minimum-column-width: " + minimumColumnWidth + ";",
 		},
-		children);
+		children,
+	);
 }

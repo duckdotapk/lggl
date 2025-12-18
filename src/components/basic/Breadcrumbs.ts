@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 
 //
 // Locals
@@ -17,16 +17,24 @@ type ItemOptions =
 
 function Item(options: ItemOptions)
 {
+	const
+	{
+		href,
+		text,
+		pjaxSelector = undefined,
+	} = options;
+
 	return new DE("a",
 		{
 			class: "component-breadcrumbs-item",
-			href: options.href,
+			href,
 
-			"data-pjax-selector": options.pjaxSelector,
+			"data-pjax-selector": pjaxSelector,
 		},
 		[
-			new DE("span", "text", options.text),
-		]);
+			new DE("span", "text", text),
+		],
+	);
 }
 
 //

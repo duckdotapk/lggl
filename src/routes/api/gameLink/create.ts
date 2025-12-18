@@ -2,12 +2,12 @@
 // Imports
 //
 
-import * as FritterApiUtilities from "@donutteam/fritter-api-utilities";
-
 import { prismaClient } from "../../../instances/prismaClient.js";
 import { ServerFritterContext } from "../../../instances/server.js";
 
-import * as Schemas from "./create.schemas.js";
+import { ApiError, createEndpointRoute } from "../../../libs/Api.js";
+
+import * as schema from "./create.schemas.js";
 
 //
 // Route
@@ -15,41 +15,42 @@ import * as Schemas from "./create.schemas.js";
 
 type RouteFritterContext = ServerFritterContext;
 
-export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext, typeof Schemas.RequestBodySchema, typeof Schemas.ResponseBodySchema>(
+export const route = createEndpointRoute<RouteFritterContext, typeof schema.RequestBodySchema, typeof schema.ResponseBodySchema>(
+{
+	schema,
+	middlewares: [],
+	handler: async (requestBody) =>
 	{
-		method: Schemas.method,
-		path: Schemas.path,
-		middlewares: [],
-		requestBodySchema: Schemas.RequestBodySchema,
-		responseBodySchema: Schemas.ResponseBodySchema,
-		handler: async (requestBody) =>
+		const game = await prismaClient.game.findUnique(
 		{
-			const game = await prismaClient.game.findUnique(
-				{
-					where:
-					{
-						id: requestBody.game_id,
-					},
-				});
-
-			if (game == null)
+			where:
 			{
-				throw new FritterApiUtilities.APIError({ code: "NOT_FOUND", message: "Game not found." });
-			}
+				id: requestBody.game_id,
+			},
+		});
 
-			await prismaClient.gameLink.create(
-				{
-					data:
-					{
-						title: requestBody.title,
-						url: requestBody.url,
+		if (game == null)
+		{
+			throw new ApiError(
+			{
+				code: "NOT_FOUND",
+				message: "Game not found.",
+			});
+		}
 
-						game_id: game.id,
-					},
-				});
+		await prismaClient.gameLink.create(
+		{
+			data:
+			{
+				title: requestBody.title,
+				url: requestBody.url,
 
-			return {
-				success: true,
-			};
-		},
-	});
+				game_id: game.id,
+			},
+		});
+
+		return {
+			success: true,
+		};
+	},
+});

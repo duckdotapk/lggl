@@ -4,29 +4,37 @@
 
 import { Prisma } from "@prisma/client";
 
-import { NameSeriesGroupManager, NumberOfGamesSeriesGroupManager } from "../../classes/SeriesGroupManager.js";
+import
+{
+	NameSeriesGroupManager,
+	NumberOfGamesSeriesGroupManager,
+} from "../../classes/SeriesGroupManager.js";
 
-import * as SettingModelLib from "../models/Setting.js";
+import { Settings } from "../models/Setting.js";
 
 //
 // Create/Find/Update/Delete Functions
 //
 
-export async function createGroupManager(transactionClient: Prisma.TransactionClient, settings: SettingModelLib.Settings, selectedSeries: Prisma.SeriesGetPayload<null> | null)
+export async function createSeriesGroupManager
+(
+	transactionClient: Prisma.TransactionClient,
+	settings: Settings,
+	selectedSeries: Prisma.SeriesGetPayload<null> | null,
+)
 {
 	const seriesList = await transactionClient.series.findMany(
+	{
+		include:
 		{
-			include:
-			{
-				seriesGames: true,
-			},
-		});
+			seriesGames: true,
+		},
+	});
 
 	switch (settings.seriesGroupMode)
 	{
 		case "name":
 			return new NameSeriesGroupManager(settings, seriesList, selectedSeries);
-
 		case "numberOfGames":
 			return new NumberOfGamesSeriesGroupManager(settings, seriesList, selectedSeries);
 	}

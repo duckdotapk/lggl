@@ -2,7 +2,11 @@
 // Imports
 //
 
-import * as BrowserUtilities from "@donutteam/browser-utilities";
+import
+{
+	getElement,
+	getElementOrThrow,
+} from "@lorenstuff/browser-utilities";
 
 //
 // Locals
@@ -12,11 +16,16 @@ async function initialise(element: HTMLElement)
 {
 	let allGroupsCollapsed = true;
 
-	const listLayoutGroups = element.querySelectorAll<HTMLDetailsElement>(".component-list-layout-group");
-	const selectedListLayoutGroupItem = BrowserUtilities.ElementClientLib.getElement<HTMLAnchorElement>(element, ".component-list-layout-group-item.selected");
-	const toggleGroupsButton = BrowserUtilities.ElementClientLib.getElementOrThrow(element, `[data-action="toggleGroups"]`);
-	const toggleGroupsButtonIcon = BrowserUtilities.ElementClientLib.getElementOrThrow(toggleGroupsButton, ".icon");
-	const toggleGroupsButtonText = BrowserUtilities.ElementClientLib.getElementOrThrow(toggleGroupsButton, ".text");
+	const listLayoutGroups = element.querySelectorAll<HTMLDetailsElement>(
+		".component-list-layout-group",
+	);
+	const selectedListLayoutGroupItem = getElement<HTMLAnchorElement>(
+		element,
+		".component-list-layout-group-item.selected",
+	);
+	const toggleGroupsButton = getElementOrThrow(element, `[data-action="toggleGroups"]`);
+	const toggleGroupsButtonIcon = getElementOrThrow(toggleGroupsButton, ".icon");
+	const toggleGroupsButtonText = getElementOrThrow(toggleGroupsButton, ".text");
 
 	const setGroupsCollapsed = (collapsed: boolean) =>
 	{
@@ -27,13 +36,19 @@ async function initialise(element: HTMLElement)
 
 		allGroupsCollapsed = collapsed;
 
-		toggleGroupsButtonIcon.className = collapsed ? "icon fa-solid fa-chevron-down" : "icon fa-solid fa-chevron-up";
-		toggleGroupsButtonText.textContent = collapsed ? "Expand all groups" : "Collapse all groups";
+		toggleGroupsButtonIcon.className = collapsed
+			? "icon fa-solid fa-chevron-down"
+			: "icon fa-solid fa-chevron-up";
+		toggleGroupsButtonText.textContent = collapsed 
+			? "Expand all groups"
+			: "Collapse all groups";
 	}
 
 	if (selectedListLayoutGroupItem != null)
 	{
-		const gameListGroup = selectedListLayoutGroupItem.closest<HTMLDetailsElement>(".component-list-layout-group");
+		const gameListGroup = selectedListLayoutGroupItem.closest<HTMLDetailsElement>(
+			".component-list-layout-group",
+		);
 	
 		if (gameListGroup != null)
 		{
@@ -52,20 +67,15 @@ async function initialise(element: HTMLElement)
 
 export async function initialiseListLayouts()
 {
-	const listLayouts = document.querySelectorAll<HTMLElement>(".component-list-layout:not(.initialised)");
+	const listLayouts = document.querySelectorAll<HTMLElement>(
+		".component-list-layout:not(.initialised)",
+	);
 
 	for (const element of listLayouts)
 	{
-		try
-		{
-			await initialise(element);
-			
-			element.classList.add("initialised");
-		}
-		catch (error)
-		{
-			console.error("[ListLayout] Error initialising:", element, error);
-		}
+		initialise(element)
+			.then(() => console.log("[ListLayout] Initialised:", element))
+			.catch((error) => console.error("[ListLayout] Error initialising:", element, error));
 	}
 }
 
@@ -75,7 +85,9 @@ export async function updateListLayouts()
 
 	for (const listLayout of listLayouts)
 	{
-		const listLayoutGroupItems = listLayout.querySelectorAll<HTMLAnchorElement>(".component-list-layout-group-item");
+		const listLayoutGroupItems = listLayout.querySelectorAll<HTMLAnchorElement>(
+			".component-list-layout-group-item",
+		);
 
 		for (const listLayoutGroupItem of listLayoutGroupItems)
 		{

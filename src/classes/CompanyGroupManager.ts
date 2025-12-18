@@ -2,13 +2,14 @@
 // Imports
 //
 
+import util from "node:util";
+
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
 
 import { GroupManager } from "./GroupManager.js";
 
 import { HumanDateTime } from "../components/basic/HumanDateTime.js";
-
 //
 // Class
 //
@@ -32,7 +33,10 @@ export abstract class CompanyGroupManager<T extends Prisma.CompanyGetPayload<nul
 
 	override getItemInfo(company: T)
 	{
-		return [ "Last updated ", HumanDateTime(DateTime.fromJSDate(company.lastUpdatedDate)) ];
+		return [ 
+			"Last updated ",
+			HumanDateTime(DateTime.fromJSDate(company.lastUpdatedDate)),
+		];
 	}
 }
 
@@ -56,7 +60,13 @@ export class NameCompanyGroupManager extends CompanyGroupManager
 	}
 }
 
-export type NumberOfGamesDevelopedCompanyGroupManagerCompany = Prisma.CompanyGetPayload<{ include: { gameCompanies: true } }>;
+export type NumberOfGamesDevelopedCompanyGroupManagerCompany = Prisma.CompanyGetPayload<
+{
+	include:
+	{
+		gameCompanies: true;
+	};
+}>;
 
 export class NumberOfGamesDevelopedCompanyGroupManager extends CompanyGroupManager<NumberOfGamesDevelopedCompanyGroupManagerCompany>
 {
@@ -67,7 +77,9 @@ export class NumberOfGamesDevelopedCompanyGroupManager extends CompanyGroupManag
 			{
 				return {
 					company,
-					numberOfGamesDeveloped: company.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER").length,
+					numberOfGamesDeveloped: company.gameCompanies.filter(
+						(gameCompany) => gameCompany.type == "DEVELOPER"
+					).length,
 				};
 			})
 			.toSorted((a, b) =>
@@ -91,9 +103,15 @@ export class NumberOfGamesDevelopedCompanyGroupManager extends CompanyGroupManag
 	{
 		for (const company of companies)
 		{
-			const numberOfGamesDeveloped = company.gameCompanies.filter((gameCompany) => gameCompany.type == "DEVELOPER").length;
+			const numberOfGamesDeveloped = company.gameCompanies.filter(
+				(gameCompany) => gameCompany.type == "DEVELOPER",
+			).length;
 
-			const groupName = numberOfGamesDeveloped + " game" + (numberOfGamesDeveloped == 1 ? "" : "s") + " developed";
+			const groupName = util.format(
+				"%d game%s developed",
+				numberOfGamesDeveloped,
+				numberOfGamesDeveloped == 1 ? "" : "s",
+			);
 
 			this.addModelToGroup(groupName, company);
 		}
@@ -102,7 +120,13 @@ export class NumberOfGamesDevelopedCompanyGroupManager extends CompanyGroupManag
 	}
 }
 
-export type NumberOfGamesPublishedCompanyGroupManagerCompany = Prisma.CompanyGetPayload<{ include: { gameCompanies: true } }>;
+export type NumberOfGamesPublishedCompanyGroupManagerCompany = Prisma.CompanyGetPayload<
+{
+	include:
+	{
+		gameCompanies: true;
+	};
+}>;
 
 export class NumberOfGamesPublishedCompanyGroupManager extends CompanyGroupManager<NumberOfGamesPublishedCompanyGroupManagerCompany>
 {
@@ -113,7 +137,9 @@ export class NumberOfGamesPublishedCompanyGroupManager extends CompanyGroupManag
 			{
 				return {
 					company,
-					numberOfGamesPublished: company.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER").length,
+					numberOfGamesPublished: company.gameCompanies.filter(
+						(gameCompany) => gameCompany.type == "PUBLISHER",
+					).length,
 				};
 			})
 			.toSorted((a, b) =>
@@ -137,9 +163,14 @@ export class NumberOfGamesPublishedCompanyGroupManager extends CompanyGroupManag
 	{
 		for (const company of companies)
 		{
-			const numberOfGamesPublished = company.gameCompanies.filter((gameCompany) => gameCompany.type == "PUBLISHER").length;
+			const numberOfGamesPublished = company.gameCompanies.filter
+			((gameCompany) => gameCompany.type == "PUBLISHER").length;
 
-			const groupName = numberOfGamesPublished + " game" + (numberOfGamesPublished == 1 ? "" : "s") + " published";
+			const groupName = util.format(
+				"%d game%s published",
+				numberOfGamesPublished,
+				numberOfGamesPublished == 1 ? "" : "s",
+			);
 
 			this.addModelToGroup(groupName, company);
 		}

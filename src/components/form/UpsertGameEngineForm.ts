@@ -2,7 +2,7 @@
 // Imports
 //
 
-import { DE } from "@donutteam/document-builder";
+import { DE } from "@lorenstuff/document-builder";
 import { Prisma } from "@prisma/client";
 
 import { Button } from "../input/Button.js";
@@ -17,95 +17,102 @@ import { ColumnLayout } from "../layout/ColumnLayout.js";
 
 export type UpsertGameEngineFormOptions =
 {
-	engines: Prisma.EngineGetPayload<null>[];
-	game: Prisma.GameGetPayload<null>;
-	gameEngine: Prisma.GameEngineGetPayload<{ include: { engine: true } }> | null;
 }
 
-export function UpsertGameEngineForm(options: UpsertGameEngineFormOptions)
+export function UpsertGameEngineForm
+(
+	engines: Prisma.EngineGetPayload<null>[],
+	game: Prisma.GameGetPayload<null>,
+	gameEngine: Prisma.GameEngineGetPayload<{ include: { engine: true } }> | null,
+)
 {
 	return new DE("form",
 		{
 			class: "component-upsert-game-engine-form",
 			autocomplete: "off",
 
-			"data-game-id": options.game.id,
-			"data-game-engine-id": options.gameEngine?.id ?? null,
+			"data-game-id": game.id,
+			"data-game-engine-id": gameEngine?.id ?? null,
 		},
 		[
 			ColumnLayout(3,
+			[
+				new DE("div", null,
 				[
-					new DE("div", null,
-						[
-							Label("engine_id", "Engine"),
-
-							Control(
-								{
-									type: "select",
-									name: "engine_id",
-									required: true,
-									value: options.gameEngine?.engine_id,
-									showEmptyOption: true,
-									options: options.engines.map((engine) => ({ value: engine.id, label: engine.name }))
-								}),
-						]),
-
-					new DE("div", null,
-						[
-							Label("version", "Version (optional)"),
-
-							Control(
-								{
-									type: "text",
-									name: "version",
-									required: false,
-									placeholder: "Version",
-									value: options.gameEngine?.version,
-								}),
-						]),
-
-					new DE("div", null,
-						[
-							Label("notes", "Notes (optional)"),
-
-							Control(
-								{
-									type: "text",
-									name: "notes",
-									required: false,
-									placeholder: "Notes",
-									value: options.gameEngine?.notes,
-								}),
-						]),
+					Label("engine_id", "Engine"),
+					Control(
+					{
+						type: "select",
+						name: "engine_id",
+						required: true,
+						value: gameEngine?.engine_id,
+						showEmptyOption: true,
+						options: engines.map((engine) =>
+						({
+							value: engine.id,
+							label: engine.name,
+						}))
+					}),
 				]),
 
-			ColumnLayout(options.gameEngine != null ? 2 : 1,
+				new DE("div", null,
 				[
-					options.gameEngine != null
-						? Button(
-							{
-								style: "danger",
-								extraAttributes:
-								{
-									"data-action": "delete",
-								},
-								type: "button",
-								iconName: "fa-solid fa-trash",
-								text: "Delete",
-							})
-						: null,
-				
-					Button(
+					Label("version", "Version (optional)"),
+					Control(
+					{
+						type: "text",
+						name: "version",
+						required: false,
+						placeholder: "Version",
+						value: gameEngine?.version,
+					}),
+				]),
+
+				new DE("div", null,
+				[
+					Label("notes", "Notes (optional)"),
+					Control(
+					{
+						type: "text",
+						name: "notes",
+						required: false,
+						placeholder: "Notes",
+						value: gameEngine?.notes,
+					}),
+				]),
+			]),
+
+			ColumnLayout(gameEngine != null ? 2 : 1,
+			[
+				gameEngine != null
+					? Button(
+					{
+						style: "danger",
+						extraAttributes:
 						{
-							style: "success",
-							type: "submit",
-							extraAttributes:
-							{
-								"data-action": "save",
-							},
-							iconName: options.gameEngine == null ? "fa-solid fa-plus" : "fa-solid fa-save",
-							text: options.gameEngine == null ? "Create" : "Save",
-						}),
-				]),
+							"data-action": "delete",
+						},
+						type: "button",
+						iconName: "fa-solid fa-trash",
+						text: "Delete",
+					})
+					: null,
+			
+				Button(
+				{
+					style: "success",
+					type: "submit",
+					extraAttributes:
+					{
+						"data-action": "save",
+					},
+					iconName: gameEngine == null
+						? "fa-solid fa-plus"
+						: "fa-solid fa-save",
+					text: gameEngine == null
+						? "Create"
+						: "Save",
+				}),
+			]),
 		]);
 }
