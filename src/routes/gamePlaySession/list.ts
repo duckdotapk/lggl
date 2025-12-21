@@ -61,7 +61,6 @@ export const route: Fritter.RouterMiddleware.Route<RouteFritterContext> =
 				},
 				include:
 				{
-					gamePlayAction: true,
 					platform: true,
 				},
 				orderBy:

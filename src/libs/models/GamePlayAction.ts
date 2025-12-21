@@ -149,7 +149,6 @@ export async function execute(gamePlayAction: ExecuteGamePlayAction, settings: S
 			data:
 			{
 				game_id: gamePlayAction.game.id,
-				gamePlayAction_id: gamePlayAction.id,
 				platform_id: LGGL_CURRENT_PLATFORM_ID,
 			},
 		});

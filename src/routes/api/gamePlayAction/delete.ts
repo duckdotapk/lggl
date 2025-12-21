@@ -40,18 +40,6 @@ export const route = FritterApiUtilities.createEndpointRoute<RouteFritterContext
 			await prismaClient.$transaction(
 				async (transactionClient) =>
 				{
-					await transactionClient.gamePlaySession.updateMany(
-						{
-							where:
-							{
-								gamePlayAction_id: requestBody.id,
-							},
-							data:
-							{
-								gamePlayAction_id: null,
-							},
-						});
-
 					await transactionClient.gamePlayAction.delete(
 						{
 							where:
