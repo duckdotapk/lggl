@@ -8,7 +8,23 @@ import path from "node:path";
 import { GameAchievementSupport, GameCompletionStatus, GameControllerSupport, GameLogoImageAlignment, GameLogoImageJustification, GameModSupport, GameProgressionType, GameSteamDeckCompatibility, GameVirtualRealitySupport, Prisma } from "@prisma/client";
 import { z } from "zod";
 
-import { CompletionStatusGameGroupManager, CreatedDateGameGroupManager, DeveloperGameGroupManager, EngineGameGroupManager, FirstCompletedDateGameGroupManager, FirstPlayedDateGameGroupManager, LastPlayedDateGameGroupManager, NameGameGroupManager, PlayTimeTotalSecondsGameGroupManager, PublisherGameGroupManager, PurchaseDateGameGroupManager, SeriesGameGroupManager, SteamDeckCompatibilityGameGroupManager } from "../../classes/GameGroupManager.js";
+import
+{
+	CompletionStatusGameGroupManager,
+	CreatedDateGameGroupManager,
+	DeveloperGameGroupManager,
+	EngineGameGroupManager,
+	FirstCompletedDateGameGroupManager,
+	FirstPlayedDateGameGroupManager,
+	InstalledGameGroupManager,
+	LastPlayedDateGameGroupManager,
+	NameGameGroupManager,
+	PlayTimeTotalSecondsGameGroupManager,
+	PublisherGameGroupManager,
+	PurchaseDateGameGroupManager,
+	SeriesGameGroupManager,
+	SteamDeckCompatibilityGameGroupManager,
+} from "../../classes/GameGroupManager.js";
 
 import { LGGL_DATA_DIRECTORY } from "../../env/LGGL_DATA_DIRECTORY.js";
 
@@ -154,6 +170,9 @@ export async function createGroupManager(transactionClient: Prisma.TransactionCl
 
 		case "firstPlayedDate":
 			return new FirstPlayedDateGameGroupManager(settings, games, selectedGame);
+
+		case "installed":
+			return new InstalledGameGroupManager(settings, games, selectedGame);
 
 		case "lastPlayedDate":
 			return new LastPlayedDateGameGroupManager(settings, games, selectedGame);

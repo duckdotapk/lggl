@@ -464,6 +464,45 @@ export class FirstPlayedDateGameGroupManager extends GameGroupManager
 	}
 }
 
+export type InstalledGameGroupManagerGame = Prisma.GameGetPayload<
+{
+	include:
+	{
+		gameInstallations: true;
+	};
+}>;
+
+export class InstalledGameGroupManager extends GameGroupManager<InstalledGameGroupManagerGame>
+{
+	override sortModels(games: GameGroupManagerGame[])
+	{
+		return games.toSorted((a, b) =>
+		{
+			return a.sortName.localeCompare(b.sortName);
+		});
+	}
+
+	override groupModels(games: GameGroupManagerGame[])
+	{
+		this.addGroup("Installed", 1);
+		this.addGroup("Not Installed", 0);
+
+		for (const game of games)
+		{
+			if (game.gameInstallations.length > 0)
+			{
+				this.addModelToGroup("Installed", game);
+			}
+			else
+			{
+				this.addModelToGroup("Not Installed", game);
+			}
+		}
+
+		return Array.from(this.groupsByName.values());
+	}
+}
+
 export class LastPlayedDateGameGroupManager extends GameGroupManager
 {
 	override getItemInfo(game: GameGroupManagerGame)

@@ -196,6 +196,7 @@ const gameGroupModeNames: Record<SettingSchemaLib.GameGroupMode, string> =
 	engine: "Engine",
 	firstCompletedDate: "First completed date",
 	firstPlayedDate: "First played date",
+	installed: "Installed",
 	lastPlayedDate: "Last played date",
 	name: "Name",
 	playTime: "Play time",
