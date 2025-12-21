@@ -10,11 +10,9 @@ model GamePlaySession {
     isHistorical    Boolean  @default(false)
     notes           String?
 
-    game_id           Int
-    gamePlayAction_id Int?
-    platform_id       Int
+    game_id     Int
+    platform_id Int
 
-    game           Game            @relation(fields: [game_id], references: [id])
-    gamePlayAction GamePlayAction? @relation(fields: [gamePlayAction_id], references: [id])
-    platform       Platform        @relation(fields: [platform_id], references: [id])
+    game     Game     @relation(fields: [game_id], references: [id])
+    platform Platform @relation(fields: [platform_id], references: [id])
 }
